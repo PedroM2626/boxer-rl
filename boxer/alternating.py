@@ -44,6 +44,10 @@ def _parse_args(argv=None) -> argparse.Namespace:
     parser.add_argument("--opponent", default="passive",
                         help="who the corners fight in iteration 0, before the other "
                              "net exists; 'passive', 'jabber', or a checkpoint dir")
+    parser.add_argument("--seed-checkpoint", type=Path, default=None,
+                        help="weights each corner starts from, instead of a random "
+                             "net. Without it a league seeded against a trained "
+                             "opponent spends iteration 0 being beaten up")
     parser.add_argument("--worlds", type=int, default=64)
     parser.add_argument("--batch-size", type=int, default=4096)
     parser.add_argument("--num-minibatches", type=int, default=8)
@@ -79,6 +83,10 @@ def command(args: argparse.Namespace, side: str, iteration: int) -> list[str]:
         "--episode-length", str(args.episode_length),
         "--output", str(directory),
     ]
+    if args.seed_checkpoint is not None:
+        # boxer.train keeps the corner's own weights if it already has them, so
+        # the seed only ever lands on a corner that has never trained.
+        argv += ["--init-from", str(args.seed_checkpoint)]
     # Passing --resume with nothing to resume would abort inside orbax, and
     # iteration 0 of a fresh league is exactly that case.
     return argv + ["--resume"] if latest_steps(directory) else argv

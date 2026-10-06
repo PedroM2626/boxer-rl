@@ -18,9 +18,11 @@ cd "$PROJECT"
 FROZEN=runs/frozen/checkpoint
 SELFPLAY=runs/selfplay/checkpoint
 
+ROUNDS="${ROUNDS:-64}"
+
 run() {
-  echo "=== $1 vs $2 ==="
-  "$PY" -u -m boxer.arena "$1" "$2" --rounds 64 --length 300 2>&1 |
+  echo "=== $1 vs $2 ($ROUNDS rounds) ==="
+  "$PY" -u -m boxer.arena "$1" "$2" --rounds "$ROUNDS" --length 300 2>&1 |
     grep -E "a_win|b_win|draw|undecided|round_seconds|hits|heads|damage"
 }
 

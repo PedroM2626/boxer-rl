@@ -76,6 +76,9 @@ def _parse_args(argv=None) -> argparse.Namespace:
     run.add_argument("--output", type=Path, default=Path("runs/boxer"))
     run.add_argument("--resume", action="store_true",
                      help="continue from the checkpoint in --output")
+    run.add_argument("--init-from", type=Path, default=None,
+                     help="checkpoint to take weights from when --output has none, "
+                          "e.g. starting a league corner from the frozen arm's net")
 
     env = parser.add_argument_group("environment")
     env.add_argument("--n-frames", type=int, default=5,
@@ -112,6 +115,42 @@ def _parse_args(argv=None) -> argparse.Namespace:
                            help="also run Brax's in-loop evaluator each point")
     ppo_group.add_argument("--num-eval-envs", type=int, default=64)
     return parser.parse_args(argv)
+
+
+def _latest_step(root: Path) -> Path | None:
+    """The newest orbax step directory under ``root``, or None if there is none."""
+    if not root.is_dir():
+        return None
+    steps = sorted(p for p in root.iterdir() if p.is_dir() and p.name.isdigit())
+    return steps[-1] if steps else None
+
+
+def _restore_path(args: argparse.Namespace, checkpoint: Path) -> str | None:
+    """Which checkpoint Brax should load weights from, or None to start random.
+
+    Brax reloads the normaliser and both networks here, but reinitialises the
+    optimizer and restarts ``env_steps`` at zero, so ``--init-from`` is a weight
+    transplant rather than a continuation -- which is what seeding a league corner
+    from another corner's net needs. A run that already has its own weights keeps
+    them, because resetting a corner to the seed every iteration would make the
+    league loop train the same few steps for ever.
+    """
+    if args.resume:
+        own = _latest_step(checkpoint)
+        if own is None:
+            raise SystemExit(f"--resume: no orbax step directory under {checkpoint}")
+        return str(own)
+    if args.init_from is None:
+        return None
+    own = _latest_step(checkpoint)
+    if own:
+        print(f"{checkpoint} already has weights; continuing it instead of "
+              f"transplanting {args.init_from}", flush=True)
+        return str(own)
+    seed = _latest_step(args.init_from) or _latest_step(args.init_from / "checkpoint")
+    if seed is None:
+        raise SystemExit(f"--init-from {args.init_from} holds no orbax step directory")
+    return str(seed)
 
 
 def main(argv=None) -> int:
@@ -217,10 +256,10 @@ def main(argv=None) -> int:
         save_checkpoint_path=str(checkpoint),
         # Brax hands this straight to orbax's metadata reader, which cannot point
         # at a checkpoint root -- it raises "No structure could be identified for
-        # the checkpoint" -- so name the newest step directory instead.
-        restore_checkpoint_path=(
-            str(policy_module.resolve_checkpoint(checkpoint)) if args.resume else None
-        ),
+        # the checkpoint" -- so name the newest step directory instead. Resuming
+        # wins over --init-from: a corner that already has weights should continue
+        # with its own rather than be reset to the seed.
+        restore_checkpoint_path=_restore_path(args, checkpoint),
     )
     del make_inference_fn, params, metrics
 

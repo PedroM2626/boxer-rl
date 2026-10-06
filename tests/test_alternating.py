@@ -62,6 +62,17 @@ def test_roster_reports_the_newest_step_of_each_corner(tmp_path):
     assert league[1]["steps"] is None
 
 
+def test_a_seed_checkpoint_is_offered_to_every_untrained_corner(args, tmp_path):
+    """Without weights of its own, a corner fighting a trained boxer just loses."""
+    argv = alternating.command(args, "red", 0)
+    assert "--init-from" not in argv
+    seeded = alternating._parse_args([
+        "--output", str(tmp_path), "--seed-checkpoint", str(tmp_path / "frozen"),
+    ])
+    argv = alternating.command(seeded, "red", 0)
+    assert argv[argv.index("--init-from") + 1] == str(tmp_path / "frozen")
+
+
 def test_main_refuses_a_batch_that_cannot_split_across_learners(tmp_path):
     argv = ["--output", str(tmp_path), "--worlds", "6", "--batch-size", "16",
             "--num-minibatches", "2", "--dry-run"]
