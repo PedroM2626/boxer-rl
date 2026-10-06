@@ -46,6 +46,23 @@ def test_a_corner_that_already_has_weights_keeps_them(tmp_path, capsys):
     assert "already has weights" in capsys.readouterr().out
 
 
+def test_a_relative_seed_is_resolved(tmp_path, monkeypatch):
+    """orbax refuses a relative directory, and callers type relative paths.
+
+    This is the failure mode that killed the first league run: the seed resolved
+    fine as a step directory and then died inside orbax, hours of compile away
+    from any training step.
+    """
+    _seed(tmp_path / "donor", "0000000300")
+    monkeypatch.chdir(tmp_path)
+    args = train._parse_args(["--output", "learner", "--init-from", "donor/checkpoint"])
+    path = train._restore_path(args, tmp_path / "learner" / "checkpoint")
+    assert path.endswith("0000000300")
+    # Windows keeps the drive letter in os.path.isabs, so compare to the resolved
+    # form instead of asking what a POSIX absolute path looks like.
+    assert path == str((tmp_path / "donor" / "checkpoint" / "0000000300").resolve())
+
+
 def test_resume_without_a_checkpoint_fails_loudly(tmp_path):
     args = train._parse_args(["--output", str(tmp_path), "--resume"])
     with pytest.raises(SystemExit):

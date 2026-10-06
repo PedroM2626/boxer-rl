@@ -139,18 +139,21 @@ def _restore_path(args: argparse.Namespace, checkpoint: Path) -> str | None:
         own = _latest_step(checkpoint)
         if own is None:
             raise SystemExit(f"--resume: no orbax step directory under {checkpoint}")
-        return str(own)
+        return str(own.resolve())
     if args.init_from is None:
         return None
     own = _latest_step(checkpoint)
     if own:
         print(f"{checkpoint} already has weights; continuing it instead of "
               f"transplanting {args.init_from}", flush=True)
-        return str(own)
+        return str(own.resolve())
     seed = _latest_step(args.init_from) or _latest_step(args.init_from / "checkpoint")
     if seed is None:
         raise SystemExit(f"--init-from {args.init_from} holds no orbax step directory")
-    return str(seed)
+    # orbax rejects a relative directory outright -- "Checkpoint path should be
+    # absolute" -- and every caller passes a run directory a person typed, so
+    # resolve here rather than at each call site.
+    return str(seed.resolve())
 
 
 def main(argv=None) -> int:
