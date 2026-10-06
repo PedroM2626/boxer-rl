@@ -1,0 +1,7 @@
+# The WSL scripts and the setup tool are executed by bash inside Linux, where a
+# trailing CR is a syntax error, so the working copy must stay LF regardless of
+# whatever core.autocrlf the cloning machine has set.
+* text=auto eol=lf
+*.png binary
+*.mp4 binary
+*.html -text

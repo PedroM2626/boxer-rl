@@ -1,0 +1,12 @@
+# CPU wheels, for developing and testing on any platform.
+# For GPU training install `jax[cuda12]` in place of `jax[cpu]` (Linux or WSL2;
+# jaxlib has no CUDA build for native Windows).
+jax[cpu]>=0.11
+brax>=0.14
+mujoco>=3.14
+mujoco-menagerie>=2026.9
+numpy>=2.0
+imageio[ffmpeg]>=2.34
+
+# development
+pytest>=8.0
