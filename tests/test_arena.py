@@ -62,10 +62,38 @@ def test_play_reports_a_probability_distribution(level):
     assert set(result) == {
         "a_win", "b_win", "draw", "undecided", "round_seconds",
         "hits_per_round", "heads_per_round", "damage_per_round",
+        "a_hits_per_round", "b_hits_per_round",
+        "a_heads_per_round", "b_heads_per_round",
     }
     total = result["a_win"] + result["b_win"] + result["draw"] + result["undecided"]
     assert total == pytest.approx(1.0, abs=1e-6)
     assert all(np.isfinite(list(result.values())))
+
+
+def test_corner_attribution_adds_up_to_the_pooled_mean(level):
+    """The per-corner counts must be the two halves the pooled mean averages.
+
+    A win is attributed by the pooled mean alone, so a boxer that only falls on
+    top of the other one looks like a puncher. Splitting by corner is the only
+    way to tell those apart, and the split has to be consistent with the mean.
+    """
+    jab = policy.jabber(
+        level.action_size,
+        pitch_adr=level.actuator_index("red/left_shoulder_pitch_joint"),
+        roll_adr=level.actuator_index("red/left_shoulder_roll_joint"),
+    )
+    passive = policy.passive(level.action_size)
+    result = arena.play(level, jab, passive, rounds=4, length=60, seed=2)
+    assert result["a_hits_per_round"] + result["b_hits_per_round"] == pytest.approx(
+        2 * result["hits_per_round"], abs=1e-5
+    )
+    assert result["a_heads_per_round"] + result["b_heads_per_round"] == pytest.approx(
+        2 * result["heads_per_round"], abs=1e-5
+    )
+    assert result["a_hits_per_round"] >= result["b_hits_per_round"], (
+        "the jabber attacks and the statue does not, so the attacker should land"
+        " at least as many gated punches"
+    )
 
 
 def test_two_boxers_holding_guard_never_trade_punches(level):
@@ -73,6 +101,8 @@ def test_two_boxers_holding_guard_never_trade_punches(level):
     passive = policy.passive(level.action_size)
     result = arena.play(level, passive, passive, rounds=8, length=40, seed=3)
     assert result["hits_per_round"] == 0.0
+    assert result["a_hits_per_round"] == 0.0
+    assert result["b_hits_per_round"] == 0.0
     assert result["damage_per_round"] == 0.0
     assert result["undecided"] == 1.0, "holding the guard should not end the round"
 

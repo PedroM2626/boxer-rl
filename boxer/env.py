@@ -578,6 +578,13 @@ class BoxingEnv(env_base.PipelineEnv):
             "hits_landed": jp.mean(jp.stack([p["landed_hits"] for p in parts])),
             "contacts": jp.mean(jp.stack([p["contacts"] for p in parts])),
             "head_shots": jp.mean(jp.stack([p["head_shots"] for p in parts])),
+            # Per corner as well as pooled: "who won because they punched" cannot
+            # be answered by the mean of two boxers, and the mean is what the
+            # arena would otherwise report.
+            "hits_red": parts[0]["landed_hits"],
+            "hits_blue": parts[1]["landed_hits"],
+            "heads_red": parts[0]["head_shots"],
+            "heads_blue": parts[1]["head_shots"],
             "knockout": jp.max(down) * (1.0 - jp.min(down)),
             "down_red": down[0],
             "down_blue": down[1],
@@ -601,7 +608,8 @@ class BoxingEnv(env_base.PipelineEnv):
             name: jp.float32(0.0)
             for name in (
                 "upright", "guard", "strike", "damage", "damage_taken",
-                "hits_landed", "contacts", "head_shots", "knockout", "down_red",
+                "hits_landed", "contacts", "head_shots", "hits_red", "hits_blue",
+                "heads_red", "heads_blue", "knockout", "down_red",
                 "down_blue", "ring_out", "distance",
             )
         }

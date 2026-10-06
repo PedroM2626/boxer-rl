@@ -21,7 +21,7 @@ SELFPLAY=runs/selfplay/checkpoint
 run() {
   echo "=== $1 vs $2 ==="
   "$PY" -u -m boxer.arena "$1" "$2" --rounds 64 --length 300 2>&1 |
-    grep -E "a_win|b_win|draw|undecided|round_seconds|hits_per_round|heads_per_round|damage_per_round"
+    grep -E "a_win|b_win|draw|undecided|round_seconds|hits|heads|damage"
 }
 
 run "$FROZEN" passive

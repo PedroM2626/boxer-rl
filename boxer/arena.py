@@ -92,10 +92,12 @@ def play(
         state, key = step(state, key)
         m = state.metrics
         return state, (state.done, m["down_red"], m["down_blue"],
-                       m["hits_landed"], m["head_shots"], m["damage"])
+                       m["hits_landed"], m["head_shots"], m["damage"],
+                       m["hits_red"], m["hits_blue"], m["heads_red"], m["heads_blue"])
 
     _, logged = jax.lax.scan(body, states, jax.random.split(jax.random.PRNGKey(seed + 1), length))
-    done, down_red, down_blue, hits, heads, damage = (np.asarray(x) for x in logged)
+    (done, down_red, down_blue, hits, heads, damage, hits_red, hits_blue,
+     heads_red, heads_blue) = (np.asarray(x) for x in logged)
 
     a_win, b_win, draw, finished, last_step = outcomes(done, down_red, down_blue, length)
     survived = np.where(finished, last_step + 1, length)
@@ -109,6 +111,14 @@ def play(
         "hits_per_round": float(hits.sum(axis=0).mean()),
         "heads_per_round": float(heads.sum(axis=0).mean()),
         "damage_per_round": float(damage.sum(axis=0).mean()),
+        # A is always red inside a single roll, so the pooled means above say how
+        # much boxing happened but not by whom -- and "won because he punched"
+        # versus "won because he fell on top of the other one" is the whole
+        # question this arena exists to answer.
+        "a_hits_per_round": float(hits_red.sum(axis=0).mean()),
+        "b_hits_per_round": float(hits_blue.sum(axis=0).mean()),
+        "a_heads_per_round": float(heads_red.sum(axis=0).mean()),
+        "b_heads_per_round": float(heads_blue.sum(axis=0).mean()),
     }
 
 
@@ -132,15 +142,18 @@ def matchup(
     if not swap_sides:
         return forward
 
-    # Roles exchanged: now A is blue, so the reported win counts are flipped.
+    # Roles exchanged: now A is blue, so every per-corner count flips corners
+    # before the halves are pooled.
     reverse = play(env, b, a, rounds, length, seed + 10_000)
     pooled = {}
-    for key in forward:
-        if key.endswith("_win"):
-            who = "a_win" if key == "b_win" else "b_win" if key == "a_win" else key
-            pooled[key] = 0.5 * (forward[key] + reverse[who])
+    for key, value in forward.items():
+        if key.startswith("a_"):
+            other = "b_" + key[2:]
+        elif key.startswith("b_"):
+            other = "a_" + key[2:]
         else:
-            pooled[key] = 0.5 * (forward[key] + reverse[key])
+            other = key
+        pooled[key] = 0.5 * (value + reverse[other])
     return pooled
 
 
