@@ -38,6 +38,42 @@ Two things worth reading off this table:
   on rematerialization, so 256 worlds is the setting that actually runs here.
   Raise it on a bigger card.
 
+### The two modes, at equal physics
+
+Both arms saw **12.45M world steps** with 256 worlds (`frozen` counts one learner
+per world and stopped at 12,451,840 learner steps; `selfplay` counts two and
+stopped at 24,903,680 -- the same simulated sparring). 64 arena rounds per cell,
+corners exchanged and the halves pooled. `hits`/`heads` are gated punches per
+round averaged over **both** boxers, so they say how much boxing happened, not
+who did it.
+
+| A vs B | A win | B win | round | hits/round | heads/round |
+| --- | --- | --- | --- | --- | --- |
+| frozen × passive | **0.641** | 0.328 | 1.10 s | 0.685 | 0.245 |
+| frozen × jabber | **0.602** | 0.359 | 1.07 s | 0.971 | 0.238 |
+| selfplay × passive | **0.141** | 0.844 | 0.80 s | 0.222 | 0.054 |
+| selfplay × jabber | **0.062** | 0.922 | 0.79 s | 0.424 | 0.022 |
+| frozen × selfplay | **0.898** | 0.086 | 0.79 s | 0.521 | 0.023 |
+
+So, in order of how much it cost to find out:
+
+- **Symmetric self-play at this budget is worse than not training.** A policy
+  that never learns anything (`passive`) beats the 12.45M-world-step self-play
+  policy in 84% of rounds. The frozen arm beats that same policy in 90%.
+- **The collapse is not caused by the opponent moving.** In the frozen arm the
+  opponent is a statue by construction and the learner still fell in 80% of
+  rounds at 0.65M steps. It recovered to 45% by 12.45M, which is the one piece of
+  good news here.
+- **Neither arm boxes well yet.** Rounds last ~1 s and fewer than one gated punch
+  lands per round per boxer, counting both corners together. `frozen` wins mostly
+  by *not being knocked down*, and no measurement yet proves it punches more than
+  its opponent does -- that attribution is the `a_hits`/`b_hits` split, added to
+  the arena after these numbers were taken.
+
+Falsified on the way: that the early `kl_mean` of 5.46 signalled an exploding
+value function. It is a first-eval transient -- the same run reports 0.005 by
+12.45M steps, with no change to `reward_scaling` or the advantage normaliser.
+
 
 ## Why this robot model
 
