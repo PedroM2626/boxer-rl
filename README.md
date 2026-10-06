@@ -43,32 +43,43 @@ Two things worth reading off this table:
 Both arms saw **12.45M world steps** with 256 worlds (`frozen` counts one learner
 per world and stopped at 12,451,840 learner steps; `selfplay` counts two and
 stopped at 24,903,680 -- the same simulated sparring). 64 arena rounds per cell,
-corners exchanged and the halves pooled. `hits`/`heads` are gated punches per
-round averaged over **both** boxers, so they say how much boxing happened, not
-who did it.
+corners exchanged and the halves pooled. `A hits`/`B hits` are gated punches the
+named corner landed in a round, so the two columns are the question the pooled
+mean could not answer.
 
-| A vs B | A win | B win | round | hits/round | heads/round |
-| --- | --- | --- | --- | --- | --- |
-| frozen × passive | **0.641** | 0.328 | 1.10 s | 0.685 | 0.245 |
-| frozen × jabber | **0.602** | 0.359 | 1.07 s | 0.971 | 0.238 |
-| selfplay × passive | **0.141** | 0.844 | 0.80 s | 0.222 | 0.054 |
-| selfplay × jabber | **0.062** | 0.922 | 0.79 s | 0.424 | 0.022 |
-| frozen × selfplay | **0.898** | 0.086 | 0.79 s | 0.521 | 0.023 |
+| A vs B | A win | B win | round | A hits | B hits | A heads | B heads |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| frozen × passive | **0.641** | 0.320 | 1.10 s | 1.55 | 0.06 | 0.49 | 0.00 |
+| frozen × jabber | **0.609** | 0.352 | 1.07 s | 2.28 | 0.12 | 0.56 | 0.00 |
+| selfplay × passive | **0.125** | 0.852 | 0.79 s | 0.68 | 0.00 | 0.07 | 0.00 |
+| selfplay × jabber | **0.086** | 0.898 | 0.79 s | 1.03 | 0.00 | 0.06 | 0.00 |
+| frozen × selfplay | **0.922** | 0.070 | 0.79 s | 0.54 | 0.47 | 0.13 | 0.00 |
 
-So, in order of how much it cost to find out:
+The attribution reorders the diagnosis:
 
-- **Symmetric self-play at this budget is worse than not training.** A policy
-  that never learns anything (`passive`) beats the 12.45M-world-step self-play
-  policy in 84% of rounds. The frozen arm beats that same policy in 90%.
-- **The collapse is not caused by the opponent moving.** In the frozen arm the
-  opponent is a statue by construction and the learner still fell in 80% of
-  rounds at 0.65M steps. It recovered to 45% by 12.45M, which is the one piece of
-  good news here.
-- **Neither arm boxes well yet.** Rounds last ~1 s and fewer than one gated punch
-  lands per round per boxer, counting both corners together. `frozen` wins mostly
-  by *not being knocked down*, and no measurement yet proves it punches more than
-  its opponent does -- that attribution is the `a_hits`/`b_hits` split, added to
-  the arena after these numbers were taken.
+- **The frozen arm really does box.** It lands 1.55 punches a round against a
+  statue that lands 0.06, and 0.49 of them on the head. Willingness to attack is
+  not what separates it from the scripted opponents.
+- **The self-play arm is not lazy either.** It lands 0.68 punches a round where
+  the statue lands none -- and still loses 85% of rounds. It is out-punching its
+  opponent and losing anyway.
+- **What separates the two trained modes is durability, not offence.** Head to
+  head they land 0.54 vs 0.47 gated punches -- the same amount of boxing -- while
+  the frozen arm wins 92% of rounds. Its rounds also last 0.79 s against 1.10 s
+  when it boxes a statue, so the short rounds are the self-play policy falling
+  over, not the exchange ending.
+- **Symmetric self-play at this budget is worse than not training at all:** the
+  statue beats it in 85% of rounds. The collapse is therefore not the opponent
+  moving -- the frozen arm fell in 80% of rounds against a statue at 0.65M steps
+  and only recovered to 45% by 12.45M. It is the learner's own balance term
+  losing to the lunge.
+
+Read the ordering, not the decimals. Two runs of these same cells, same seeds and
+same checkpoints, differed by up to 0.11 in win rate and by 0.222 vs 0.339 in the
+selfplay-vs-statue pooled hits: XLA picks different reduction schedules between
+compilations, and the commitment gate is a threshold, so a whole substep of
+contacts can flip. At 64 rounds per cell that is the noise floor; the decisive
+cells want `--rounds 256` at least.
 
 Falsified on the way: that the early `kl_mean` of 5.46 signalled an exploding
 value function. It is a first-eval transient -- the same run reports 0.005 by
@@ -261,6 +272,13 @@ under `runs/boxer/` is the attempt to reach standing-and-punching behaviour.
 
 ## What is honest here
 
+- **Arena numbers at 64 rounds have a real noise floor.** Two runs of the same
+  cells, same seeds and same checkpoints, differed by up to 0.11 in win rate and
+  by more than 50% in the selfplay-vs-statue pooled hits. XLA chooses different
+  reduction schedules between compilations and the commitment gate is a
+  threshold, so a whole substep of contacts can flip. Read the ordering in the
+  comparison table, not the decimals, and raise `--rounds` before quoting a
+  number.
 - **Brax 0.14 warns that its own System, pipelines and environments are no
   longer actively maintained** and points at MJX. This project takes that
   advice: physics is MJX, and Brax contributes the env API and the PPO trainer.
