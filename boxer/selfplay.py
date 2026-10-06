@@ -189,6 +189,13 @@ class FrozenOpponent(Wrapper):
         return self.env.observation_size
 
     def _project(self, state: State) -> State:
+        # Brax hands the state this returns straight back into the next step, and
+        # the opponent needs the *other* corner's observation, so the full
+        # per-agent obs travels along in info. Projecting it away made the second
+        # step index a 2-D array as if it still had the agent axis, which silently
+        # worked for an opponent that only reads ``obs.shape[0]`` -- like
+        # ``passive`` -- and exploded for one that reads its observation.
+        state = state.replace(info={**state.info, "both_obs": state.obs})
         return state.replace(
             obs=state.obs[:, self._side],
             reward=state.reward[:, self._side],
@@ -199,7 +206,7 @@ class FrozenOpponent(Wrapper):
 
     def step(self, state: State, action: jax.Array) -> State:
         opponent_action = self._opponent(
-            state.obs[:, 1 - self._side], state.pipeline_state.time, None
+            state.info["both_obs"][:, 1 - self._side], state.pipeline_state.time, None
         )
         order = [action, opponent_action] if self._side == 0 else [opponent_action, action]
         return self._project(self.env.step(state, jp.stack(order, axis=1)))

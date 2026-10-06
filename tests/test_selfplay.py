@@ -156,6 +156,33 @@ def test_frozen_opponent_actually_moves(frozen, level):
     assert held.max() < moved.max(), "the learner's own corner must not be driven"
 
 
+def test_frozen_opponent_receives_its_own_observation_vector(level):
+    """An opponent that reads its observation must get a (worlds, D) slice.
+
+    The wrapper projects the learner's corner out, and Brax hands that projected
+    state straight back into the next step -- so the second step onward used to
+    slice an already-projected array and hand the opponent a (worlds,) vector.
+    Scripted opponents never noticed because they only read ``obs.shape[0]``; a
+    trained checkpoint subtracts its observation normaliser and died.
+    """
+    seen = []
+
+    def opponent(obs, time, key):
+        seen.append(tuple(obs.shape))
+        return 0.05 * jp.clip(obs[:, :level.action_size], -1.0, 1.0)
+
+    worlds = 4
+    env = selfplay.wrap_frozen(level, opponent, episode_length=500, learner_side=0)
+    state = jax.jit(env.reset)(_keys(worlds, 12))
+    step = jax.jit(env.step)
+    for _ in range(3):
+        state = step(state, jp.zeros((worlds, level.action_size)))
+
+    assert seen, "the opponent was never asked to act"
+    assert seen[0] == (worlds, level.observation_size)
+    assert np.asarray(state.obs).shape == (worlds, level.observation_size)
+
+
 def test_frozen_mode_keeps_per_side_reward_bookkeeping(frozen):
     worlds = 4
     state = jax.jit(frozen.reset)(_keys(worlds, 9))
