@@ -121,6 +121,68 @@ def test_a_moving_fist_that_connects_scores(level):
     assert scored, "a swinging fist that reaches the opponent should land a punch"
 
 
+def test_a_fast_fist_travelling_away_from_the_opponent_is_not_a_punch(level):
+    """The gate's third condition, added after watching a trained policy.
+
+    Rendered rollout: the boxer topples forward with its arm over the opponent's
+    chest. It is upright enough, and its fist is fast relative to its own torso,
+    so both older conditions pass and the collapse scores as a punch. Direction
+    is the only thing that separates throwing from falling forward, so the gate
+    has to require the fist to be closing on a target.
+    """
+    state = level.reset(jax.random.PRNGKey(3))
+    me = level._frame(state.pipeline_state, scene.RED)
+    foe = level._frame(state.pipeline_state, scene.BLUE)
+    assert float(level._committed(me, foe)) == 0.0, "nothing is moving at reset"
+
+    toward = foe["torso"] - me["torso"]
+    toward = toward / jp.linalg.norm(toward)
+
+    retract = dict(me, left_palm_vel=me["torso_vel"] - 5.0 * toward)
+    assert float(level._committed(retract, foe)) == 0.0, (
+        "a fist moving at 5 m/s away from the opponent is not a punch"
+    )
+
+    jab = dict(me, left_palm_vel=me["torso_vel"] + 5.0 * toward)
+    assert float(level._committed(jab, foe)) > 0.5, (
+        "the same speed aimed at the opponent should read as a punch"
+    )
+
+
+def test_fighting_distance_only_pays_an_upright_boxer(level):
+    """The range term used to pay a boxer for collapsing into its opponent.
+
+    It was multiplied by ``alive``, so the reward for standing at punching range
+    was still collected on the way down and diving paid better than boxing. The
+    torso quaternion *sensor* is rewritten here, not the joint state, so head
+    height, distance and "alive" stay identical between the two evaluations and
+    posture is the only thing that can move the number.
+    """
+    def reward_at(roll: float):
+        state = level.reset(jax.random.PRNGKey(5))
+        pipeline = state.pipeline_state
+        adr = level._sensor_adr["red/torso_quat"]
+        half = roll / 2.0
+        data = pipeline.sensordata.at[adr:adr + 4].set(
+            jp.array([jp.cos(half), 0.0, jp.sin(half), 0.0])
+        )
+        pipeline = pipeline.replace(sensordata=data)
+        reward, parts = level._reward(
+            pipeline, scene.RED, scene.BLUE, jp.zeros(level.action_size),
+            level._contact_damage(pipeline),
+        )
+        return float(reward), float(parts["upright"]), float(parts["distance"])
+
+    standing, upright_standing, gap = reward_at(0.0)
+    tipped, upright_tipped, gap_after = reward_at(jp.pi / 2.0)
+    assert upright_standing > 0.99 and upright_tipped < 0.01
+    assert gap == pytest.approx(gap_after), "posture must not move the boxers"
+    assert standing - tipped > 0.5, (
+        f"tipping over at fighting distance must cost real reward, got "
+        f"{standing:.2f} upright against {tipped:.2f} sideways"
+    )
+
+
 def test_contact_slot_mapping_is_static(level):
     """Guards the optimisation that folds per-geom roles into per-slot constants.
 

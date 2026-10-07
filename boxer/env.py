@@ -105,14 +105,19 @@ class BoxingEnv(env_base.PipelineEnv):
         punch_speed_ref: float = 5.0,
         punch_speed_min: float = 1.0,
         w_alive: float = 0.2,
-        w_upright: float = 0.3,
+        # A round is ~50 control steps in practice, so 0.3 per step was already
+        # worth ~15 across a round when it was set -- but the knockout pays once
+        # and pays 10, and the measured behaviour is a boxer that dives at the
+        # opponent to collect it. Uprightness has to dominate a single terminal
+        # event for the collapse race to stop being the best policy.
+        w_upright: float = 0.8,
         w_range: float = 0.3,
         w_facing: float = 0.2,
         w_guard: float = 0.2,
         w_strike: float = 0.3,
         w_hit: float = 3.0,
         w_energy: float = 0.05,
-        w_ko: float = 10.0,
+        w_ko: float = 3.0,
         w_ring: float = 1.0,
     ):
         model = scene.build_model(spawn_distance=spawn_distance, visual=visual)
@@ -371,27 +376,49 @@ class BoxingEnv(env_base.PipelineEnv):
             out[f"{side}_heads"] = jp.sum(strike * slot["head"])
         return out
 
-    def _committed(self, frame: Dict[str, jax.Array]) -> jax.Array:
+    def _punch_signals(self, frame: Dict[str, jax.Array], foe: Dict[str, jax.Array]):
+        """Per-hand (torso-relative fist speed, part of it closing on a target).
+
+        Speed is measured against the striker's own torso because world-frame
+        speed cannot tell a punch from a fall. Direction is measured against the
+        *target*, which is what speed alone cannot tell a punch from a lunge: a
+        boxer falling forward carries a fast fist that is closing on nothing.
+        """
+        fists = jp.stack([frame["left_palm"], frame["right_palm"]])
+        velocity = jp.stack([frame["left_palm_vel"], frame["right_palm_vel"]])
+        relative = velocity - frame["torso_vel"]
+        targets = jp.stack([foe["head"], foe["torso"]])
+        toward = targets[None, :, :] - fists[:, None, :]
+        unit = toward / _norm(toward)[:, :, None]
+        closing = jp.max(jp.sum(unit * relative[:, None, :], axis=-1), axis=-1)
+        return _norm(relative, axis=-1), closing
+
+    def _committed(self, frame: Dict[str, jax.Array], foe: Dict[str, jax.Array]) -> jax.Array:
         """Whether this boxer is throwing a punch, as a 0..1 gate.
 
-        Two conditions, because neither alone is enough:
+        Three conditions, each one added because measurement killed the pair
+        before it:
 
-        * fist speed measured *relative to its own torso*. World-frame fist speed
-          cannot separate a punch from a fall -- a collapsing body carries both
-          fists along at several m/s.
-        * the striker still being upright. Measured: two boxers standing perfectly
-          passively drift together, topple, and register 12 "punches" a round
-          purely from the arms flailing during the collapse, with torso-relative
-          speed well over the threshold. A punch is thrown from the feet.
+        * fist speed *relative to its own torso*. World-frame fist speed cannot
+          separate a punch from a fall -- a collapsing body carries both fists
+          along at several m/s.
+        * the striker still being upright. Two boxers standing perfectly passively
+          drift together, topple, and register 12 "punches" a round purely from
+          the arms flailing during the collapse, with torso-relative speed well
+          over the threshold.
+        * the fast fist actually *closing on* the head or torso. Rendered: a
+          trained boxer falls forward with its arm over the opponent's chest,
+          which is upright enough and fast enough to pass both tests above, and
+          is not a punch. Requiring the velocity to point at a target is what
+          distinguishes throwing from toppling.
         """
-        def relative(palm_vel):
-            return _norm(palm_vel - frame["torso_vel"])
-
-        speed = jp.maximum(relative(frame["left_palm_vel"]), relative(frame["right_palm_vel"]))
+        speed, closing = self._punch_signals(frame, foe)
+        fastest = jp.max(speed)
         low, high = self._punch_speed_min, self._punch_speed_ref
-        swinging = jp.clip((speed - low) / (high - low), 0.0, 1.0)
+        swinging = jp.clip((fastest - low) / (high - low), 0.0, 1.0)
+        aim = jp.clip((jp.max(closing) / (fastest + 1e-6) - 0.5) / 0.3, 0.0, 1.0)
         upright = jp.clip((self._upright(frame) - 0.9) / 0.08, 0.0, 1.0)
-        return swinging * upright
+        return swinging * aim * upright
 
     def _reward(
         self,
@@ -421,17 +448,15 @@ class BoxingEnv(env_base.PipelineEnv):
         ])
         held = jp.clip(1.0 - _norm(hands - guard) / 0.25, 0.0, 1.0)
 
-        # Dense shaping only: pay a fist that is extending fast toward a scoring
-        # target. Speed is measured against the torso for the same reason the
-        # contact gate does it -- a falling body must not be paid for punching.
-        swing = jp.clip(
-            jp.stack([
-                _norm(me["left_palm_vel"] - me["torso_vel"]),
-                _norm(me["right_palm_vel"] - me["torso_vel"]),
-            ])
-            / self._punch_speed_ref,
-            0.0,
-            1.0,
+        # Dense shaping only: pay a fist that is extending fast *toward* a
+        # scoring target. Speed is measured against the torso for the same reason
+        # the contact gate does it -- a falling body must not be paid for
+        # punching -- and the closing term is there so a forward topple, which is
+        # fast and torso-relative too, earns nothing.
+        speed, closing = self._punch_signals(me, foe)
+        swing = (
+            jp.clip(speed / self._punch_speed_ref, 0.0, 1.0)
+            * jp.clip(closing / (speed + 1e-6), 0.0, 1.0)
         )
         fists = jp.stack([me["left_palm"], me["right_palm"]])[:, None, :]
         targets = jp.stack([foe["head"], foe["torso"]])[None, :, :]
@@ -448,8 +473,8 @@ class BoxingEnv(env_base.PipelineEnv):
         # torso contacts (measured: they drift from 1.3 m apart to 0.42 m while
         # both hold a passive guard), and without this gate those collisions are
         # indistinguishable from punches in the arena's win/hit statistics.
-        my_commitment = self._committed(me)
-        foes_commitment = self._committed(foe)
+        my_commitment = self._committed(me, foe)
+        foes_commitment = self._committed(foe, me)
         landed = damage[agent] * my_commitment
         taken = damage[1 - agent] * foes_commitment
         landed_hits = raw_landed * my_commitment
@@ -465,7 +490,11 @@ class BoxingEnv(env_base.PipelineEnv):
         reward = (
             w["alive"] * alive
             + w["upright"] * upright
-            + w["range"] * in_range * alive
+            # Being at fighting distance only pays while the boxer is upright.
+            # Multiplying by `alive` instead let a forward topple collect the
+            # range reward on the way down, which is the exact behaviour the
+            # rendered rollout showed.
+            + w["range"] * in_range * alive * upright
             + w["facing"] * facing * alive
             + w["guard"] * jp.mean(held) * alive
             + w["strike"] * strike * alive
