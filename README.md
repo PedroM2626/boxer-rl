@@ -122,8 +122,27 @@ plateaued, which means "more steps cannot help" was wrong as stated; what is sti
 that no amount of steps fixes a task whose first sub-skill is standing up, and that
 sub-skill is measured separately rather than assumed.
 
+Then the geometry was checked directly, because "nobody punches" has an obvious
+candidate explanation: the fist has to reach. `tools/gate_calibration.py` drives the
+scripted jab at a still opponent and counts contacts that happened while the punch gate
+was open: **0 in 200 steps at 1.15 m, 9 at 0.9 m, 66 at 0.7 m.** So punching is
+geometrically rare at exactly the distance the range term rewards, and the range target
+was moved to 0.7 m and retrained. That is also a null result: at 2.62M learner steps the
+0.7 m arm lands 0.20 gated punches per episode against the 0.9 m arm's 0.42, with
+contacts falling from 50 to 41. Moving the reward closer to arm's reach did not make the
+policy punch, which means the limit is not where the boxers stand but what they can do
+with their legs.
+
+The experiment designed to answer that — an opponent placed out of reach so that only
+balance, facing and guard can be earned — was first run at 2.2 m and produced episodes of
+9 steps, because the round ends when the boxers separate by more than `MAX_SEPARATION`
+(2.4 m) and spawn jitter is +/-0.12 m per boxer. It measured the separation timeout, not
+standing. Re-run at 2.0 m, where contact is still impossible and there is 0.4 m of
+headroom.
+
 Also falsified, by measurement rather than argument, while looking for the cause of the
 falls:
+
 
 - **Disabling Euler damping does not make the robot fall.** 54 steps until down with
   `mjDSBL_EULERDAMP` set and with it cleared, identically. The G1's joints carry no
