@@ -96,7 +96,13 @@ class BoxingEnv(env_base.PipelineEnv):
         n_frames: int = 5,
         backend: str = "mjx",
         visual: bool = False,
-        target_range: float = 0.9,
+        # The distance the range term rewards, set to where a punch can actually
+        # land. Measured with tools/gate_calibration.py: a scripted jab thrown at a
+        # still opponent connects 0 times in 200 steps at 1.15 m, 26 at 0.9 m and 53
+        # at 0.7 m, because the arm reaches about 0.6 m past a torso half-width. The
+        # previous 0.9 put the reward's optimum where contact-while-punching is
+        # already rare, which is one reason no mode ever learned to hit anything.
+        target_range: float = 0.7,
         ring_radius: float = scene.RING_RADIUS,
         down_up_z: float = 0.15,
         down_head_z: float = 0.55,

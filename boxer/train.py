@@ -84,7 +84,7 @@ def _parse_args(argv=None) -> argparse.Namespace:
     env.add_argument("--n-frames", type=int, default=5,
                      help="physics substeps per control step (substep is 4 ms)")
     env.add_argument("--spawn-distance", type=float, default=1.3)
-    env.add_argument("--target-range", type=float, default=0.9)
+    env.add_argument("--target-range", type=float, default=0.7)
     # Position actuators are commanded at 50 Hz. A scale of 1.0 lets one action
     # target the whole joint range, which topples the boxers within ~15 steps of
     # random exploration and leaves no signal to learn from; 0.25 keeps the
