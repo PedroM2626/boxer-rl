@@ -102,23 +102,46 @@ def play(
     a_win, b_win, draw, finished, last_step = outcomes(done, down_red, down_blue, length)
     survived = np.where(finished, last_step + 1, length)
 
+    # A diverged physics state turns one step's contact count into NaN, and the
+    # sum over the round then poisons the mean for every world -- the arena used
+    # to print "a_hits_per_round: nan" and nothing else. Keep the rounds that
+    # stayed finite and report how many were thrown away, so a missing number is
+    # visible instead of looking like a zero.
+    totals = {
+        "hits": hits.sum(axis=0), "heads": heads.sum(axis=0), "damage": damage.sum(axis=0),
+        "hits_red": hits_red.sum(axis=0), "hits_blue": hits_blue.sum(axis=0),
+        "heads_red": heads_red.sum(axis=0), "heads_blue": heads_blue.sum(axis=0),
+    }
+    finite = np.isfinite(np.stack(list(totals.values()))).all(axis=0)
+    finite &= np.isfinite(done.sum(axis=0)) & np.isfinite(down_red.sum(axis=0))
+    finite &= np.isfinite(down_blue.sum(axis=0))
+
+    a_win, b_win, draw = a_win[finite], b_win[finite], draw[finite]
+    survived = survived[finite]
+    totals = {key: values[finite] for key, values in totals.items()}
+
+    def mean(values) -> float:
+        kept = np.asarray(values)
+        return float(kept.mean()) if kept.size else float("nan")
+
     return {
-        "a_win": float(a_win.mean()),
-        "b_win": float(b_win.mean()),
-        "draw": float(draw.mean()),
-        "undecided": float(1.0 - a_win.mean() - b_win.mean() - draw.mean()),
-        "round_seconds": float(survived.mean() * float(env.dt)),
-        "hits_per_round": float(hits.sum(axis=0).mean()),
-        "heads_per_round": float(heads.sum(axis=0).mean()),
-        "damage_per_round": float(damage.sum(axis=0).mean()),
+        "a_win": mean(a_win),
+        "b_win": mean(b_win),
+        "draw": mean(draw),
+        "undecided": float(1.0 - mean(a_win) - mean(b_win) - mean(draw)),
+        "round_seconds": mean(survived) * float(env.dt),
+        "hits_per_round": mean(totals["hits"]),
+        "heads_per_round": mean(totals["heads"]),
+        "damage_per_round": mean(totals["damage"]),
         # A is always red inside a single roll, so the pooled means above say how
         # much boxing happened but not by whom -- and "won because he punched"
         # versus "won because he fell on top of the other one" is the whole
         # question this arena exists to answer.
-        "a_hits_per_round": float(hits_red.sum(axis=0).mean()),
-        "b_hits_per_round": float(hits_blue.sum(axis=0).mean()),
-        "a_heads_per_round": float(heads_red.sum(axis=0).mean()),
-        "b_heads_per_round": float(heads_blue.sum(axis=0).mean()),
+        "a_hits_per_round": mean(totals["hits_red"]),
+        "b_hits_per_round": mean(totals["hits_blue"]),
+        "a_heads_per_round": mean(totals["heads_red"]),
+        "b_heads_per_round": mean(totals["heads_blue"]),
+        "dropped_rounds": float(1.0 - finite.mean()),
     }
 
 

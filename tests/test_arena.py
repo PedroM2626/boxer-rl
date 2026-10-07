@@ -63,11 +63,12 @@ def test_play_reports_a_probability_distribution(level):
         "a_win", "b_win", "draw", "undecided", "round_seconds",
         "hits_per_round", "heads_per_round", "damage_per_round",
         "a_hits_per_round", "b_hits_per_round",
-        "a_heads_per_round", "b_heads_per_round",
+        "a_heads_per_round", "b_heads_per_round", "dropped_rounds",
     }
     total = result["a_win"] + result["b_win"] + result["draw"] + result["undecided"]
     assert total == pytest.approx(1.0, abs=1e-6)
     assert all(np.isfinite(list(result.values())))
+    assert result["dropped_rounds"] == 0.0, "a clean roll should discard nothing"
 
 
 def test_corner_attribution_adds_up_to_the_pooled_mean(level):
