@@ -204,6 +204,16 @@ parallel environments, and needs a curriculum that sorts adversarial motions by 
 the robot survives on them. That is the same failure this project is hitting, addressed
 with curriculum rather than with reward weights.
 
+The nearest thing to this project's exact premise that is open source is
+[Boxing-AI](https://github.com/JakubLeb/Boxing-AI-MAIN): a Unity / ML-Agents scene with
+**two independent agents** boxing each other, PPO, positional observations and a reward
+for landing strikes -- the same three properties this project has, and the same
+"each corner has its own network" formulation that `boxer.alternating` implements. Its
+README publishes no step count and no evaluation numbers, so nothing about its quality is
+verified here beyond that it exists and is built this way; the recollection this repo was
+written against is that it trained on the order of 200M steps and the result stayed
+mediocre, which is consistent with what the reference stacks above need just to stand.
+
 Also falsified, by measurement rather than argument, while looking for the cause of the
 falls:
 
