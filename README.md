@@ -96,6 +96,51 @@ Falsified on the way: that the early `kl_mean` of 5.46 signalled an exploding
 value function. It is a first-eval transient -- the same run reports 0.005 by
 12.45M steps, with no change to `reward_scaling` or the advantage normaliser.
 
+### Reweighting the reward changed nothing
+
+Because the diagnosis so far was "the knockout term outshouts balance", the reward was
+rescaled and retrained: `ko` 10 → 3, `upright` 0.3 → 0.8, and the range term multiplied
+by `upright` instead of `alive` so that collapsing into the opponent stops collecting the
+reward for being at fighting distance. A second arm trained under it, same opponent, same
+worlds, same batch geometry:
+
+| learner steps | arm | round | `down_red` | `down_blue` | `upright` |
+| --- | --- | --- | --- | --- | --- |
+| 0.66M | old | 50.1 | 0.80 | 0.24 | 44.4 |
+| 0.66M | rescaled | 50.7 | 0.79 | 0.23 | 44.9 |
+| 5.24M | old | 52.8 | 0.67 | 0.38 | 47.7 |
+| 5.24M | rescaled | 52.5 | 0.72 | 0.33 | 47.6 |
+| 9.83M | old | 54.9 | 0.46 | 0.59 | 50.1 |
+| 9.83M | rescaled | 55.0 | 0.47 | 0.60 | 50.3 |
+
+Null result at every matched step count. Two things follow. The first is that the shape
+of the terminal and range terms is not what keeps the boxers on the floor. The second is
+visible in the `old` column itself: `down_red` is still falling at 9.83M (0.80 → 0.46)
+while `down_blue` -- a boxer with *no policy at all* -- rises from 0.24 to 0.59, so the
+learner is getting harder to knock over and better at knocking over. The curve has not
+plateaued, which means "more steps cannot help" was wrong as stated; what is still true is
+that no amount of steps fixes a task whose first sub-skill is standing up, and that
+sub-skill is measured separately rather than assumed.
+
+Also falsified, by measurement rather than argument, while looking for the cause of the
+falls:
+
+- **Disabling Euler damping does not make the robot fall.** 54 steps until down with
+  `mjDSBL_EULERDAMP` set and with it cleared, identically. The G1's joints carry no
+  `damping` at all -- only `frictionloss` and `armature` -- so the flag has nothing to act
+  on; the actuator's own `kv` is the only velocity feedback in the model.
+- **The centre of mass is inside the feet in every stance** (`tools/com_check.py`): 7.0 cm
+  of margin at `qpos0`, 8.4 cm at the upstream home keyframe, 6.8 cm with the fitted guard
+  arms. The pose is not statically impossible.
+- **The control targets are consistent with the pose**: all 29 actuators have
+  `ctrl == qpos` in the keyframe, so nothing is being driven somewhere else at t=0.
+
+Which leaves the boring explanation: `ctrl == qpos` means zero error means **zero torque**,
+and a position-controlled humanoid with no policy is not holding anything up. Plain MuJoCo
+with the same model topples at the same moment -- 270 substeps, torso from 1.04 m to the
+floor. A zero-action boxer falling in ~1 s is the expected behaviour of this class of model,
+not a defect in the scene.
+
 
 ## Why this robot model
 
@@ -289,6 +334,13 @@ under `runs/boxer/` is the attempt to reach standing-and-punching behaviour.
 
 ## What is honest here
 
+- **`--total-steps` does not mean what it looks like.** Brax splits it across the
+  eval points with `ceil()`, so a request smaller than
+  `num_evals * batch_size * unroll_length * num_minibatches` is ignored outright:
+  the 4.19M run asked for one night is a 9.83M run, and two arms of the mode
+  comparison only came out equalised because they shared an eval count.
+  `boxer.train` now prints the horizon it will actually honour and warns when the
+  number typed is not it (`eval_schedule`, pinned against three real runs).
 - **Arena numbers have a real noise floor, and 64 rounds per cell sits below it.**
   See the measurement notes under "The two modes, at equal physics": identical
   seeds and checkpoints disagreed by up to 0.11 in win rate at 64 rounds, which
