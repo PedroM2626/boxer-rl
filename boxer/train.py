@@ -125,6 +125,23 @@ def _latest_step(root: Path) -> Path | None:
     return steps[-1] if steps else None
 
 
+def eval_schedule(args: argparse.Namespace) -> tuple[int, int]:
+    """The horizon Brax will actually run for, given the requested eval count.
+
+    Brax splits ``num_timesteps`` across the eval points with ``ceil()``, so a
+    request smaller than ``num_evals * block`` does not shorten the run -- it
+    silently becomes ``num_evals * block``, where one block is
+    ``batch_size * unroll_length * num_minibatches`` learner steps. Asking for
+    4.19M with 16 evals on this configuration runs 10.5M. Returns the block
+    count and the resulting horizon so the log can state what is really happening
+    instead of repeating the number that was typed.
+    """
+    block = args.batch_size * args.unroll_length * args.num_minibatches
+    evals = max(args.num_evals - 1, 1)
+    per_epoch = max(-(-args.total_steps // (evals * block)), 1)
+    return block, evals * per_epoch * block
+
+
 def _restore_path(args: argparse.Namespace, checkpoint: Path) -> str | None:
     """Which checkpoint Brax should load weights from, or None to start random.
 
@@ -187,6 +204,15 @@ def main(argv=None) -> int:
             "--batch-size * --num-minibatches must be a multiple of the learner "
             f"count ({learners})"
         )
+
+    block, horizon = eval_schedule(args)
+    print(f"one checkpoint = {block:,} learner steps; {args.num_evals} checkpoints "
+          f"will run ~{horizon:,} learner steps (asked for {args.total_steps:,})",
+          flush=True)
+    if horizon > 1.25 * args.total_steps:
+        print(f"WARNING: --total-steps is being ignored. Lower --num-evals "
+              f"(or --batch-size) to get near {args.total_steps:,}; the shortest "
+              f"run at this batch geometry is {block:,} steps.", flush=True)
 
     args.output.mkdir(parents=True, exist_ok=True)
     # orbax rejects relative paths outright, so resolve before handing it over.

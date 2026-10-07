@@ -57,7 +57,9 @@ def build(arms: str, euler_damping: bool) -> BoxingEnv:
     if euler_damping:
         def patched(**kwargs):
             model = original_build(**kwargs)
-            model.opt.disableflags &= ~mujoco.mjtDisableBit.mjDSBL_EULERDAMP
+            # mujoco's enum object does not support ~, and disableflags is a plain
+            # int field, so the bit has to be cast before it can be cleared.
+            model.opt.disableflags &= ~int(mujoco.mjtDisableBit.mjDSBL_EULERDAMP)
             return model
         scene.build_model = patched
     try:
