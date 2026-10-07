@@ -171,12 +171,38 @@ enough of it.
 That reverses the conclusion this README held an hour earlier. "More steps cannot help,
 fix the reward first" was wrong: the 12.45M arm is still descending at its last
 checkpoint (`down_red` 0.80 → 0.46), and the no-contact arm shows the same curve is being
-spent on standing rather than on boxing. So the long run is the 200M-step frozen arm,
-with a stated falsifier rather than a hope: **if `down_red` has not gone below ~0.3 by
-50M learner steps, scale is not the blocker either**, and what remains is the control
-interface -- 29 joints under 50 Hz position actuators at `action_scale` 0.25 -- not the
-optimiser's budget. Checkpoints land every 5,242,880 steps (~40 minutes), and `--resume`
-works, so the run is stoppable mid-flight without losing it.
+spent on standing rather than on boxing. So the long run is the 200M-step frozen arm.
+
+**Why 200M and not less.** [MuJoCo Playground](https://arxiv.org/abs/2502.08844) -- the
+reference MJX stack for this exact robot -- trains the Unitree G1 to walk on flat ground
+for **200M timesteps** and then another **100M** on rough terrain, with 8,192 parallel
+environments, finishing in under 30 minutes on two RTX 4090s. Plain locomotion is a
+strictly easier objective than a two-boxer duel with declared contact pairs, so 200M is
+read as the floor here rather than a stretch goal. An intermediate checkpoint of this
+run was going to be used as a stop signal at 50M steps; that was withdrawn before it
+could fire, because 50M is a quarter of Playground's *walking* budget and the test would
+have killed a run that had not yet had a chance.
+
+The comparison also puts the real constraint in perspective: this laptop reaches ~2,200
+learner steps/s at 256 worlds, so 200M costs ~25 hours -- roughly **50x** the reference
+throughput gap. The binding limit on this project is steps per second, not willingness to
+wait, and the bench above shows that 1,024 worlds buys only ~15% more on a 6 GB card.
+What would still falsify the scale hypothesis: `down_red` above ~0.3 after the full 200M,
+which would leave the control interface -- 29 joints under 50 Hz position actuators at
+`action_scale` 0.25 -- as the remaining suspect. `python -m tools.check_falsifier` prints
+the curve and the verdict.
+
+For related work that is *not* an analogue, recorded so nobody re-reads them as one:
+[FightLadder](https://arxiv.org/abs/2406.02081) is a video-game MARL benchmark built on
+gym-retro's Street Fighter II, and the 2.5D fighting work around
+[Little Fighter 2](https://arxiv.org/abs/1805.02070) uses an A3C agent over a discrete
+state abstraction -- neither simulates a balanced humanoid, so neither says anything about
+how many steps standing takes. The closest analogue found is
+[ALMA](https://arxiv.org/abs/2504.14305), which trains a humanoid against an adversarial
+upper body that pushes it, reports that "the robot inevitably falls initially", runs 4,096
+parallel environments, and needs a curriculum that sorts adversarial motions by how long
+the robot survives on them. That is the same failure this project is hitting, addressed
+with curriculum rather than with reward weights.
 
 Also falsified, by measurement rather than argument, while looking for the cause of the
 falls:

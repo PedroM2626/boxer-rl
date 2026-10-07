@@ -14,7 +14,7 @@ import json
 import sys
 from pathlib import Path
 
-LIMIT = 50_000_000
+LIMIT = 200_000_000
 THRESHOLD = 0.30
 KEYS = ("episode/length", "episode/down_red", "episode/hits_red",
         "episode/head_shots", "episode/contacts", "episode/upright")
@@ -39,7 +39,8 @@ def main(argv=None) -> int:
     print(f"\nlast checkpoint {last['step']:,} learner steps, "
           f"down_red={last['episode/down_red']:.3f}")
     if last["step"] < LIMIT:
-        print(f"not decided yet: the falsifier reads at {LIMIT:,} steps, "
+        print(f"not decided yet: the verdict reads at {LIMIT:,} steps "
+              f"(MuJoCo Playground's flat-ground G1 budget), "
               f"{LIMIT - last['step']:,} to go")
     elif last["episode/down_red"] > THRESHOLD:
         print(f"FALSIFIED: down_red is above {THRESHOLD} at {LIMIT:,} steps, so scale "

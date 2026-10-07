@@ -17,11 +17,20 @@
 # that more steps buy something here after all.
 #
 # What would make this a wasted night, stated in advance so it is detectable and
-# not just hoped away: if down_red has not gone below ~0.3 by 50M learner steps,
-# then scale is not the blocker either and the problem is the control interface
-# (50 Hz position actuators on 29 joints, action_scale 0.25) rather than the
-# optimiser's budget. Checkpoints land every 5,242,880 steps, so that is readable
-# after roughly 40 minutes and the run can be stopped with --resume still working.
+# not just hoped away: the run is judged at the end, against MuJoCo Playground's own
+# budget for the same robot -- it trains the G1 to walk on flat ground for 200M
+# timesteps (plus 100M more on rough terrain) using 8,192 parallel environments, in
+# under 30 minutes on two RTX 4090s. If down_red is still above ~0.3 after 200M steps
+# here, scale is not the blocker at this throughput and the remaining suspect is the
+# control interface: 29 joints under 50 Hz position actuators at action_scale 0.25.
+#
+# An earlier version of this file stopped the run at 50M on that criterion. That was
+# wrong and was withdrawn: 50M is a quarter of what the reference stack spends on
+# plain locomotion, so the test would have killed a run that had not yet had a chance.
+#
+# The asymmetry worth keeping in view: this card reaches ~2,200 learner steps/s at 256
+# worlds, so 200M costs ~25 hours -- the binding constraint is steps per second, not
+# willingness to wait, and the bench shows 1,024 worlds buys only ~15% more on 6 GB.
 #
 #   wsl bash tools/long_run.sh
 set -uo pipefail
