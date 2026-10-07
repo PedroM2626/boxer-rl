@@ -150,6 +150,34 @@ balance, facing and guard can be earned — was first run at 2.2 m and produced 
 standing. Re-run at 2.0 m, where contact is still impossible and there is 0.4 m of
 headroom.
 
+### The falls are not about the opponent
+
+The isolation run finally answered the question the three nulls were circling. With the
+passive opponent placed 2.0 m away -- out of arm's reach, so almost nothing can happen
+between them -- and 2.62M learner steps:
+
+| arm, all at 2.62M learner steps | `down_red` | `hits_red` | contacts |
+| --- | --- | --- | --- |
+| standing only, opponent at 2.0 m | **0.82** | 0.00 | 3.0 |
+| frozen, opponent in reach (range 0.9 m) | 0.72 | 0.42 | 50.2 |
+| frozen, opponent in reach (range 0.7 m) | 0.76 | 0.20 | 40.7 |
+
+A boxer with no opponent to fight, nothing to defend and no contact to make still falls
+over in 82% of its rounds. Falling is therefore not caused by the opponent, not by the
+distance the range reward prefers, and not by the knockout term's magnitude -- all three
+of those were tested and came back null. It is the base skill, and this budget has not
+enough of it.
+
+That reverses the conclusion this README held an hour earlier. "More steps cannot help,
+fix the reward first" was wrong: the 12.45M arm is still descending at its last
+checkpoint (`down_red` 0.80 → 0.46), and the no-contact arm shows the same curve is being
+spent on standing rather than on boxing. So the long run is the 200M-step frozen arm,
+with a stated falsifier rather than a hope: **if `down_red` has not gone below ~0.3 by
+50M learner steps, scale is not the blocker either**, and what remains is the control
+interface -- 29 joints under 50 Hz position actuators at `action_scale` 0.25 -- not the
+optimiser's budget. Checkpoints land every 5,242,880 steps (~40 minutes), and `--resume`
+works, so the run is stoppable mid-flight without losing it.
+
 Also falsified, by measurement rather than argument, while looking for the cause of the
 falls:
 
