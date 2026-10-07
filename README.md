@@ -204,15 +204,18 @@ parallel environments, and needs a curriculum that sorts adversarial motions by 
 the robot survives on them. That is the same failure this project is hitting, addressed
 with curriculum rather than with reward weights.
 
-The nearest thing to this project's exact premise that is open source is
-[Boxing-AI](https://github.com/JakubLeb/Boxing-AI-MAIN): a Unity / ML-Agents scene with
-**two independent agents** boxing each other, PPO, positional observations and a reward
-for landing strikes -- the same three properties this project has, and the same
-"each corner has its own network" formulation that `boxer.alternating` implements. Its
-README publishes no step count and no evaluation numbers, so nothing about its quality is
-verified here beyond that it exists and is built this way; the recollection this repo was
-written against is that it trained on the order of 200M steps and the result stayed
-mediocre, which is consistent with what the reference stacks above need just to stand.
+The closest thing to this project's exact premise that is open source is
+[mbaske/ml-selfplay-fighter](https://github.com/mbaske/ml-selfplay-fighter), "Self-Play
+Boxing Match made with Unity Machine Learning Agents" -- Unity, two fighters, self-play,
+PPO. Its `trainer_config.yaml` asks for **`max_steps: 200000000`** with `batch_size: 2048`,
+`buffer_size: 51200`, `num_epoch: 3`, `learning_rate: 3e-4`, `gamma: 0.99`, `beta: 0.01`.
+That is an independent implementation of this same idea choosing 200M as its budget, which
+is the same floor MuJoCo Playground spends on the G1 just to walk -- and the outcome is
+still a demo rather than a boxer. Two of the three hyperparameters worth copying are
+already matched here (learning rate, entropy coefficient); the third, `gamma`, is not:
+this environment discounts at 0.97 over a 20 ms control step, which throws away roughly
+twice as much future as their setup, on a task where "keep balancing for the next second"
+is the whole problem.
 
 Also falsified, by measurement rather than argument, while looking for the cause of the
 falls:
