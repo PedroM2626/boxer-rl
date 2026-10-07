@@ -413,12 +413,14 @@ class BoxingEnv(env_base.PipelineEnv):
           distinguishes throwing from toppling.
         """
         speed, closing = self._punch_signals(frame, foe)
-        fastest = jp.max(speed)
         low, high = self._punch_speed_min, self._punch_speed_ref
-        swinging = jp.clip((fastest - low) / (high - low), 0.0, 1.0)
-        aim = jp.clip((jp.max(closing) / (fastest + 1e-6) - 0.5) / 0.3, 0.0, 1.0)
+        swinging = jp.clip((speed - low) / (high - low), 0.0, 1.0)
+        aim = jp.clip((closing / (speed + 1e-6) - 0.5) / 0.3, 0.0, 1.0)
         upright = jp.clip((self._upright(frame) - 0.9) / 0.08, 0.0, 1.0)
-        return swinging * aim * upright
+        # Per hand, then the better of the two: taking the fastest hand and the
+        # best-aligned hand independently would let a retraction travelling at
+        # 5 m/s borrow the aim of a slow, correctly-pointed other hand.
+        return jp.max(swinging * aim) * upright
 
     def _reward(
         self,
