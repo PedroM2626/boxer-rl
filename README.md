@@ -55,6 +55,12 @@ question a pooled mean cannot.
 | selfplay × jabber | **0.141** | 0.846 | 0.80 s | 1.08 | 0.02 | 0.11 | 0.00 |
 | frozen × selfplay | **0.893** | 0.096 | 0.79 s | 1.30 | 0.59 | 0.11 | 0.05 |
 
+> **These hit counts were measured with the old punch gate.** Rendering the best policy showed it
+> topples forward onto the opponent rather than punching, and the old gate scored that as a
+> punch, so `A hits` above overstates offence for every row. The gate now also requires the fist
+> to be closing on the head or torso; re-measure before quoting these numbers. The win rates and
+> round lengths are unaffected -- they don't go through the gate.
+
 - **The frozen arm boxes.** 1.34 punches a round against a statue that lands
   0.04, and a third of them on the head. Offence is not what separates it from
   the scripted opponents.
@@ -210,15 +216,21 @@ ever beats the shared policy.
 
 ### What counts as a punch
 
-A landed punch is gated on two conditions, and both are needed. Measured: two
-boxers holding a perfectly passive guard drift together from 1.3 m to 0.42 m
-apart, topple, and register ~12 "punches" a round from nothing but the collision.
+A landed punch is gated on three conditions, and each one was added because
+measurement or a render killed the pair before it. Measured: two boxers holding a
+perfectly passive guard drift together from 1.3 m to 0.42 m apart, topple, and
+register ~12 "punches" a round from nothing but the collision.
 
 * **fist speed relative to its own torso**, not in world frame -- a collapsing
   body carries both fists along at several m/s, so world speed cannot tell a jab
   from a fall;
 * **the striker still being upright** -- torso-relative speed alone still passed
-  the collapse case, because flailing arms move fast relative to the torso.
+  the collapse case, because flailing arms move fast relative to the torso;
+* **the fast fist closing on the head or torso** -- rendered, a trained boxer
+  topples forward with its arm over the opponent's chest. That is upright and
+  fast in torso-relative terms, so it passed both tests above and scored. Speed
+  is measured against the torso; direction is measured against the target, which
+  is the only thing that separates throwing from falling onto someone.
 
 Raw contacts remain available as the separate `contacts` metric, so "touched" and
 "hit" stay distinguishable in the logs.
