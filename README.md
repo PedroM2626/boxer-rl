@@ -1,14 +1,24 @@
 # boxer — two humanoids learning to fight each other in JAX
 
 Two [Unitree G1](https://github.com/google-deepmind/mujoco_menagerie/tree/main/unitree_g1)
-humanoids spar in a single 3D physics world simulated entirely in JAX. One
-shared policy controls both corners, so every skill it discovers it must also
-learn to defend against: symmetric self-play.
+humanoids spar in a single 3D physics world simulated entirely in JAX. Three ways of
+training that duel are implemented — symmetric self-play, a frozen opponent, and a
+best-response league with one network per corner — and they are measured against each
+other rather than assumed, which is what the Results section below is.
 
 The environment is a Brax `PipelineEnv` on the **MJX** backend (MuJoCo's JAX
 port), trained with Brax's PPO. Collisions are real — a landed punch is a
 contact between the fist geom and the opponent's head or torso geom, not a
-proximity heuristic.
+proximity heuristic, and it is gated on the fist closing on a target while the
+striker is still upright.
+
+**Where this is at:** the physics, the throughput and the measurement machinery work;
+the boxers do not box yet. The best policy holds a guard, closes distance and lands
+~0.3 gated punches a round, and wins 64% of rounds against a passive opponent by being
+the one still standing. Symmetric self-play at the same budget loses 88% of its rounds
+to that passive opponent. Three reward interventions have been tried and reported as
+null results rather than quietly dropped; the diagnosis and the experiments still open
+are in [Results](#results).
 
 ## Results
 
