@@ -110,6 +110,8 @@ class BoxingEnv(env_base.PipelineEnv):
         down_head_z: float = 0.55,
         action_scale: float = 1.0,
         hit_depth_ref: float = 0.01,
+        clinch_range: float = 0.5,
+        punch_reach: float = 0.68,
         punch_speed_ref: float = 5.0,
         punch_speed_min: float = 1.0,
         w_alive: float = 0.2,
@@ -124,6 +126,12 @@ class BoxingEnv(env_base.PipelineEnv):
         w_guard: float = 0.2,
         w_strike: float = 0.3,
         w_hit: float = 3.0,
+        # A referee stops a boxing match when the two hold each other. This env had
+        # no such notion, so the optimal policy under a per-frame contact reward was
+        # to close, wrap the opponent's head and topple -- measured at 185 "punches"
+        # a round by the 204M arm. Costs a step for every step spent inside arm
+        # embrace rather than at punching distance.
+        w_clinch: float = 0.5,
         w_energy: float = 0.05,
         w_ko: float = 3.0,
         w_ring: float = 1.0,
@@ -141,11 +149,14 @@ class BoxingEnv(env_base.PipelineEnv):
         self._down_head_z = down_head_z
         self._action_scale = action_scale
         self._hit_depth_ref = hit_depth_ref
+        self._clinch_range = clinch_range
+        self._punch_reach = punch_reach
         self._punch_speed_ref = punch_speed_ref
         self._punch_speed_min = punch_speed_min
         self._w = dict(
             alive=w_alive, upright=w_upright, range=w_range, facing=w_facing,
             guard=w_guard, strike=w_strike, hit=w_hit, energy=w_energy,
+            clinch=w_clinch,
             ko=w_ko, ring=w_ring,
         )
         self._spawn_distance = spawn_distance
@@ -437,6 +448,7 @@ class BoxingEnv(env_base.PipelineEnv):
         opponent: str,
         action: jax.Array,
         contact: Dict[str, jax.Array],
+        new_contact: jax.Array,
     ) -> tuple[jax.Array, Dict[str, jax.Array]]:
         me = self._frame(pipeline_state, side)
         foe = self._frame(pipeline_state, opponent)
@@ -485,16 +497,22 @@ class BoxingEnv(env_base.PipelineEnv):
         # indistinguishable from punches in the arena's win/hit statistics.
         my_commitment = self._committed(me, foe)
         foes_commitment = self._committed(foe, me)
-        landed = damage[agent] * my_commitment
-        taken = damage[1 - agent] * foes_commitment
-        landed_hits = raw_landed * my_commitment
-        taken_hits = raw_taken * foes_commitment
+        # ... and a punch is one event, not a running total. ``raw_landed`` sums the
+        # contact buffer over the five physics substeps of a control step, so a fist
+        # resting on the opponent's chest scores ~0.7 times per step and the 204M arm
+        # measured 185 "punches" a round doing exactly that. ``new_contact`` is 1 only
+        # on the step whose contact was absent the step before, which is what a
+        # landed punch is.
+        landed = damage[agent] * my_commitment * new_contact
+        taken = damage[1 - agent] * foes_commitment * new_contact
+        landed_hits = raw_landed * my_commitment * new_contact
+        taken_hits = raw_taken * foes_commitment * new_contact
         # head_shots must go through the same gate as hits; reporting it ungated
         # made the arena show more head shots than punches, which is impossible
         # when one is a subset of the other.
         head_shots = (
             contact["red_heads"] if agent == 0 else contact["blue_heads"]
-        ) * my_commitment
+        ) * my_commitment * new_contact
 
         centre = self._ring_distance(me)
         reward = (
@@ -509,6 +527,9 @@ class BoxingEnv(env_base.PipelineEnv):
             + w["guard"] * jp.mean(held) * alive
             + w["strike"] * strike * alive
             + w["hit"] * (landed - taken)
+            # Inside embrace, being at "fighting distance" is not a skill at all.
+            - w["clinch"] * jp.clip((self._punch_reach - distance)
+                                    / (self._punch_reach - self._clinch_range), 0.0, 1.0)
             - w["energy"] * jp.mean(jp.square(action))
             - w["ring"] * jp.clip(centre - 0.75 * self._ring_radius, 0.0, 10.0)
         )
@@ -516,6 +537,7 @@ class BoxingEnv(env_base.PipelineEnv):
             upright=upright, in_range=in_range, facing=facing, guard=jp.mean(held),
             strike=strike, landed=landed, taken=taken, distance=distance, centre=centre,
             landed_hits=landed_hits, taken_hits=taken_hits, head_shots=head_shots,
+            raw_landed=raw_landed,
             contacts=0.5 * (raw_landed + raw_taken),
         )
         return reward, parts
@@ -555,7 +577,7 @@ class BoxingEnv(env_base.PipelineEnv):
             reward=jp.zeros(NUM_AGENTS),
             done=jp.float32(0.0),
             metrics=self._zero_metrics(),
-            info={"last_action": action},
+            info={"last_action": action, "last_contact": jp.zeros(NUM_AGENTS)},
         )
 
     def _observe(self, pipeline_state: physics_base.State, action: jax.Array) -> jax.Array:
@@ -597,13 +619,21 @@ class BoxingEnv(env_base.PipelineEnv):
         separation = _norm(frames[scene.RED]["torso"] - frames[scene.BLUE]["torso"])
         done = jp.clip(jp.max(down) + jp.max(outside) + (separation > MAX_SEPARATION), 0.0, 1.0)
 
+        # A punch is a rising edge of contact, so the previous step's contact count
+        # has to survive in info: the contact buffer alone says "hands are on the
+        # opponent", which is true for a punch and equally true for a clinch.
+        raw_contact = jp.stack([contact["red_hits"], contact["blue_hits"]])
+        first_touch = ((raw_contact > 0.0) & (state.info["last_contact"] <= 0.0))
+        first_touch = first_touch.astype(jp.float32)
+
         rewards, parts = [], []
         for i, side in enumerate(scene.SIDES):
             # A knockout only pays if the winner is still upright, and costs the
             # loser the same amount: the round is zero-sum at the terminal step.
             knockout = down[1 - i] * (1.0 - down[i]) - down[i] * (1.0 - down[1 - i])
             reward, part = self._reward(
-                pipeline_state, side, scene.OPPONENT[side], action[i], contact
+                pipeline_state, side, scene.OPPONENT[side], action[i], contact,
+                first_touch[i],
             )
             rewards.append(reward + self._w["ko"] * knockout)
             parts.append(part)
@@ -634,6 +664,7 @@ class BoxingEnv(env_base.PipelineEnv):
         # episode bookkeeping in `info`, which a new State would drop.
         state.metrics.update(metrics)
         state.info["last_action"] = action
+        state.info["last_contact"] = raw_contact
         return state.replace(
             pipeline_state=pipeline_state,
             obs=self._observe(pipeline_state, action),
@@ -667,6 +698,8 @@ class BoxingEnv(env_base.PipelineEnv):
             "down_up_z": self._down_up_z,
             "down_head_z": self._down_head_z,
             "hit_depth_ref": self._hit_depth_ref,
+            "clinch_range": self._clinch_range,
+            "punch_reach": self._punch_reach,
             "punch_speed_ref": self._punch_speed_ref,
             "punch_speed_min": self._punch_speed_min,
         }

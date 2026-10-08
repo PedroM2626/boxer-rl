@@ -267,3 +267,68 @@ def test_a_recorded_config_beats_the_fallback_scale(level, tmp_path):
     resolved = env.resolve_env((str(tmp_path / "checkpoint"), "passive"),
                                5, action_scale=0.25)
     assert resolved.config()["action_scale"] == 0.1
+
+
+def _close_quarters_env():
+    return BoxingEnv(spawn_distance=0.85, spawn_jitter=0.0, yaw_jitter=0.0,
+                     pose_noise=0.0, action_scale=0.25)
+
+
+def test_sustained_contact_stops_paying_after_the_first_touch():
+    """A fist resting on the opponent is one punch, not one per substep.
+
+    The 204M arm measured 185 "punches" a round doing this: hands wrapped around
+    the other boxer's head, scoring ~0.7 times per control step because hits summed
+    the contact buffer over all five substeps. Contact frames are still reported, so
+    the difference between touching and hitting is measurable either way.
+    """
+    from boxer import policy as policy_module
+
+    env = _close_quarters_env()
+    jab = policy_module.jabber(
+        env.action_size,
+        pitch_adr=env.actuator_index("red/left_shoulder_pitch_joint"),
+        roll_adr=env.actuator_index("red/left_shoulder_roll_joint"),
+    )
+    state = env.reset(jax.random.PRNGKey(11))
+    step = jax.jit(env.step)
+    hits = contacts = 0.0
+    for _ in range(40):
+        action = jp.stack([
+            jab(state.obs[0][None], jp.array([float(state.pipeline_state.time)]),
+                jax.random.PRNGKey(0))[0],
+            jp.zeros(env.action_size),
+        ])
+        state = step(state, action)
+        m = {k: float(np.asarray(v)) for k, v in state.metrics.items()}
+        hits += m["hits_red"]
+        contacts += m["contacts"]
+    assert contacts > 5.0, "the boxers should be in contact at 0.85 m apart"
+    assert hits <= 8.0, f"contact frames must not be counted as punches: {hits} vs {contacts}"
+
+
+def test_embrace_costs_more_than_fighting_distance():
+    """The env had no notion of a clinch, so holding was free and then optimal.
+
+    Two environments rather than one moved qpos: the boxer's position, torso
+    quaternion and palm velocities all come out of sensors, and editing the joint
+    state without running kinematics leaves the sensors describing the old pose.
+    """
+    def reward_at(separation: float) -> float:
+        env = BoxingEnv(spawn_distance=separation, spawn_jitter=0.0, yaw_jitter=0.0,
+                        pose_noise=0.0, action_scale=0.25)
+        state = env.reset(jax.random.PRNGKey(12))
+        reward, parts = env._reward(
+            state.pipeline_state, scene.RED, scene.BLUE, jp.zeros(env.action_size),
+            env._contact_damage(state.pipeline_state), 0.0,
+        )
+        assert abs(float(parts["distance"]) - separation) < 0.05, (
+            "the two setups must differ in separation, not in something else"
+        )
+        return float(reward)
+
+    embraced, fighting = reward_at(0.45), reward_at(0.75)
+    assert fighting > embraced, (
+        f"being inside embrace ({embraced:.2f}) should not pay better than being "
+        f"at punching distance ({fighting:.2f})"
+    )
