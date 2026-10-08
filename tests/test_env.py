@@ -1,11 +1,13 @@
 """The duel env: shapes, jittability, and whether hits are real."""
 
+import json
 import jax
 import numpy as np
 import pytest
 from jax import numpy as jp
 
 from boxer import scene
+from boxer import env
 from boxer.env import NUM_AGENTS, BoxingEnv
 
 
@@ -239,3 +241,29 @@ def test_guard_pose_is_the_zero_action(env):
     state = env.step(state, jp.zeros((NUM_AGENTS, env.action_size)))
     assert float(np.asarray(state.metrics["guard"])) > 0.5
     assert float(np.asarray(state.metrics["upright"])) > 0.9
+
+
+def test_a_run_directory_rebuilds_its_own_environment(level, tmp_path):
+    """A checkpoint is only meaningful in the env it learned, and that has to travel."""
+    (tmp_path / env.CONFIG_FILE).write_text(json.dumps(level.config()))
+    rebuilt = env.build_from_run(tmp_path)
+    assert rebuilt.config() == level.config()
+
+
+def test_evaluation_defaults_to_the_scale_every_run_trained_at(tmp_path):
+    """The bug this pins: the arena used to build BoxingEnv() and get 1.0.
+
+    Actions here are relative joint targets, so evaluating a 0.25-scale policy at
+    1.0 multiplies both its mean command and its sampled noise by four. That made a
+    trained agent fall in half a second and read as a training failure.
+    """
+    resolved = env.resolve_env(("passive", "jabber"), 5, action_scale=0.25)
+    assert resolved.config()["action_scale"] == 0.25
+
+
+def test_a_recorded_config_beats_the_fallback_scale(level, tmp_path):
+    (tmp_path / env.CONFIG_FILE).write_text(json.dumps({**level.config(),
+                                                        "action_scale": 0.1}))
+    resolved = env.resolve_env((str(tmp_path / "checkpoint"), "passive"),
+                               5, action_scale=0.25)
+    assert resolved.config()["action_scale"] == 0.1

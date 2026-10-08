@@ -13,6 +13,8 @@ heuristic stands in for the collision engine.
 
 from __future__ import annotations
 
+import json
+from pathlib import Path
 from typing import Any, Dict, List
 
 from brax import base as physics_base
@@ -650,3 +652,74 @@ class BoxingEnv(env_base.PipelineEnv):
                 "down_blue", "ring_out", "distance",
             )
         }
+
+    def config(self) -> Dict[str, Any]:
+        """The constructor arguments that reproduce this environment."""
+        return {
+            "n_frames": self._n_frames,
+            "spawn_distance": self._spawn_distance,
+            "target_range": self._target_range,
+            "action_scale": self._action_scale,
+            "spawn_jitter": self._spawn_jitter,
+            "yaw_jitter": self._yaw_jitter,
+            "pose_noise": self._pose_noise,
+            "ring_radius": self._ring_radius,
+            "down_up_z": self._down_up_z,
+            "down_head_z": self._down_head_z,
+            "hit_depth_ref": self._hit_depth_ref,
+            "punch_speed_ref": self._punch_speed_ref,
+            "punch_speed_min": self._punch_speed_min,
+        }
+
+
+#: Written next to a checkpoint so evaluation can rebuild the env it belongs to.
+CONFIG_FILE = "env_config.json"
+
+
+def build_from_run(run: str | Path, visual: bool = False, **overrides) -> BoxingEnv:
+    """Rebuild the environment a checkpoint was trained in.
+
+    A policy is only meaningful with the action scale it learned against: these are
+    relative joint targets, so evaluating a 0.25-scale policy at the class default
+    of 1.0 commands four times the excursion and reports a collapsed agent when the
+    real finding is a mis-scaled one. That is not a hypothetical -- the arena and
+    the rollout both built ``BoxingEnv()`` and so silently measured every published
+    comparison at the wrong scale. Falls back to the class defaults when a run
+    directory has no config, which is the case for checkpoints saved before this
+    file existed.
+    """
+    path = Path(run) / CONFIG_FILE
+    kwargs = json.loads(path.read_text()) if path.is_file() else {}
+    kwargs.update(overrides)
+    return BoxingEnv(visual=visual, **kwargs)
+
+
+def run_dir_of(spec: str) -> Path | None:
+    """The training run directory behind a checkpoint spec, if there is one."""
+    path = Path(spec)
+    if path.name in ("passive", "jabber"):
+        return None
+    return path.parent if path.name == "checkpoint" else path
+
+
+def resolve_env(specs, n_frames: int, action_scale: float, **overrides) -> BoxingEnv:
+    """Build the arena env, preferring what the checkpoints recorded about themselves.
+
+    Every run in this repo trained at ``action_scale`` 0.25, so that is the
+    fallback; the class default of 1.0 is not, and using it here once turned a
+    trained policy into something that falls over in half a second and looked like
+    a training failure.
+    """
+    configs = [d for d in (run_dir_of(s) for s in specs)
+               if d is not None and (d / CONFIG_FILE).is_file()]
+    if configs:
+        env = build_from_run(configs[0], n_frames=n_frames, **overrides)
+        if len(configs) > 1:
+            other = json.loads((configs[1] / CONFIG_FILE).read_text())
+            mine = env.config()
+            disagree = {k: (mine[k], other[k]) for k in mine if mine[k] != other[k]}
+            if disagree:
+                print(f"WARNING: the two checkpoints were trained in different "
+                      f"environments: {disagree}", flush=True)
+        return env
+    return BoxingEnv(n_frames=n_frames, action_scale=action_scale, **overrides)

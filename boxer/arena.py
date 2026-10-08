@@ -14,14 +14,16 @@ from __future__ import annotations
 
 import argparse
 import functools
+import json
 from pathlib import Path
 
 import jax
 import jax.numpy as jp
 import numpy as np
 
+from boxer import env as env_module
 from boxer import policy as policy_module
-from boxer.env import BoxingEnv
+from boxer.env import BoxingEnv, resolve_env
 
 
 def _step_pair(env_step, policy_a, policy_b, state, key):
@@ -153,14 +155,20 @@ def matchup(
     length: int = 500,
     seed: int = 0,
     swap_sides: bool = True,
+    deterministic: bool = True,
 ) -> dict[str, float]:
     """Plays two opponents, optionally with the corners exchanged.
 
     ``swap_sides`` matters more than it looks: with a shared or near-shared policy
     a systematic corner advantage would otherwise be read as skill.
+
+    ``deterministic`` is the mode the checkpoint is evaluated in. It is not a
+    cosmetic flag: a policy trained on samples from its own Gaussian can do fine
+    under that noise and collapse on its mean action, so the two modes can rank
+    checkpoints differently.
     """
-    a = policy_module.make_opponent(spec_a, env)
-    b = policy_module.make_opponent(spec_b, env)
+    a = policy_module.make_opponent(spec_a, env, deterministic=deterministic)
+    b = policy_module.make_opponent(spec_b, env, deterministic=deterministic)
     forward = play(env, a, b, rounds, length, seed)
     if not swap_sides:
         return forward
@@ -196,21 +204,36 @@ def _parse_args(argv=None) -> argparse.Namespace:
     parser.add_argument("--length", type=int, default=500, help="max control steps per round")
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--n-frames", type=int, default=5)
+    parser.add_argument("--action-scale", type=float, default=0.25,
+                        help="used when a checkpoint carries no env_config.json; "
+                             "0.25 is what every run in this repo trained with")
     parser.add_argument("--no-swap", action="store_true", help="do not exchange corners")
+    parser.add_argument("--stochastic", action="store_true",
+                        help="sample from each policy instead of taking its mean action; "
+                             "a policy can win under its own training noise and lose on "
+                             "the deterministic action it would run on a real robot")
     return parser.parse_args(argv)
 
 
 def main(argv=None) -> int:
     args = _parse_args(argv)
-    env = BoxingEnv(n_frames=args.n_frames)
+    env = resolve_env((args.policy_a, args.policy_b), args.n_frames, args.action_scale)
     print(f"devices: {jax.devices()}", flush=True)
+    # Printed first because it is the field that was wrong for every number this
+    # project ever reported: a policy trained at 0.25 and evaluated at 1.0 is a
+    # different agent, not a worse one.
+    print(f"env: action_scale={env.config()['action_scale']} "
+          f"target_range={env.config()['target_range']} "
+          f"spawn_distance={env.config()['spawn_distance']}", flush=True)
     print(f"{_describe(args.policy_a)}  vs  {_describe(args.policy_b)}  "
-          f"({args.rounds} rounds, corners {'swapped' if not args.no_swap else 'fixed'})\n",
+          f"({args.rounds} rounds, corners {'swapped' if not args.no_swap else 'fixed'}, "
+          f"{'stochastic' if args.stochastic else 'deterministic'})\n",
           flush=True)
 
     result = matchup(
         env, args.policy_a, args.policy_b,
-        rounds=args.rounds, length=args.length, seed=args.seed, swap_sides=not args.no_swap,
+        rounds=args.rounds, length=args.length, seed=args.seed,
+        swap_sides=not args.no_swap, deterministic=not args.stochastic,
     )
     for key, value in result.items():
         print(f"  {key:>20}: {value:.3f}", flush=True)

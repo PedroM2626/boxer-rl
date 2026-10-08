@@ -25,6 +25,7 @@ import numpy as np
 from brax.training.agents.ppo import networks as ppo_networks
 from brax.training.agents.ppo import train as ppo
 
+from boxer import env as env_module
 from boxer import policy as policy_module
 from boxer import selfplay
 from boxer.env import NUM_AGENTS, BoxingEnv
@@ -215,6 +216,13 @@ def main(argv=None) -> int:
               f"run at this batch geometry is {block:,} steps.", flush=True)
 
     args.output.mkdir(parents=True, exist_ok=True)
+    # Evaluation has to rebuild this exact environment. The action scale in
+    # particular is part of the policy's meaning, not a detail: the arena used to
+    # construct BoxingEnv() itself and so measured every checkpoint at 1.0 while
+    # these policies learned at 0.25.
+    (args.output / env_module.CONFIG_FILE).write_text(
+        json.dumps(env.config(), indent=2) + "\n"
+    )
     # orbax rejects relative paths outright, so resolve before handing it over.
     checkpoint = (args.output / "checkpoint").resolve()
     progress_log = args.output / "progress.jsonl"
