@@ -48,63 +48,49 @@ Two things worth reading off this table:
   on rematerialization, so 256 worlds is the setting that actually runs here.
   Raise it on a bigger card.
 
-### The two modes, at equal physics
+### The modes, at equal physics
 
-Both arms saw **12.45M world steps** with 256 worlds (`frozen` counts one learner
-per world and stopped at 12,451,840 learner steps; `selfplay` counts two and
-stopped at 24,903,680 -- the same simulated sparring). Every cell below is
-**256 rounds**, corners exchanged and the halves pooled. `A hits`/`B hits` are
-gated punches the named corner landed in a round, so the two columns answer the
-question a pooled mean cannot.
+Both arms of the original comparison saw **12.45M world steps** with 256 worlds
+(`frozen` counts one learner per world and stopped at 12,451,840 learner steps;
+`selfplay` counts two and stopped at 24,903,680 -- the same simulated sparring).
+Every number below is **256 arena rounds**, corners exchanged and the halves
+pooled, at `action_scale` 0.25 -- the scale the policies were trained at.
 
 | A vs B | A win | B win | round | A hits | B hits | A heads | B heads |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| frozen × passive | **0.639** | 0.330 | 1.10 s | 1.34 | 0.04 | 0.58 | 0.00 |
-| frozen × jabber | **0.639** | 0.328 | 1.07 s | 1.76 | 0.23 | 0.50 | 0.00 |
-| selfplay × passive | **0.104** | 0.885 | 0.80 s | 0.51 | 0.00 | 0.10 | 0.00 |
-| selfplay × jabber | **0.141** | 0.846 | 0.80 s | 1.08 | 0.02 | 0.11 | 0.00 |
-| frozen × selfplay | **0.893** | 0.096 | 0.79 s | 1.30 | 0.59 | 0.11 | 0.05 |
+| 200M x passive | **0.938** | 0.049 | 1.24 s | 184.8 | -- | 40.7 | -- |
+| 200M x jabber | **0.947** | 0.035 | 1.22 s | 161.7 | 0.28 | 34.2 | 0.00 |
+| 200M x 12.45M | **0.754** | 0.203 | 1.27 s | 49.2 | 3.6 | 17.1 | 0.07 |
+| 12.45M frozen x passive | 0.824 | 0.141 | 1.26 s | 3.14 | -- | 0.37 | -- |
+| selfplay x passive | 0.869 | 0.104 | 1.26 s | 3.56 | 0.05 | 0.47 | 0.00 |
+| league (alt/red) x passive | 0.867 | 0.123 | 1.25 s | 10.2 | 0.01 | 0.44 | 0.00 |
 
-> **These hit counts were measured with the old punch gate.** Rendering the best policy showed it
-> topples forward onto the opponent rather than punching, and the old gate scored that as a
-> punch, so `A hits` above overstates offence for every row. The gate now also requires the fist
-> to be closing on the head or torso; re-measure before quoting these numbers. The win rates and
-> round lengths are unaffected -- they don't go through the gate.
+**Two earlier conclusions in this section were wrong and are withdrawn.** Both
+were measured before the arena was fixed to evaluate checkpoints at the action
+scale they trained against (see "What is honest here"): the arena built
+`BoxingEnv()` and got the class default of 1.0, which multiplies both the
+commanded joint excursion and the sampled noise by four. Measured that way, the
+symmetric self-play arm lost 88% of its rounds to a passive opponent and the
+best-response league arm lost 87%, which produced the claim that self-play is
+"worse than not training". Re-measured at 0.25, **both beat the statue in 87% of
+rounds**. The training-mode ranking that survived is much flatter than the one I
+published: what mattered was the step count, not the mode.
 
-- **The frozen arm boxes.** 1.34 punches a round against a statue that lands
-  0.04, and a third of them on the head. Offence is not what separates it from
-  the scripted opponents.
-- **The self-play arm is not lazy -- it is just not standing.** It out-punches
-  the statue 0.51 to 0.00 and 1.08 to 0.02, and still loses 85-89% of rounds.
-  Landing more punches than your opponent is not sufficient here, which is the
-  single most useful number in this table.
-- **Head to head the frozen arm wins on both axes:** 1.30 vs 0.59 punches, 0.11
-  vs 0.05 head shots, 0.893 vs 0.096 rounds. Its rounds last 1.10 s against a
-  statue and 0.79 s against the self-play policy, so the short rounds are the
-  self-play fighter going down, not the exchange ending early.
-- **Symmetric self-play at this budget is worse than not training at all.** The
-  collapse is therefore not the opponent moving: the frozen arm fell in 80% of
-  rounds against a statue at 0.65M steps and only recovered to 45% by 12.45M.
-  The learner's own balance is losing to the lunge.
+What the corrected table does say:
 
-Two measurement notes, because both bit during this comparison:
-
-- **64 rounds is not enough.** Two runs of the same cells at 64 rounds, same
-  seeds and same checkpoints, differed by up to 0.11 in win rate and by 0.222 vs
-  0.339 in pooled hits. XLA chooses different reduction schedules between
-  compilations and the commitment gate is a threshold, so a whole substep of
-  contacts can flip. At 64 rounds I read "they land 0.54 vs 0.47 -- the modes
-  differ only in durability" off this table; at 256 rounds the same cell reads
-  1.30 vs 0.59, so that conclusion was noise and is withdrawn here.
-- **`hits_per_round` is not the mean of `a_hits` and `b_hits`.** Within one roll
-  it is exactly that (a test pins it), but `matchup` pools two rolls with
-  different seeds, so across a corner swap the identity holds only approximately
-  -- 0.369 against 0.335 for `selfplay × passive`. Compare the attributed columns
-  to each other; do not average them into the pooled column.
-
-Falsified on the way: that the early `kl_mean` of 5.46 signalled an exploding
-value function. It is a first-eval transient -- the same run reports 0.005 by
-12.45M steps, with no change to `reward_scaling` or the advantage normaliser.
+- **Scale helped, monotonically.** Against the same passive opponent: 0.824 at
+  12.45M, 0.938 at 204M. Head to head, the 204M arm takes 75% of rounds against
+  20% for the 12.45M arm.
+- **The three modes are within ~5 points of each other at equal budget** (0.82
+  frozen, 0.87 self-play, 0.87 league). The mode is not where the project is
+  stuck.
+- **The `hits` column is not counting punches.** The 204M arm registers 185
+  "hits" and 41 "head shots" per round, which at ~62 steps per round is 0.7
+  contacts *per step*. Rendered, the behaviour is: guard up for ~0.3 s, close to
+  chest contact, wrap both arms around the opponent's head and neck, and topple
+  together into a ground clinch. The metric rewards that because hits accumulate
+  per physics substep and nothing in the environment stops the action when the two
+  are holding each other. See "What counts as a punch".
 
 ### Reweighting the reward changed nothing
 
@@ -376,6 +362,16 @@ register ~12 "punches" a round from nothing but the collision.
 Raw contacts remain available as the separate `contacts` metric, so "touched" and
 "hit" stay distinguishable in the logs.
 
+**What the gate still does not do is count a punch as one thing.** Hits accumulate per
+physics substep, so a boxer holding both hands on the opponent's head -- which is what
+the 204M arm actually does, rendered -- scores ~0.7 "hits" per control step and 40+
+"head shots" a round. The environment also has no clinch: nothing stops the action when
+the two are wrapped around each other, so closing and toppling is worth more under this
+reward than punching from outside. Fixing that means counting a punch as an *event*
+(contact preceded by non-contact) and ending or penalising sustained contact, neither of
+which is a weight adjustment -- which is the useful thing about the three null results
+above.
+
 ## Quickstart
 
 Native Windows has no CUDA build of jaxlib, so the CPU path is for development
@@ -430,6 +426,16 @@ under `runs/boxer/` is the attempt to reach standing-and-punching behaviour.
 
 ## What is honest here
 
+- **Every arena number published before 2026-10-08 was measured at the wrong action
+  scale.** The arena and the rollout constructed `BoxingEnv()` and so used the class
+  default `action_scale=1.0`, while every training run used 0.25. Actions are relative
+  joint targets, so that multiplied both the commanded excursion and the sampled noise
+  by four, and it was enough to invert conclusions: symmetric self-play and the
+  best-response league both appeared to lose ~87% of their rounds to a passive opponent
+  and actually win ~87% of them. Training logs were unaffected -- they used the env they
+  trained in -- so the standing and `down_red` curves in this README were never in
+  doubt. Checkpoints now carry `env_config.json` and evaluation rebuilds the env from
+  it, printing the scale it used.
 - **`--total-steps` does not mean what it looks like.** Brax splits it across the
   eval points with `ceil()`, so a request smaller than
   `num_evals * batch_size * unroll_length * num_minibatches` is ignored outright:
