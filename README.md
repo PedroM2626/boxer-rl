@@ -223,6 +223,49 @@ with the same model topples at the same moment -- 270 substeps, torso from 1.04 
 floor. A zero-action boxer falling in ~1 s is the expected behaviour of this class of model,
 not a defect in the scene.
 
+### Why the arms looked broken
+
+Every render so far shows the boxers with their fists at chin height, elbows straight and
+both wrists cranked about 90 degrees. That pose was not the robot's guard, it was mine. The
+`GUARD_ARMS` numbers came from a random search whose only objective was the fist's
+*position* in the torso frame, and it shipped an elbow of `-0.007` rad (straight) with wrist
+pitch/yaw at `+1.491 / -1.610` on the left hand and `+1.614 / +1.419` on the right -- the
+G1's wrist limits are `±1.614`, so two of those four sat flush against their stops.
+
+The reason it could do that is that the arm is a 7-DoF redundant chain and the `left_palm`
+*site* sits 8 cm down the forearm from the wrist yaw joint (`pos="0.08 0 0"` in
+`left_wrist_yaw_link`). Rotating the wrist swings that 8 cm lever, so the site moves without
+the arm moving -- "break the wrist" was the cheapest way to satisfy a target the arm cannot
+reach naturally. The target itself was the error: handed `(0.28, ±0.20, 0.10)` m and told to
+keep the wrists inside 0.35 rad, the same search cannot get within 8 cm of the requested
+height and lands at `z = +0.02` m. Chin height was only ever reachable by breaking the
+wrist, so the height was the fit's mistake, not the robot's.
+
+`tools/fit_guard.py` refits it with the two things the first search lacked -- a hard 0.35 rad
+cap on the wrist joints and a prior pulling the arm toward the upstream `home` keyframe. The
+pose it ships flexes both elbows to `+0.695` rad (~40 degrees), keeps every wrist inside
+0.34 rad, and puts the fists at `(0.33, ±0.22, 0.02)` m in the torso frame: forward and in,
+at chest rather than chin height. `tests/test_scene.py::test_stance_holds_the_guard` now
+asserts that *shape* (elbow above 0.4 rad, wrists below 0.45) and not just the position, and
+its old height assertion (`palm[2] > 0.10`) is gone -- the only pose that ever passed it was
+the broken one, so the test was pinning the fit's fantasy instead of a guard.
+
+Two things this does not fix, both worth knowing before reading a video:
+
+- The arms will still trail their commanded angles under load, and that is the model's own
+  spec, not a bug in the scene. Shoulder, elbow and waist position actuators inherit `kp=75`
+  with `actuatorfrcrange=±25 N·m`, so they saturate at 0.33 rad of position error; the wrists
+  get `kp=20` with `±5 N·m` and saturate at 0.25 rad. A saturated position controller cannot
+  hold a limb during a dive or on contact, so the visual is a slack arm following a target it
+  is not strong enough to reach.
+- The stance is baked into the observation (the 6 guard-error dims and the 29
+  `qpos - stance` dims) and into the `guard` term of the reward, and it is *not* recorded in a
+  run's `env_config.json`. A checkpoint trained under the old pose therefore sees a shifted
+  input distribution when reloaded into the fixed one. Every number and video in this README
+  before this change was measured with the broken-wrist stance, and the two are not directly
+  comparable -- the same class of mistake as evaluating at the wrong `action_scale`, one
+  smaller and one larger.
+
 
 ## Why this robot model
 
@@ -284,8 +327,9 @@ winner and costs the loser the same amount, so the terminal step is zero-sum.
 
 The default pose is a fitted boxing guard, not the upstream standing keyframe:
 arm joint targets were searched against MuJoCo forward kinematics so both fists
-sit in front of the chest at chin height (see `scene.GUARD_ARMS`). The upstream
-`home` pose leaves the fists down by the hips.
+sit in front of the chest, elbows flexed and wrists straight (see
+`scene.GUARD_ARMS`, and `tools/fit_guard.py` for how they were fitted). The
+upstream `home` pose leaves the fists down by the hips.
 
 **Self-play.** Brax's `EpisodeWrapper` requires `reward` and `done` to share a
 leading shape, which a duel does not satisfy. `boxer.selfplay` does the episode

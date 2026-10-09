@@ -83,14 +83,19 @@ ARM_JOINTS = (
     "shoulder_pitch", "shoulder_roll", "shoulder_yaw", "elbow",
     "wrist_roll", "wrist_pitch", "wrist_yaw",
 )
-# Arm targets fitted by random search against MuJoCo forward kinematics so that
-# both fists sit in front of the chest at chin height -- torso-frame
-# (0.26, +-0.18, 0.22) m, residual under 1 cm, and stable for a full second of
-# position control. The upstream `home` keyframe keeps the legs and waist, but
-# leaves the fists down by the hips, which is not a guard.
+# Arm targets for the guard, fitted by random search against MuJoCo forward
+# kinematics (tools/fit_guard.py). The first version of this fit minimised fist
+# *position* alone and landed on elbows locked straight with both wrists cranked
+# ~90 degrees, because the arm is redundant and the palm site is offset from the
+# wrist joint -- breaking the wrist moves the fist without moving the arm, so it
+# was the cheapest solution to a target the robot cannot reach naturally. This one
+# caps the wrists at 0.35 rad and pulls toward the home keyframe, and reaches
+# (0.33, +-0.22, 0.02) m in the torso frame: hands forward at chest height, elbows
+# flexed ~40 degrees. The chin-height target it replaces was not reachable without
+# the broken-wrist pose, so the height was the fit's error, not the robot's.
 GUARD_ARMS = {
-    "left": (-0.676, 0.679, 0.236, -0.007, -0.573, 1.491, -1.610),
-    "right": (-0.781, -0.930, 0.076, -0.310, 0.430, 1.614, 1.419),
+    "left": (-0.302, 0.276, 0.028, 0.695, -0.001, -0.338, 0.009),
+    "right": (-0.300, -0.276, -0.026, 0.694, 0.001, -0.338, -0.010),
 }
 
 
