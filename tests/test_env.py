@@ -271,6 +271,28 @@ def test_a_recorded_config_beats_the_fallback_scale(level, tmp_path):
     assert resolved.config()["action_scale"] == 0.1
 
 
+def test_a_run_that_never_recorded_its_pose_is_assumed_the_legacy_one(tmp_path):
+    """Guessing the stance is the same mistake as guessing the action scale.
+
+    The pose is subtracted from 29 observation dims and added back to the action,
+    so playing a legacy checkpoint in the refitted guard measures a shifted input
+    distribution: measured, the 204M arm's win rate against a statue went from
+    0.938 to 0.139. A run with no config at all therefore assumes the pose every
+    checkpoint in this repo actually trained in.
+    """
+    resolved = env.resolve_env((str(tmp_path / "checkpoint"), "passive"), 5,
+                               action_scale=0.25)
+    assert resolved.config()["guard_pose"] == "broken-wrist"
+
+
+def test_a_recorded_guard_pose_beats_the_assumption(level, tmp_path):
+    (tmp_path / env.CONFIG_FILE).write_text(json.dumps({**level.config(),
+                                                        "guard_pose": "natural"}))
+    resolved = env.resolve_env((str(tmp_path / "checkpoint"), "passive"),
+                               5, action_scale=0.25)
+    assert resolved.config()["guard_pose"] == "natural"
+
+
 def _close_quarters_env():
     return BoxingEnv(spawn_distance=0.85, spawn_jitter=0.0, yaw_jitter=0.0,
                      pose_noise=0.0, action_scale=0.25)

@@ -22,6 +22,7 @@ from brax.io import html
 from PIL import Image
 
 from boxer import policy as policy_module
+from boxer import scene
 from boxer.env import BoxingEnv, resolve_env
 
 
@@ -43,6 +44,9 @@ def _parse_args(argv=None) -> argparse.Namespace:
     parser.add_argument("--n-frames", type=int, default=5)
     parser.add_argument("--action-scale", type=float, default=0.25,
                         help="used when the checkpoint carries no env_config.json")
+    parser.add_argument("--guard-pose", default="broken-wrist", choices=sorted(scene.GUARD_POSES),
+                        help="the stance assumed for a checkpoint that never recorded one; "
+                             "'broken-wrist' is what every run here trained in")
     parser.add_argument("--stochastic", action="store_true",
                         help="sample from the policy instead of taking its mode")
     parser.add_argument("--sheet-tiles", type=int, default=4)
@@ -94,11 +98,20 @@ def main(argv=None) -> int:
     # Same trap the arena fell into: a policy trained at action_scale 0.25 has to
     # be watched at 0.25, or the video shows a scaling artefact and not the agent.
     env = resolve_env((args.checkpoint, args.opponent), args.n_frames, args.action_scale,
+                      guard_pose=args.guard_pose,
                       visual=True, spawn_jitter=0.0, yaw_jitter=0.0, pose_noise=0.0)
-    checkpoint = policy_module.resolve_checkpoint(args.checkpoint)
-    print(f"devices: {jax.devices()}", flush=True)
-    print(f"loading {checkpoint}", flush=True)
-    learner = policy_module.load_policy(checkpoint, deterministic=not args.stochastic)
+    print(f"env: action_scale={env.config()['action_scale']} "
+          f"guard_pose={env.config()['guard_pose']}", flush=True)
+    if str(args.checkpoint) in ("passive", "jabber"):
+        # No checkpoint at all: two scripted corners, which is how the guard pose
+        # itself gets looked at, without a policy's behaviour in the way.
+        learner = policy_module.make_opponent(args.checkpoint, env)
+        print(f"red corner runs the scripted {args.checkpoint}", flush=True)
+    else:
+        checkpoint = policy_module.resolve_checkpoint(args.checkpoint)
+        print(f"devices: {jax.devices()}", flush=True)
+        print(f"loading {checkpoint}", flush=True)
+        learner = policy_module.load_policy(checkpoint, deterministic=not args.stochastic)
     opponent = (
         learner if args.opponent is None
         else policy_module.make_opponent(args.opponent, env)

@@ -153,7 +153,11 @@ def make_opponent(spec: str, env, deterministic: bool = True):
     The scripted policies need the action width and the arm's actuator indices,
     which belong to the env rather than to this module -- hard-coding them here
     would silently misfire the moment the robot description changes.
+
+    ``spec`` is coerced because a CLI hands over a ``Path`` and the scripted names
+    are compared as text.
     """
+    spec = str(spec)
     if spec == "passive":
         return passive(env.action_size)
     if spec == "jabber":

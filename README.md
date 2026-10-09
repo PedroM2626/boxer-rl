@@ -259,12 +259,24 @@ Two things this does not fix, both worth knowing before reading a video:
   hold a limb during a dive or on contact, so the visual is a slack arm following a target it
   is not strong enough to reach.
 - The stance is baked into the observation (the 6 guard-error dims and the 29
-  `qpos - stance` dims) and into the `guard` term of the reward, and it is *not* recorded in a
-  run's `env_config.json`. A checkpoint trained under the old pose therefore sees a shifted
-  input distribution when reloaded into the fixed one. Every number and video in this README
-  before this change was measured with the broken-wrist stance, and the two are not directly
-  comparable -- the same class of mistake as evaluating at the wrong `action_scale`, one
-  smaller and one larger.
+  `qpos - stance` dims) and into the action, so playing an old checkpoint in the
+  corrected pose does not show the same agent -- it shows a shifted input
+  distribution. The cost was measured rather than assumed, 256 arena rounds per cell
+  (`tools/stance_ab.sh`):
+
+  | the 204M arm, 256 rounds | trained pose | refitted pose |
+  | --- | --- | --- |
+  | vs passive | 0.938 | **0.139** |
+  | vs jabber | 0.947 | 0.174 |
+  | vs the 12.45M arm | 0.754 | 0.051 |
+
+  A skill that does not survive an offset in thirteen observation dims is not
+  robustness, it is fitting to the pose. That is why `guard_pose` is now one of the
+  things a run records in `env_config.json`, why the arena and the rollout print it
+  on the `env:` line, and why an unrecorded run is assumed to have trained in
+  `broken-wrist` rather than in whatever the module happens to default to now.
+  Everything in this README before this change was measured in the broken-wrist
+  stance, and remains reproducible with `--guard-pose broken-wrist`.
 
 
 ## Why this robot model

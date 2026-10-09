@@ -86,17 +86,45 @@ ARM_JOINTS = (
 # Arm targets for the guard, fitted by random search against MuJoCo forward
 # kinematics (tools/fit_guard.py). The first version of this fit minimised fist
 # *position* alone and landed on elbows locked straight with both wrists cranked
-# ~90 degrees, because the arm is redundant and the palm site is offset from the
-# wrist joint -- breaking the wrist moves the fist without moving the arm, so it
-# was the cheapest solution to a target the robot cannot reach naturally. This one
-# caps the wrists at 0.35 rad and pulls toward the home keyframe, and reaches
-# (0.33, +-0.22, 0.02) m in the torso frame: hands forward at chest height, elbows
-# flexed ~40 degrees. The chin-height target it replaces was not reachable without
-# the broken-wrist pose, so the height was the fit's error, not the robot's.
+# ~90 degrees, because the arm is redundant and the palm site sits 8 cm down the
+# forearm from the wrist yaw joint -- breaking the wrist moves the fist without
+# moving the arm, so it was the cheapest solution to a target the robot cannot
+# reach naturally.
+#
+# The replacement was fitted with the wrists inside 0.15 rad and a floor on elbow
+# flexion, and the interesting result is what it cannot do: at elbow floors of 0.6,
+# 0.9 and 1.2 rad the fist tops out at +0.05 m above torso centre every time, and
+# asking for chin height (+0.20 m) only makes the search pay for it by straightening
+# the arm or pinning the wrist at its cap. A high elbow flexion buys reach forward,
+# not height. So this is the measured envelope of a straight-wristed G1 guard: hands
+# (0.36, +-0.12, +0.05) m in the torso frame, elbows flexed 34 degrees, 24 cm apart.
+# It reads as hands at the sternum rather than at the chin, and that is the robot,
+# not the fit.
 GUARD_ARMS = {
-    "left": (-0.302, 0.276, 0.028, 0.695, -0.001, -0.338, 0.009),
-    "right": (-0.300, -0.276, -0.026, 0.694, 0.001, -0.338, -0.010),
+    "left": (-0.446, 0.099, -0.068, 0.600, -0.008, -0.150, -0.043),
+    "right": (-0.446, -0.100, 0.068, 0.600, 0.009, -0.150, 0.043),
 }
+# The pose every checkpoint in runs/ before 2026-10-08 was trained in: fists at
+# chin height, elbows locked, wrists cranked to their stops. It is kept only so
+# those checkpoints can still be played in the environment they learned. The
+# stance enters the observation -- 6 guard-error dims and 29 `qpos - stance`
+# dims -- so reloading one of them into the fitted pose above measures a shifted
+# input distribution, not the same agent. Measured: the 204M arm went from 0.938
+# wins against a statue to 0.139, and from 0.754 against the 12.45M arm to 0.051.
+GUARD_ARMS_BROKEN_WRIST = {
+    "left": (-0.676, 0.679, 0.236, -0.007, -0.573, 1.491, -1.610),
+    "right": (-0.781, -0.930, 0.076, -0.310, 0.430, 1.614, 1.419),
+}
+
+#: Names a run can record so an evaluation rebuilds the pose it trained with.
+GUARD_POSES = {"natural": GUARD_ARMS, "broken-wrist": GUARD_ARMS_BROKEN_WRIST}
+
+
+def guard_arms(name: str) -> dict:
+    try:
+        return GUARD_POSES[name]
+    except KeyError:
+        raise SystemExit(f"unknown guard pose {name!r}; choose from {sorted(GUARD_POSES)}")
 
 
 def robot_xml_path() -> Path:
@@ -290,13 +318,15 @@ def build_model(spawn_distance: float = 1.3, visual: bool = True) -> mujoco.MjMo
     return build_spec(spawn_distance, visual=visual).compile()
 
 
-def stance(model: mujoco.MjModel) -> tuple[np.ndarray, np.ndarray]:
+def stance(model: mujoco.MjModel, guard_pose: str = "natural") -> tuple[np.ndarray, np.ndarray]:
     """Guard pose for both boxers, as ``(qpos, ctrl)`` for ``model``.
 
     Free-joint values come from the model defaults, which the frame attachment
     already placed on the ring centre line facing the opponent; the legs and
-    waist take the upstream home keyframe and the arms take :data:`GUARD_ARMS`.
+    waist take the upstream home keyframe and the arms take the named pose in
+    :data:`GUARD_POSES`.
     """
+    arms = guard_arms(guard_pose)
     home_qpos, home_ctrl = home_pose()
     robot = mujoco.MjModel.from_xml_path(str(robot_xml_path()))
 
@@ -313,7 +343,7 @@ def stance(model: mujoco.MjModel) -> tuple[np.ndarray, np.ndarray]:
             name = mujoco.mj_id2name(robot, mujoco.mjtObj.mjOBJ_ACTUATOR, a)
             ctrl[mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_ACTUATOR, side + name)] = home_ctrl[a]
 
-        for half, values in GUARD_ARMS.items():
+        for half, values in arms.items():
             for joint, value in zip(ARM_JOINTS, values):
                 name = f"{side}{half}_{joint}_joint"
                 qpos[model.jnt_qposadr[mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_JOINT, name)]] = value

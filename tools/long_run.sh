@@ -43,6 +43,16 @@ cd "$PROJECT"
 
 while pgrep -f "boxer.train|boxer.arena|boxer.rollout" > /dev/null; do sleep 20; done
 
+# This arm is finished, and its checkpoints are the evidence behind the README's
+# tables. A second trainer writing into the same directory overwrote the early step
+# directories once already, so the script now refuses to start one.
+if [ -d runs/frozen_200m/checkpoint ] && \
+   [ "$(ls runs/frozen_200m/checkpoint | wc -l)" -gt 30 ]; then
+  echo "runs/frozen_200m holds the completed 204M arm ($(ls runs/frozen_200m/checkpoint | wc -l) checkpoints); not writing into it"
+  echo "the next arm is tools/long_run_event.sh"
+  exit 1
+fi
+
 mkdir -p runs/frozen_200m
 "$PY" -u -m boxer.train --mode frozen --opponent passive \
   --total-steps 200000000 --num-evals 40 \

@@ -98,6 +98,12 @@ class BoxingEnv(env_base.PipelineEnv):
         n_frames: int = 5,
         backend: str = "mjx",
         visual: bool = False,
+        # Which arm pose the round starts in, and what the action is offset from.
+        # This is not cosmetic: the stance is subtracted from the joint positions
+        # in the observation and added back to the action, so a checkpoint is only
+        # the same agent in the stance it trained with. It is recorded in
+        # env_config.json for that reason.
+        guard_pose: str = "natural",
         # The distance the range term rewards, set to where a punch can actually
         # land. Measured with tools/gate_calibration.py: a scripted jab thrown at a
         # still opponent connects 0 times in 200 steps at 1.15 m, 26 at 0.9 m and 53
@@ -143,6 +149,7 @@ class BoxingEnv(env_base.PipelineEnv):
         self._spawn_jitter = spawn_jitter
         self._yaw_jitter = yaw_jitter
         self._pose_noise = pose_noise
+        self._guard_pose = guard_pose
         self._target_range = target_range
         self._ring_radius = ring_radius
         self._down_up_z = down_up_z
@@ -193,7 +200,7 @@ class BoxingEnv(env_base.PipelineEnv):
         if not np.array_equal(np.sort(actuator_ids), np.arange(model.nu)):
             raise AssertionError("actuator order does not match the agent order")
 
-        qpos, ctrl = scene.stance(model)
+        qpos, ctrl = scene.stance(model, guard_pose)
         self._stance_qpos = jp.array(qpos.astype(np.float32))
         self._stance_ctrl = jp.array(ctrl.astype(np.float32))
         self._stance_joints = self._stance_ctrl.reshape(NUM_AGENTS, self._num_joints)
@@ -694,6 +701,7 @@ class BoxingEnv(env_base.PipelineEnv):
             "spawn_jitter": self._spawn_jitter,
             "yaw_jitter": self._yaw_jitter,
             "pose_noise": self._pose_noise,
+            "guard_pose": self._guard_pose,
             "ring_radius": self._ring_radius,
             "down_up_z": self._down_up_z,
             "down_head_z": self._down_head_z,
@@ -709,7 +717,8 @@ class BoxingEnv(env_base.PipelineEnv):
 CONFIG_FILE = "env_config.json"
 
 
-def build_from_run(run: str | Path, visual: bool = False, **overrides) -> BoxingEnv:
+def build_from_run(run: str | Path, visual: bool = False, defaults: dict | None = None,
+                   **overrides) -> BoxingEnv:
     """Rebuild the environment a checkpoint was trained in.
 
     A policy is only meaningful with the action scale it learned against: these are
@@ -720,9 +729,15 @@ def build_from_run(run: str | Path, visual: bool = False, **overrides) -> Boxing
     comparison at the wrong scale. Falls back to the class defaults when a run
     directory has no config, which is the case for checkpoints saved before this
     file existed.
+
+    ``defaults`` fills in keys the run did not record -- it cannot know the guard
+    pose of a checkpoint saved before the stance was recorded, and silently using
+    the current default there is what turns a measurement into an artefact.
     """
     path = Path(run) / CONFIG_FILE
     kwargs = json.loads(path.read_text()) if path.is_file() else {}
+    for key, value in (defaults or {}).items():
+        kwargs.setdefault(key, value)
     kwargs.update(overrides)
     return BoxingEnv(visual=visual, **kwargs)
 
@@ -735,24 +750,35 @@ def run_dir_of(spec: str) -> Path | None:
     return path.parent if path.name == "checkpoint" else path
 
 
-def resolve_env(specs, n_frames: int, action_scale: float, **overrides) -> BoxingEnv:
+def resolve_env(specs, n_frames: int, action_scale: float,
+                guard_pose: str = "broken-wrist", **overrides) -> BoxingEnv:
     """Build the arena env, preferring what the checkpoints recorded about themselves.
 
     Every run in this repo trained at ``action_scale`` 0.25, so that is the
     fallback; the class default of 1.0 is not, and using it here once turned a
     trained policy into something that falls over in half a second and looked like
     a training failure.
+
+    ``guard_pose`` is the same kind of fallback. Every checkpoint here predates the
+    stance being recorded and trained with its fists at chin height and its wrists
+    at their limits, so that is what an unrecorded run is assumed to have used --
+    playing one in the fitted pose instead measures a shifted observation rather
+    than the agent, and the cost is large: the 204M arm goes from 0.938 wins against
+    a statue to 0.139. Runs write their own config, so this only fires on the
+    legacy directories.
     """
+    defaults = {"action_scale": action_scale, "guard_pose": guard_pose}
     configs = [d for d in (run_dir_of(s) for s in specs)
                if d is not None and (d / CONFIG_FILE).is_file()]
     if configs:
-        env = build_from_run(configs[0], n_frames=n_frames, **overrides)
+        env = build_from_run(configs[0], n_frames=n_frames, defaults=defaults, **overrides)
         if len(configs) > 1:
             other = json.loads((configs[1] / CONFIG_FILE).read_text())
             mine = env.config()
-            disagree = {k: (mine[k], other[k]) for k in mine if mine[k] != other[k]}
+            disagree = {k: (mine[k], other.get(k)) for k in mine if mine[k] != other.get(k)}
             if disagree:
                 print(f"WARNING: the two checkpoints were trained in different "
                       f"environments: {disagree}", flush=True)
         return env
-    return BoxingEnv(n_frames=n_frames, action_scale=action_scale, **overrides)
+    return BoxingEnv(n_frames=n_frames, action_scale=action_scale, guard_pose=guard_pose,
+                     **overrides)

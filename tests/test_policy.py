@@ -66,3 +66,16 @@ def test_make_opponent_resolves_indices_from_the_env_not_from_literals(level):
     passive = policy.make_opponent("passive", level)
     assert float(jp.abs(passive(jp.zeros((2, level.observation_size)), jp.zeros(2),
                                  jax.random.PRNGKey(0))).max()) == 0.0
+
+
+def test_a_scripted_name_still_works_as_a_path(level):
+    """argparse turns a positional into a Path, and that is what rollout passes in.
+
+    Comparing it to the text "passive" silently sent the scripted corner to the
+    checkpoint reader, so asking for two scripted boxers died on a missing directory.
+    """
+    from pathlib import Path
+
+    scripted = policy.make_opponent(Path("passive"), level)
+    action = scripted(jp.zeros((2, level.observation_size)), jp.zeros(2), jax.random.PRNGKey(0))
+    assert float(jp.abs(action).max()) == 0.0

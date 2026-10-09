@@ -31,15 +31,22 @@ from boxer import scene
 #: The height is the whole argument. The first fit was handed +0.22 m (chin height)
 #: with no wrist cap and met it by cranking both wrists to their +/-1.614 rad stops,
 #: because the palm site is 8 cm down the forearm from the wrist yaw joint -- a broken
-#: wrist moves the site without moving the arm. With the wrists capped at WRIST_LIMIT
-#: the same search cannot close that height: it lands near +0.02 m and leaves ~8 cm of
-#: z-residual behind, and that residual is the measurement of how high a
-#: straight-wristed G1 fist can actually be held. This target is set from it.
-TARGET_X, TARGET_Y, TARGET_Z = 0.28, 0.20, 0.10
+#: wrist moves the site without moving the arm. These numbers are the measured
+#: envelope instead: with the wrists inside WRIST_LIMIT and the elbow above ELBOW_MIN,
+#: the fist tops out near +0.05 m above torso centre at every elbow floor tried
+#: (0.6, 0.9, 1.2 rad), and pushing the target to +0.20 m only makes the search buy
+#: height by straightening the arm. The defaults here are the fit that produced
+#: scene.GUARD_ARMS, so running the tool with no arguments reproduces the shipped
+#: pose.
+TARGET_X, TARGET_Y, TARGET_Z = 0.25, 0.12, 0.15
 TORSO_BODY = "torso_link"          # the frame the offset is expressed in
 PALM_SITE = "{half}_palm"
-WRIST_LIMIT = 0.35   # rad; a guard does not bend the wrist more than ~20 degrees
-NATURALNESS = 0.03   # weight on staying near the home keyframe's arm angles
+WRIST_LIMIT = 0.15   # rad; a guard cocks the wrist a little, it does not bend it
+#: A floor on elbow flexion. Without it the search buys fist height by straightening
+#: the arm, which is the same mistake in the other direction: a punch lands from a
+#: straight arm, a guard does not. Set from a sweep spec's fifth field.
+ELBOW_MIN = 0.6
+NATURALNESS = 0.02   # weight on staying near the home keyframe's arm angles
 ITERATIONS = 60_000
 
 
@@ -75,6 +82,7 @@ def fit_half(robot: mujoco.MjModel, home: np.ndarray, half: str, seed: int):
     home_arm = home[adr].copy()
     rng = np.random.default_rng(seed)
     wrist_mask = np.array([j.startswith("wrist") for j in scene.ARM_JOINTS])
+    elbow_mask = np.array([j == "elbow" for j in scene.ARM_JOINTS])
 
     def cost(values: np.ndarray) -> float:
         offset = fist_offset(robot, home, adr, values, half)
@@ -90,30 +98,46 @@ def fit_half(robot: mujoco.MjModel, home: np.ndarray, half: str, seed: int):
             scale *= 0.5
         trial = best + rng.normal(0.0, scale, best.shape)
         trial[wrist_mask] = np.clip(trial[wrist_mask], -WRIST_LIMIT, WRIST_LIMIT)
+        trial[elbow_mask] = np.maximum(trial[elbow_mask], ELBOW_MIN)
         value = cost(trial)
         if value < best_cost:
             best, best_cost = trial, value
     return best, best_cost
 
 
-def main() -> int:
+def main(argv=None) -> int:
+    """Fits one target, or compares several with `--sweep x,y,z[,nat[,elbow_min]]`."""
+    global TARGET_X, TARGET_Y, TARGET_Z, NATURALNESS, ELBOW_MIN
+    argv = list(sys.argv[1:] if argv is None else argv)
+    targets = [(TARGET_X, TARGET_Y, TARGET_Z)]
+    if argv and argv[0] == "--sweep":
+        # Each spec is x,y,z and may carry a fourth value, the naturalness weight,
+        # because how far the arm may leave the home keyframe is exactly what the
+        # guard's height is traded against.
+        targets = [tuple(float(v) for v in spec.split(",")) for spec in argv[1].split(";")]
     robot = mujoco.MjModel.from_xml_path(str(scene.robot_xml_path()))
     home, _ = scene.home_pose()
-    out = {}
-    print(f"target fist offset: ({TARGET_X:+.2f}, +-{TARGET_Y:.2f}, {TARGET_Z:+.2f}) m "
-          "in the torso frame")
-    print(f"wrist cap {WRIST_LIMIT} rad, naturalness weight {NATURALNESS}\n")
-    for i, half in enumerate(("left", "right")):
-        values, cost = fit_half(robot, home, half, seed=7 + i)
-        offset = fist_offset(robot, home, arm_indices(robot, half), values, half)
-        residual = float(np.linalg.norm(offset - target_for(half)))
-        print(f"{half}: residual {residual * 100:.2f} cm  cost {cost:.4f}")
-        print(f"   {', '.join(f'{j}={v:+.3f}' for j, v in zip(scene.ARM_JOINTS, values))}")
-        out[half] = tuple(round(float(v), 3) for v in values)
-    print("\nGUARD_ARMS = {")
-    for half, values in out.items():
-        print(f'    "{half}": {values},')
-    print("}")
+    print(f"wrist cap {WRIST_LIMIT} rad")
+    for spec in targets:
+        x, y, z = spec[:3]
+        NATURALNESS = spec[3] if len(spec) > 3 else NATURALNESS
+        ELBOW_MIN = spec[4] if len(spec) > 4 else ELBOW_MIN
+        TARGET_X, TARGET_Y, TARGET_Z = x, y, z
+        out = {}
+        print(f"\ntarget fist offset: ({x:+.2f}, +-{y:.2f}, {z:+.2f}) m in the torso frame,"
+              f" naturalness {NATURALNESS}, elbow floor {ELBOW_MIN}")
+        for i, half in enumerate(("left", "right")):
+            values, cost = fit_half(robot, home, half, seed=7 + i)
+            offset = fist_offset(robot, home, arm_indices(robot, half), values, half)
+            residual = float(np.linalg.norm(offset - target_for(half)))
+            print(f"{half}: residual {residual * 100:.2f} cm  at ({offset[0]:+.2f},"
+                  f" {offset[1]:+.2f}, {offset[2]:+.2f})  cost {cost:.4f}")
+            print(f"   {', '.join(f'{j}={v:+.3f}' for j, v in zip(scene.ARM_JOINTS, values))}")
+            out[half] = tuple(round(float(v), 3) for v in values)
+        print("GUARD_ARMS = {")
+        for half, values in out.items():
+            print(f'    "{half}": {values},')
+        print("}")
     return 0
 
 
