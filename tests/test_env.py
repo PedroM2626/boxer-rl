@@ -109,18 +109,20 @@ def test_a_moving_fist_that_connects_scores(level):
         pipeline_state=pipeline.replace(qpos=pipeline.qpos.at[blue_free].add(-0.75))
     )
 
-    scored = False
-    for _ in range(40):
+    def body(state, _):
+        clock = jp.atleast_1d(state.pipeline_state.time)[:1]
         action = jp.stack([
             jp.zeros(level.action_size),
-            jab(state.obs[1][None], jp.array([float(state.pipeline_state.time)]),
-                jax.random.PRNGKey(0))[0],
+            jab(state.obs[1][None], clock, jax.random.PRNGKey(0))[0],
         ])
         state = level.step(state, action)
-        if float(np.asarray(state.metrics["hits_landed"])) > 0.0:
-            scored = True
-            break
-    assert scored, "a swinging fist that reaches the opponent should land a punch"
+        return state, state.metrics["hits_landed"]
+
+    # One compile for the whole round. Stepping eagerly re-traced the physics scan
+    # on every control step, and the XLA CPU backend aborted in the fourth minute
+    # of compiling them (Fatal Python error: Aborted, in backend_compile_and_load).
+    _, hits = jax.lax.scan(body, state, None, length=40)
+    assert float(hits.max()) > 0.0, "a swinging fist that reaches the opponent should land a punch"
 
 
 def test_a_fast_fist_travelling_away_from_the_opponent_is_not_a_punch(level):
@@ -171,7 +173,7 @@ def test_fighting_distance_only_pays_an_upright_boxer(level):
         pipeline = pipeline.replace(sensordata=data)
         reward, parts = level._reward(
             pipeline, scene.RED, scene.BLUE, jp.zeros(level.action_size),
-            level._contact_damage(pipeline),
+            level._contact_damage(pipeline), 1.0,
         )
         return float(reward), float(parts["upright"]), float(parts["distance"])
 
