@@ -92,6 +92,34 @@ What the corrected table does say:
   per physics substep and nothing in the environment stops the action when the two
   are holding each other. See "What counts as a punch".
 
+### The statue was a ragdoll
+
+The table above is measured against `passive`, which means "zero action: hold the
+guard and do nothing". Two of those, 256 rounds, corners swapped:
+
+| `passive` × `passive` | broken-wrist guard | refitted guard |
+| --- | --- | --- |
+| someone goes down | 0.90 | **0.87** |
+| round length | 1.14 s | **1.11 s** |
+| punches landed | 0.000 | 0.000 |
+
+Nobody throws anything and 87% of rounds still end with a boxer on the floor, in
+about a second. That is the expected physics -- a position controller with no
+balancing policy is not holding a humanoid up -- but the consequence for every
+number in this README is not: **a win against `passive` has been partly a race to
+stay standing**, and the 0.938 of the 204M arm is not 94% proof of boxing. It is
+also why the frozen arm could not have answered the question the event reward was
+built for: the target leaves the floor's reach in 1.1 s, before a punch has to be
+anything.
+
+The fix is `--anchor-opponent`, which pins the frozen corner's root to where it
+spawned -- it can still be hit, its limbs still move, but it cannot fall or be
+pushed over. With the opponent anchored, landing a punch is the only way to score,
+which is the condition the second long run trains under. `tests/test_env.py::
+test_an_anchored_corner_cannot_be_knocked_over` holds the two halves of that: the
+pinned corner is upright for a full 6 s round, and the unpinned one still goes
+down, so it is an anchor and not a global buff to balance.
+
 ### Reweighting the reward changed nothing
 
 Because the diagnosis so far was "the knockout term outshouts balance", the reward was

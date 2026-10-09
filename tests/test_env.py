@@ -58,6 +58,29 @@ def test_symmetric_agents_see_symmetric_worlds(level):
     assert reward[0] == pytest.approx(reward[1], abs=1e-4)
 
 
+def test_an_anchored_corner_cannot_be_knocked_over():
+    """The frozen baseline was never an opponent, it was a ragdoll.
+
+    Measured over 256 rounds of two zero-action boxers: one of them was on the floor
+    in 1.11 s with 0.000 punches landed, in both the old and the refitted guard. So
+    every win rate against "passive" this project has reported is partly a race to
+    stay standing, and a run trained that way cannot be read as learning to box.
+    Anchoring pins one root to its spawn, which leaves landing a punch as the only
+    way to score -- and it has to do that for one corner only.
+    """
+    env = BoxingEnv(spawn_jitter=0.0, yaw_jitter=0.0, pose_noise=0.0,
+                    action_scale=0.25, anchor=scene.BLUE)
+    state = env.reset(jax.random.PRNGKey(2))
+
+    def body(state, _):
+        state = env.step(state, jp.zeros((NUM_AGENTS, env.action_size)))
+        return state, (state.metrics["down_blue"], state.metrics["down_red"])
+
+    _, (down_blue, down_red) = jax.lax.scan(body, state, None, length=300)
+    assert float(down_blue.max()) == 0.0, "the anchored corner must not go down"
+    assert float(down_red.max()) > 0.0, "the unanchored corner still falls: it is per-side"
+
+
 def test_no_phantom_hits_at_range(env):
     """A contact slot exists for every declared pair; only touching ones count."""
     state = env.reset(jax.random.PRNGKey(3))
@@ -78,12 +101,21 @@ def test_a_static_collision_is_not_a_punch(level):
     this distinction a policy could score by falling onto its opponent, and the
     measured drift (1.3 m apart to 0.42 m while both stand passively) makes that
     an easy accident rather than a rare trick.
+
+    The depth of the drop is the whole test. Measured over 0.20 to 0.75 m: nothing
+    touches below 0.40, the gate correctly scores 0.00 punches at 0.40, 0.50 and
+    0.60, and only at 0.75 does it score 2.41 -- because at that depth the bodies
+    overlap far enough that the contact solver throws them apart, which gives the
+    fists genuine speed and the gate sees what it is built to see. The refitted
+    guard is what moved that boundary: the fists now sit 0.36 m forward and near
+    the centre line, so the old -0.75 teleport stopped being a touch and became an
+    ejection.
     """
     state = level.reset(jax.random.PRNGKey(4))
     pipeline = state.pipeline_state
     blue_free = level._sides[scene.BLUE]["free_adr"]
     state = state.replace(
-        pipeline_state=pipeline.replace(qpos=pipeline.qpos.at[blue_free].add(-0.75))
+        pipeline_state=pipeline.replace(qpos=pipeline.qpos.at[blue_free].add(-0.50))
     )
 
     state = level.step(state, jp.zeros((NUM_AGENTS, level.action_size)))

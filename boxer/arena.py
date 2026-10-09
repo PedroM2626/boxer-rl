@@ -211,6 +211,9 @@ def _parse_args(argv=None) -> argparse.Namespace:
     parser.add_argument("--guard-pose", default="broken-wrist", choices=sorted(scene.GUARD_POSES),
                         help="the stance assumed for a checkpoint that never recorded one; "
                              "'broken-wrist' is what every run here trained in")
+    parser.add_argument("--anchor", default="none", choices=("none", "red", "blue"),
+                        help="pin this corner's root so it cannot fall; a frozen baseline "
+                             "that topples by itself in ~1.1 s is not an opponent")
     parser.add_argument("--no-swap", action="store_true", help="do not exchange corners")
     parser.add_argument("--stochastic", action="store_true",
                         help="sample from each policy instead of taking its mean action; "
@@ -221,15 +224,16 @@ def _parse_args(argv=None) -> argparse.Namespace:
 
 def main(argv=None) -> int:
     args = _parse_args(argv)
+    anchor = "" if args.anchor == "none" else getattr(scene, args.anchor.upper())
     env = resolve_env((args.policy_a, args.policy_b), args.n_frames, args.action_scale,
-                      guard_pose=args.guard_pose)
+                      guard_pose=args.guard_pose, anchor=anchor)
     print(f"devices: {jax.devices()}", flush=True)
     # Printed first because it is the field that was wrong for every number this
     # project ever reported: a policy trained at 0.25 and evaluated at 1.0 is a
     # different agent, not a worse one. The guard pose belongs in the same line for
     # the same reason -- it is subtracted from the observation.
     print(f"env: action_scale={env.config()['action_scale']} "
-          f"guard_pose={env.config()['guard_pose']} "
+          f"guard_pose={env.config()['guard_pose']} anchor={env.config()['anchor'] or '-'} "
           f"target_range={env.config()['target_range']} "
           f"spawn_distance={env.config()['spawn_distance']}", flush=True)
     print(f"{_describe(args.policy_a)}  vs  {_describe(args.policy_b)}  "

@@ -27,6 +27,7 @@ from brax.training.agents.ppo import train as ppo
 
 from boxer import env as env_module
 from boxer import policy as policy_module
+from boxer import scene
 from boxer import selfplay
 from boxer.env import NUM_AGENTS, BoxingEnv
 
@@ -91,6 +92,10 @@ def _parse_args(argv=None) -> argparse.Namespace:
     # random exploration and leaves no signal to learn from; 0.25 keeps the
     # control authority in the range humanoid PPO normally operates in.
     env.add_argument("--action-scale", type=float, default=0.25)
+    env.add_argument("--anchor-opponent", action="store_true",
+                     help="pin the frozen opponent's root so it cannot fall or be "
+                          "pushed over; without it the baseline is a ragdoll that "
+                          "topples in ~1.1 s and winning needs no punch")
 
     ppo_group = parser.add_argument_group("ppo")
     ppo_group.add_argument("--unroll-length", type=int, default=20)
@@ -179,11 +184,19 @@ def main(argv=None) -> int:
     _jax_compat_for_brax()
 
     print(f"devices: {jax.devices()}", flush=True)
+    anchor = ""
+    if args.anchor_opponent:
+        if args.mode != "frozen":
+            raise SystemExit("--anchor-opponent only makes sense in frozen mode: "
+                             "in self-play both corners are being trained")
+        # The corner that is not learning is the one that gets pinned.
+        anchor = scene.BLUE if args.learner_side == "red" else scene.RED
     env = BoxingEnv(
         n_frames=args.n_frames,
         spawn_distance=args.spawn_distance,
         target_range=args.target_range,
         action_scale=args.action_scale,
+        anchor=anchor,
     )
     if args.mode == "frozen":
         opponent = policy_module.make_opponent(args.opponent, env)

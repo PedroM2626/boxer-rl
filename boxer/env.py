@@ -104,6 +104,14 @@ class BoxingEnv(env_base.PipelineEnv):
         # the same agent in the stance it trained with. It is recorded in
         # env_config.json for that reason.
         guard_pose: str = "natural",
+        # Pin one corner's root to where it spawned, so it cannot fall or be pushed
+        # over. Without this the "passive opponent" is not a target but a ragdoll:
+        # measured over 256 rounds, two boxers holding zero action put one another
+        # on the floor in 1.11 s with 0.000 punches landed, which means every
+        # frozen-opponent win rate in this project has been partly a race to stay
+        # standing. Anchoring the opponent makes landing a punch the only way to
+        # score, which is the thing the event reward is supposed to be tested on.
+        anchor: str = "",
         # The distance the range term rewards, set to where a punch can actually
         # land. Measured with tools/gate_calibration.py: a scripted jab thrown at a
         # still opponent connects 0 times in 200 steps at 1.15 m, 26 at 0.9 m and 53
@@ -186,7 +194,20 @@ class BoxingEnv(env_base.PipelineEnv):
                 qpos_adr=jp.array(model.jnt_qposadr[joint]),
                 dof_adr=jp.array(model.jnt_dofadr[joint]),
                 free_adr=int(model.jnt_qposadr[free]),
+                free_dof_adr=int(model.jnt_dofadr[free]),
             )
+        # Anchoring is a pair of broadcast masks rather than index writes, because
+        # the same env runs at (nq,) under a single world and with a leading world
+        # axis under vmap, and an index slice would have to guess which.
+        self._anchor = anchor
+        self._anchor_qpos_mask = jp.zeros((self.sys.nq,))
+        self._anchor_qvel_mask = jp.zeros((self.sys.nv,))
+        if anchor:
+            index = self._sides[anchor]
+            self._anchor_qpos_mask = self._anchor_qpos_mask.at[
+                index["free_adr"]:index["free_adr"] + 7].set(1.0)
+            self._anchor_qvel_mask = self._anchor_qvel_mask.at[
+                index["free_dof_adr"]:index["free_dof_adr"] + 6].set(1.0)
         # The flat action vector is red-then-blue; check that against the model
         # rather than trusting the attach order.
         self._actuators = {
@@ -584,7 +605,11 @@ class BoxingEnv(env_base.PipelineEnv):
             reward=jp.zeros(NUM_AGENTS),
             done=jp.float32(0.0),
             metrics=self._zero_metrics(),
-            info={"last_action": action, "last_contact": jp.zeros(NUM_AGENTS)},
+            info={"last_action": action, "last_contact": jp.zeros(NUM_AGENTS),
+                  # Where the anchored corner was put by the spawn randomisation:
+                  # it is pinned back here every step, so it can be punched but
+                  # cannot be knocked over.
+                  "anchor_qpos": qpos},
         )
 
     def _observe(self, pipeline_state: physics_base.State, action: jax.Array) -> jax.Array:
@@ -617,6 +642,16 @@ class BoxingEnv(env_base.PipelineEnv):
         ctrl = jp.clip(self._stance_ctrl + action.reshape(-1) * span, self._ctrl_lo, self._ctrl_hi)
 
         pipeline_state, contact = self._step_with_contacts(state.pipeline_state, ctrl)
+
+        if self._anchor:
+            # After the substeps, so a punch still registers its contact and its
+            # damage; only the root is put back, and its velocity is dropped so the
+            # accumulated momentum cannot carry it over the next step.
+            pipeline_state = pipeline_state.replace(
+                qpos=pipeline_state.qpos * (1.0 - self._anchor_qpos_mask)
+                     + state.info["anchor_qpos"] * self._anchor_qpos_mask,
+                qvel=pipeline_state.qvel * (1.0 - self._anchor_qvel_mask),
+            )
 
         frames = {side: self._frame(pipeline_state, side) for side in scene.SIDES}
         down = jp.stack([self._down(frames[side]) for side in scene.SIDES])
@@ -702,6 +737,7 @@ class BoxingEnv(env_base.PipelineEnv):
             "yaw_jitter": self._yaw_jitter,
             "pose_noise": self._pose_noise,
             "guard_pose": self._guard_pose,
+            "anchor": self._anchor,
             "ring_radius": self._ring_radius,
             "down_up_z": self._down_up_z,
             "down_head_z": self._down_head_z,

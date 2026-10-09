@@ -44,8 +44,23 @@ while pgrep -f "boxer.train|boxer.arena|boxer.rollout|pytest" > /dev/null; do
 done
 
 mkdir -p runs/frozen_event_200m
-"$PY" -u -m boxer.train --mode frozen --opponent passive \
-  --total-steps 200000000 --num-evals 40 \
-  --worlds 256 --batch-size 4096 --num-minibatches 8 \
-  --output runs/frozen_event_200m > runs/frozen_event_200m/train.log 2>&1
-echo "event-reward long run exited $?"
+# The card has taken the WSL VM down three times in one night, and a trainer that
+# dies at hour 20 should not lose the run. Every attempt after the first resumes
+# from the newest checkpoint, which lands every 5,242,880 steps, so the worst case
+# cost of a crash is ~40 minutes. This does not survive the *VM* dying -- a loop
+# inside WSL cannot outlive it -- so a reboot still needs the script re-run.
+resume=""
+for attempt in 1 2 3 4 5 6; do
+  "$PY" -u -m boxer.train --mode frozen --opponent passive --anchor-opponent \
+    --total-steps 200000000 --num-evals 40 \
+    --worlds 256 --batch-size 4096 --num-minibatches 8 $resume \
+    --output runs/frozen_event_200m >> runs/frozen_event_200m/train.log 2>&1
+  rc=$?
+  if [ "$rc" -eq 0 ]; then
+    echo "event-reward long run finished cleanly"
+    break
+  fi
+  echo "trainer exited $rc on attempt $attempt; resuming from the last checkpoint"
+  resume=--resume
+  sleep 30
+done
