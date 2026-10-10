@@ -222,9 +222,11 @@ def _parse_args(argv=None) -> argparse.Namespace:
     parser.add_argument("--guard-pose", default="broken-wrist", choices=sorted(scene.GUARD_POSES),
                         help="the stance assumed for a checkpoint that never recorded one; "
                              "'broken-wrist' is what every run here trained in")
-    parser.add_argument("--anchor", default="none", choices=("none", "red", "blue"),
+    parser.add_argument("--anchor", default=None, choices=("none", "red", "blue"),
                         help="pin this corner's root so it cannot fall; a frozen baseline "
-                             "that topples by itself in ~1.1 s is not an opponent")
+                             "that topples by itself in ~1.1 s is not an opponent. Omit to "
+                             "use whatever the checkpoint recorded -- 'none' here means "
+                             "unpin one, not 'no flag given'")
     parser.add_argument("--rearm-gap", type=float, default=None,
                         help="override the env's fist retraction needed to arm a punch; "
                              "0 disables that gate, which is what the counter looked like "
@@ -242,15 +244,16 @@ def _parse_args(argv=None) -> argparse.Namespace:
 
 def main(argv=None) -> int:
     args = _parse_args(argv)
-    anchor = "" if args.anchor == "none" else getattr(scene, args.anchor.upper())
     # Only passed when the flag was given, so a run's own recorded counter wins.
     counter = {}
+    if args.anchor is not None:
+        counter["anchor"] = "" if args.anchor == "none" else getattr(scene, args.anchor.upper())
     if args.rearm_gap is not None:
         counter["rearm_gap"] = args.rearm_gap
     if args.impact_ref is not None:
         counter["impact_ref"] = args.impact_ref
     env = resolve_env((args.policy_a, args.policy_b), args.n_frames, args.action_scale,
-                      guard_pose=args.guard_pose, anchor=anchor, **counter)
+                      guard_pose=args.guard_pose, **counter)
     print(f"devices: {jax.devices()}", flush=True)
     # Printed first because it is the field that was wrong for every number this
     # project ever reported: a policy trained at 0.25 and evaluated at 1.0 is a
