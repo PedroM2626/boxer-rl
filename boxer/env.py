@@ -135,6 +135,16 @@ class BoxingEnv(env_base.PipelineEnv):
         # cock and throw an arm, instead of at the contact buffer's flicker rate.
         # Measured before this existed: 43 counted punches a second, head_shots 0.
         rearm_gap: float = 0.15,
+        # The speed a fist has to lose against the opponent for the contact to be
+        # paid as an impact, in m/s. Contact force is what fighting-agent work
+        # scores on -- RoboStriker (Unitree G1 boxing) uses "the proportion of
+        # contacts exceeding the force threshold" -- and MJX does not expose force
+        # on its contact struct at all (fields are dist, pos, frame, includemargin,
+        # friction, solref, solreffriction, solimp, dim, geom1/2, efc_address). So
+        # this uses the observable twin of the same physics: a fist that stops dead
+        # delivered an impulse, a fist that only reverses at a centimetre of travel
+        # did not.
+        impact_ref: float = 3.0,
         clinch_range: float = 0.5,
         punch_reach: float = 0.68,
         punch_speed_ref: float = 5.0,
@@ -176,6 +186,7 @@ class BoxingEnv(env_base.PipelineEnv):
         self._action_scale = action_scale
         self._hit_depth_ref = hit_depth_ref
         self._rearm_gap = rearm_gap
+        self._impact_ref = impact_ref
         self._clinch_range = clinch_range
         self._punch_reach = punch_reach
         self._punch_speed_ref = punch_speed_ref
@@ -440,6 +451,31 @@ class BoxingEnv(env_base.PipelineEnv):
         targets = jp.stack([foe["head"], foe["torso"]])
         return jp.min(_norm(fists[:, None, :] - targets[None, :, :], axis=-1))
 
+    def _fist_velocity(self, frame: Dict[str, jax.Array]) -> jax.Array:
+        """Both fists' velocity relative to the striker's own torso, shape (2, 3).
+
+        Torso-relative for the same reason the gate is: a collapsing body carries
+        both fists along at several m/s, and world-frame speed cannot tell that
+        apart from a punch.
+        """
+        velocity = jp.stack([frame["left_palm_vel"], frame["right_palm_vel"]])
+        return velocity - frame["torso_vel"]
+
+    def _impact(self, frame: Dict[str, jax.Array], last_velocity: jax.Array) -> jax.Array:
+        """How much approach speed each fist lost to the opponent, 0..1.
+
+        Measured along the direction the fist was already travelling, so a rebound
+        counts as a bigger stop instead of cancelling the impact out.
+        """
+        now = self._fist_velocity(frame)
+        if self._impact_ref <= 0.0:
+            # "Gate off" has to be a branch, not a division: 0/0 would spread NaN
+            # through the reward the first time a fist happened to be still.
+            return jp.ones(2)
+        unit = last_velocity / (_norm(last_velocity, axis=-1)[:, None] + 1e-6)
+        lost = jp.sum((last_velocity - now) * unit, axis=-1)
+        return jp.clip(lost / self._impact_ref, 0.0, 1.0)
+
     def _punch_signals(self, frame: Dict[str, jax.Array], foe: Dict[str, jax.Array]):
         """Per-hand (torso-relative fist speed, part of it closing on a target).
 
@@ -449,8 +485,7 @@ class BoxingEnv(env_base.PipelineEnv):
         boxer falling forward carries a fast fist that is closing on nothing.
         """
         fists = jp.stack([frame["left_palm"], frame["right_palm"]])
-        velocity = jp.stack([frame["left_palm_vel"], frame["right_palm_vel"]])
-        relative = velocity - frame["torso_vel"]
+        relative = self._fist_velocity(frame)
         targets = jp.stack([foe["head"], foe["torso"]])
         toward = targets[None, :, :] - fists[:, None, :]
         unit = toward / _norm(toward)[:, :, None]
@@ -496,6 +531,8 @@ class BoxingEnv(env_base.PipelineEnv):
         new_contact: jax.Array,
         can_score: jax.Array = 1.0,
         foe_can_score: jax.Array = 1.0,
+        impact: jax.Array = 1.0,
+        foe_impact: jax.Array = 1.0,
     ) -> tuple[jax.Array, Dict[str, jax.Array]]:
         me = self._frame(pipeline_state, side)
         foe = self._frame(pipeline_state, opponent)
@@ -550,16 +587,16 @@ class BoxingEnv(env_base.PipelineEnv):
         # measured 185 "punches" a round doing exactly that. ``new_contact`` is 1 only
         # on the step whose contact was absent the step before, which is what a
         # landed punch is.
-        landed = damage[agent] * my_commitment * new_contact * can_score
-        taken = damage[1 - agent] * foes_commitment * new_contact * foe_can_score
-        landed_hits = raw_landed * my_commitment * new_contact * can_score
-        taken_hits = raw_taken * foes_commitment * new_contact * foe_can_score
+        landed = damage[agent] * my_commitment * new_contact * can_score * impact
+        taken = damage[1 - agent] * foes_commitment * new_contact * foe_can_score * foe_impact
+        landed_hits = raw_landed * my_commitment * new_contact * can_score * impact
+        taken_hits = raw_taken * foes_commitment * new_contact * foe_can_score * foe_impact
         # head_shots must go through the same gate as hits; reporting it ungated
         # made the arena show more head shots than punches, which is impossible
         # when one is a subset of the other.
         head_shots = (
             contact["red_heads"] if agent == 0 else contact["blue_heads"]
-        ) * my_commitment * new_contact * can_score
+        ) * my_commitment * new_contact * can_score * impact
 
         centre = self._ring_distance(me)
         reward = (
@@ -631,7 +668,10 @@ class BoxingEnv(env_base.PipelineEnv):
                   "anchor_qpos": qpos,
                   # Both start with their hands away from the opponent, which is
                   # what "armed" means: see `rearm_gap`.
-                  "punch_armed": jp.ones(NUM_AGENTS)},
+                  "punch_armed": jp.ones(NUM_AGENTS),
+                  # Last control step's torso-relative fist velocities, which is the
+                  # reference the impact term measures a stop against.
+                  "last_fist_vel": jp.zeros((NUM_AGENTS, 2, 3))},
         )
 
     def _observe(self, pipeline_state: physics_base.State, action: jax.Array) -> jax.Array:
@@ -690,12 +730,23 @@ class BoxingEnv(env_base.PipelineEnv):
         first_touch = ((raw_contact > 0.0) & (state.info["last_contact"] <= 0.0))
         first_touch = first_touch.astype(jp.float32)
 
-        # A boxer whose fist is still pressed against the opponent is not armed, no
-        # matter how many times the contact buffer blinks.
+        # The two gates that turn "there is contact" into "a punch landed".
         gap = jp.stack([
             self._punch_gap(frames[side], frames[scene.OPPONENT[side]]) for side in scene.SIDES
         ])
-        armed = jp.maximum(state.info["punch_armed"], (gap > self._rearm_gap).astype(jp.float32))
+        if self._rearm_gap > 0.0:
+            # A boxer whose fist is still pressed against the opponent is not armed,
+            # no matter how many times the contact buffer blinks.
+            armed = jp.maximum(state.info["punch_armed"],
+                               (gap > self._rearm_gap).astype(jp.float32))
+        else:
+            armed = jp.ones(NUM_AGENTS)
+        impact = jp.stack([
+            # Max over hands, the same reduction _committed uses: which fist landed
+            # is not tracked through the contact buffer, so the gate is per boxer.
+            jp.max(self._impact(frames[side], state.info["last_fist_vel"][i]))
+            for i, side in enumerate(scene.SIDES)
+        ])
 
         rewards, parts = [], []
         for i, side in enumerate(scene.SIDES):
@@ -705,6 +756,7 @@ class BoxingEnv(env_base.PipelineEnv):
             reward, part = self._reward(
                 pipeline_state, side, scene.OPPONENT[side], action[i], contact,
                 first_touch[i], can_score=armed[i], foe_can_score=armed[1 - i],
+                impact=impact[i], foe_impact=impact[1 - i],
             )
             rewards.append(reward + self._w["ko"] * knockout)
             parts.append(part)
@@ -741,6 +793,9 @@ class BoxingEnv(env_base.PipelineEnv):
         state.info["last_action"] = action
         state.info["last_contact"] = raw_contact
         state.info["punch_armed"] = armed
+        state.info["last_fist_vel"] = jp.stack([
+            self._fist_velocity(frames[side]) for side in scene.SIDES
+        ])
         return state.replace(
             pipeline_state=pipeline_state,
             obs=self._observe(pipeline_state, action),
@@ -777,6 +832,7 @@ class BoxingEnv(env_base.PipelineEnv):
             "down_head_z": self._down_head_z,
             "hit_depth_ref": self._hit_depth_ref,
             "rearm_gap": self._rearm_gap,
+            "impact_ref": self._impact_ref,
             "clinch_range": self._clinch_range,
             "punch_reach": self._punch_reach,
             "punch_speed_ref": self._punch_speed_ref,

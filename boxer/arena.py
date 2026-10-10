@@ -96,11 +96,12 @@ def play(
         m = state.metrics
         return state, (state.done, m["down_red"], m["down_blue"],
                        m["hits_landed"], m["head_shots"], m["damage"],
-                       m["hits_red"], m["hits_blue"], m["heads_red"], m["heads_blue"])
+                       m["hits_red"], m["hits_blue"], m["heads_red"], m["heads_blue"],
+                       m["contacts"])
 
     _, logged = jax.lax.scan(body, states, jax.random.split(jax.random.PRNGKey(seed + 1), length))
     (done, down_red, down_blue, hits, heads, damage, hits_red, hits_blue,
-     heads_red, heads_blue) = (np.asarray(x) for x in logged)
+     heads_red, heads_blue, contacts) = (np.asarray(x) for x in logged)
 
     a_win, b_win, draw, finished, last_step = outcomes(done, down_red, down_blue, length)
     survived = np.where(finished, last_step + 1, length)
@@ -114,6 +115,7 @@ def play(
         "hits": hits.sum(axis=0), "heads": heads.sum(axis=0), "damage": damage.sum(axis=0),
         "hits_red": hits_red.sum(axis=0), "hits_blue": hits_blue.sum(axis=0),
         "heads_red": heads_red.sum(axis=0), "heads_blue": heads_blue.sum(axis=0),
+        "contacts": contacts.sum(axis=0),
     }
     finite = np.isfinite(np.stack(list(totals.values()))).all(axis=0)
     finite &= np.isfinite(done.sum(axis=0)) & np.isfinite(down_red.sum(axis=0))
@@ -144,6 +146,15 @@ def play(
         "b_hits_per_round": mean(totals["hits_blue"]),
         "a_heads_per_round": mean(totals["heads_red"]),
         "b_heads_per_round": mean(totals["heads_blue"]),
+        # The ratio, not the sum. This is how fighting-agent work that has to score
+        # a hit without a force channel frames it -- RoboStriker reports strikes as
+        # "the proportion of contacts exceeding the force threshold to the total
+        # number of offensive attempts" -- and a ratio cannot be farmed by doing the
+        # same non-punch more often. Both earlier counters here were sums, and both
+        # were inflated by repetition: 185 contact frames a round, then 43 counted
+        # punches a second against a target that cannot be pushed.
+        "hits_per_contact": mean(totals["hits"] / np.maximum(totals["contacts"], 1.0)),
+        "contacts_per_round": mean(totals["contacts"]),
         "dropped_rounds": float(1.0 - finite.mean()),
     }
 
@@ -214,6 +225,13 @@ def _parse_args(argv=None) -> argparse.Namespace:
     parser.add_argument("--anchor", default="none", choices=("none", "red", "blue"),
                         help="pin this corner's root so it cannot fall; a frozen baseline "
                              "that topples by itself in ~1.1 s is not an opponent")
+    parser.add_argument("--rearm-gap", type=float, default=None,
+                        help="override the env's fist retraction needed to arm a punch; "
+                             "0 disables that gate, which is what the counter looked like "
+                             "before it existed")
+    parser.add_argument("--impact-ref", type=float, default=None,
+                        help="override the m/s of approach speed a contact has to take to "
+                             "count; 0 makes every contact full impact, i.e. gate off")
     parser.add_argument("--no-swap", action="store_true", help="do not exchange corners")
     parser.add_argument("--stochastic", action="store_true",
                         help="sample from each policy instead of taking its mean action; "
@@ -225,8 +243,14 @@ def _parse_args(argv=None) -> argparse.Namespace:
 def main(argv=None) -> int:
     args = _parse_args(argv)
     anchor = "" if args.anchor == "none" else getattr(scene, args.anchor.upper())
+    # Only passed when the flag was given, so a run's own recorded counter wins.
+    counter = {}
+    if args.rearm_gap is not None:
+        counter["rearm_gap"] = args.rearm_gap
+    if args.impact_ref is not None:
+        counter["impact_ref"] = args.impact_ref
     env = resolve_env((args.policy_a, args.policy_b), args.n_frames, args.action_scale,
-                      guard_pose=args.guard_pose, anchor=anchor)
+                      guard_pose=args.guard_pose, anchor=anchor, **counter)
     print(f"devices: {jax.devices()}", flush=True)
     # Printed first because it is the field that was wrong for every number this
     # project ever reported: a policy trained at 0.25 and evaluated at 1.0 is a
@@ -234,6 +258,7 @@ def main(argv=None) -> int:
     # the same reason -- it is subtracted from the observation.
     print(f"env: action_scale={env.config()['action_scale']} "
           f"guard_pose={env.config()['guard_pose']} anchor={env.config()['anchor'] or '-'} "
+          f"rearm_gap={env.config()['rearm_gap']} impact_ref={env.config()['impact_ref']} "
           f"target_range={env.config()['target_range']} "
           f"spawn_distance={env.config()['spawn_distance']}", flush=True)
     print(f"{_describe(args.policy_a)}  vs  {_describe(args.policy_b)}  "

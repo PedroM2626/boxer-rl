@@ -105,6 +105,33 @@ def test_a_punch_needs_the_arm_to_come_back_first(level):
     assert float(unarmed["landed"]) == 0.0 and float(unarmed["head_shots"]) == 0.0
 
 
+def test_a_fist_that_never_slowed_down_hit_nothing(level):
+    """The force proxy, because MJX gives no contact force to score on.
+
+    A fist vibrating on a chest and a fist that stops dead both cross the contact
+    threshold, both are fast, both are aimed. What separates them is how much
+    approach speed the target took, which is the observable twin of impulse. This
+    is the term that has to make the anchored-opponent exploit unprofitable.
+    """
+    state = level.reset(jax.random.PRNGKey(9))
+    me = level._frame(state.pipeline_state, scene.RED)
+    approaching = jp.array([[5.0, 0.0, 0.0], [5.0, 0.0, 0.0]])
+
+    through = dict(me, left_palm_vel=me["torso_vel"] + approaching[0],
+                   right_palm_vel=me["torso_vel"] + approaching[1])
+    assert float(level._impact(through, approaching).max()) == pytest.approx(0.0, abs=1e-6), \
+        "still at 5 m/s means it went past, not into"
+
+    stopped = dict(me, left_palm_vel=me["torso_vel"], right_palm_vel=me["torso_vel"])
+    assert float(level._impact(stopped, approaching).min()) == pytest.approx(1.0), \
+        "a dead stop at 5 m/s is over the 3 m/s reference"
+
+    # A rebound counts as a bigger stop, not as no contact at all.
+    bounced = dict(me, left_palm_vel=me["torso_vel"] - approaching[0],
+                   right_palm_vel=me["torso_vel"] - approaching[1])
+    assert float(level._impact(bounced, approaching).min()) == pytest.approx(1.0)
+
+
 def test_no_phantom_hits_at_range(env):
     """A contact slot exists for every declared pair; only touching ones count."""
     state = env.reset(jax.random.PRNGKey(3))
