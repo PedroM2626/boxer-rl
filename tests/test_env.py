@@ -81,6 +81,30 @@ def test_an_anchored_corner_cannot_be_knocked_over():
     assert float(down_red.max()) > 0.0, "the unanchored corner still falls: it is per-side"
 
 
+def test_a_punch_needs_the_arm_to_come_back_first(level):
+    """The counter's only defence against an opponent that cannot be pushed.
+
+    Anchoring the target removed the physical signature of an impact -- momentum
+    transfer -- so a fist vibrating on its chest and a landed punch look the same
+    to the contact buffer. Measured that way the 204M-era successor reached 43
+    counted punches a second with zero head shots. What still separates the two is
+    that an arm has to reload, so a score spends the boxer's armed state until a
+    fist is back outside `rearm_gap`.
+    """
+    state = level.reset(jax.random.PRNGKey(5))
+    me = level._frame(state.pipeline_state, scene.RED)
+    foe = level._frame(state.pipeline_state, scene.BLUE)
+    assert float(level._punch_gap(me, foe)) > level._rearm_gap, "1.3 m apart is armed"
+
+    contact = level._contact_damage(state.pipeline_state)
+    args = (state.pipeline_state, scene.RED, scene.BLUE, jp.zeros(level.action_size),
+            contact, 1.0)
+    _, unarmed = level._reward(*args, can_score=0.0)
+    _, armed = level._reward(*args, can_score=1.0)
+    assert float(unarmed["landed_hits"]) == 0.0, "a fist that never retracted cannot score twice"
+    assert float(unarmed["landed"]) == 0.0 and float(unarmed["head_shots"]) == 0.0
+
+
 def test_no_phantom_hits_at_range(env):
     """A contact slot exists for every declared pair; only touching ones count."""
     state = env.reset(jax.random.PRNGKey(3))
