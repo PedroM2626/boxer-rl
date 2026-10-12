@@ -1,30 +1,36 @@
 #!/usr/bin/env bash
-# The second long run: same budget as the first, in a fixed instrument.
+# The third long run: the same arm, retrained under a counter that counts punches.
 #
-# Everything trained before this point saw three things that were wrong:
+# runs/frozen_event_200m finished 204.5M steps in a broken instrument, and reading
+# it back is the reason this one exists. Three separate bugs made "hits" mean
+# something other than punches, each found by measuring rather than by tuning:
 #
-#   * a guard pose that held the fists at chin height by breaking both wrists,
-#     which is 29 observation dims and the action's own offset (measured cost:
-#     the 204M arm goes from 0.938 wins against a statue to 0.139 when the pose
-#     is corrected underneath it, so that 200M is not re-usable, only re-playable
-#     through --guard-pose broken-wrist);
-#   * a hit counter that accumulated per physics substep, so a fist resting on the
-#     opponent paid 185 times a round and the best policy was to close and topple;
-#   * no notion of an embrace at all, so the collapse race had no cost.
+#   * an event paid ~17 hits, because raw_landed sums how many contact slots
+#     crossed the margin over the five substeps (fixed: hits and head shots are
+#     indicators, damage still scales with how much connected);
+#   * the retraction gate never bound, because it measured distance to the torso
+#     *site* at the body's centre, so a fist resting on a chest counted as
+#     retracted (fixed: rearm_steps, and contact spends the window);
+#   * the arena anchored the blue corner while the corner swap puts the learner
+#     there for half the rounds, so a_win sat at exactly 0.500 with the statue
+#     falling by itself in the swapped half (fixed: the anchor follows the corner
+#     holding the opponent).
 #
-# Those are fixed now, so the objective this run optimises is the one the README
-# claims it always had. The budget is deliberately the same as the first long run
-# because the reason for the budget has not changed: standing is the base skill and
-# on this card it needed ~100M steps, which is roughly what MuJoCo Playground spends
-# on the G1 just to walk.
+# One variable changes from the previous arm: the counter. The reward weights are
+# deliberately untouched, because this project has already spent three null results
+# learning that weight tuning buys nothing while the instrument is wrong -- and
+# because moving the head bonus at the same time would make this run unable to say
+# which of the two did anything.
 #
-# What would make this a wasted night, stated before starting it rather than after:
-# read the arena at the 100M checkpoint (256 rounds, corners swapped). If the arm is
-# upright and still lands fewer than ~1 punch per round, then scale is not what buys
-# punching either, and the remaining suspect is the arm's own pathway -- wrist
-# actuators limited to 5 N.m at kp 20, saturating at a quarter radian of error, with
-# no reward term that can see the difference between a punch and a palm that happens
-# to be near a face. `python -m boxer.arena runs/frozen_event_200m passive --rounds 256`
+# What this run can say that the last one could not: the previous arm, re-measured
+# in the fixed instrument, lands 19.4 punches in a 10 s round (1.96/s) and 0.000 to
+# the head, and the head is reachable (+0.55 m of fist against +0.43 m) -- so if this
+# arm also never aims high, it is shaping, and the head term is the next thing to
+# change with a measurement behind it.
+#
+# Read it at the end, not in the middle: `python -m boxer.arena
+# runs/frozen_event2_200m passive --rounds 256 --length 500`. Running the arena
+# alongside a trainer is what has taken the VM down.
 #
 #   wsl bash tools/long_run_event.sh
 set -uo pipefail
@@ -43,7 +49,15 @@ while pgrep -f "boxer.train|boxer.arena|boxer.rollout|pytest" > /dev/null; do
   echo "waiting for the GPU to be free"; sleep 30
 done
 
-mkdir -p runs/frozen_event_200m
+# Same hazard that nearly cost the 204M arm its checkpoints: a second trainer
+# writing into a finished run's directory overwrites the evidence.
+if [ -d runs/frozen_event2_200m/checkpoint ] && \
+   [ "$(ls runs/frozen_event2_200m/checkpoint | wc -l)" -gt 30 ]; then
+  echo "runs/frozen_event2_200m already holds a finished arm; not writing into it"
+  exit 1
+fi
+
+mkdir -p runs/frozen_event2_200m
 # The card has taken the WSL VM down three times in one night, and a trainer that
 # dies at hour 20 should not lose the run. Every attempt after the first resumes
 # from the newest checkpoint, which lands every 5,242,880 steps, so the worst case
@@ -54,7 +68,7 @@ for attempt in 1 2 3 4 5 6; do
   "$PY" -u -m boxer.train --mode frozen --opponent passive --anchor-opponent \
     --total-steps 200000000 --num-evals 40 \
     --worlds 256 --batch-size 4096 --num-minibatches 8 $resume \
-    --output runs/frozen_event_200m >> runs/frozen_event_200m/train.log 2>&1
+    --output runs/frozen_event2_200m >> runs/frozen_event2_200m/train.log 2>&1
   rc=$?
   if [ "$rc" -eq 0 ]; then
     echo "event-reward long run finished cleanly"
