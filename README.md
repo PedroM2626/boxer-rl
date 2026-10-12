@@ -443,18 +443,41 @@ register ~12 "punches" a round from nothing but the collision.
   is measured against the torso; direction is measured against the target, which
   is the only thing that separates throwing from falling onto someone.
 
-Raw contacts remain available as the separate `contacts` metric, so "touched" and
-"hit" stay distinguishable in the logs.
+Contacts remain available as the separate `contacts` metric, so "touched" and "hit"
+stay distinguishable -- as *presence* of contact per step, not a substep-summed count,
+which is what made the ratio between them meaningless the first time around.
 
-**What the gate still does not do is count a punch as one thing.** Hits accumulate per
-physics substep, so a boxer holding both hands on the opponent's head -- which is what
-the 204M arm actually does, rendered -- scores ~0.7 "hits" per control step and 40+
-"head shots" a round. The environment also has no clinch: nothing stops the action when
-the two are wrapped around each other, so closing and toppling is worth more under this
-reward than punching from outside. Fixing that means counting a punch as an *event*
-(contact preceded by non-contact) and ending or penalising sustained contact, neither of
-which is a weight adjustment -- which is the useful thing about the three null results
-above.
+**Counting a punch as an event turned out to be three bugs, not one.** The rising edge
+landed, and the numbers still made no sense, so each layer got measured separately:
+
+- **an event paid ~17 punches.** `raw_landed` sums how many contact slots crossed the
+  margin across the five substeps, so one landed punch scored once per geom that
+  touched. The trace showed only 3.2% of control steps carried a counted punch --
+  1.6/s, a boxing rate -- while the metric reported 28/s. Hits and head shots are
+  indicators now; damage still scales with how much connected, because a punch that
+  catches shoulder and chest did more work than one that grazes a knuckle.
+- **the retraction gate was decoration.** It measured the fist-to-target distance to
+  the torso *site*, which sits at the body's centre, so a fist resting on the chest was
+  already 0.16 m "retracted" and 99.3% of steps counted as armed. What replaces it is
+  the invariant the trace actually showed violated: every counted step had contact
+  present. A punch comes from outside, so `rearm_steps` consecutive steps off the
+  opponent are required, and contact itself spends the window. That alone takes 22.4
+  hits a round down to 7.85.
+- **an impact threshold cannot exist against a welded target.** Scoring on contact force
+  is what the closest published work does -- RoboStriker, same robot, uses "the
+  proportion of contacts exceeding the force threshold" -- but MJX exposes no force on
+  its contact struct, and the proxy that seemed equivalent (how much approach speed the
+  fist loses) pays a vibrating fist for its own reversal. It was removed rather than
+  tuned.
+
+**What the 200M arm in this instrument actually is.** 256 rounds, full 10 s length,
+against an opponent that cannot fall and throws nothing: **19.4 punches, 1.96 a second,
+and 0.000 to the head.** No knockdowns either way. The head is not out of reach -- the
+fist can be raised to +0.55 m above the torso against the head's +0.43 m -- but only
+with the shoulder near vertical, and the head bonus does not pay for lifting an arm that
+far while staying upright and re-cocking. So "never aims high" is a reward-shaping result
+here, not a kinematic one, and it is the clearest thing this run says about what to
+change next.
 
 ## Quickstart
 
