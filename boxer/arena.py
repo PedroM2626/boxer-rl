@@ -187,7 +187,17 @@ def matchup(
 
     # Roles exchanged: now A is blue, so every per-corner count flips corners
     # before the halves are pooled.
-    reverse = play(env, b, a, rounds, length, seed + 10_000)
+    #
+    # An anchored opponent has to be re-anchored on the corner that actually holds
+    # it, or the swapped half pins the learner and lets the statue fall by itself --
+    # which is the artifact the anchor exists to remove, arriving back through the
+    # corner swap. Measured before this: a_win stuck at exactly 0.500 with b_win 0,
+    # because every one of those wins came from the swapped half.
+    reverse_env = env
+    if env._anchor:
+        other = scene.BLUE if env._anchor == scene.RED else scene.RED
+        reverse_env = BoxingEnv(**{**env.config(), "anchor": other})
+    reverse = play(reverse_env, b, a, rounds, length, seed + 10_000)
     pooled = {}
     for key, value in forward.items():
         if key.startswith("a_"):
@@ -227,13 +237,10 @@ def _parse_args(argv=None) -> argparse.Namespace:
                              "that topples by itself in ~1.1 s is not an opponent. Omit to "
                              "use whatever the checkpoint recorded -- 'none' here means "
                              "unpin one, not 'no flag given'")
-    parser.add_argument("--rearm-gap", type=float, default=None,
-                        help="override the env's fist retraction needed to arm a punch; "
-                             "0 disables that gate, which is what the counter looked like "
-                             "before it existed")
-    parser.add_argument("--impact-ref", type=float, default=None,
-                        help="override the m/s of approach speed a contact has to take to "
-                             "count; 0 makes every contact full impact, i.e. gate off")
+    parser.add_argument("--rearm-steps", type=int, default=None,
+                        help="override the control steps a boxer must spend off the "
+                             "opponent before a contact counts again; 0 turns that gate "
+                             "off, which is what the counter looked like before it")
     parser.add_argument("--no-swap", action="store_true", help="do not exchange corners")
     parser.add_argument("--stochastic", action="store_true",
                         help="sample from each policy instead of taking its mean action; "
@@ -248,10 +255,8 @@ def main(argv=None) -> int:
     counter = {}
     if args.anchor is not None:
         counter["anchor"] = "" if args.anchor == "none" else getattr(scene, args.anchor.upper())
-    if args.rearm_gap is not None:
-        counter["rearm_gap"] = args.rearm_gap
-    if args.impact_ref is not None:
-        counter["impact_ref"] = args.impact_ref
+    if args.rearm_steps is not None:
+        counter["rearm_steps"] = args.rearm_steps
     env = resolve_env((args.policy_a, args.policy_b), args.n_frames, args.action_scale,
                       guard_pose=args.guard_pose, **counter)
     print(f"devices: {jax.devices()}", flush=True)
@@ -261,7 +266,7 @@ def main(argv=None) -> int:
     # the same reason -- it is subtracted from the observation.
     print(f"env: action_scale={env.config()['action_scale']} "
           f"guard_pose={env.config()['guard_pose']} anchor={env.config()['anchor'] or '-'} "
-          f"rearm_gap={env.config()['rearm_gap']} impact_ref={env.config()['impact_ref']} "
+          f"rearm_steps={env.config()['rearm_steps']} "
           f"target_range={env.config()['target_range']} "
           f"spawn_distance={env.config()['spawn_distance']}", flush=True)
     print(f"{_describe(args.policy_a)}  vs  {_describe(args.policy_b)}  "

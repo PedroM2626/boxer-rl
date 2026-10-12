@@ -67,13 +67,32 @@ def test_an_anchored_corner_cannot_be_knocked_over():
     stay standing, and a run trained that way cannot be read as learning to box.
     Anchoring pins one root to its spawn, which leaves landing a punch as the only
     way to score -- and it has to do that for one corner only.
+
+    Red jabs here rather than holding still, because the leak this also closes only
+    shows up under pushing: with the pelvis welded in place the torso can still be
+    shoved below the height threshold, and the arena measured half of all rounds
+    ending with the anchored corner "down" -- a knockdown of a body that cannot
+    fall. So the anchored side is never down, by construction, and the other corner
+    still is.
     """
+    from boxer import policy as policy_module
+
     env = BoxingEnv(spawn_jitter=0.0, yaw_jitter=0.0, pose_noise=0.0,
                     action_scale=0.25, anchor=scene.BLUE)
+    jab = policy_module.jabber(
+        env.action_size,
+        pitch_adr=env.actuator_index("red/left_shoulder_pitch_joint"),
+        roll_adr=env.actuator_index("red/left_shoulder_roll_joint"),
+    )
     state = env.reset(jax.random.PRNGKey(2))
 
     def body(state, _):
-        state = env.step(state, jp.zeros((NUM_AGENTS, env.action_size)))
+        clock = jp.atleast_1d(state.pipeline_state.time)[:1]
+        action = jp.stack([
+            jab(state.obs[0][None], clock, jax.random.PRNGKey(0))[0],
+            jp.zeros(env.action_size),
+        ])
+        state = env.step(state, action)
         return state, (state.metrics["down_blue"], state.metrics["down_red"])
 
     _, (down_blue, down_red) = jax.lax.scan(body, state, None, length=300)
@@ -81,55 +100,42 @@ def test_an_anchored_corner_cannot_be_knocked_over():
     assert float(down_red.max()) > 0.0, "the unanchored corner still falls: it is per-side"
 
 
-def test_a_punch_needs_the_arm_to_come_back_first(level):
-    """The counter's only defence against an opponent that cannot be pushed.
+def test_contact_spends_the_arm_and_only_distance_buys_it_back(level):
+    """The gate the trace forced, measured rather than argued.
 
-    Anchoring the target removed the physical signature of an impact -- momentum
-    transfer -- so a fist vibrating on its chest and a landed punch look the same
-    to the contact buffer. Measured that way the 204M-era successor reached 43
-    counted punches a second with zero head shots. What still separates the two is
-    that an arm has to reload, so a score spends the boxer's armed state until a
-    fist is back outside `rearm_gap`.
+    Two earlier gates -- a fist-retraction distance and an impact threshold -- were
+    both decoration: the distance was measured to the torso *site*, so a fist
+    resting on the chest already counted as retracted, and the threshold paid a
+    vibrating fist for its own reversal. What the trace showed instead is that every
+    counted step had contact present. A punch comes from outside, so the boxer has
+    to have spent `rearm_steps` control steps off the opponent before a contact
+    counts, and contact itself resets that count.
     """
     state = level.reset(jax.random.PRNGKey(5))
-    me = level._frame(state.pipeline_state, scene.RED)
-    foe = level._frame(state.pipeline_state, scene.BLUE)
-    assert float(level._punch_gap(me, foe)) > level._rearm_gap, "1.3 m apart is armed"
+    assert float(state.info["steps_off"].min()) >= level._rearm_steps, \
+        "a fresh spawn is 1.3 m apart, so both corners start armed"
 
-    contact = level._contact_damage(state.pipeline_state)
-    args = (state.pipeline_state, scene.RED, scene.BLUE, jp.zeros(level.action_size),
-            contact, 1.0)
-    _, unarmed = level._reward(*args, can_score=0.0)
-    _, armed = level._reward(*args, can_score=1.0)
-    assert float(unarmed["landed_hits"]) == 0.0, "a fist that never retracted cannot score twice"
-    assert float(unarmed["landed"]) == 0.0 and float(unarmed["head_shots"]) == 0.0
+    blue_free = level._sides[scene.BLUE]["free_adr"]
+    pipeline = state.pipeline_state
+    state = state.replace(
+        pipeline_state=pipeline.replace(qpos=pipeline.qpos.at[blue_free].add(-0.50))
+    )
+    state = level.step(state, jp.zeros((NUM_AGENTS, level.action_size)))
+    assert float(np.asarray(state.metrics["contacts"])) > 0.0, "the overlap should touch"
+    assert float(state.info["steps_off"][0]) == 0.0, "being in contact spends the arm"
 
+    # Off the opponent the counter climbs one step per control step, and it takes the
+    # whole window before a contact would count again. Done from a fresh spawn
+    # because after the overlap above the two stay in contact -- which is precisely
+    # the state the gate exists to make unprofitable.
+    def body(state, _):
+        state = level.step(state, jp.zeros((NUM_AGENTS, level.action_size)))
+        return state, state.info["steps_off"]
 
-def test_a_fist_that_never_slowed_down_hit_nothing(level):
-    """The force proxy, because MJX gives no contact force to score on.
-
-    A fist vibrating on a chest and a fist that stops dead both cross the contact
-    threshold, both are fast, both are aimed. What separates them is how much
-    approach speed the target took, which is the observable twin of impulse. This
-    is the term that has to make the anchored-opponent exploit unprofitable.
-    """
-    state = level.reset(jax.random.PRNGKey(9))
-    me = level._frame(state.pipeline_state, scene.RED)
-    approaching = jp.array([[5.0, 0.0, 0.0], [5.0, 0.0, 0.0]])
-
-    through = dict(me, left_palm_vel=me["torso_vel"] + approaching[0],
-                   right_palm_vel=me["torso_vel"] + approaching[1])
-    assert float(level._impact(through, approaching).max()) == pytest.approx(0.0, abs=1e-6), \
-        "still at 5 m/s means it went past, not into"
-
-    stopped = dict(me, left_palm_vel=me["torso_vel"], right_palm_vel=me["torso_vel"])
-    assert float(level._impact(stopped, approaching).min()) == pytest.approx(1.0), \
-        "a dead stop at 5 m/s is over the 3 m/s reference"
-
-    # A rebound counts as a bigger stop, not as no contact at all.
-    bounced = dict(me, left_palm_vel=me["torso_vel"] - approaching[0],
-                   right_palm_vel=me["torso_vel"] - approaching[1])
-    assert float(level._impact(bounced, approaching).min()) == pytest.approx(1.0)
+    clean = level.reset(jax.random.PRNGKey(5))
+    _, off = jax.lax.scan(body, clean, None, length=3)
+    assert float(off[0][0]) == level._rearm_steps + 1
+    assert float(off[2][0]) == level._rearm_steps + 3
 
 
 def test_no_phantom_hits_at_range(env):
