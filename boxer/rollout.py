@@ -47,6 +47,10 @@ def _parse_args(argv=None) -> argparse.Namespace:
     parser.add_argument("--guard-pose", default="broken-wrist", choices=sorted(scene.GUARD_POSES),
                         help="the stance assumed for a checkpoint that never recorded one; "
                              "'broken-wrist' is what every run here trained in")
+    parser.add_argument("--anchor", default=None, choices=("none", "red", "blue"),
+                        help="pin this corner's root so it cannot fall; needed to watch a "
+                             "frozen-opponent checkpoint for a full round, since an "
+                             "unanchored baseline collapses in ~1.1 s")
     parser.add_argument("--stochastic", action="store_true",
                         help="sample from the policy instead of taking its mode")
     parser.add_argument("--sheet-tiles", type=int, default=4)
@@ -97,11 +101,16 @@ def main(argv=None) -> int:
 
     # Same trap the arena fell into: a policy trained at action_scale 0.25 has to
     # be watched at 0.25, or the video shows a scaling artefact and not the agent.
+    anchor = None
+    if args.anchor is not None:
+        anchor = "" if args.anchor == "none" else getattr(scene, args.anchor.upper())
+    env_kwargs = {} if anchor is None else {"anchor": anchor}
     env = resolve_env((args.checkpoint, args.opponent), args.n_frames, args.action_scale,
-                      guard_pose=args.guard_pose,
-                      visual=True, spawn_jitter=0.0, yaw_jitter=0.0, pose_noise=0.0)
+                      guard_pose=args.guard_pose, visual=True,
+                      spawn_jitter=0.0, yaw_jitter=0.0, pose_noise=0.0, **env_kwargs)
     print(f"env: action_scale={env.config()['action_scale']} "
-          f"guard_pose={env.config()['guard_pose']}", flush=True)
+          f"guard_pose={env.config()['guard_pose']} anchor={env.config()['anchor'] or '-'}",
+          flush=True)
     if str(args.checkpoint) in ("passive", "jabber"):
         # No checkpoint at all: two scripted corners, which is how the guard pose
         # itself gets looked at, without a policy's behaviour in the way.
