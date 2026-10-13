@@ -334,6 +334,18 @@ def test_guard_pose_is_the_zero_action(env):
     assert float(np.asarray(state.metrics["upright"])) > 0.9
 
 
+def test_a_corner_with_no_spec_of_its_own_has_no_run_directory():
+    """`rollout <ckpt>` with no --opponent runs the checkpoint on both corners.
+
+    That is the self-fight view, and it crashed in resolve_env because the helper
+    tried to turn None into a path -- unexercised until now because every render
+    this project has made passed an explicit opponent.
+    """
+    assert env.run_dir_of(None) is None
+    assert env.run_dir_of("passive") is None
+    assert env.run_dir_of("runs/x/checkpoint").name == "x"
+
+
 def test_a_run_directory_rebuilds_its_own_environment(level, tmp_path):
     """A checkpoint is only meaningful in the env it learned, and that has to travel."""
     (tmp_path / env.CONFIG_FILE).write_text(json.dumps(level.config()))

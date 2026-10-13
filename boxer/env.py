@@ -831,8 +831,13 @@ def build_from_run(run: str | Path, visual: bool = False, defaults: dict | None 
     return BoxingEnv(visual=visual, **kwargs)
 
 
-def run_dir_of(spec: str) -> Path | None:
+def run_dir_of(spec: str | None) -> Path | None:
     """The training run directory behind a checkpoint spec, if there is one."""
+    if spec is None:
+        # A corner with no spec of its own: `boxer.rollout` without --opponent
+        # runs the same checkpoint on both corners, and there is nothing here to
+        # look a config up for.
+        return None
     path = Path(spec)
     if path.name in ("passive", "jabber"):
         return None
