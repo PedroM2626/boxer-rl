@@ -581,5 +581,16 @@ under `runs/boxer/` is the attempt to reach standing-and-punching behaviour.
   higher so that landing dominates once the policy finds it, but this is the
   term to watch if training produces flailing.
 - Ring boundary is a termination condition, not a physical rope.
+- **The whole test suite does not finish on this machine, and that is a limit of the
+  instrument, not of the code.** Run as one job it kills the WSL VM at 20-25 minutes
+  every time (four reboots in one night; `uptime` reads 0 min and the log stops
+  mid-progress with no summary), while a trainer ran 20.6 h uninterrupted on the same
+  card. So the suite is run in halves and each half is reported separately:
+  `tests/test_env.py` on its own, and the remaining files as a second job. A green
+  "73 passed" line has been produced this way repeatedly but never in a single pass,
+  and anything that gates a launch on a single-pass suite would never launch here.
+  `tools/verify_then_train.sh` captures pytest's own exit status for the halves it can
+  run; the trainer's wait loop checks for a free card, which says nothing about tests,
+  so it must not be treated as the gate.
 - Renders are only as good as the policy. See the run artefacts under `runs/`.
 
