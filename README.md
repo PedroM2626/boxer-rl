@@ -479,6 +479,19 @@ far while staying upright and re-cocking. So "never aims high" is a reward-shapi
 here, not a kinematic one, and it is the clearest thing this run says about what to
 change next.
 
+**And rendered, it is not boxing.** Contact sheets of the finished arm against the
+pinned opponent, from a front camera and with the round run to its full length
+(`boxer.rollout <ckpt> --opponent passive --anchor blue`): the learner walks in, closes
+to chest contact, drops its own guard, and flaps both hands around the opponent's torso.
+The hands-together guard visible in those frames is the statue's, not the learner's. So
+the 1.96/s is real contact events with a fast-enough, aimed-enough fist, and it is
+produced by behaviour nobody would call punching. Two readings remain open, and the next
+run is the one that separates them: the gate is still too loose (1 m/s of torso-relative
+speed and a 0.16 s re-cock window are both generous), or 200M steps against an opponent
+that cannot retaliate converges on pressing-and-flapping whatever the counter says. This
+arm was trained under the 17x-inflated counter, so retraining it under the corrected one
+is the test -- which is what `tools/long_run_event.sh` now runs.
+
 ## Quickstart
 
 Native Windows has no CUDA build of jaxlib, so the CPU path is for development
