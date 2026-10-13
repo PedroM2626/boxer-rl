@@ -63,7 +63,10 @@ def test_play_reports_a_probability_distribution(level):
         "a_win", "b_win", "draw", "undecided", "round_seconds",
         "hits_per_round", "heads_per_round", "damage_per_round",
         "a_hits_per_round", "b_hits_per_round",
-        "a_heads_per_round", "b_heads_per_round", "dropped_rounds",
+        "a_heads_per_round", "b_heads_per_round",
+        # The ratio, added because every counter in this project has been a sum and
+        # every sum has been inflated by repetition rather than by boxing.
+        "hits_per_contact", "contacts_per_round", "dropped_rounds",
     }
     total = result["a_win"] + result["b_win"] + result["draw"] + result["undecided"]
     assert total == pytest.approx(1.0, abs=1e-6)

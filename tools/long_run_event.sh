@@ -32,7 +32,8 @@
 # runs/frozen_event2_200m passive --rounds 256 --length 500`. Running the arena
 # alongside a trainer is what has taken the VM down.
 #
-#   wsl bash tools/long_run_event.sh
+#   wsl bash tools/verify_then_train.sh   # the gate: suite green, then this
+#   wsl bash tools/long_run_event.sh      # only if you have already run the suite
 set -uo pipefail
 
 PROJECT=/mnt/e/boxer-agent
