@@ -77,7 +77,9 @@ def _parse_args(argv=None) -> argparse.Namespace:
     run.add_argument("--seed", type=int, default=0)
     run.add_argument("--output", type=Path, default=Path("runs/boxer"))
     run.add_argument("--resume", action="store_true",
-                     help="continue from the checkpoint in --output")
+                     help="reload the weights in --output with a fresh optimizer and a "
+                          "restarted step counter (brax 0.14 cannot restore the training "
+                          "state, so this fine-tunes rather than continues)")
     run.add_argument("--init-from", type=Path, default=None,
                      help="checkpoint to take weights from when --output has none, "
                           "e.g. starting a league corner from the frozen arm's net")
@@ -162,6 +164,14 @@ def _restore_path(args: argparse.Namespace, checkpoint: Path) -> str | None:
         own = _latest_step(checkpoint)
         if own is None:
             raise SystemExit(f"--resume: no orbax step directory under {checkpoint}")
+        # Brax 0.14 has no full-state restore: this reloads the normaliser and both
+        # networks and reinitialises the optimizer with env_steps at zero, so the
+        # horizon starts over from the restored weights. That is a fine-tune from a
+        # good policy, not a continuation, and saying otherwise in a flag name is
+        # how a 26 h run got relaunched as a fresh 26 h schedule after a VM death.
+        print(f"WARNING: --resume restores weights from {own} with a FRESH optimizer "
+              f"and a restarted step counter (brax 0.14 cannot restore the training "
+              f"state); the full horizon will run again from those weights", flush=True)
         return str(own.resolve())
     if args.init_from is None:
         return None

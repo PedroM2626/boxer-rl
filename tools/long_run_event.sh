@@ -59,11 +59,13 @@ if [ -d runs/frozen_event2_200m/checkpoint ] && \
 fi
 
 mkdir -p runs/frozen_event2_200m
-# The card has taken the WSL VM down three times in one night, and a trainer that
-# dies at hour 20 should not lose the run. Every attempt after the first resumes
-# from the newest checkpoint, which lands every 5,242,880 steps, so the worst case
-# cost of a crash is ~40 minutes. This does not survive the *VM* dying -- a loop
-# inside WSL cannot outlive it -- so a reboot still needs the script re-run.
+# The card has taken the WSL VM down several times, and a trainer that dies at hour
+# 20 should not lose the weights. Note what "resume" can and cannot mean here: brax
+# 0.14 restores the networks but reinitialises the optimizer and restarts the step
+# counter, so each attempt after a crash is a fresh horizon fine-tuned from the last
+# checkpoint, not a continuation. That bounds the loss of a crash to the steps since
+# the last checkpoint (~39 min of wall time), which is what this loop is for -- but
+# it also means a crash at hour 20 costs another full horizon, not 40 minutes.
 resume=""
 for attempt in 1 2 3 4 5 6; do
   "$PY" -u -m boxer.train --mode frozen --opponent passive --anchor-opponent \
