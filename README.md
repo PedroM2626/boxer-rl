@@ -326,6 +326,42 @@ research-standard platform with enough arm DOF to box, and it ships with the
 MJX tuning this project would otherwise have had to rediscover. It is pulled
 from PyPI (`mujoco-menagerie`), never copied into the repo.
 
+### The hands are grafted, not swapped
+
+The video that prompted the scorecard also showed open hands: `g1_mjx` has one rigid
+rubber-hand mesh where a hand should be, and at any camera distance it reads as a flat
+palm. The same Menagerie folder ships `g1_with_hands`, the articulated Dex3-1 hand, and
+swapping to it is the obvious fix. It is also not available: MJX's collision driver has
+no cylinder-versus-mesh function and the hand variant's colliders are exactly that pair,
+so `mjx.put_model` raises `NotImplementedError` before a single step runs
+(`tools/hand_cost.py`). Making it simulable would mean authoring new colliders for the
+robot -- the one thing this project's brief rules out -- on top of paying its 2 ms step
+and 100 solver iterations against this scene's 4 ms and 5.
+
+So the fist is grafted instead. `_graft_fists` takes the articulated hand's own meshes --
+the palm plus seven finger links -- at a closed pose and attaches them as *visual* geoms
+to the wrist yaw link of the tuned robot, in place of the rubber hand. The pose is
+written as joint angles of the articulated model and read back through its forward
+kinematics, mirrored in sign for the right hand because that hand's joint ranges are the
+negation of the left's. `tests/test_scene.py` pins the result geometrically -- distal
+links 56-61 mm from the palm against 94-111 mm with the fingers straight -- because a
+wrong sign leaves a hand open and nothing else in the build would notice.
+
+The property that makes this safe is that the graft is visual *only*. The grafted geoms
+carry the same signature the rubber hand had -- contype 0, conaffinity 0, no pair -- so
+`compiler.discardvisual` drops them from the visual-free build the trainer compiles
+exactly as it drops the hand they replace. Measured: that build is unchanged in
+everything the policies touch (55 geoms, 208 pairs, nq 72, nu 58, 66.6823 kg), so every
+checkpoint trained before the graft still means what it meant, and only the render gains
+fingers.
+
+One trap worth recording for whoever touches this next: MuJoCo's compiler rewrites the
+pose of a mesh geom as it loads the asset -- the palm's declared offset of 0.0415 m reads
+back as 0.0838 m with a 122 degree turn -- so copying transforms out of a *compiled*
+model applies that rewrite twice and the hand arrives splayed at twice the distance. The
+graft therefore takes body transforms from kinematics and geom offsets from the spec,
+which is declared coordinates on both sides.
+
 ## Architecture
 
 ```
@@ -491,6 +527,64 @@ speed and a 0.16 s re-cock window are both generous), or 200M steps against an o
 that cannot retaliate converges on pressing-and-flapping whatever the counter says. This
 arm was trained under the 17x-inflated counter, so retraining it under the corrected one
 is the test -- which is what `tools/long_run_event.sh` now runs.
+
+### What watching the video changed in the reward
+
+Rendered and watched back, the finished third arm does three things that are not boxing:
+it walks to one spot and stays there, it flaps a hand up from the guard at roughly 6 Hz --
+which reads as a greeting rather than a jab -- and both boxers spend the round slapping
+each other's hands. Each of those is a number in the reward, and each number moved:
+
+* **the arms are worth nothing.** A glove was worth 0.25, which made hand-slapping the
+  cheapest scoring contact in the scene. Arms stay collision geoms -- blocking has to be
+  a real physical event -- but they now score 0.0, and a zero-weight target is masked out
+  of the *hit count* as well as out of the damage, so the metric and the reward cannot
+  disagree about what happened in a round.
+* **the scorecard is ordered**: head 1.0 > torso 0.5 > legs 0.35 > arms 0.0, which is what
+  a boxing scorecard does and what the render said was missing.
+* **the re-cock window is a jab's, not a vibration's**: `rearm_steps` 8 -> 20, i.e. 0.4 s
+  off the opponent at 50 Hz. 8 steps (0.16 s) was short enough to permit the 6 Hz flap.
+
+Presence and score are two different quantities, and each has exactly one job. Presence -- any
+striker inside the margin of any target, weighted or not -- drives the rising edge and the
+`contacts` metric: a punch has to arrive from off the opponent's body, and `hits_per_contact`
+needs a denominator that a glove touch still counts against. Score drives the damage, the hit
+count, and the rearm window.
+
+The window is the part that took two attempts, and both are worth keeping because the first
+sounds stricter and is not usable. Spending it on *any* touch means that at fighting distance
+-- 0.9 m apart, where the corners are in contact on well over half the control steps and the
+longest clean run is shorter than the window -- it never reopens: 0 scored steps in 200 for a
+jabber throwing 1.6 times a second (`tools/fist_probe.py`). Spending it on a *scored* contact
+says what the window was always for, "0.4 s since this boxer last put a fist on something that
+counts", and the same jabber in the same round scores again. A glove resting on a glove does not
+silence a boxer; a fist vibrating on a chest does, which is the flicker the window exists to
+stop.
+
+**What the new scorecard says about the third arm.** Re-measured in it, the finished arm
+lands **0.000 punches across 256 full-length rounds** while still making 126 contacts a
+round -- the same 126 it made when the old counter reported 31.3 punches in 10 s. Nothing
+about the policy or the physics moved between those two numbers; only what a contact is
+allowed to be worth did. The video was right and the counter was wrong: every counted
+"punch" of the third arm was a hand on a hand. The window is not what zeroed it -- 8 and
+20 steps both read 0.000 -- which isolates the arms-at-zero as the whole of the difference,
+and makes the fourth arm a clean test of whether a boxer can be taught to aim at something
+the scorecard buys.
+
+**A confident claim that turned out to be false.** While making the arms score zero the
+glove test would not pass, and reading the contact buffer seemed to show that MJX's
+slot -> pair mapping depends on the state: 284 slots for 208 declared pairs, every
+head-involving slot same-body or floor, and no cross-body fist-on-head slot anywhere. That
+reading was wrong and the error was mine. `contact.geom` indexes the geoms of the model
+the *env* compiled, which is built without visuals -- 55 geoms -- while the names were
+being resolved through a fresh `scene.build_model()`, which carries 125. Every id named a
+different geom, so a declared pair looked undeclared. `tools/slot_audit.py` reads the
+buffer through the env's own model and reports what is actually there: the mapping is
+byte-identical at reset, after a step, and with the corners teleported into each other;
+the eight fist-on-head slots exist; and the 76 extra slots are pairs that fall into two
+condim groups, none of them weighted, so damage cannot be summed twice. The optimisation
+that folds per-geom roles into per-slot constants stands, and so does the test that pins
+it. What does not stand is the generalisation from one misread diagnostic.
 
 ## Quickstart
 
