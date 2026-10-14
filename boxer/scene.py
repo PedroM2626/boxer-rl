@@ -132,6 +132,159 @@ def robot_xml_path() -> Path:
     return menagerie.get("unitree_g1").xml("g1_mjx")
 
 
+def hands_xml_path() -> Path:
+    """Path to the articulated-hand variant of the same robot.
+
+    Used for its meshes only; see :func:`_graft_fists` for why the robot that
+    trains is still the MJX-tuned one.
+    """
+    return robot_xml_path().parent / "g1_with_hands.xml"
+
+
+# A closed fist, in radians, in the left hand's sign convention. The right hand
+# mirrors: its joint ranges are the negation of the left's (thumb_2 is [0, 1.745]
+# on the left and [-1.745, 0] on the right), so the same pose is written with the
+# signs flipped and each angle is clipped into whatever range the model declares.
+# Chosen by measurement rather than by eye: at these angles the distal links sit
+# 56-61 mm from the palm mesh against 94-111 mm with the fingers straight, and the
+# fingertip reach comes in from 165 mm to 125 mm past the wrist. The first number
+# is what tests/test_scene.py pins, because a wrong sign on one hand leaves it
+# open and nothing else in the build would notice.
+FIST_ANGLES = {
+    "thumb_0": 0.5,
+    "thumb_1": 0.5,
+    "thumb_2": 1.4,
+    "index_0": -1.45,
+    "index_1": -1.65,
+    "middle_0": -1.45,
+    "middle_1": -1.65,
+}
+# Eight meshes per hand: the palm, which is a geom on the wrist itself in the
+# articulated model, and the seven finger links.
+FIST_MESHES_PER_HAND = 8
+
+
+def _fist_geoms(hand: str) -> list[tuple[str, np.ndarray, np.ndarray]]:
+    """The hand's meshes at the fist pose, as ``(mesh, pos, quat)`` in the wrist frame.
+
+    Two coordinate systems have to be kept apart here. MuJoCo's compiler rewrites
+    the pose of a mesh geom as it loads the asset -- the palm's declared offset of
+    0.0415 m reads back as 0.0838 m with a 122 degree turn -- so copying poses out
+    of a *compiled* model has that rewrite applied a second time, and the hand
+    arrives twice as far from the wrist with the fingers splayed (measured: 0.120 m
+    from palm to fingertip instead of 0.061 m). The graft therefore takes body
+    transforms from kinematics and geom offsets from the spec, which is declared
+    coordinates on both sides, and leaves the compiler to do its rewrite once.
+
+    Read off the articulated-hand model instead of transcribed from it, so the
+    numbers stay derived: the finger joints are set, forward kinematics is run
+    once, and every hand mesh is expressed in the wrist yaw link's frame. Putting
+    them on that body is what welds the hand shut -- a geom has no degrees of
+    freedom.
+    """
+    spec = mujoco.MjSpec.from_file(str(hands_xml_path()))
+    model = spec.compile()
+    data = mujoco.MjData(model)
+    prefix = f"{hand}_hand_"
+
+    sign = 1.0 if hand == "left" else -1.0
+    for j in range(model.njnt):
+        name = mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_JOINT, j) or ""
+        if not name.startswith(prefix):
+            continue
+        angle = FIST_ANGLES[name[len(prefix):-len("_joint")]] * sign
+        low, high = model.jnt_range[j]
+        data.qpos[model.jnt_qposadr[j]] = float(np.clip(angle, low, high))
+    mujoco.mj_forward(model, data)
+
+    wrist = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, f"{hand}_wrist_yaw_link")
+    inverse = np.zeros(4)
+    mujoco.mju_negQuat(inverse, data.xquat[wrist])
+
+    out = []
+    for geom in spec.geoms:
+        mesh = geom.meshname or ""
+        if not mesh.startswith(prefix) or int(geom.group) != 2:
+            continue                      # the collision geom repeats the visual one
+        body = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, geom.parent.name)
+
+        frame = np.zeros(4)
+        mujoco.mju_mulQuat(frame, inverse, data.xquat[body])
+        flat = np.zeros(9)
+        mujoco.mju_quat2Mat(flat, frame)
+        matrix = flat.reshape(3, 3)
+
+        offset = np.zeros(3)
+        mujoco.mju_rotVecQuat(offset, data.xpos[body] - data.xpos[wrist], inverse)
+        position = offset + matrix @ np.asarray(geom.pos, dtype=np.float64)
+        quat = np.zeros(4)
+        mujoco.mju_mulQuat(quat, frame, np.asarray(geom.quat, dtype=np.float64))
+        out.append((mesh, position, quat))
+
+    if len(out) != FIST_MESHES_PER_HAND:
+        raise AssertionError(
+            f"expected {FIST_MESHES_PER_HAND} hand meshes for {hand}, "
+            f"found {sorted(mesh for mesh, _, _ in out)}"
+        )
+    return out
+
+
+def _graft_fists(robot: mujoco.MjSpec) -> None:
+    """Swaps each rubber hand for the articulated hand's meshes, welded into a fist.
+
+    The robot that trains has one rigid rubber-hand mesh where a hand should be,
+    and rendered it reads as an open hand -- which is what the third arm's video
+    showed. The articulated-hand variant of the same robot would fix that at the
+    source, and cannot: MJX has no cylinder-versus-mesh collision function and the
+    variant's colliders are exactly that pair, so it will not load at all
+    (``tools/hand_cost.py``). Even if it did, it ships at a 2 ms step with 100 solver
+    iterations against this one's 4 ms with 5, and its colliders are unnamed meshes
+    that two robots would generate candidates for by broadphase instead of by the
+    208 pairs declared here.
+
+    So the hands are grafted as *visual* geoms and nothing else. They carry
+    contype 0, conaffinity 0, density 0 and no pair, which is the same signature
+    the rubber hand has, so ``compiler.discardvisual`` drops them from the
+    visual-free build the trainer compiles exactly as it drops the hand they
+    replace. The model the policies see is unchanged -- same geoms, same contacts,
+    same mass, same every checkpoint that was ever trained -- and only the render
+    gains fingers.
+    """
+    assets = hands_xml_path().parent / "assets"
+    for hand in ("left", "right"):
+        rubber = [g for g in robot.geoms if g.meshname == f"{hand}_rubber_hand"]
+        if not rubber:
+            raise AssertionError(f"no {hand}_rubber_hand geom to replace")
+        template = rubber[0]
+        wrist = robot.body(f"{hand}_wrist_yaw_link")
+
+        for mesh, pos, quat in _fist_geoms(hand):
+            path = assets / f"{mesh}.STL"
+            if not path.exists():
+                raise AssertionError(f"missing hand mesh asset {path}")
+            asset = robot.add_mesh(name=mesh)
+            asset.file = str(path)
+
+            geom = wrist.add_geom()
+            # Every field the rubber hand's default class carried, set rather than
+            # inherited: assigning `classname` hands over an MjsDefault object and
+            # leaves the geom a group-0 sphere. Group 2 and zero density keep the
+            # graft out of the mass, and contype 0 with conaffinity 0 is what makes
+            # it visual -- and therefore droppable from the trainer's build.
+            geom.type = mujoco.mjtGeom.mjGEOM_MESH
+            geom.meshname = mesh
+            geom.pos = pos
+            geom.quat = quat
+            geom.group = template.group
+            geom.density = 0.0
+            geom.material = template.material
+            geom.contype = 0
+            geom.conaffinity = 0
+
+        for geom in rubber:
+            robot.delete(geom)
+
+
 def scene_xml_path() -> Path:
     """Path to the upstream single-robot MJX scene (floor + contact pairs)."""
     return menagerie.get("unitree_g1").xml("scene_mjx")
@@ -213,6 +366,7 @@ def _add_robot(spec: mujoco.MjSpec, prefix: str, x: float, face_away: bool) -> N
 
     for sensor in list(robot.sensors):
         robot.delete(sensor)
+    _graft_fists(robot)
     for body_name, sites in EXTRA_SITES.items():
         body = robot.body(body_name)
         for site_name, pos in sites:

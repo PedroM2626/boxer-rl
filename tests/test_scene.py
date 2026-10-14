@@ -134,3 +134,102 @@ def test_mjx_solver_settings_survive_the_attach(model):
     assert model.opt.timestep == pytest.approx(0.004)
     assert model.opt.integrator == mujoco.mjtIntegrator.mjINT_IMPLICITFAST
     assert model.opt.iterations == 5
+
+
+def test_the_closed_fist_is_a_render_and_not_a_change_of_robot(model):
+    """The grafted hand must reach the camera and nothing else.
+
+    Watched back, the third arm had open hands: the robot that trains carries one
+    rigid rubber-hand mesh. The articulated-hand variant of the same G1 would fix
+    that at the source and cost a rewrite of every contact pair plus a solver that
+    ships at 2 ms and 100 iterations, so the fist is grafted instead -- the hand's
+    own meshes, welded shut, as visual geoms on the wrist.
+
+    What must not happen is the physics moving with it. The trainer compiles the
+    scene without visuals, and a graft that survived that build would change the
+    mass at the end of both arms and the contact list, which is to say the meaning
+    of every checkpoint already trained. So the two builds are held side by side:
+    identical in the degrees of freedom, the pairs and the mass, and the fingers
+    present only in the one that renders.
+    """
+    plain = scene.build_model(visual=False)
+    assert (plain.nq, plain.nv, plain.nu, plain.npair) == \
+           (model.nq, model.nv, model.nu, model.npair)
+    assert float(plain.body_mass.sum()) == pytest.approx(float(model.body_mass.sum())), \
+        "a visual graft must not add mass to the end of the arm"
+
+    def meshes(built):
+        return [
+            mujoco.mj_id2name(built, mujoco.mjtObj.mjOBJ_MESH, built.geom_dataid[g]) or ""
+            for g in range(built.ngeom)
+            if built.geom_type[g] == mujoco.mjtGeom.mjGEOM_MESH
+        ]
+
+    hands = lambda built: {m for m in meshes(built) if "_hand_" in m}
+    assert hands(plain) == set(), "the trainer's model must not carry the graft"
+    assert len(hands(model)) == 2 * len(scene.SIDES) * scene.FIST_MESHES_PER_HAND
+    assert not any("rubber_hand" in m for m in meshes(model)), \
+        "the open hand has to go, or the fist grows out of it"
+
+    # On the wrist, and inert: a geom has no degrees of freedom, which is what
+    # welds the fingers, and contype 0 with no pair is what makes it visual.
+    wrist = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY,
+                              scene.RED + "left_wrist_yaw_link")
+
+    def mesh_of(g):
+        return mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_MESH, model.geom_dataid[g]) or ""
+
+    fingers = [
+        g for g in range(model.ngeom)
+        if model.geom_bodyid[g] == wrist
+        and model.geom_type[g] == mujoco.mjtGeom.mjGEOM_MESH
+        and "_hand_" in mesh_of(g)          # the wrist link's own mesh is not a finger
+    ]
+    assert len(fingers) == scene.FIST_MESHES_PER_HAND
+    for g in fingers:
+        assert model.geom_contype[g] == 0 and model.geom_conaffinity[g] == 0
+        assert model.geom_group[g] == 2, "group 2 is what the visual build renders"
+
+
+def test_the_grafted_fingers_are_curled_and_not_splayed(model):
+    """A fist, checked geometrically, because a render can also be argued with.
+
+    The pose is written as joint angles of the articulated model and then welded,
+    so nothing else verifies that the result is closed -- and the two hands take
+    opposite signs, because the right hand's joint ranges are the negation of the
+    left's. If a sign is wrong the fingers stay straight and the boxer renders
+    karate-chopping, which is exactly the mistake the mirrored ranges invite.
+    """
+    data = mujoco.MjData(model)
+    qpos, ctrl = scene.stance(model)
+    data.qpos[:] = qpos
+    data.ctrl[:] = ctrl
+    mujoco.mj_forward(model, data)
+
+    distal = ("index_1_link", "middle_1_link", "thumb_2_link")
+    for side in scene.SIDES:
+        for hand in ("left", "right"):
+            wrist = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY,
+                                      f"{side}{hand}_wrist_yaw_link")
+            palm, tips = None, []
+            for g in range(model.ngeom):
+                if model.geom_bodyid[g] != wrist:
+                    continue
+                if model.geom_type[g] != mujoco.mjtGeom.mjGEOM_MESH:
+                    continue
+                name = mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_MESH,
+                                         model.geom_dataid[g]) or ""
+                if name.endswith("palm_link"):
+                    palm = data.geom_xpos[g].copy()
+                elif name.endswith(distal):
+                    tips.append(data.geom_xpos[g].copy())
+            assert palm is not None and len(tips) == 3, f"{side}{hand} graft incomplete"
+            reach = [float(np.linalg.norm(tip - palm)) for tip in tips]
+            assert max(reach) < 0.08, (
+                f"{side}{hand}: the distal links sit {max(reach):.3f} m from the palm "
+                "mesh. Measured on the articulated model: 0.056-0.061 m at these joint "
+                "angles, 0.094-0.111 m with the fingers straight, so 0.08 is the line "
+                "between a fist and a karate chop -- and a wrong sign on one hand "
+                "leaves it straight."
+            )
+
