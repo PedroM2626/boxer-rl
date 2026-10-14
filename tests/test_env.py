@@ -100,36 +100,131 @@ def test_an_anchored_corner_cannot_be_knocked_over():
     assert float(down_red.max()) > 0.0, "the unanchored corner still falls: it is per-side"
 
 
-def test_contact_spends_the_arm_and_only_distance_buys_it_back(level):
-    """The gate the trace forced, measured rather than argued.
+# Where the corners have to be moved for the two contact cases, measured with
+# `tools/fist_probe.py --static-gaps` rather than guessed: at 0.8 m apart the guards
+# meet and nothing is reachable but a glove, and at 0.5 m the fists are through the
+# guard and onto the torso.
+GLOVE_GAP, TORSO_GAP = 0.50, 0.80
+
+
+def _overlap(level, gap):
+    """A pipeline state with the blue corner moved `gap` metres onto the red one.
+
+    ``pipeline_init`` rather than ``step``: it runs the forward pass, so the contact
+    buffer describes the pose it is given, and no gate has had a chance to fire.
+    """
+    qpos = level._stance_qpos.at[level._sides[scene.BLUE]["free_adr"]].add(-gap)
+    return level.pipeline_init(qpos, jp.zeros(level.sys.nv), None, level._stance_ctrl)
+
+
+def test_a_fist_on_the_torso_scores_and_a_fist_on_a_glove_does_not(level):
+    """The scorecard read off real contacts, with no gate in the way.
+
+    `_contact_damage` is the only thing between the collision engine and the reward,
+    and it now reports two different quantities: `touch`, a striker inside the margin
+    of any target, which is what the rising edge and the `contacts` metric read; and
+    `hits`, the same thing restricted to targets the scorecard buys. A glove is worth
+    nothing, so the two come apart exactly where the third arm's video said they
+    should -- the boxers were touching all round and scoring on nothing but hands.
+    """
+    # One compile for both overlaps: an eager `pipeline_init` re-traces the forward
+    # pass per call.
+    damage_at = jax.jit(lambda gap: level._contact_damage(_overlap(level, gap)))
+    unpack = lambda out: {k: float(np.asarray(v)) for k, v in out.items()}
+
+    glove = unpack(damage_at(GLOVE_GAP))
+    assert glove["red_touch"] > 0.0, "at 0.8 m apart the guards meet"
+    assert glove["red_hits"] == 0.0, "and a glove is not a target"
+    assert glove["red_damage"] == 0.0
+
+    torso = unpack(damage_at(TORSO_GAP))
+    assert torso["red_hits"] > 0.0, "through the guard the fist is on the torso"
+    assert torso["red_damage"] > 0.0, "and the torso is worth something"
+
+
+def test_a_committed_fist_on_a_scored_contact_counts_as_a_punch(level):
+    """The gate's positive case, which is the half a stack of negative tests cannot pin.
+
+    Everything the gate asks for is supplied and exactly one hit comes out: a real
+    scoring contact, a fist moving at 5 m/s straight at the torso, a rising edge, and
+    an armed boxer. The fist velocity is written into the *sensor* block because that
+    is where the gate reads it, and a qvel written into a pipeline state does not
+    reach the sensors until a step has run -- measured with tools/fist_probe.py, a
+    shoulder rate of -8 rad/s reads 0.00 m/s of fist on the step where the contact is
+    still a rising edge and 2.71 m/s on the next one, when it no longer is.
+    """
+    state = _overlap(level, TORSO_GAP)
+    contact = level._contact_damage(state)
+    assert float(np.asarray(contact["red_hits"])) > 0.0
+
+    me = level._frame(state, scene.RED)
+    foe = level._frame(state, scene.BLUE)
+    toward = foe["torso"] - me["left_palm"]
+    toward = toward / jp.linalg.norm(toward)
+    address = level._sensor_adr["red/left_palm_linvel"]
+    sensors = state.sensordata.at[address:address + 3].set(5.0 * toward)
+
+    _, parts = level._reward(
+        state.replace(sensordata=sensors), scene.RED, scene.BLUE,
+        jp.zeros(level.action_size), contact, 1.0, can_score=1.0, foe_can_score=1.0,
+    )
+    assert float(np.asarray(parts["landed_hits"])) > 0.9, "one punch, counted once"
+    assert float(np.asarray(parts["landed"])) > 0.0, "and it did damage"
+    assert float(np.asarray(parts["head_shots"])) == 0.0, "the torso is not the head"
+
+    # The same fist, the same contact, and a boxer that has just scored: the window is
+    # shut, so nothing counts. This is the flicker case the window exists for.
+    _, disarmed = level._reward(
+        state.replace(sensordata=sensors), scene.RED, scene.BLUE,
+        jp.zeros(level.action_size), contact, 1.0, can_score=0.0, foe_can_score=1.0,
+    )
+    assert float(np.asarray(disarmed["landed_hits"])) == 0.0
+
+
+def test_a_scored_contact_spends_the_arm_and_a_glove_does_not(level):
+    """The gate the trace forced, and the measurement that narrowed it.
 
     Two earlier gates -- a fist-retraction distance and an impact threshold -- were
-    both decoration: the distance was measured to the torso *site*, so a fist
-    resting on the chest already counted as retracted, and the threshold paid a
-    vibrating fist for its own reversal. What the trace showed instead is that every
-    counted step had contact present. A punch comes from outside, so the boxer has
-    to have spent `rearm_steps` control steps off the opponent before a contact
-    counts, and contact itself resets that count.
+    both decoration: the distance was measured to the torso *site*, so a fist resting
+    on the chest already counted as retracted, and the threshold paid a vibrating fist
+    for its own reversal. What the trace showed instead is that every counted step had
+    contact present, so a punch has to come from outside: `rearm_steps` control steps
+    have to pass before the next contact can count.
+
+    What spends that window is a contact that *scores*. Any touch is the wrong answer
+    and was tried first: at fighting distance the corners are in contact on well over
+    half the steps and never stay off each other for 20 in a row, so a window spent by
+    any touch stays shut for the whole round and nothing can score whatever the policy
+    does (tools/fist_probe.py). Brushing a glove therefore has to leave the window
+    open -- presence without a punch -- while a fist on the torso closes it again.
     """
     state = level.reset(jax.random.PRNGKey(5))
     assert float(state.info["steps_off"].min()) >= level._rearm_steps, \
         "a fresh spawn is 1.3 m apart, so both corners start armed"
 
-    blue_free = level._sides[scene.BLUE]["free_adr"]
-    pipeline = state.pipeline_state
-    state = state.replace(
-        pipeline_state=pipeline.replace(qpos=pipeline.qpos.at[blue_free].add(-0.50))
-    )
-    state = level.step(state, jp.zeros((NUM_AGENTS, level.action_size)))
-    assert float(np.asarray(state.metrics["contacts"])) > 0.0, "the overlap should touch"
-    assert float(state.info["steps_off"][0]) == 0.0, "being in contact spends the arm"
+    step = jax.jit(level.step)
+    zero = jp.zeros((NUM_AGENTS, level.action_size))
+
+    def one_step(gap):
+        pipeline = state.pipeline_state
+        moved = step(state.replace(pipeline_state=pipeline.replace(
+            qpos=pipeline.qpos.at[level._sides[scene.BLUE]["free_adr"]].add(-gap))), zero)
+        metrics = {key: float(np.asarray(value)) for key, value in moved.metrics.items()}
+        return metrics, float(np.asarray(moved.info["steps_off"][0]))
+
+    glove, off_after_glove = one_step(GLOVE_GAP)
+    assert glove["contacts"] > 0.0, "the overlap should touch"
+    assert glove["hits_landed"] == 0.0, "a stationary touch is not a punch"
+    assert off_after_glove == level._rearm_steps + 1, \
+        "brushing a glove must not spend the window, or nothing can score at range"
+
+    _, off_after_torso = one_step(TORSO_GAP)
+    assert off_after_torso == 0.0, "a contact that scores spends the window"
 
     # Off the opponent the counter climbs one step per control step, and it takes the
-    # whole window before a contact would count again. Done from a fresh spawn
-    # because after the overlap above the two stay in contact -- which is precisely
-    # the state the gate exists to make unprofitable.
+    # whole window before a contact would count again.
     def body(state, _):
-        state = level.step(state, jp.zeros((NUM_AGENTS, level.action_size)))
+        state = step(state, zero)
         return state, state.info["steps_off"]
 
     clean = level.reset(jax.random.PRNGKey(5))
@@ -180,38 +275,6 @@ def test_a_static_collision_is_not_a_punch(level):
     assert metrics["contacts"] > 0.0, "the forced overlap should register contact"
     assert metrics["hits_landed"] == 0.0, "a stationary touch is not a punch"
     assert metrics["damage"] == 0.0
-
-
-def test_a_moving_fist_that_connects_scores(level):
-    """The other half of the gate: commitment turns contact into a punch."""
-    from boxer import policy as policy_module
-
-    jab = policy_module.jabber(
-        level.action_size,
-        pitch_adr=level.actuator_index("red/left_shoulder_pitch_joint"),
-        roll_adr=level.actuator_index("red/left_shoulder_roll_joint"),
-    )
-    state = level.reset(jax.random.PRNGKey(6))
-    pipeline = state.pipeline_state
-    blue_free = level._sides[scene.BLUE]["free_adr"]
-    state = state.replace(
-        pipeline_state=pipeline.replace(qpos=pipeline.qpos.at[blue_free].add(-0.75))
-    )
-
-    def body(state, _):
-        clock = jp.atleast_1d(state.pipeline_state.time)[:1]
-        action = jp.stack([
-            jp.zeros(level.action_size),
-            jab(state.obs[1][None], clock, jax.random.PRNGKey(0))[0],
-        ])
-        state = level.step(state, action)
-        return state, state.metrics["hits_landed"]
-
-    # One compile for the whole round. Stepping eagerly re-traced the physics scan
-    # on every control step, and the XLA CPU backend aborted in the fourth minute
-    # of compiling them (Fatal Python error: Aborted, in backend_compile_and_load).
-    _, hits = jax.lax.scan(body, state, None, length=40)
-    assert float(hits.max()) > 0.0, "a swinging fist that reaches the opponent should land a punch"
 
 
 def test_a_fast_fist_travelling_away_from_the_opponent_is_not_a_punch(level):
@@ -294,6 +357,81 @@ def test_contact_slot_mapping_is_static(level):
     after = np.asarray(state.pipeline_state.contact.geom)
     assert before.shape == after.shape
     assert np.array_equal(before, after)
+
+
+def test_a_punch_that_ends_on_a_glove_scores_nothing(level):
+    """The opponent's arms are blocking surfaces, not targets.
+
+    Measured on the rendered third arm: both boxers spent the round slapping each
+    other's hands, because a glove was worth 0.25 and the hit counter did not look
+    at weights at all. Arms are zero now, and a zero-weight target has to be absent
+    from the *count* as well as from the damage, or the metric and the reward keep
+    disagreeing about what happened in the round.
+    """
+    import mujoco
+
+    # Names have to be resolved through the model the *env* compiled, which is
+    # built without visuals: 55 geoms, and exactly the index space contact.geom
+    # uses. A fresh build with visuals has 125, so every id resolves to a
+    # different geom and the scene appears to declare no fist-on-head pair at
+    # all. That misreading cost this test four rewrites and produced a confident
+    # claim -- that MJX's contact buffer depends on the state -- which
+    # tools/slot_audit.py then falsified: the buffer is identical at reset, after
+    # a step and with the corners teleported into each other.
+    model = level._model
+    # Slot order is the MJX contact buffer's own ordering of the declared pairs,
+    # not the declaration order, so the table has to be read through
+    # contact.geom -- with the corner prefix kept, because a boxer's hand on its
+    # own shin has the same bare names as a punch and must not be confused with
+    # one. test_contact_slot_mapping_is_static pins that this ordering is
+    # state-independent, which is what makes reading it once here valid.
+    geoms = np.asarray(level.reset(jax.random.PRNGKey(9)).pipeline_state.contact.geom)
+
+    def name(gid):
+        return mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_GEOM, int(gid)) or ""
+
+    strikers = set(scene.HAND_GEOMS + scene.FOREARM_GEOMS)
+    arm_targets = set(scene.UPPER_TARGET_GEOMS) - {"head_collision", "torso_collision"}
+    scoring = {side: np.asarray(level._slot[side]["scoring"]) for side in ("red", "blue")}
+    weight = {side: np.asarray(level._slot[side]["weight"]) for side in ("red", "blue")}
+
+    glove_checks, head_checks = [], []
+    for slot, pair in enumerate(geoms):
+        n1, n2 = name(pair[0]), name(pair[1])
+        if "/" not in n1 or "/" not in n2 or n1.split("/")[0] == n2.split("/")[0]:
+            continue                      # floor, or same-body: not a strike
+        (s1, b1), (s2, b2) = n1.split("/", 1), n2.split("/", 1)
+        if b1 in strikers and b2 in arm_targets:
+            glove_checks.append((s1, slot))
+        elif b2 in strikers and b1 in arm_targets:
+            glove_checks.append((s2, slot))
+        if b1 in strikers and b2 == "head_collision":
+            head_checks.append((s1, slot))
+        elif b2 in strikers and b1 == "head_collision":
+            head_checks.append((s2, slot))
+    assert glove_checks and head_checks, "the scene must declare both kinds of pair"
+    for side, slot in glove_checks:
+        assert weight[side][slot] == 0.0, "a glove is a blocking surface, not a target"
+        assert scoring[side][slot] == 0.0, "and it must not enter the hit count"
+    for side, slot in head_checks:
+        assert scoring[side][slot] == 1.0 and weight[side][slot] == 1.0
+
+
+def test_the_scorecard_orders_head_above_torso_above_legs_above_arms():
+    """The priority a boxing scorecard uses, pinned as a table.
+
+    Requested after watching the third arm: both boxers spent the round slapping
+    each other's hands, and the reason was that a glove paid something. Zero is
+    not "low priority" -- it is the only value that makes blocking a hand a
+    non-event, and the ordering above it has to stay strict or the head shot
+    stops being the thing worth aiming at.
+    """
+    head = env.TARGET_WEIGHTS["head_collision"]
+    torso = env.TARGET_WEIGHTS["torso_collision"]
+    legs = [env.TARGET_WEIGHTS[g] for g in scene.BODY_TARGET_GEOMS]
+    arms = [env.TARGET_WEIGHTS[g] for g in scene.HAND_GEOMS + scene.FOREARM_GEOMS]
+    assert head > torso > max(legs) > 0.0
+    assert all(value == 0.0 for value in arms), "an arm is a block, never a target"
 
 
 def test_a_tipped_boxer_ends_the_round(env):

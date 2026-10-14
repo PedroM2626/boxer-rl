@@ -35,12 +35,17 @@ MAX_SEPARATION = 2.4
 # (the forearm blocks, and it also lands in a clinch).
 RED_STRIKE, BLUE_STRIKE, RED_TARGET, BLUE_TARGET = 1, 2, 4, 8
 
-# What a landed punch on each target is worth, relative to a head shot.
-TARGET_WEIGHTS: Dict[str, float] = {"head_collision": 1.0, "torso_collision": 0.6}
+# What a landed contact is worth, by what it landed on. The arms are zero: they
+# stay collision geoms so that blocking is a real physical event, but a punch that
+# ends on the opponent's glove is not a punch -- measured on the rendered third arm,
+# both boxers spent the round slapping each other's hands because 0.25 was still
+# something. Head pays twice the torso and the torso pays above the legs, which is
+# the ordering a boxing scorecard uses.
+TARGET_WEIGHTS: Dict[str, float] = {"head_collision": 1.0, "torso_collision": 0.5}
 for _geom in scene.UPPER_TARGET_GEOMS:
-    TARGET_WEIGHTS.setdefault(_geom, 0.25)
+    TARGET_WEIGHTS.setdefault(_geom, 0.0)
 for _geom in scene.BODY_TARGET_GEOMS:
-    TARGET_WEIGHTS.setdefault(_geom, 0.4)
+    TARGET_WEIGHTS.setdefault(_geom, 0.35)
 del _geom
 
 STRIKERS = scene.HAND_GEOMS + scene.FOREARM_GEOMS
@@ -124,17 +129,30 @@ class BoxingEnv(env_base.PipelineEnv):
         down_head_z: float = 0.55,
         action_scale: float = 1.0,
         hit_depth_ref: float = 0.01,
-        # How many consecutive control steps a boxer must spend OFF the opponent
-        # before a contact counts as a punch again. This replaces two gates that
-        # tools/counter_trace.py showed were decoration: a distance threshold
+        # How many consecutive control steps must pass since a boxer's last *scoring*
+        # contact before another contact counts as a punch. This replaces two gates
+        # that tools/counter_trace.py showed were decoration: a distance threshold
         # measured to the torso *site*, which sits at the body's centre, so a fist
         # resting on the chest is already 0.16 m away and 99.3% of steps counted as
         # retracted; and an impact threshold that paid a vibrating fist for its own
         # reversal. What the trace did show is that every counted step had contact
         # present -- a punch comes from outside the opponent's volume, a flicker
-        # never leaves it. At 50 Hz, 8 steps is 0.16 s off the target, shorter than
-        # any real re-cock and longer than any vibration.
-        rearm_steps: int = 8,
+        # never leaves it.
+        #
+        # 8 steps (0.16 s) turned out to permit the motion the rendered third arm
+        # actually shows: a hand flapping up from the guard at up to 6 Hz, which
+        # reads as a greeting rather than a jab. 20 steps is 0.4 s -- the cadence of
+        # a real jab, and a ceiling of 2.5 punches a second.
+        #
+        # What spends the window matters as much as its length, and any touch is the
+        # wrong answer: at fighting distance the corners are in contact on well over
+        # half the steps and never stay off each other for 20 in a row, so a window
+        # spent by any touch never reopens and the round scores nothing at all
+        # (tools/fist_probe.py). A scored contact spends it, so the window asks
+        # whether the boxer has been off something that counts -- which is the flicker
+        # it exists to stop -- while incidental glove contact in close range does not
+        # silence a real punch.
+        rearm_steps: int = 20,
         clinch_range: float = 0.5,
         punch_reach: float = 0.68,
         punch_speed_ref: float = 5.0,
@@ -165,6 +183,11 @@ class BoxingEnv(env_base.PipelineEnv):
         sys = mjcf.load_model(model)
         super().__init__(sys=sys, backend=backend, n_frames=n_frames)
 
+        # The contact buffer indexes geoms by *this* model's ids. A second build
+        # with visuals carries 125 geoms where this one carries 55, so resolving a
+        # slot's name through it renames every pair in the scene -- which is how a
+        # missing fist-on-head slot came to look like a missing declaration.
+        self._model = model
         self._spawn_jitter = spawn_jitter
         self._yaw_jitter = yaw_jitter
         self._pose_noise = pose_noise
@@ -392,6 +415,16 @@ class BoxingEnv(env_base.PipelineEnv):
         ``tests.test_env.test_contact_slot_mapping_is_static`` pins the
         assumption this rests on, so a MuJoCo change that reorders the buffer
         fails a test instead of silently miscounting punches.
+
+        Measured with ``tools/slot_audit.py``: 284 slots for 208 declared pairs,
+        because a pair that falls into two condim groups gets one slot per group
+        (none of the weighted pairs do, so damage cannot be summed twice), and
+        the buffer is byte-identical at reset, after a step and with the corners
+        teleported into each other. The slot geom ids index ``self._model``, the
+        visual-free build; resolving them through a build with visuals -- 125
+        geoms against 55 -- renames every pair in the scene and makes a declared
+        fist-on-head contact look missing. That misreading once produced a
+        confident claim that the buffer was state-dependent, which is false.
         """
         pipeline_state = self.pipeline_init(
             self._stance_qpos, jp.zeros(self.sys.nv), None, self._stance_ctrl
@@ -409,6 +442,12 @@ class BoxingEnv(env_base.PipelineEnv):
                 "landed": jp.array(landed),
                 "weight": jp.array(struck),
                 "head": jp.array((struck >= self._contact_head_weight).astype(np.float32)),
+                # A contact on a zero-weight target -- the opponent's glove, say --
+                # is a physical event but not a scored one, so it must not enter the
+                # hit count either. Without this mask the counter paid for hand
+                # slapping at full rate while the reward paid almost nothing, which
+                # is exactly the split that made the metric and the video disagree.
+                "scoring": jp.array((struck > 0.0).astype(np.float32)),
             }
 
         red = classify(RED_STRIKE, BLUE_TARGET)
@@ -431,8 +470,15 @@ class BoxingEnv(env_base.PipelineEnv):
             slot = self._slot[side]
             strike = landed * slot["landed"]
             out[f"{side}_damage"] = jp.sum(strike * depth * slot["weight"])
-            out[f"{side}_hits"] = jp.sum(strike)
+            out[f"{side}_hits"] = jp.sum(strike * slot["scoring"])
             out[f"{side}_heads"] = jp.sum(strike * slot["head"])
+            # Presence, deliberately *not* weight-masked. A fist resting on the
+            # opponent's glove scores nothing, but it is still contact, and two things
+            # have to see it: the `contacts` metric, which is the denominator of
+            # hits_per_contact, and the rising edge, which is what makes a punch
+            # something that arrives from off the opponent's body rather than
+            # something that slides from his glove onto his chest.
+            out[f"{side}_touch"] = jp.sum(strike)
         return out
 
     def _fist_velocity(self, frame: Dict[str, jax.Array]) -> jax.Array:
@@ -534,10 +580,11 @@ class BoxingEnv(env_base.PipelineEnv):
         fists = jp.stack([me["left_palm"], me["right_palm"]])[:, None, :]
         targets = jp.stack([foe["head"], foe["torso"]])[None, :, :]
         gap = _norm(fists - targets)
-        strike = jp.sum(swing[:, None] * jp.exp(-(gap / 0.30) ** 2) * jp.array([[1.0, 0.6]]))
+        strike = jp.sum(swing[:, None] * jp.exp(-(gap / 0.30) ** 2) * jp.array([[1.0, 0.5]]))
 
         damage = (contact["red_damage"], contact["blue_damage"])
         hits = (contact["red_hits"], contact["blue_hits"])
+        touch = (contact["red_touch"], contact["blue_touch"])
         raw_landed, raw_taken = hits[agent], hits[1 - agent]
         landed, taken = damage[agent], damage[1 - agent]
 
@@ -594,12 +641,15 @@ class BoxingEnv(env_base.PipelineEnv):
             strike=strike, landed=landed, taken=taken, distance=distance, centre=centre,
             landed_hits=landed_hits, taken_hits=taken_hits, head_shots=head_shots,
             raw_landed=raw_landed,
-            # Presence, not magnitude: `raw_landed` is a substep-summed slot count,
-            # so leaving it that way made hits_per_contact divide an indicator by a
-            # magnitude and report 0.009 for something that is really "how many of
-            # the steps where I was touching him were punches".
-            contacts=0.5 * ((raw_landed > 0.0).astype(jp.float32)
-                            + (raw_taken > 0.0).astype(jp.float32)),
+            # Presence, not magnitude, and presence of *any* contact rather than of a
+            # scoring one: `raw_landed` is a substep-summed slot count over weighted
+            # targets only, so dividing an indicator by it reported 0.009 for what is
+            # really "how many of the steps where I was touching him were punches".
+            # Reading the denominator off `touch` keeps that ratio honest now that a
+            # glove is worth nothing -- scored against `hits` it would be 1 by
+            # construction and would say nothing about the round.
+            contacts=0.5 * ((touch[agent] > 0.0).astype(jp.float32)
+                            + (touch[1 - agent] > 0.0).astype(jp.float32)),
         )
         return reward, parts
 
@@ -643,8 +693,8 @@ class BoxingEnv(env_base.PipelineEnv):
                   # it is pinned back here every step, so it can be punched but
                   # cannot be knocked over.
                   "anchor_qpos": qpos,
-                  # Control steps spent off the opponent. Both boxers spawn 1.3 m
-                  # apart, so both start armed: see `rearm_steps`.
+                  # Control steps since this boxer's last scoring contact. Both spawn
+                  # 1.3 m apart, so both start armed: see `rearm_steps`.
                   "steps_off": jp.full((NUM_AGENTS,), float(self._rearm_steps))},
         )
 
@@ -704,20 +754,27 @@ class BoxingEnv(env_base.PipelineEnv):
         separation = _norm(frames[scene.RED]["torso"] - frames[scene.BLUE]["torso"])
         done = jp.clip(jp.max(down) + jp.max(outside) + (separation > MAX_SEPARATION), 0.0, 1.0)
 
-        # A punch is a rising edge of contact, so the previous step's contact count
-        # has to survive in info: the contact buffer alone says "hands are on the
-        # opponent", which is true for a punch and equally true for a clinch.
-        raw_contact = jp.stack([contact["red_hits"], contact["blue_hits"]])
-        first_touch = ((raw_contact > 0.0) & (state.info["last_contact"] <= 0.0))
+        # A punch is a rising edge of contact, so the previous step's contact has to
+        # survive in info: the contact buffer alone says "hands are on the opponent",
+        # which is true for a punch and equally true for a clinch. The edge reads
+        # *presence* rather than score, because a punch has to arrive from off the
+        # opponent's body -- a fist that slides from a glove onto a chest without
+        # ever leaving has not been withdrawn, and that is a shove.
+        presence = jp.stack([contact["red_touch"], contact["blue_touch"]])
+        first_touch = ((presence > 0.0) & (state.info["last_contact"] <= 0.0))
         first_touch = first_touch.astype(jp.float32)
 
-        # The two gates that turn "there is contact" into "a punch landed".
-        # A punch comes from outside. The boxer has to have spent `rearm_steps`
-        # consecutive control steps off the opponent before this step's contact can
-        # count, which is the invariant the trace showed the flicker violating: every
-        # counted step had contact present, and a fist resting on a chest never left.
+        # The window that has to open before the next punch can count is spent by a
+        # *scoring* contact and not by any touch, and the difference is measured
+        # rather than argued: at fighting distance -- 0.9 m apart -- the corners are
+        # in contact on well over half of 200 control steps and never stay off each
+        # other for 20 in a row (tools/fist_probe.py), so a window spent by any touch
+        # stays shut for the whole round and no punch of any kind can score. Spent by
+        # a scored contact it says what it was always meant to say: this boxer has not
+        # put a fist on anything that counts for `rearm_steps`.
+        scored = jp.stack([contact["red_hits"], contact["blue_hits"]])
         armed = (state.info["steps_off"] >= self._rearm_steps).astype(jp.float32)
-        steps_off = jp.where(raw_contact > 0.0, 0.0, state.info["steps_off"] + 1.0)
+        steps_off = jp.where(scored > 0.0, 0.0, state.info["steps_off"] + 1.0)
 
         rewards, parts = [], []
         for i, side in enumerate(scene.SIDES):
@@ -757,7 +814,7 @@ class BoxingEnv(env_base.PipelineEnv):
         # episode bookkeeping in `info`, which a new State would drop.
         state.metrics.update(metrics)
         state.info["last_action"] = action
-        state.info["last_contact"] = raw_contact
+        state.info["last_contact"] = presence
         state.info["steps_off"] = steps_off
         return state.replace(
             pipeline_state=pipeline_state,
