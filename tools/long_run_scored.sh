@@ -4,8 +4,10 @@
 # runs/frozen_event2_200m (199.2M steps) was trained with every target above the
 # waist paying something, and rendered it is not boxing: the learner walks to one
 # spot, drops its guard and flaps both hands at the opponent's chest and gloves at
-# about 6 Hz. Under the counter it scored 31.3 hits in a 10 s round, and the video
-# says most of those were hand slaps -- because a glove paid 0.25 and that was the
+# about 6 Hz. Under the counter it scored 31.3 hits in a 10 s round; re-measured in
+# this scorecard the same checkpoint lands 0.000 punches with the same 126 contacts a
+# round (256 rounds, and 8 and 20 steps of window read identically), so every one of
+# those 31.3 was a hand on a hand -- a glove paid 0.25 and that was the
 # cheapest scoring contact in the scene.
 #
 # What changes here is one question -- what counts as a scored punch -- and the
@@ -51,20 +53,38 @@ while pgrep -f "boxer.train|boxer.arena|boxer.rollout|pytest|hand_cost|jab_probe
 done
 
 RUN=runs/frozen_scored_200m
+# The horizon is a parameter because this arm has already been restarted once: the
+# host powered off at 23:29 on 2026-10-14 with 45.9M steps logged and its last
+# checkpoint at 41.9M, and brax 0.14 cannot continue a run -- a resume is a fresh
+# horizon fine-tuned from those weights. Running the full 200M again would give this
+# arm ~246M steps against the third arm's ~204M, which makes compute a second
+# difference between them and stops the comparison being one-variable. So the
+# relaunch asks for the remainder, and lands within ~2M steps of the other arm.
+TOTAL_STEPS=${TOTAL_STEPS:-160000000}
+echo "horizon for this attempt: $TOTAL_STEPS learner steps"
 if [ -d "$RUN/checkpoint" ] && [ "$(ls "$RUN/checkpoint" | wc -l)" -gt 30 ]; then
   echo "$RUN already holds a finished arm; not writing into it"
   exit 1
 fi
 
+# If this run already holds checkpoints, the previous attempt did not end in a
+# trainer crash: a host reboot takes this script with it, and a first attempt
+# without --resume would start at step 0 and overwrite the weights that were saved.
+# Detect them instead of relying on someone remembering the flag -- that hazard
+# already cost the 204M arm its checkpoints once.
+resume=""
+if [ -n "$(ls -A "$RUN/checkpoint" 2>/dev/null)" ]; then
+  echo "$RUN already has checkpoints; resuming their weights with a fresh horizon"
+  resume=--resume
+fi
 mkdir -p "$RUN"
 # brax 0.14 cannot continue a run: --resume restores the networks and restarts the
 # optimizer and the step counter, so an attempt after a crash is a fresh horizon
 # fine-tuned from the last checkpoint. That bounds the loss of a crash to the steps
 # since the last checkpoint (~39 min), not to the whole arm.
-resume=""
 for attempt in 1 2 3 4 5 6; do
   "$PY" -u -m boxer.train --mode frozen --opponent passive --anchor-opponent \
-    --total-steps 200000000 --num-evals 40 \
+    --total-steps "$TOTAL_STEPS" --num-evals 40 \
     --worlds 256 --batch-size 4096 --num-minibatches 8 $resume \
     --output "$RUN" >> "$RUN/train.log" 2>&1
   rc=$?
