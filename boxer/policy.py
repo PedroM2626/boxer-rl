@@ -128,20 +128,31 @@ def passive(action_size: int):
     return policy
 
 
-def jabber(action_size: int, pitch_adr: int, roll_adr: int, rate: float = 1.6,
-           amplitude: float = 0.7):
-    """A metronome lead hand: throws a jab every ``1 / rate`` simulated seconds.
+def jabber(action_size: int, pitch_adr: int, elbow_adr: int, rate: float = 1.6,
+           amplitude: float = 1.0):
+    """A metronome lead hand: throws a straight jab every ``1 / rate`` simulated seconds.
 
     Gives the learner something rhythmic to attack and to learn to slip, which a
     fully passive opponent never asks of it.
+
+    It used to be a sine on shoulder pitch alone, which rotates the whole arm about
+    the shoulder and sends the fist up in an arc -- a greeting, not a jab. That is why
+    a scripted "punch" in this project kept arriving on the opponent's gloves and
+    reading as an upward wave on video, and why it is now an elbow extension with the
+    upper arm brought round at the same time: the fist travels along the axis the
+    boxer faces, which is the shape the gate requires.
     """
 
     def policy(obs, time, key):
         del key
         phase = 2 * jp.pi * rate * time
+        # Half a cycle out, half back. Clipping the sine keeps the extension fast and
+        # the return slow, so there is an unmistakable punch phase for the gate to
+        # catch rather than a symmetric oscillation.
+        strike = jp.clip(jp.sin(phase), 0.0, 1.0)
         actions = jp.zeros((obs.shape[0], action_size))
-        actions = actions.at[:, pitch_adr].set(amplitude * jp.sin(phase))
-        actions = actions.at[:, roll_adr].set(0.3 * amplitude * jp.cos(phase))
+        actions = actions.at[:, pitch_adr].set(-0.32 * amplitude * strike)
+        actions = actions.at[:, elbow_adr].set(-0.55 * amplitude * strike)
         return actions
 
     return policy
@@ -164,6 +175,6 @@ def make_opponent(spec: str, env, deterministic: bool = True):
         return jabber(
             env.action_size,
             pitch_adr=env.actuator_index(scene.RED + "left_shoulder_pitch_joint"),
-            roll_adr=env.actuator_index(scene.RED + "left_shoulder_roll_joint"),
+            elbow_adr=env.actuator_index(scene.RED + "left_elbow_joint"),
         )
     return load_policy(spec, deterministic=deterministic)

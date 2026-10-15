@@ -34,21 +34,27 @@ def test_passive_is_exactly_zero_action(level):
     assert float(jp.abs(action).max()) == 0.0
 
 
-def test_jabber_moves_only_the_lead_arm_joints(level):
+def test_jabber_extends_the_lead_arm_instead_of_waving_it(level):
     pitch = level.actuator_index("red/left_shoulder_pitch_joint")
-    roll = level.actuator_index("red/left_shoulder_roll_joint")
-    jab = policy.jabber(level.action_size, pitch, roll)
+    elbow = level.actuator_index("red/left_elbow_joint")
+    jab = policy.jabber(level.action_size, pitch, elbow)
 
-    # Start the clock off zero: the jab is a sine, so t=0 is a legitimate
-    # no-motion sample and would mask a policy that never moved at all.
+    # Start the clock off zero: the extension is a clipped sine, so t=0 is a
+    # legitimate no-motion sample and would mask a policy that never moved at all.
     times = 0.1 + jp.arange(8) * 0.2
-    action = jab(jp.zeros((8, level.observation_size)), times, jax.random.PRNGKey(0))
+    values = np.asarray(jab(jp.zeros((8, level.observation_size)), times,
+                            jax.random.PRNGKey(0)))
 
-    moved = np.asarray(jp.abs(action) > 0)
-    assert moved[:, pitch].all(), "the lead shoulder should be oscillating"
-    assert moved[:, roll].all()
-    assert int(moved.sum(axis=1)[0]) == 2, "exactly two joints should be driven"
-    assert float(jp.abs(action).max()) <= 1.0, "actions must stay normalised"
+    assert int((np.abs(values) > 0).sum(axis=1).max()) == 2, \
+        "exactly two joints should be driven"
+    # The direction is the whole point. The fixture used to be a sine on shoulder
+    # pitch alone, which rotates the arm about the shoulder and lifts the fist through
+    # an arc -- a greeting, and the reason a scripted "jab" here kept arriving on the
+    # opponent's gloves. Below the stance value means straightening.
+    assert (values[:, pitch] <= 0).all() and (values[:, elbow] <= 0).all()
+    assert values[:, elbow].min() < -0.3, "the cycle has to actually straighten the arm"
+    assert (values[:, elbow] == 0).any(), "and it has to come back to the guard"
+    assert float(np.abs(values).max()) <= 1.0, "actions must stay normalised"
 
 
 def test_actuator_index_rejects_unknown_names(level):

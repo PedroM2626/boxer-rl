@@ -33,7 +33,13 @@ run_half () {
   } >> "$STATUS"
 }
 
-run_half half_a tests/test_env.py tests/test_scene.py
-run_half half_b tests/test_policy.py tests/test_arena.py tests/test_alternating.py \
-                tests/test_selfplay.py tests/test_train.py
+# Half A is test_env.py alone. It used to share the process with test_scene.py, and
+# that pair was killed by the OOM killer (exit 137) two tests from the end of a
+# 36-test run: the physics traces accumulate in one process and the VM has 7.8 GB,
+# of which a full suite run holds about 4. test_scene.py is a pure-MuJoCo file that
+# costs three seconds, so it belongs with the cheap half, not at the end of the
+# expensive one.
+run_half half_a tests/test_env.py
+run_half half_b tests/test_scene.py tests/test_policy.py tests/test_arena.py \
+                tests/test_alternating.py tests/test_selfplay.py tests/test_train.py
 echo "gate finished" >> "$STATUS"

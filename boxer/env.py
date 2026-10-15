@@ -168,7 +168,21 @@ class BoxingEnv(env_base.PipelineEnv):
         w_facing: float = 0.2,
         w_guard: float = 0.2,
         w_strike: float = 0.3,
-        w_hit: float = 3.0,
+        # What one landed punch is worth, paid on the *event*. It used to be paid on
+        # the depth of the contact (`damage`), and that made the channel invisible:
+        # the fourth arm measured damage=0.013 against a round return of 829, because
+        # a fist that crosses the margin by less than a centimetre prices at a
+        # fraction of a fraction, while simply standing and being alive pays 1.659
+        # every step. So the cleanest policy in that environment was to grind gloves
+        # against the statue -- 403 contacts a round, 0.000 punches -- and it was
+        # arithmetically right to do so.
+        #
+        # 10 puts one landed punch at six steps of standing, and with the rearm window
+        # capping a boxer at 2.5 punches a second it makes landing them the best use of
+        # a round by a wide margin. Depth keeps a small share through `w_damage`, so a
+        # crunch still beats a graze without either beating the fact of connection.
+        w_hit: float = 10.0,
+        w_damage: float = 1.0,
         # A referee stops a boxing match when the two hold each other. This env had
         # no such notion, so the optimal policy under a per-frame contact reward was
         # to close, wrap the opponent's head and topple -- measured at 185 "punches"
@@ -205,8 +219,8 @@ class BoxingEnv(env_base.PipelineEnv):
         self._punch_speed_min = punch_speed_min
         self._w = dict(
             alive=w_alive, upright=w_upright, range=w_range, facing=w_facing,
-            guard=w_guard, strike=w_strike, hit=w_hit, energy=w_energy,
-            clinch=w_clinch,
+            guard=w_guard, strike=w_strike, hit=w_hit, damage=w_damage,
+            energy=w_energy, clinch=w_clinch,
             ko=w_ko, ring=w_ring,
         )
         self._spawn_distance = spawn_distance
@@ -507,11 +521,37 @@ class BoxingEnv(env_base.PipelineEnv):
         closing = jp.max(jp.sum(unit * relative[:, None, :], axis=-1), axis=-1)
         return _norm(relative, axis=-1), closing
 
+    def _forward_drive(self, frame: Dict[str, jax.Array]) -> jax.Array:
+        """Per hand, how much of the fist's velocity is *forward* rather than up.
+
+        The fourth condition a punch needs, added after the fourth arm was watched
+        rather than before it was trained: it answers a fast fist that closes on the
+        head by lifting the arm from the chest, which reads as a greeting. That is not
+        the policy being lazy -- on this robot the head sits 0.43 m above the torso
+        centre while the straight-wristed guard tops out at +0.05 m, so the only path
+        to the head that is not horizontal is a shoulder raised near vertical. The
+        reward was paying for the lift because it asked only for speed and closing.
+
+        Requiring the motion to lie along the direction the boxer faces makes a jab
+        the way to score, and it does cost an uppercut its reward. That trade is
+        deliberate: this robot cannot throw an uppercut without first raising the arm
+        through the same arc as the wave, so paying one would pay the other.
+        """
+        forward = math.rotate(_WORLD_FORWARD, frame["quat"])
+        relative = self._fist_velocity(frame)
+        along = jp.sum(relative * (forward / _norm(forward))[None, :], axis=-1)
+        # Ramps in over the last fifth of the cone, so a punch thrown within ~25
+        # degrees of straight-on scores in full and one thrown sideways does not
+        # score at all. Both terms are per-hand (2,) -- broadcasting a (2,1) in here
+        # would divide one hand's component by the other hand's speed and hand back
+        # a ratio of thousands.
+        return jp.clip((along / (_norm(relative, axis=-1) + 1e-6) - 0.7) / 0.2, 0.0, 1.0)
+
     def _committed(self, frame: Dict[str, jax.Array], foe: Dict[str, jax.Array]) -> jax.Array:
         """Whether this boxer is throwing a punch, as a 0..1 gate.
 
-        Three conditions, each one added because measurement killed the pair
-        before it:
+        Four conditions, three of them added because measurement or a render killed
+        the set before it:
 
         * fist speed *relative to its own torso*. World-frame fist speed cannot
           separate a punch from a fall -- a collapsing body carries both fists
@@ -525,16 +565,22 @@ class BoxingEnv(env_base.PipelineEnv):
           which is upright enough and fast enough to pass both tests above, and
           is not a punch. Requiring the velocity to point at a target is what
           distinguishes throwing from toppling.
+        * and the motion being *forward* rather than lifted -- see
+          :meth:`_forward_drive`, which exists because speed and closing alone
+          still paid for a hand raised from the chest to the head.
         """
         speed, closing = self._punch_signals(frame, foe)
         low, high = self._punch_speed_min, self._punch_speed_ref
         swinging = jp.clip((speed - low) / (high - low), 0.0, 1.0)
         aim = jp.clip((closing / (speed + 1e-6) - 0.5) / 0.3, 0.0, 1.0)
         upright = jp.clip((self._upright(frame) - 0.9) / 0.08, 0.0, 1.0)
+        drive = self._forward_drive(frame)
         # Per hand, then the better of the two: taking the fastest hand and the
         # best-aligned hand independently would let a retraction travelling at
-        # 5 m/s borrow the aim of a slow, correctly-pointed other hand.
-        return jp.max(swinging * aim) * upright
+        # 5 m/s borrow the aim of a slow, correctly-pointed other hand. The same
+        # applies to the form term -- a lifted hand must not score by borrowing a
+        # forward-pointing other hand.
+        return jp.max(swinging * aim * drive) * upright
 
     def _reward(
         self,
@@ -571,11 +617,15 @@ class BoxingEnv(env_base.PipelineEnv):
         # scoring target. Speed is measured against the torso for the same reason
         # the contact gate does it -- a falling body must not be paid for
         # punching -- and the closing term is there so a forward topple, which is
-        # fast and torso-relative too, earns nothing.
+        # fast and torso-relative too, earns nothing. The form term is here as well
+        # because the shaping and the gate have to want the same motion: paying for a
+        # lift near the head while refusing to count it as a punch is how the fourth
+        # arm learned to wave in the first place.
         speed, closing = self._punch_signals(me, foe)
         swing = (
             jp.clip(speed / self._punch_speed_ref, 0.0, 1.0)
             * jp.clip(closing / (speed + 1e-6), 0.0, 1.0)
+            * self._forward_drive(me)
         )
         fists = jp.stack([me["left_palm"], me["right_palm"]])[:, None, :]
         targets = jp.stack([foe["head"], foe["torso"]])[None, :, :]
@@ -629,7 +679,11 @@ class BoxingEnv(env_base.PipelineEnv):
             + w["facing"] * facing * alive
             + w["guard"] * jp.mean(held) * alive
             + w["strike"] * strike * alive
-            + w["hit"] * (landed - taken)
+            + w["hit"] * (landed_hits - taken_hits)
+            # Depth still matters -- a punch that catches the shoulder and the chest
+            # did more work than one that grazes a knuckle -- but as a small extra on
+            # top of the event, not as the event's price. See `w_hit`.
+            + w["damage"] * (landed - taken)
             # Inside embrace, being at "fighting distance" is not a skill at all.
             - w["clinch"] * jp.clip((self._punch_reach - distance)
                                     / (self._punch_reach - self._clinch_range), 0.0, 1.0)
@@ -856,6 +910,12 @@ class BoxingEnv(env_base.PipelineEnv):
             "punch_reach": self._punch_reach,
             "punch_speed_ref": self._punch_speed_ref,
             "punch_speed_min": self._punch_speed_min,
+            # What a run optimised for. Two arms trained under different weights and
+            # no record of them are not comparable, and this project has already
+            # published a comparison where the reward paid far less than the metric
+            # suggested -- so the hit channel's two weights travel with the run.
+            "w_hit": self._w["hit"],
+            "w_damage": self._w["damage"],
         }
 
 

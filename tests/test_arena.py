@@ -84,7 +84,7 @@ def test_corner_attribution_adds_up_to_the_pooled_mean(level):
     jab = policy.jabber(
         level.action_size,
         pitch_adr=level.actuator_index("red/left_shoulder_pitch_joint"),
-        roll_adr=level.actuator_index("red/left_shoulder_roll_joint"),
+        elbow_adr=level.actuator_index("red/left_elbow_joint"),
     )
     passive = policy.passive(level.action_size)
     result = arena.play(level, jab, passive, rounds=4, length=60, seed=2)

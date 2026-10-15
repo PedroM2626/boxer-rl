@@ -82,7 +82,7 @@ def test_an_anchored_corner_cannot_be_knocked_over():
     jab = policy_module.jabber(
         env.action_size,
         pitch_adr=env.actuator_index("red/left_shoulder_pitch_joint"),
-        roll_adr=env.actuator_index("red/left_shoulder_roll_joint"),
+        elbow_adr=env.actuator_index("red/left_elbow_joint"),
     )
     state = env.reset(jax.random.PRNGKey(2))
 
@@ -146,29 +146,32 @@ def test_a_committed_fist_on_a_scored_contact_counts_as_a_punch(level):
     """The gate's positive case, which is the half a stack of negative tests cannot pin.
 
     Everything the gate asks for is supplied and exactly one hit comes out: a real
-    scoring contact, a fist moving at 5 m/s straight at the torso, a rising edge, and
-    an armed boxer. The fist velocity is written into the *sensor* block because that
-    is where the gate reads it, and a qvel written into a pipeline state does not
-    reach the sensors until a step has run -- measured with tools/fist_probe.py, a
-    shoulder rate of -8 rad/s reads 0.00 m/s of fist on the step where the contact is
-    still a rising edge and 2.71 m/s on the next one, when it no longer is.
+    scoring contact, a fist moving at 5 m/s along the axis the boxer faces, a rising
+    edge, and an armed boxer. The fist velocity is written into the *sensor* block
+    because that is where the gate reads it, and a qvel written into a pipeline state
+    does not reach the sensors until a step has run -- measured with
+    tools/fist_probe.py, a shoulder rate of -8 rad/s reads 0.00 m/s of fist on the step
+    where the contact is still a rising edge and 2.71 m/s on the next one, when it no
+    longer is.
     """
     state = _overlap(level, TORSO_GAP)
     contact = level._contact_damage(state)
     assert float(np.asarray(contact["red_hits"])) > 0.0
 
     me = level._frame(state, scene.RED)
-    foe = level._frame(state, scene.BLUE)
-    toward = foe["torso"] - me["left_palm"]
-    toward = toward / jp.linalg.norm(toward)
+    # Along the axis the boxer faces, not merely at the target: the gate asks for
+    # both, and a velocity aimed at the torso from below would be a lift.
+    from brax import math
+    forward = math.rotate(env._WORLD_FORWARD, me["quat"])
+    forward = forward / jp.linalg.norm(forward)
     address = level._sensor_adr["red/left_palm_linvel"]
-    sensors = state.sensordata.at[address:address + 3].set(5.0 * toward)
+    sensors = state.sensordata.at[address:address + 3].set(5.0 * forward)
 
     _, parts = level._reward(
         state.replace(sensordata=sensors), scene.RED, scene.BLUE,
         jp.zeros(level.action_size), contact, 1.0, can_score=1.0, foe_can_score=1.0,
     )
-    assert float(np.asarray(parts["landed_hits"])) > 0.9, "one punch, counted once"
+    assert float(np.asarray(parts["landed_hits"])) > 0.5, "one punch, counted once"
     assert float(np.asarray(parts["landed"])) > 0.0, "and it did damage"
     assert float(np.asarray(parts["head_shots"])) == 0.0, "the torso is not the head"
 
@@ -179,6 +182,57 @@ def test_a_committed_fist_on_a_scored_contact_counts_as_a_punch(level):
         jp.zeros(level.action_size), contact, 1.0, can_score=0.0, foe_can_score=1.0,
     )
     assert float(np.asarray(disarmed["landed_hits"])) == 0.0
+
+
+def test_a_landed_punch_pays_the_event_and_not_the_depth_of_the_contact(level):
+    """One connected punch outweighs several seconds of standing, by arithmetic.
+
+    The hit channel used to pay `damage` -- the depth of the contact, which is a
+    fraction of a fraction for anything that does not sink a centimetre into the
+    target. Measured on the fourth arm: damage 0.013 per episode against a round
+    return of 829, while standing and being alive pays 1.659 *every step*. That is
+    why it ground its gloves against the statue for 403 contacts a round and scored
+    0.000 punches -- the policy was reading the reward correctly.
+
+    So the event is what pays now, and what this pins is the ratio that makes the
+    channel visible at all: a landed punch has to outweigh seconds of just staying
+    up, and the depth of the contact may only tip the balance on top of that.
+    """
+    state = _overlap(level, TORSO_GAP)
+    me = level._frame(state, scene.RED)
+    from brax import math
+    forward = math.rotate(env._WORLD_FORWARD, me["quat"])
+    forward = forward / jp.linalg.norm(forward)
+    address = level._sensor_adr["red/left_palm_linvel"]
+    pipeline = state.replace(
+        sensordata=state.sensordata.at[address:address + 3].set(5.0 * forward))
+    zeros = jp.zeros(level.action_size)
+
+    def contact_with(damage):
+        return {
+            "red_damage": jp.array(damage), "red_hits": jp.array(1.0),
+            "red_heads": jp.array(0.0), "red_touch": jp.array(1.0),
+            "blue_damage": jp.array(0.0), "blue_hits": jp.array(0.0),
+            "blue_heads": jp.array(0.0), "blue_touch": jp.array(0.0),
+        }
+
+    def reward_and_hits(contact, edge):
+        out, parts = level._reward(pipeline, scene.RED, scene.BLUE, zeros, contact, edge)
+        return float(np.asarray(out)), float(np.asarray(parts["landed_hits"]))
+
+    floor, _ = reward_and_hits(contact_with(0.0), 0.0)
+    graze, hits_graze = reward_and_hits(contact_with(0.02), 1.0)
+    crunch, hits_crunch = reward_and_hits(contact_with(1.0), 1.0)
+
+    # 0.80 rather than 1.0 at this geometry: the torso is 42 degrees off the facing
+    # axis when the corners are 0.5 m apart, and the aim factor ramps over that cone.
+    assert hits_graze == hits_crunch > 0.5, \
+        "a connection is one punch, deep or shallow"
+    assert graze - floor >= 3.0 * floor, (
+        f"one landed punch ({graze - floor:.1f}) has to outweigh seconds of just "
+        f"staying up ({floor:.2f} a step), or nothing will aim"
+    )
+    assert crunch - graze < graze - floor, "depth tips the balance, it does not carry it"
 
 
 def test_a_scored_contact_spends_the_arm_and_a_glove_does_not(level):
@@ -302,6 +356,43 @@ def test_a_fast_fist_travelling_away_from_the_opponent_is_not_a_punch(level):
     jab = dict(me, left_palm_vel=me["torso_vel"] + 5.0 * toward)
     assert float(level._committed(jab, foe)) > 0.5, (
         "the same speed aimed at the opponent should read as a punch"
+    )
+
+
+def test_a_fist_lifted_from_below_is_not_a_punch(level):
+    """The gate's fourth condition, added after the fourth arm was watched.
+
+    Speed, aim and uprightness together still pass a hand that is *raised* from the
+    chest into the head, and on this robot that is the path of least resistance to the
+    head: the head sits 0.43 m above the torso centre while the guard's fists sit
+    0.05 m above it. Rendered, the motion is a greeting, and the fourth arm did it for
+    whole rounds while the shaping paid it for swinging near the head.
+
+    Both fists below move at the same 5 m/s and both close on the head. The
+    discriminator is the direction of the fist's velocity against the direction the
+    boxer *faces*, which is the only thing that separates throwing from lifting.
+    """
+    from brax import math
+
+    state = level.reset(jax.random.PRNGKey(3))
+    me = level._frame(state.pipeline_state, scene.RED)
+    foe = level._frame(state.pipeline_state, scene.BLUE)
+    forward = math.rotate(env._WORLD_FORWARD, me["quat"])
+    forward = forward / jp.linalg.norm(forward)
+
+    up = jp.array([0.0, 0.0, 1.0])
+    lifted = 0.3 * forward + 0.95 * up
+    lifted = lifted / jp.linalg.norm(lifted)
+
+    wave = dict(me, left_palm_vel=me["torso_vel"] + 5.0 * lifted)
+    assert float(level._committed(wave, foe)) == 0.0, (
+        "a hand raised into the head is not a punch, however fast and however well "
+        "it is closing on the target"
+    )
+
+    jab = dict(me, left_palm_vel=me["torso_vel"] + 5.0 * forward)
+    assert float(level._committed(jab, foe)) > 0.5, (
+        "the same speed thrown along the facing axis has to count"
     )
 
 
@@ -551,7 +642,7 @@ def test_sustained_contact_stops_paying_after_the_first_touch():
     jab = policy_module.jabber(
         env.action_size,
         pitch_adr=env.actuator_index("red/left_shoulder_pitch_joint"),
-        roll_adr=env.actuator_index("red/left_shoulder_roll_joint"),
+        elbow_adr=env.actuator_index("red/left_elbow_joint"),
     )
     state = env.reset(jax.random.PRNGKey(11))
     step = jax.jit(env.step)

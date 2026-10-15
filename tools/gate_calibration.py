@@ -37,7 +37,7 @@ def main(argv=None) -> int:
     jab = policy.jabber(
         env.action_size,
         pitch_adr=env.actuator_index("red/left_shoulder_pitch_joint"),
-        roll_adr=env.actuator_index("red/left_shoulder_roll_joint"),
+        elbow_adr=env.actuator_index("red/left_elbow_joint"),
     )
     state = env.reset(jax.random.PRNGKey(0))
     step = jax.jit(env.step)

@@ -44,7 +44,7 @@ def run(rearm: int, gap: float, steps: int) -> None:
     jab = policy_module.jabber(
         level.action_size,
         pitch_adr=level.actuator_index("red/left_shoulder_pitch_joint"),
-        roll_adr=level.actuator_index("red/left_shoulder_roll_joint"),
+        elbow_adr=level.actuator_index("red/left_elbow_joint"),
     )
     state = level.reset(jax.random.PRNGKey(6))
     pipeline = state.pipeline_state

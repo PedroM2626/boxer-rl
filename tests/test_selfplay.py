@@ -122,7 +122,7 @@ def frozen(level):
     opponent = policy_module.jabber(
         level.action_size,
         pitch_adr=level.actuator_index("red/left_shoulder_pitch_joint"),
-        roll_adr=level.actuator_index("red/left_shoulder_roll_joint"),
+        elbow_adr=level.actuator_index("red/left_elbow_joint"),
     )
     return selfplay.wrap_frozen(level, opponent, episode_length=500, learner_side=0)
 
@@ -138,7 +138,13 @@ def test_frozen_mode_has_one_learner_per_physics_world(frozen, level):
 
 
 def test_frozen_opponent_actually_moves(frozen, level):
-    """The wrapper must feed the opponent's actions into its corner."""
+    """The wrapper must feed the opponent's actions into its corner.
+
+    Measured as the largest excursion over the round rather than the last frame: a
+    jab is a clipped sine, so the arm sits back at the guard for half of every cycle,
+    and a single endpoint sample can land exactly in that rest and report a motionless
+    opponent that was swinging a moment ago.
+    """
     learner_red = _qpos_address(level, "red/left_shoulder_pitch_joint")
     opponent_blue = _qpos_address(level, "blue/left_shoulder_pitch_joint")
     stance = np.asarray(level._stance_qpos)
@@ -146,14 +152,15 @@ def test_frozen_opponent_actually_moves(frozen, level):
     state = jax.jit(frozen.reset)(_keys(4, 8))
     step = jax.jit(frozen.step)
     action = jp.zeros((4, level.action_size))
+    moved = held = 0.0
     for _ in range(30):
         state = step(state, action)
+        qpos = np.asarray(state.pipeline_state.qpos)
+        moved = max(moved, float(np.abs(qpos[:, opponent_blue] - stance[opponent_blue]).max()))
+        held = max(held, float(np.abs(qpos[:, learner_red] - stance[learner_red]).max()))
 
-    qpos = np.asarray(state.pipeline_state.qpos)
-    moved = np.abs(qpos[:, opponent_blue] - stance[opponent_blue])
-    held = np.abs(qpos[:, learner_red] - stance[learner_red])
-    assert moved.max() > 0.05, "the scripted opponent should have swung its arm"
-    assert held.max() < moved.max(), "the learner's own corner must not be driven"
+    assert moved > 0.05, "the scripted opponent should have swung its arm"
+    assert held < moved, "the learner's own corner must not be driven"
 
 
 def test_frozen_opponent_receives_its_own_observation_vector(level):

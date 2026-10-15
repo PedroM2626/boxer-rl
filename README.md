@@ -574,6 +574,46 @@ allowed to be worth did. The video was right and the counter was wrong: every co
 and makes the fourth arm a clean test of whether a boxer can be taught to aim at something
 the scorecard buys.
 
+**And what training under that scorecard did.** The fourth arm was trained with the glove
+worth nothing, the head worth most and a 0.4 s window. It reached 161M steps and was
+stopped by decision once 50M of them had produced nothing new. In the arena it lands
+**0.000 punches across 256 full-length rounds** and makes **403 contacts a round** -- three
+times the third arm's, with the same zero head shots. Rendered, it walks in and presses
+both gloves against the statue's gloves for the whole round: no wind-up, no retraction, no
+punch shape. What it did learn is the thing that was actually being paid for -- it fell in
+100% of episodes early in training and in 1% by the end, and rounds now run the full 10 s.
+
+So the scorecard was right and still produced no boxing, and that is what pointed at the
+next bug -- same family as the others. The hit channel pays `damage`, the **depth** of a
+contact: `clip(-dist / 1 cm)` times the target weight, summed over the slots that crossed
+the margin. A fist that touches without sinking a centimetre prices at a fraction, and this
+arm's measured `damage` was **0.013 per episode against a round return of 829**, while
+merely standing upright pays **1.659 every step**. Grinding gloves was the correct reading
+of those numbers. The clean event indicator the arena reports (`landed_hits`) already
+existed in the code and was never what the agent was paid on. The fifth arm changes that one
+thing: the hit channel pays the event (`w_hit` 3.0 -> 10.0 on `landed_hits`) with depth kept
+as a small extra (`w_damage` 1.0), which puts a landed punch at about six steps of standing.
+`tests/test_env.py` asserts that ratio, so the channel cannot quietly sink back under the
+noise floor of existing.
+
+**Then there is the shape of the motion, which was two bugs wearing one costume.** The
+scripted "jabber" that every punch fixture here leaned on was a sine on shoulder pitch
+alone. That rotates the whole arm about the shoulder, so the fist travels an arc that is
+mostly *up*: the metronome was throwing a greeting and arriving on the opponent's gloves,
+which is also why a scripted jab scored nothing once gloves stopped being worth anything.
+It is now an elbow extension with the upper arm brought round at the same time, which is
+what sends the fist along the axis the boxer faces.
+
+And the gate gained a fourth condition for the same reason. Speed, aim and uprightness
+together still pass a hand *lifted* from the chest into the head -- and on this robot that
+is the path of least resistance to the head, since the head sits 0.43 m above the torso
+centre while the straight-wristed guard tops out at +0.05 m. A fist's velocity now has to
+lie along the facing direction (full credit within ~25 degrees), and the same factor is
+applied to the dense shaping, because paying for a lift near the head while refusing to
+count it as a punch is exactly how the fourth arm learned to wave. The cost is deliberate
+and worth stating: an uppercut cannot score here, because this robot cannot throw one
+without first raising the arm through the same arc as the wave.
+
 **A confident claim that turned out to be false.** While making the arms score zero the
 glove test would not pass, and reading the contact buffer seemed to show that MJX's
 slot -> pair mapping depends on the state: 284 slots for 208 declared pairs, every
