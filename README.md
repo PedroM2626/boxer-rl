@@ -90,7 +90,10 @@ What the corrected table does say:
   chest contact, wrap both arms around the opponent's head and neck, and topple
   together into a ground clinch. The metric rewards that because hits accumulate
   per physics substep and nothing in the environment stops the action when the two
-  are holding each other. See "What counts as a punch".
+  are holding each other. See "What counts as a punch". Two instruments have since
+  replaced this column: the event counter reads the same arm at 19.4, and the
+  scorecard reads it at **0.000** -- the numbers in this table are history, not
+  measurement.
 
 ### The statue was a ragdoll
 
