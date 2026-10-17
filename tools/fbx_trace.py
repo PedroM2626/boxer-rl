@@ -11,8 +11,12 @@ Run headless (Blender 4.2, Windows side):
 
     blender -b --python tools/fbx_trace.py -- <clip.fbx> <out.json>
 
-The clip stays out of git: runs/reference/ is ignored, and the Mixamo terms have
-not been checked for redistribution.
+The clip stays out of git: runs/reference/ is ignored. The Mixamo terms were
+checked on 2026-10-17 -- Adobe's General Terms section 3.6 allow using and
+modifying Content Files inside a product you author but forbid distributing them
+"on a stand-alone basis, outside of the End Use" -- so the published motion
+reference for the imitation channel is CMU's instead (see LICENSES.md and
+tools/cmu_fetch.sh). The flat-travel measurement below still stands.
 """
 import json
 import sys

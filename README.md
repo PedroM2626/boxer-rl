@@ -329,6 +329,20 @@ research-standard platform with enough arm DOF to box, and it ships with the
 MJX tuning this project would otherwise have had to rediscover. It is pulled
 from PyPI (`mujoco-menagerie`), never copied into the repo.
 
+### Where the motion reference comes from
+
+The imitation channel tracks a recorded human jab, retargeted onto the G1's arm
+joints by `tools/retarget_dense.py`. The recording is the **CMU Graphics Lab
+Motion Capture Database** — its FAQ states the data "may be copied, modified, or
+redistributed without permission" (`tools/cmu_fetch.sh` pulls it; `LICENSES.md`
+carries the wording and the acknowledgement CMU asks for). The earlier reference
+was a Mixamo clip, kept locally for the measurement it produced: Adobe's General
+Terms section 3.6 allow using and modifying their Content Files inside a product
+you author but forbid distributing them stand-alone, so a Mixamo clip or any
+curve dump derived from it cannot live in this repo. Reproducing the pipeline
+means running the fetch script and the two converters — no motion file is
+committed, and none is needed from anyone else.
+
 ### The hands are grafted, not swapped
 
 The video that prompted the scorecard also showed open hands: `g1_mjx` has one rigid

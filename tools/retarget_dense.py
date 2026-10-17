@@ -58,13 +58,23 @@ def main(argv=None) -> int:
     ap.add_argument("--out", default="runs/reference/jab_targets.json")
     ap.add_argument("--grid", type=int, default=12,
                     help="coarse seeds per joint before the least-squares")
+    ap.add_argument("--side", default="right", choices=("right", "left"),
+                    help="which recorded arm to fit; the imitation channel reads "
+                         "the arm named here out of the geometry JSON")
+    ap.add_argument("--window-only", action="store_true",
+                    help="fit only the strike window (a session-length series "
+                         "costs minutes of solver time and the channel never "
+                         "reads the frames outside the punch)")
     args = ap.parse_args(argv)
 
     with open(args.geometry) as handle:
         clip = json.load(handle)
-    side = "right"
+    side = args.side
     rows = clip["sides"][side]["rows"]
     window = clip["sides"][side]["window_frames"]
+    if args.window_only:
+        rows = rows[window[0]:window[1] + 1]
+        window = [0, len(rows) - 1]
     clip_q = np.array([[r[q] for q in QUANTS] for r in rows])
 
     model = scene.build_model(spawn_distance=1.3, visual=False)
@@ -160,7 +170,9 @@ def main(argv=None) -> int:
 
     print("\n  frame  clip(elbow,fore_elev,upper_elev,align)  "
           "fit(elbow,fore_elev,upper_elev,align) | pitch roll yaw elbow (deg)")
-    for i in list(range(window[0] - 1, window[1] + 2)):
+    # clamped: with --window-only the window starts at frame 0, and window[0] - 1
+    # would index the last row of the series and print it as "-1"
+    for i in list(range(max(0, window[0] - 1), min(len(rows), window[1] + 2))):
         got = quantities(refined[i]).round(1)
         j = np.degrees(refined[i]).round(0)
         print(f"  {i:5d}  {clip_q[i].round(1)}  {got} | {j}  worst {worst1[i]:.1f}")

@@ -198,12 +198,18 @@ class WarpBoxing:
         # jab (tools/retarget_dense.py), four right-arm joints per clip frame.
         self._imit = None
         self._imit_cols = None
+        self._imit_arm = "right"
+        self._imit_fps = 30.0
         if imitation_path is not None:
             with open(imitation_path) as handle:
                 traj = json.load(handle)
             start, stop = traj["strike_window"]
             self._imit = np.asarray(traj["targets_radians"])[start:stop + 1]
-            self._imit_cols = {side: self._arm_columns(side) for side in scene.SIDES}
+            # the recorded arm decides which of the boxer's own arms is shaped
+            self._imit_arm = traj.get("side", "right")
+            self._imit_fps = float(traj.get("fps", 30))
+            self._imit_cols = {side: self._arm_columns(side, self._imit_arm)
+                               for side in scene.SIDES}
 
         self._m = mjwarp.put_model(self._model)
         # nconmax/njmax must be sized by hand: put_data derives defaults from
@@ -221,12 +227,12 @@ class WarpBoxing:
         self._steps_off = np.full((nworld, 2), rearm_steps, dtype=np.int64)
         self._last_action = np.zeros((nworld, 2, self.action_size))
 
-    def _arm_columns(self, side: str) -> np.ndarray:
-        """Columns of the right arm's four fitted joints inside me["qpos"]."""
+    def _arm_columns(self, side: str, arm: str = "right") -> np.ndarray:
+        """Columns of the recorded arm's four fitted joints inside me["qpos"]."""
         cols = []
         for joint in ("shoulder_pitch", "shoulder_roll", "shoulder_yaw", "elbow"):
             aid = mujoco.mj_name2id(self._model, mujoco.mjtObj.mjOBJ_ACTUATOR,
-                                    side + "right_" + joint + "_joint")
+                                    side + arm + "_" + joint + "_joint")
             cols.append(int(np.flatnonzero(self._sides[side]["actuators"] == aid)[0]))
         return np.array(cols)
 
@@ -415,7 +421,7 @@ class WarpBoxing:
                 qarm = me["qpos"][:, cols]
                 d2 = np.sum((qarm[:, None, :] - self._imit[None, :, :]) ** 2, axis=2)
                 shape = np.exp(-d2 / self._imit_sigma ** 2).max(axis=1)
-                speed = np.sum(me["right_palm_vel"] * offset
+                speed = np.sum(me[self._imit_arm + "_palm_vel"] * offset
                                / (distance[:, None] + 1e-6), axis=1)
                 gate = np.clip(speed / self._imit_speed_ref, 0.0, 1.0)
                 imit = shape * gate
@@ -537,12 +543,16 @@ if __name__ == "__main__":
           f"(force threshold {env._force_threshold:.0f} N)")
     assert np.isfinite(obs).all() and hits > 0.0, "self-check failed"
 
-    # Imitation channel: drive the right arm along the retargeted strike
-    # poses and the shaped term must light up. Skipped without the locally
-    # generated targets (runs/ is out of git with the clip).
+    # Imitation channel: drive the arm the targets name along the retargeted
+    # strike poses and the shaped term must light up. Skipped when no targets
+    # file is present (runs/ is out of git with the motion data).
     from pathlib import Path
-    targets_file = Path("runs/reference/jab_targets.json")
-    if targets_file.exists():
+    found = [p for p in (Path("runs/reference/jab_targets.json"),
+                         Path("runs/reference/jab_targets_cmu.json"))
+             if p.exists()]
+    if not found:
+        print("no jab_targets*.json -- imitation channel not exercised")
+    for targets_file in found:
         env2 = WarpBoxing(nworld=8, spawn_distance=0.45,
                           imitation_path=str(targets_file),
                           spawn_jitter=0.0, yaw_jitter=0.0, pose_noise=0.0)
@@ -551,16 +561,18 @@ if __name__ == "__main__":
         aid = env2._sides[scene.RED]["actuators"][cols]
         ctrl0 = np.asarray(env2._ctrl0)
         action = np.zeros((8, 2, env2.action_size))
+        # one clip frame spans the control clock it maps to: 50 Hz control vs
+        # the clip's own 30 or 120 fps
+        hold = max(1, int(round(50.0 / env2._imit_fps)))
         peak = 0.0
         for f in range(len(env2._imit)):
             action[:, 0, cols] = ((env2._imit[f] - ctrl0[aid])
                                   / env2._action_scale)
-            for _ in range(3):  # one 30 fps clip frame over three ctrl steps
+            for _ in range(hold):
                 obs, reward, done, parts = env2.step(action)
                 peak = max(peak, float(parts["imit"].max()))
-        print(f"retargeted-jab tracking over {len(env2._imit)} clip frames: "
+        print(f"{targets_file.name} ({env2._imit_arm} arm, "
+              f"{len(env2._imit)} frames, {env2._imit_fps} fps, hold {hold}): "
               f"peak imitation term {peak:.3f}")
         assert peak > 0.05, "imitation channel dead"
-    else:
-        print("no jab_targets.json -- imitation channel not exercised")
     print("self-check passed")

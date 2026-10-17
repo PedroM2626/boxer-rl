@@ -13,8 +13,10 @@ Run headless (Blender 4.2, Windows side):
     blender -b --python tools/fbx_arm_dirs.py -- <clip.fbx> <trace.json> <out.json>
 
 ``trace.json`` is the output of ``tools/fbx_trace.py`` and supplies the strike
-window frames. The clip stays out of git: runs/reference/ is ignored, and the
-Mixamo terms have not been checked for redistribution.
+window frames. The clip stays out of git: runs/reference/ is ignored. Adobe's
+General Terms section 3.6 forbid distributing Mixamo Content Files stand-alone
+(checked 2026-10-17, see LICENSES.md), so the reference the imitation channel
+actually tracks is converted from CMU data by ``tools/bvh_to_dirs.py``.
 """
 import json
 import sys
