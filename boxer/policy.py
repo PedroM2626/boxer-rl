@@ -14,6 +14,7 @@ function of its inputs to survive ``jit``; trained policies simply ignore it.
 from __future__ import annotations
 
 import json
+import pickle
 from pathlib import Path
 from typing import Callable
 
@@ -113,6 +114,61 @@ def load_policy(
     return lambda obs, time, key: inference(obs, key)[0]
 
 
+def load_warp_policy(checkpoint: str | Path, deterministic: bool = True):
+    """Rebuild an inference policy from a ``boxer.warp_train`` run.
+
+    The checkpoint is a pickle of (params, value params, optax state,
+    normalizer, step) with numpy leaves; the run directory's
+    ``warp_config.json`` carries the layer widths and the observation/action
+    contract. The forward is written against those arrays directly (no flax
+    needed), mirroring ``boxer/warp_train``: running-mean normalisation, silu
+    MLP, head split into ``loc ∥ raw scale``, actions through tanh.
+
+    Accepts a run root (``runs/warp1``), its ``checkpoint`` directory, or a
+    specific ``step-*.pkl``. One caveat when the policy drives the MJX env:
+    its guard-error observation block was built from torso/palm SITE frames
+    there while the warp env reads the same quantities from sensors -- close,
+    but not bit-identical, so arena numbers on a warp arm are approximate
+    until the arms are scored natively in warp.
+    """
+    p = Path(checkpoint)
+    if p.is_file() and p.suffix == ".pkl":
+        step_file = p
+        root = p.parent.parent if p.parent.name == "checkpoint" else p.parent
+    else:
+        root, step_file = p, None
+        latest = root / "checkpoint" / "latest.txt"
+        if not latest.exists():
+            raise SystemExit(f"{root}: not a warp run (no checkpoint/latest.txt)")
+        step_file = root / "checkpoint" / f"step-{latest.read_text().strip()}.pkl"
+    config = json.loads((root / "warp_config.json").read_text())
+    with step_file.open("rb") as handle:
+        params_p, _params_v, _opt, norm_state, step = pickle.load(handle)
+
+    mean = jp.asarray(norm_state["mean"])
+    var = jp.asarray(norm_state["var"])
+    kernels = [(jp.asarray(params_p["params"][f"Dense_{i}"]["kernel"]),
+                jp.asarray(params_p["params"][f"Dense_{i}"]["bias"]))
+               for i in range(len(config["policy_layers"]) + 1)]
+    action_size = config["action_size"]
+
+    def policy(obs, time, key):
+        del time
+        x = (jp.asarray(obs) - mean) / jp.sqrt(var + 1e-8)      # (batch, D)
+        for kernel, bias in kernels[:-1]:
+            x = x @ kernel + bias
+            x = x * jax.nn.sigmoid(x)                           # silu
+        kernel, bias = kernels[-1]
+        out = x @ kernel + bias                                 # (batch, 2A)
+        loc = out[:, :action_size]
+        if deterministic:
+            return jp.tanh(loc)                                 # mode of the dist
+        scale = jax.nn.softplus(out[:, action_size:]) + 0.001
+        return jp.tanh(loc + scale * jax.random.normal(key, loc.shape))
+
+    return policy
+
+
 def passive(action_size: int):
     """Holds the guard pose and does nothing else.
 
@@ -177,4 +233,8 @@ def make_opponent(spec: str, env, deterministic: bool = True):
             pitch_adr=env.actuator_index(scene.RED + "left_shoulder_pitch_joint"),
             elbow_adr=env.actuator_index(scene.RED + "left_elbow_joint"),
         )
+    path = Path(spec)
+    warp_root = (path.parent.parent if path.suffix == ".pkl" else path)
+    if (warp_root / "warp_config.json").exists():
+        return load_warp_policy(spec, deterministic=deterministic)
     return load_policy(spec, deterministic=deterministic)
