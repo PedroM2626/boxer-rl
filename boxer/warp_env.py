@@ -17,7 +17,10 @@ Differences from the MJX env, each tied to a measurement:
   band and the clinch only starts below it.
 * a hit is a force-threshold contact event on a weighted target surface, not a
   margin crossing: the published recipe's scorecard, now that the engine
-  exposes force.
+  exposes force. It is credited by ROLE -- a striker surface of one corner on a
+  scoring surface of the other -- and gated on that fist closing on the
+  opponent, because geometry order in the contact buffer says nothing about who
+  threw the punch and a leaning guard clears 50 N on its own.
 * optionally, an imitation shaping term (``imitation_path``): the strike-phase
   arm poses of the retargeted jab (``tools/retarget_dense.py``; the JSON sits
   out of git with the clip), paid clock-free as the closest pose match and
@@ -94,6 +97,7 @@ class WarpBoxing:
                  clinch_range: float = 0.35, force_threshold: float = 50.0,
                  rearm_steps: int = 20, round_steps: int = 500,
                  down_up_z: float = 0.15, down_head_z: float = 0.55,
+                 punch_speed_min: float = 1.0,
                  w_upright: float = 0.8, w_range: float = 0.3,
                  w_facing: float = 0.2, w_hit: float = 10.0,
                  w_clinch: float = 0.5, w_energy: float = 0.05,
@@ -109,6 +113,7 @@ class WarpBoxing:
         self._clinch_range, self._force_threshold = clinch_range, force_threshold
         self._rearm_steps, self._round_steps = rearm_steps, round_steps
         self._down_up_z, self._down_head_z = down_up_z, down_head_z
+        self._punch_speed_min = punch_speed_min
         self._imit_sigma, self._imit_speed_ref = imit_sigma, imit_speed_ref
         self._w = dict(upright=w_upright, range=w_range, facing=w_facing,
                        hit=w_hit, clinch=w_clinch, energy=w_energy, ring=w_ring,
@@ -160,9 +165,34 @@ class WarpBoxing:
             self._model, mujoco.mjtObj.mjOBJ_GEOM, g) or "").startswith(scene.RED)]
         self._blue_ids = [g for g in range(self._model.ngeom) if (mujoco.mj_id2name(
             self._model, mujoco.mjtObj.mjOBJ_GEOM, g) or "").startswith(scene.BLUE)]
-        # Scorecard weights by target surface, indexed by geom id.
-        self._weight = self._target_weights(scene.BLUE)
-        self._red_weight = self._target_weights(scene.RED)
+        # Scorecard value of being hit, indexed by target geom (both corners).
+        self._target_w = np.zeros(self._model.ngeom)
+        for side in scene.SIDES:
+            for name, value in TARGET_WEIGHTS.items():
+                gid = mujoco.mj_name2id(self._model, mujoco.mjtObj.mjOBJ_GEOM,
+                                        side + name)
+                if gid >= 0:
+                    self._target_w[gid] = value
+        # Who struck whom is a question about ROLES, not about the order the
+        # collision pair happens to be stored in: tools/warp_hit_directions.py
+        # measured a chest-to-chest press scoring 0.5 for red, and blue landing
+        # a whole jab scoring 0.0, because red geoms keep the lower index and
+        # the pair came out (red, blue) ~90% of the time. Only a fist or
+        # forearm of one corner meeting a scoring surface of the other counts.
+        self._striker = np.zeros(self._model.ngeom, dtype=bool)
+        self._striker_palm = -np.ones(self._model.ngeom, dtype=np.int64)
+        self._geom_side = -np.ones(self._model.ngeom, dtype=np.int64)
+        for agent, side in enumerate(scene.SIDES):
+            for geom in scene.HAND_GEOMS + scene.FOREARM_GEOMS:
+                gid = mujoco.mj_name2id(self._model, mujoco.mjtObj.mjOBJ_GEOM,
+                                        side + geom)
+                if gid >= 0:
+                    self._striker[gid] = True
+                    # which of the two fists this surface belongs to, so the
+                    # motion gate can read that palm's velocity
+                    self._striker_palm[gid] = 1 if geom.startswith("right") else 0
+            for g in (self._red_ids if side == scene.RED else self._blue_ids):
+                self._geom_side[g] = agent
 
         # Optional imitation shaping: the strike-phase poses of the retargeted
         # jab (tools/retarget_dense.py), four right-arm joints per clip frame.
@@ -190,15 +220,6 @@ class WarpBoxing:
         self._steps = np.zeros(nworld, dtype=np.int64)
         self._steps_off = np.full((nworld, 2), rearm_steps, dtype=np.int64)
         self._last_action = np.zeros((nworld, 2, self.action_size))
-
-    def _target_weights(self, side: str) -> np.ndarray:
-        out = np.zeros(self._model.ngeom)
-        for name, value in TARGET_WEIGHTS.items():
-            gid = mujoco.mj_name2id(self._model, mujoco.mjtObj.mjOBJ_GEOM,
-                                    side + name)
-            if gid >= 0:
-                out[gid] = value
-        return out
 
     def _arm_columns(self, side: str) -> np.ndarray:
         """Columns of the right arm's four fitted joints inside me["qpos"]."""
@@ -289,16 +310,22 @@ class WarpBoxing:
         sensors = self._d.sensordata.numpy()
         self._qpos_sync = self._d.qpos.numpy()
         self._qvel_sync = self._d.qvel.numpy()
-        hit = self._scorecard()
+        hit = self._scorecard(sensors)
         reward, done, metrics = self._reward(actions, hit, sensors)
         return self._observe(sensors), reward, done, metrics
 
-    def _scorecard(self) -> np.ndarray:
+    def _scorecard(self, sensors: np.ndarray) -> np.ndarray:
         """(nworld, 2) hit values: best target weight struck this step.
 
         Active contacts occupy the packed prefix ``[0, nacon)`` of the buffer;
-        ``efc_address >= 0`` marks rows the solver took. Whichever corner is
-        the striker, the struck surface sits in column 1 under the cross mask.
+        ``efc_address >= 0`` marks rows the solver took. Attribution is by
+        role: the geom carrying a striker surface (fist/forearm) is the hitter
+        and the other geom is the target, whichever column each landed in. A
+        scored contact must also be moving: a guard forearm leaning on a chest
+        crosses the force threshold under gravity alone
+        (tools/warp_hit_directions.py), and env.py paid hits only under a
+        commitment gate, so the striker's fist has to travel toward the
+        opponent at ``punch_speed_min`` or better.
         """
         value = np.zeros((self.nworld, 2))
         nacon = int(self._d.nacon.numpy()[0])
@@ -308,22 +335,39 @@ class WarpBoxing:
         geoms = self._d.contact.geom.numpy()[rows]
         worldid = self._d.contact.worldid.numpy()[rows]
         efc = self._d.contact.efc_address.numpy()[rows, 0]
-        red_first = (np.isin(geoms[:, 0], self._red_ids)
-                     & np.isin(geoms[:, 1], self._blue_ids))
-        blue_first = (np.isin(geoms[:, 0], self._blue_ids)
-                      & np.isin(geoms[:, 1], self._red_ids))
-        cross = np.flatnonzero((red_first | blue_first) & (efc >= 0))
-        if not len(cross):
+        striker_first = self._striker[geoms[:, 0]] & ~self._striker[geoms[:, 1]]
+        striker_second = self._striker[geoms[:, 1]] & ~self._striker[geoms[:, 0]]
+        cand = np.flatnonzero((striker_first | striker_second) & (efc >= 0))
+        if not len(cand):
             return value
-        force = wp.zeros(len(cross), dtype=wp.spatial_vector)
-        mjwarp.contact_force(self._m, self._d, wp.array(cross.astype(np.int32)),
+        first = striker_first[cand]
+        strikers = np.where(first, geoms[cand, 0], geoms[cand, 1])
+        targets = np.where(first, geoms[cand, 1], geoms[cand, 0])
+        agents = self._geom_side[strikers]
+        # a fist against its own corner's ribs is not a punch
+        cross = self._geom_side[targets] != agents
+        valid = np.flatnonzero(cross & (self._target_w[targets] > 0.0))
+        if not len(valid):
+            return value
+        sel = cand[valid]
+        force = wp.zeros(len(sel), dtype=wp.spatial_vector)
+        mjwarp.contact_force(self._m, self._d, wp.array(sel.astype(np.int32)),
                              True, force)
         strong = np.linalg.norm(force.numpy()[:, :3], axis=1) >= self._force_threshold
-        targets = geoms[cross, 1]
-        weights = np.where(red_first[cross], self._weight[targets],
-                           self._red_weight[targets])
-        agents = np.where(red_first[cross], 0, 1)
-        np.maximum.at(value, (worldid[cross], agents), weights * strong)
+
+        red = self._frame(scene.RED, sensors)
+        blue = self._frame(scene.BLUE, sensors)
+        palm = np.stack([[red["left_palm_vel"], red["right_palm_vel"]],
+                         [blue["left_palm_vel"], blue["right_palm_vel"]]])
+        torso = np.stack([red["torso"], blue["torso"]])
+        who, where = agents[valid], worldid[sel]
+        direction = torso[1 - who, where] - torso[who, where]
+        direction /= np.linalg.norm(direction, axis=1, keepdims=True) + 1e-6
+        toward = np.sum(palm[who, self._striker_palm[strikers[valid]], where]
+                        * direction, axis=1)
+        scored = strong & (toward >= self._punch_speed_min)
+        np.maximum.at(value, (where, who),
+                      self._target_w[targets[valid]] * scored)
         return value
 
     def _reward(self, actions, hit, sensors: np.ndarray) -> tuple:
