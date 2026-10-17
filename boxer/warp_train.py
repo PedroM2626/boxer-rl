@@ -201,6 +201,10 @@ def _parse_args(argv=None):
     env_g.add_argument("--round-steps", type=int, default=480,
                        help="control steps per round; must be a multiple of the "
                             "iteration length (80 at 2048 worlds): 480 = 6 x 80")
+    env_g.add_argument("--imitation", type=Path, default=None,
+                       help="runs/reference/jab_targets.json from "
+                            "tools/retarget_dense.py; absent = pure RL, no shaping")
+    env_g.add_argument("--w-imit", type=float, default=0.3)
     ppo = ap.add_argument_group("ppo")
     ppo.add_argument("--unroll-length", type=int, default=20)
     ppo.add_argument("--batch-size", type=int, default=2048,
@@ -254,7 +258,9 @@ def main(argv=None) -> int:
     env = WarpBoxing(nworld=args.worlds, n_frames=args.n_frames,
                      spawn_distance=args.spawn_distance,
                      action_scale=args.action_scale,
-                     round_steps=args.round_steps)
+                     round_steps=args.round_steps,
+                     imitation_path=str(args.imitation) if args.imitation else None,
+                     w_imit=args.w_imit)
     policy = MLP(tuple(args.policy_layers), 2 * env.action_size)
     value = MLP(tuple(args.value_layers), 1)
     act = make_act(policy)
@@ -275,6 +281,8 @@ def main(argv=None) -> int:
         "obs_size": env.obs_size, "round_steps": args.round_steps,
         "n_frames": args.n_frames, "spawn_distance": args.spawn_distance,
         "action_scale": args.action_scale,
+        "imitation": {"path": str(args.imitation) if args.imitation else None,
+                      "w_imit": args.w_imit},
         "policy_layers": list(args.policy_layers),
         "value_layers": list(args.value_layers),
         "ppo": {k: getattr(args, k) for k in (
@@ -313,7 +321,7 @@ def main(argv=None) -> int:
         rew_buf = np.zeros((t_it, rows), np.float32)
         done_buf = np.zeros((t_it, rows), np.float32)
         hits_red = hits_blue = 0.0
-        dist_mean = 0.0
+        dist_mean = imit_mean = 0.0
         flat_obs = obs.reshape(rows, env.obs_size)
         for t in range(t_it):
             key, sub = jax.random.split(key)
@@ -329,6 +337,7 @@ def main(argv=None) -> int:
             hits_red += float(np.sum(parts["scored"]))
             hits_blue += float(np.sum(parts["taken"]))
             dist_mean += float(np.mean(parts["distance"]))
+            imit_mean += float(np.mean(parts["imit"]))
             flat_obs = obs.reshape(rows, env.obs_size)
             step += rows
         terminal_obs = flat_obs.copy()
@@ -375,7 +384,7 @@ def main(argv=None) -> int:
             "reward_red": float(rew_buf[:, 0::2].mean()),
             "reward_blue": float(rew_buf[:, 1::2].mean()),
             "hits_red": hits_red, "hits_blue": hits_blue,
-            "distance": dist_mean / t_it,
+            "distance": dist_mean / t_it, "imit": imit_mean / t_it,
             **{k: float(jp.asarray(v)) for k, v in metrics.items()},
         }
         with progress_log.open("a") as sink:

@@ -18,6 +18,10 @@ Differences from the MJX env, each tied to a measurement:
 * a hit is a force-threshold contact event on a weighted target surface, not a
   margin crossing: the published recipe's scorecard, now that the engine
   exposes force.
+* optionally, an imitation shaping term (``imitation_path``): the strike-phase
+  arm poses of the retargeted jab (``tools/retarget_dense.py``; the JSON sits
+  out of git with the clip), paid clock-free as the closest pose match and
+  gated on forward fist speed so holding a pose pays nothing.
 
 v0 keeps the observation vector's structure but reduces the reward to the
 measured core (upright, in_range, facing, hit events, clinch, energy, ring);
@@ -26,6 +30,8 @@ Runs only in the warp venv (mujoco 3.16 + mujoco-warp + mujoco_menagerie);
 ``boxer/scene.py`` is jax-free so it imports unchanged.
 """
 from __future__ import annotations
+
+import json
 
 import mujoco
 import mujoco_warp as mjwarp
@@ -91,7 +97,9 @@ class WarpBoxing:
                  w_upright: float = 0.8, w_range: float = 0.3,
                  w_facing: float = 0.2, w_hit: float = 10.0,
                  w_clinch: float = 0.5, w_energy: float = 0.05,
-                 w_ring: float = 1.0):
+                 w_ring: float = 1.0,
+                 imitation_path: str | None = None, w_imit: float = 0.3,
+                 imit_sigma: float = 0.3, imit_speed_ref: float = 5.0):
         self.nworld, self.n_frames = nworld, n_frames
         self._spawn_distance = spawn_distance
         self._action_scale = action_scale
@@ -101,8 +109,10 @@ class WarpBoxing:
         self._clinch_range, self._force_threshold = clinch_range, force_threshold
         self._rearm_steps, self._round_steps = rearm_steps, round_steps
         self._down_up_z, self._down_head_z = down_up_z, down_head_z
+        self._imit_sigma, self._imit_speed_ref = imit_sigma, imit_speed_ref
         self._w = dict(upright=w_upright, range=w_range, facing=w_facing,
-                       hit=w_hit, clinch=w_clinch, energy=w_energy, ring=w_ring)
+                       hit=w_hit, clinch=w_clinch, energy=w_energy, ring=w_ring,
+                       imit=w_imit)
 
         self._model = scene.build_model(spawn_distance=spawn_distance, visual=False)
         self._qpos0, self._ctrl0 = scene.stance(self._model, guard_pose)
@@ -154,6 +164,17 @@ class WarpBoxing:
         self._weight = self._target_weights(scene.BLUE)
         self._red_weight = self._target_weights(scene.RED)
 
+        # Optional imitation shaping: the strike-phase poses of the retargeted
+        # jab (tools/retarget_dense.py), four right-arm joints per clip frame.
+        self._imit = None
+        self._imit_cols = None
+        if imitation_path is not None:
+            with open(imitation_path) as handle:
+                traj = json.load(handle)
+            start, stop = traj["strike_window"]
+            self._imit = np.asarray(traj["targets_radians"])[start:stop + 1]
+            self._imit_cols = {side: self._arm_columns(side) for side in scene.SIDES}
+
         self._m = mjwarp.put_model(self._model)
         # nconmax/njmax must be sized by hand: put_data derives defaults from
         # the host MjData's contact state, which is empty before any forward
@@ -178,6 +199,15 @@ class WarpBoxing:
             if gid >= 0:
                 out[gid] = value
         return out
+
+    def _arm_columns(self, side: str) -> np.ndarray:
+        """Columns of the right arm's four fitted joints inside me["qpos"]."""
+        cols = []
+        for joint in ("shoulder_pitch", "shoulder_roll", "shoulder_yaw", "elbow"):
+            aid = mujoco.mj_name2id(self._model, mujoco.mjtObj.mjOBJ_ACTUATOR,
+                                    side + "right_" + joint + "_joint")
+            cols.append(int(np.flatnonzero(self._sides[side]["actuators"] == aid)[0]))
+        return np.array(cols)
 
     @property
     def action_size(self) -> int:
@@ -329,10 +359,27 @@ class WarpBoxing:
                              - w["clinch"] * clinch * alive
                              - w["energy"] * np.mean(actions[:, i, :] ** 2, axis=1)
                              - w["ring"] * ring)
+            imit = np.zeros(self.nworld)
+            if self._imit is not None:
+                # Shape reward: how close this boxer's right arm sits to ANY
+                # strike-phase pose of the retargeted jab -- no clock, the
+                # boxer chooses when to pass through them. Gated by the fist
+                # moving along the line to the opponent, so a static guard-
+                # like pose near a target pays nothing (the old shaping term's
+                # failure mode).
+                cols = self._imit_cols[scene.RED if i == 0 else scene.BLUE]
+                qarm = me["qpos"][:, cols]
+                d2 = np.sum((qarm[:, None, :] - self._imit[None, :, :]) ** 2, axis=2)
+                shape = np.exp(-d2 / self._imit_sigma ** 2).max(axis=1)
+                speed = np.sum(me["right_palm_vel"] * offset
+                               / (distance[:, None] + 1e-6), axis=1)
+                gate = np.clip(speed / self._imit_speed_ref, 0.0, 1.0)
+                imit = shape * gate
+                rewards[:, i] += w["imit"] * imit
             if i == 0:
                 parts = dict(upright=upright, in_range=in_range, facing=facing,
                              distance=distance, clinch=clinch, hit=hit[:, 0],
-                             scored=scored, taken=taken)
+                             scored=scored, taken=taken, imit=imit)
         # env.py:831 -- the rearm counter resets on any scoring-surface
         # contact, armed or not, so a held clinch scores once and must let go
         # to re-arm.
@@ -445,4 +492,31 @@ if __name__ == "__main__":
     print(f"scripted jab over 110 steps: peak hit value {hits:.2f} "
           f"(force threshold {env._force_threshold:.0f} N)")
     assert np.isfinite(obs).all() and hits > 0.0, "self-check failed"
+
+    # Imitation channel: drive the right arm along the retargeted strike
+    # poses and the shaped term must light up. Skipped without the locally
+    # generated targets (runs/ is out of git with the clip).
+    from pathlib import Path
+    targets_file = Path("runs/reference/jab_targets.json")
+    if targets_file.exists():
+        env2 = WarpBoxing(nworld=8, spawn_distance=0.45,
+                          imitation_path=str(targets_file),
+                          spawn_jitter=0.0, yaw_jitter=0.0, pose_noise=0.0)
+        env2.reset(1)
+        cols = env2._imit_cols[scene.RED]
+        aid = env2._sides[scene.RED]["actuators"][cols]
+        ctrl0 = np.asarray(env2._ctrl0)
+        action = np.zeros((8, 2, env2.action_size))
+        peak = 0.0
+        for f in range(len(env2._imit)):
+            action[:, 0, cols] = ((env2._imit[f] - ctrl0[aid])
+                                  / env2._action_scale)
+            for _ in range(3):  # one 30 fps clip frame over three ctrl steps
+                obs, reward, done, parts = env2.step(action)
+                peak = max(peak, float(parts["imit"].max()))
+        print(f"retargeted-jab tracking over {len(env2._imit)} clip frames: "
+              f"peak imitation term {peak:.3f}")
+        assert peak > 0.05, "imitation channel dead"
+    else:
+        print("no jab_targets.json -- imitation channel not exercised")
     print("self-check passed")
