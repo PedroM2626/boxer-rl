@@ -252,7 +252,9 @@ class WarpBoxing:
         self._d.ctrl.assign(ctrl)
         for _ in range(self.n_frames):
             mjwarp.step(self._m, self._d)
-        self._last_action = np.asarray(actions, dtype=np.float32)
+        # np.array, not np.asarray: a jax-derived input may arrive read-only,
+        # and reset zeroes this buffer in place.
+        self._last_action = np.array(actions, dtype=np.float32)
 
         sensors = self._d.sensordata.numpy()
         self._qpos_sync = self._d.qpos.numpy()
