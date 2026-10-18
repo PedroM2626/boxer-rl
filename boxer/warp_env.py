@@ -380,11 +380,18 @@ class WarpBoxing:
         w = self._w
         red = self._frame(scene.RED, sensors)
         blue = self._frame(scene.BLUE, sensors)
+        # Both corners' down state, needed before the per-agent loop so a boxer's
+        # metrics can see the opponent's state (the video of warp1 iteration 375
+        # shows the standing corner carrying the fallen one around, because the
+        # range term only checked whether *I* was down).
+        frames = (red, blue)
+        downs = [(quat_rotate(f["quat"], WORLD_UP[None, :])[:, 2] < self._down_up_z)
+                 | (f["head"][:, 2] < self._down_head_z) for f in frames]
         rewards, parts = np.zeros((self.nworld, 2)), {}
         for i, (me, foe) in enumerate(((red, blue), (blue, red))):
             quat = me["quat"]
             upright = quat_rotate(quat, WORLD_UP[None, :])[:, 2]
-            down = (upright < self._down_up_z) | (me["head"][:, 2] < self._down_head_z)
+            down = downs[i]
             alive = np.where(down, 0.0, 1.0)
             offset = foe["torso"] - me["torso"]
             distance = np.linalg.norm(offset, axis=1)
@@ -411,7 +418,7 @@ class WarpBoxing:
                              - w["ring"] * ring)
             imit = np.zeros(self.nworld)
             if self._imit is not None:
-                # Shape reward: how close this boxer's right arm sits to ANY
+                # Shape reward: how close this boxer's recorded arm sits to ANY
                 # strike-phase pose of the retargeted jab -- no clock, the
                 # boxer chooses when to pass through them. Gated by the fist
                 # moving along the line to the opponent, so a static guard-
@@ -429,7 +436,12 @@ class WarpBoxing:
             if i == 0:
                 parts = dict(upright=upright, in_range=in_range, facing=facing,
                              distance=distance, clinch=clinch, hit=hit[:, 0],
-                             scored=scored, taken=taken, imit=imit)
+                             scored=scored, taken=taken, imit=imit,
+                             # metric only, no reward attached yet: how often red is
+                             # inside punching distance of a DOWN blue -- the state
+                             # the range term pays without any punch being thrown
+                             carry=np.where(downs[1], (distance < self._punch_reach)
+                                            & (in_range > 0.5), 0.0))
         # env.py:831 -- the rearm counter resets on any scoring-surface
         # contact, armed or not, so a held clinch scores once and must let go
         # to re-arm.

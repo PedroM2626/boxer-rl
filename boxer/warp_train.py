@@ -100,10 +100,18 @@ class RunningNorm:
         self.count = float(state["count"])
 
 
-def split_params(parameters):
-    """(batch, 2A) -> loc, scale: brax's NormalTanhDistribution."""
+def split_params(parameters, std_bounds=(0.05, 2.0)):
+    """(batch, 2A) -> loc, scale: brax's NormalTanhDistribution, bounded.
+
+    The clip is the deliberate deviation brax's own arms did not need: warp1's
+    std grew 0.71 -> 27.4 over 356 iterations while entropy climbed 33 -> 110,
+    because a tanh-squashed Normal with std ~16 is a saturated coin flip -- the
+    "hits" that followed were flailing contacts, not punches. Bounding the scale
+    (and dropping the entropy cost to brax's own 1e-4 default order of magnitude)
+    keeps exploration from out-running the reward.
+    """
     loc, raw_scale = jp.split(parameters, 2, axis=-1)
-    return loc, jax.nn.softplus(raw_scale) + TANH_MIN_STD
+    return loc, jp.clip(jax.nn.softplus(raw_scale) + TANH_MIN_STD, *std_bounds)
 
 
 def normal_logp(loc, scale, action):
@@ -114,18 +122,18 @@ def normal_logp(loc, scale, action):
                   axis=-1)
 
 
-def make_act(policy):
+def make_act(policy, std_bounds):
     @jax.jit
     def act(params_p, obs, key):
         """(rows, D) normalised obs -> (env action, raw pre-tanh action, logp)."""
-        loc, scale = split_params(policy.apply(params_p, obs))
+        loc, scale = split_params(policy.apply(params_p, obs), std_bounds)
         u = loc + scale * jax.random.normal(key, loc.shape)
         return jp.tanh(u), u, normal_logp(loc, scale, u)
     return act
 
 
 def make_update(policy, value, tx, clip_epsilon, entropy_cost, value_cost,
-                gamma, lam):
+                gamma, lam, std_bounds):
     """brax-parity update: GAE is recomputed inside the loss from the CURRENT
     value net (baseline = V(obs), bootstrap = V(terminal_obs)), so advantages
     fade as the critic fits -- the mechanism that kept brax's clip fraction
@@ -137,7 +145,7 @@ def make_update(policy, value, tx, clip_epsilon, entropy_cost, value_cost,
         def loss_fn(p_p, p_v, b):
             rows, t_steps = b["reward"].shape
             obs = b["obs"].reshape(rows * t_steps, -1)
-            loc, scale = split_params(policy.apply(p_p, obs))
+            loc, scale = split_params(policy.apply(p_p, obs), std_bounds)
             scale = scale.reshape(rows, t_steps, -1)
             logp = normal_logp(loc.reshape(rows, t_steps, -1), scale,
                                b["raw_action"])
@@ -215,7 +223,14 @@ def _parse_args(argv=None):
     ppo.add_argument("--num-updates-per-batch", type=int, default=4,
                      help="epochs over the collected transitions")
     ppo.add_argument("--learning-rate", type=float, default=3e-4)
-    ppo.add_argument("--entropy-cost", type=float, default=1e-2)
+    ppo.add_argument("--entropy-cost", type=float, default=1e-3,
+                     help="train.py used brax's 1e-2 for a 25-DOF robot; on the "
+                          "29-joint warp arm that let entropy run 33 -> 110 and "
+                          "the action std 0.7 -> 27 in 356 iterations")
+    ppo.add_argument("--std-min", type=float, default=0.05)
+    ppo.add_argument("--std-max", type=float, default=2.0,
+                     help="cap on the tanh-Normal scale; past ~2 the squashed "
+                          "action is a saturated coin flip whatever the mean says")
     ppo.add_argument("--discounting", type=float, default=0.97)
     ppo.add_argument("--gae-lambda", type=float, default=0.95)
     ppo.add_argument("--clipping-epsilon", type=float, default=0.2)
@@ -263,11 +278,12 @@ def main(argv=None) -> int:
                      w_imit=args.w_imit)
     policy = MLP(tuple(args.policy_layers), 2 * env.action_size)
     value = MLP(tuple(args.value_layers), 1)
-    act = make_act(policy)
+    std_bounds = (args.std_min, args.std_max)
+    act = make_act(policy, std_bounds)
     tx = optax.adam(learning_rate=args.learning_rate)
     update = make_update(policy, value, tx, args.clipping_epsilon,
                          args.entropy_cost, args.value_cost,
-                         args.discounting, args.gae_lambda)
+                         args.discounting, args.gae_lambda, std_bounds)
 
     key = jax.random.PRNGKey(args.seed)
     params_p = policy.init({"params": key}, jp.zeros((1, env.obs_size)))
@@ -288,7 +304,8 @@ def main(argv=None) -> int:
         "ppo": {k: getattr(args, k) for k in (
             "unroll_length", "batch_size", "num_minibatches",
             "num_updates_per_batch", "learning_rate", "entropy_cost",
-            "discounting", "gae_lambda", "clipping_epsilon", "value_cost")},
+            "discounting", "gae_lambda", "clipping_epsilon", "value_cost",
+            "std_min", "std_max")},
     }, indent=2) + "\n")
 
     ckpt_dir = args.output / "checkpoint"
@@ -321,7 +338,7 @@ def main(argv=None) -> int:
         rew_buf = np.zeros((t_it, rows), np.float32)
         done_buf = np.zeros((t_it, rows), np.float32)
         hits_red = hits_blue = 0.0
-        dist_mean = imit_mean = 0.0
+        dist_mean = imit_mean = carry_mean = 0.0
         flat_obs = obs.reshape(rows, env.obs_size)
         for t in range(t_it):
             key, sub = jax.random.split(key)
@@ -338,6 +355,7 @@ def main(argv=None) -> int:
             hits_blue += float(np.sum(parts["taken"]))
             dist_mean += float(np.mean(parts["distance"]))
             imit_mean += float(np.mean(parts["imit"]))
+            carry_mean += float(np.mean(parts["carry"]))
             flat_obs = obs.reshape(rows, env.obs_size)
             step += rows
         terminal_obs = flat_obs.copy()
@@ -385,6 +403,7 @@ def main(argv=None) -> int:
             "reward_blue": float(rew_buf[:, 1::2].mean()),
             "hits_red": hits_red, "hits_blue": hits_blue,
             "distance": dist_mean / t_it, "imit": imit_mean / t_it,
+            "carry": carry_mean / t_it,
             **{k: float(jp.asarray(v)) for k, v in metrics.items()},
         }
         with progress_log.open("a") as sink:

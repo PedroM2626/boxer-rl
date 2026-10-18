@@ -117,10 +117,14 @@ def main(argv=None) -> int:
         learner = policy_module.make_opponent(args.checkpoint, env)
         print(f"red corner runs the scripted {args.checkpoint}", flush=True)
     else:
-        checkpoint = policy_module.resolve_checkpoint(args.checkpoint)
+        # make_opponent, not load_policy: it dispatches on what the directory
+        # holds, so a boxer.warp_train run (step-*.pkl + warp_config.json) renders
+        # through the same path as a brax one. resolve_checkpoint would have walked
+        # looking for orbax step dirs and found none.
         print(f"devices: {jax.devices()}", flush=True)
-        print(f"loading {checkpoint}", flush=True)
-        learner = policy_module.load_policy(checkpoint, deterministic=not args.stochastic)
+        print(f"loading {args.checkpoint}", flush=True)
+        learner = policy_module.make_opponent(
+            args.checkpoint, env, deterministic=not args.stochastic)
     opponent = (
         learner if args.opponent is None
         else policy_module.make_opponent(args.opponent, env)
