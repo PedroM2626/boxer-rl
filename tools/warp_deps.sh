@@ -5,12 +5,12 @@ set -euo pipefail
 
 /home/pedro/venvs/boxer/bin/uv pip install \
   --python /home/pedro/venvs/warp_test/bin/python \
-  "jax[cpu]" flax optax
+  "jax[cpu]" flax optax "imageio[ffmpeg]"
 
 /home/pedro/venvs/warp_test/bin/python - <<'EOF'
 import jax
 assert jax.devices()[0].platform == "cpu", jax.devices()
-import flax, optax
+import flax, optax, imageio, imageio_ffmpeg
 print(f"jax {jax.__version__} (cpu), flax {flax.__version__}, "
-      f"optax {optax.__version__}")
+      f"optax {optax.__version__}, imageio {imageio.__version__}")
 EOF
