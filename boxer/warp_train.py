@@ -204,7 +204,9 @@ def _parse_args(argv=None):
                      help="iterations between checkpoints (~40 over a 200M run)")
     env_g = ap.add_argument_group("environment")
     env_g.add_argument("--n-frames", type=int, default=5)
-    env_g.add_argument("--spawn-distance", type=float, default=1.3)
+    env_g.add_argument("--spawn-distance", type=float, default=0.75,
+                       help="warp1 trained at 1.3 m and never closed inside the 0.45-0.55 m "
+                            "band where the arm can score; 0.75 puts a step and a half away")
     env_g.add_argument("--action-scale", type=float, default=0.25)
     env_g.add_argument("--round-steps", type=int, default=480,
                        help="control steps per round; must be a multiple of the "
@@ -223,11 +225,13 @@ def _parse_args(argv=None):
     ppo.add_argument("--num-updates-per-batch", type=int, default=4,
                      help="epochs over the collected transitions")
     ppo.add_argument("--learning-rate", type=float, default=3e-4)
-    ppo.add_argument("--entropy-cost", type=float, default=1e-3,
+    ppo.add_argument("--entropy-cost", type=float, default=5e-3,
                      help="train.py used brax's 1e-2 for a 25-DOF robot; on the "
                           "29-joint warp arm that let entropy run 33 -> 110 and "
                           "the action std 0.7 -> 27 in 356 iterations")
-    ppo.add_argument("--std-min", type=float, default=0.05)
+    ppo.add_argument("--std-min", type=float, default=0.3,
+                     help="warp1 ran the std to the floor (0.22) and froze; a scale below "
+                          "~0.3 cannot move a 29-joint arm off its mean")
     ppo.add_argument("--std-max", type=float, default=2.0,
                      help="cap on the tanh-Normal scale; past ~2 the squashed "
                           "action is a saturated coin flip whatever the mean says")

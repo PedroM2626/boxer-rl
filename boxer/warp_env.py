@@ -21,10 +21,23 @@ Differences from the MJX env, each tied to a measurement:
   scoring surface of the other -- and gated on that fist closing on the
   opponent, because geometry order in the contact buffer says nothing about who
   threw the punch and a leaning guard clears 50 N on its own.
+* every dense term needs BOTH boxers standing. warp1 ended its rounds sitting on
+  the floor propped on one arm, because the old down test (upright_z < 0.15, head
+  below 0.55 m) called that alive: falling cost nothing and staying down collected
+  ``upright`` and ``in_range`` all round. A torso past 45 deg or a head under
+  0.85 m is now down, and the range/facing/upright/clinch/imitation terms stop
+  for both corners the moment one of them is.
+* ``in_range`` is narrow (``range_sigma`` 0.15, was brax's 0.35) and cheap
+  (``w_range`` 0.15, was 0.3). At 0.86 m the old width still paid 55% of the peak
+  -- 0.156/step of free income against a punch worth ~5 per event that happens a
+  fraction of the time -- which is why warp1 froze at a distance where nothing
+  can land.
 * optionally, an imitation shaping term (``imitation_path``): the strike-phase
   arm poses of the retargeted jab (``tools/retarget_dense.py``; the JSON sits
   out of git with the clip), paid clock-free as the closest pose match and
-  gated on forward fist speed so holding a pose pays nothing.
+  gated on forward fist speed so holding a pose pays nothing. Its tolerance is
+  0.6 rad: warp1's 0.3 rad was unreachable from a random arm and the term
+  measured exactly 0.0 through all 611 iterations.
 
 v0 keeps the observation vector's structure but reduces the reward to the
 measured core (upright, in_range, facing, hit events, clinch, energy, ring);
@@ -90,28 +103,34 @@ class WarpBoxing:
     """N independent boxing rounds stepping in parallel on one warp Data."""
 
     def __init__(self, nworld: int = 1024, n_frames: int = 5,
-                 spawn_distance: float = 1.3, guard_pose: str = "natural",
+                 spawn_distance: float = 0.75, guard_pose: str = "natural",
                  action_scale: float = 0.25, spawn_jitter: float = 0.12,
                  yaw_jitter: float = 0.3, pose_noise: float = 0.02,
                  target_range: float = 0.55, punch_reach: float = 0.45,
+                 range_sigma: float = 0.15,
                  clinch_range: float = 0.35, force_threshold: float = 50.0,
                  rearm_steps: int = 20, round_steps: int = 500,
-                 down_up_z: float = 0.15, down_head_z: float = 0.55,
+                 down_up_z: float = 0.70, down_head_z: float = 0.85,
                  punch_speed_min: float = 1.0,
-                 w_upright: float = 0.8, w_range: float = 0.3,
+                 w_upright: float = 0.8, w_range: float = 0.15,
                  w_facing: float = 0.2, w_hit: float = 10.0,
                  w_clinch: float = 0.5, w_energy: float = 0.05,
                  w_ring: float = 1.0,
                  imitation_path: str | None = None, w_imit: float = 0.3,
-                 imit_sigma: float = 0.3, imit_speed_ref: float = 5.0):
+                 imit_sigma: float = 0.6, imit_speed_ref: float = 5.0):
         self.nworld, self.n_frames = nworld, n_frames
         self._spawn_distance = spawn_distance
         self._action_scale = action_scale
         self._spawn_jitter, self._yaw_jitter = spawn_jitter, yaw_jitter
         self._pose_noise = pose_noise
         self._target_range, self._punch_reach = target_range, punch_reach
+        self._range_sigma = range_sigma
         self._clinch_range, self._force_threshold = clinch_range, force_threshold
         self._rearm_steps, self._round_steps = rearm_steps, round_steps
+        # A torso tilted past 45 deg or a head below 0.85 m is down. The old
+        # thresholds (0.15 / 0.55) only caught a boxer flat on the floor, and
+        # warp1's video showed why that is not a detail: both corners fell in
+        # ~1 s and then sat propped on their arms collecting the dense terms.
         self._down_up_z, self._down_head_z = down_up_z, down_head_z
         self._punch_speed_min = punch_speed_min
         self._imit_sigma, self._imit_speed_ref = imit_sigma, imit_speed_ref
@@ -393,12 +412,17 @@ class WarpBoxing:
             upright = quat_rotate(quat, WORLD_UP[None, :])[:, 2]
             down = downs[i]
             alive = np.where(down, 0.0, 1.0)
+            # Every dense term needs BOTH boxers up. warp1's policy ended the
+            # round sitting on the floor propped on one arm -- with the old
+            # per-agent gate that still paid upright and range, so falling was
+            # free and staying down was the optimum.
+            engaged = alive * np.where(downs[1 - i], 0.0, 1.0)
             offset = foe["torso"] - me["torso"]
             distance = np.linalg.norm(offset, axis=1)
             forward = quat_rotate(quat, WORLD_FORWARD[None, :])
             facing = np.clip(
                 np.sum(forward * offset / (distance[:, None] + 1e-6), axis=1), 0.0, 1.0)
-            in_range = np.exp(-((distance - self._target_range) / 0.35) ** 2)
+            in_range = np.exp(-((distance - self._target_range) / self._range_sigma) ** 2)
             clinch = np.clip((self._punch_reach - distance)
                              / (self._punch_reach - self._clinch_range), 0.0, 1.0)
             centre = np.linalg.norm(me["torso"][:, :2], axis=1)
@@ -409,11 +433,11 @@ class WarpBoxing:
             foe_armed = self._steps_off[:, 1 - i] >= self._rearm_steps
             scored = np.where(armed, hit[:, i], 0.0)
             taken = np.where(foe_armed, hit[:, 1 - i], 0.0)
-            rewards[:, i] = (w["upright"] * upright
-                             + w["range"] * in_range * alive * upright
-                             + w["facing"] * facing * alive
+            rewards[:, i] = (w["upright"] * upright * engaged
+                             + w["range"] * in_range * engaged
+                             + w["facing"] * facing * engaged
                              + w["hit"] * (scored - taken)
-                             - w["clinch"] * clinch * alive
+                             - w["clinch"] * clinch * engaged
                              - w["energy"] * np.mean(actions[:, i, :] ** 2, axis=1)
                              - w["ring"] * ring)
             imit = np.zeros(self.nworld)
@@ -423,7 +447,7 @@ class WarpBoxing:
                 # boxer chooses when to pass through them. Gated by the fist
                 # moving along the line to the opponent, so a static guard-
                 # like pose near a target pays nothing (the old shaping term's
-                # failure mode).
+                # failure mode), and by both corners being up.
                 cols = self._imit_cols[scene.RED if i == 0 else scene.BLUE]
                 qarm = me["qpos"][:, cols]
                 d2 = np.sum((qarm[:, None, :] - self._imit[None, :, :]) ** 2, axis=2)
@@ -431,7 +455,7 @@ class WarpBoxing:
                 speed = np.sum(me[self._imit_arm + "_palm_vel"] * offset
                                / (distance[:, None] + 1e-6), axis=1)
                 gate = np.clip(speed / self._imit_speed_ref, 0.0, 1.0)
-                imit = shape * gate
+                imit = shape * gate * engaged
                 rewards[:, i] += w["imit"] * imit
             if i == 0:
                 parts = dict(upright=upright, in_range=in_range, facing=facing,
