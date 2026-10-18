@@ -21,12 +21,15 @@ Differences from the MJX env, each tied to a measurement:
   scoring surface of the other -- and gated on that fist closing on the
   opponent, because geometry order in the contact buffer says nothing about who
   threw the punch and a leaning guard clears 50 N on its own.
-* every dense term needs BOTH boxers standing. warp1 ended its rounds sitting on
-  the floor propped on one arm, because the old down test (upright_z < 0.15, head
-  below 0.55 m) called that alive: falling cost nothing and staying down collected
-  ``upright`` and ``in_range`` all round. A torso past 45 deg or a head under
-  0.85 m is now down, and the range/facing/upright/clinch/imitation terms stop
-  for both corners the moment one of them is.
+* the interaction terms (range, facing, clinch, imitation) need BOTH boxers
+  standing. warp1 ended its rounds sitting on the floor propped on one arm,
+  because the old down test (upright_z < 0.15, head below 0.55 m) called that
+  alive: falling cost nothing and staying down collected ``in_range`` and facing
+  all round. A torso past 45 deg or a head under 0.85 m is now down, and those
+  terms stop for both corners the moment one of them is. ``upright`` itself stays
+  ungated -- the first warp2 attempt gated it too, and the rollout then spent 87%
+  of the round on the floor paying nobody anything, so the gradient died with the
+  reward. See the comment in ``_reward``.
 * ``in_range`` is narrow (``range_sigma`` 0.15, was brax's 0.35) and cheap
   (``w_range`` 0.15, was 0.3). At 0.86 m the old width still paid 55% of the peak
   -- 0.156/step of free income against a punch worth ~5 per event that happens a
@@ -411,12 +414,21 @@ class WarpBoxing:
             quat = me["quat"]
             upright = quat_rotate(quat, WORLD_UP[None, :])[:, 2]
             down = downs[i]
-            alive = np.where(down, 0.0, 1.0)
-            # Every dense term needs BOTH boxers up. warp1's policy ended the
-            # round sitting on the floor propped on one arm -- with the old
-            # per-agent gate that still paid upright and range, so falling was
-            # free and staying down was the optimum.
-            engaged = alive * np.where(downs[1 - i], 0.0, 1.0)
+            # Two gates, two jobs. ``engaged`` (BOTH corners up) holds the
+            # interaction terms: warp1 ended the round propped on one arm next to
+            # a fallen foe because a per-agent gate still paid range and facing
+            # there, so falling was free.
+            #
+            # ``upright`` itself is NOT gated -- it is about my own posture. The
+            # first warp2 attempt gated it and paid for the mistake: measured with
+            # tools/warp_probe_policy.py, the boxers spent 87% of the round on the
+            # floor and both corners were up for only 11.8% of it, so for most of
+            # every rollout all dense terms read zero. Reward flatlined at -0.005
+            # (the energy residue), value_loss collapsed to 0.0003, entropy fell
+            # 47 -> 8 and std pinned at its 0.3 floor -- a dead gradient, not a
+            # converged policy. Standing had to pay again before falling could
+            # lose.
+            engaged = np.where(down | downs[1 - i], 0.0, 1.0)
             offset = foe["torso"] - me["torso"]
             distance = np.linalg.norm(offset, axis=1)
             forward = quat_rotate(quat, WORLD_FORWARD[None, :])
@@ -433,7 +445,7 @@ class WarpBoxing:
             foe_armed = self._steps_off[:, 1 - i] >= self._rearm_steps
             scored = np.where(armed, hit[:, i], 0.0)
             taken = np.where(foe_armed, hit[:, 1 - i], 0.0)
-            rewards[:, i] = (w["upright"] * upright * engaged
+            rewards[:, i] = (w["upright"] * upright
                              + w["range"] * in_range * engaged
                              + w["facing"] * facing * engaged
                              + w["hit"] * (scored - taken)
@@ -461,6 +473,10 @@ class WarpBoxing:
                 parts = dict(upright=upright, in_range=in_range, facing=facing,
                              distance=distance, clinch=clinch, hit=hit[:, 0],
                              scored=scored, taken=taken, imit=imit,
+                             # metric only: both corners' down flags, because the
+                             # training log's reward and distance cannot tell
+                             # "walked away" from "fell over and got gated off"
+                             on_floor=np.stack(downs, axis=1).astype(np.float32),
                              # metric only, no reward attached yet: how often red is
                              # inside punching distance of a DOWN blue -- the state
                              # the range term pays without any punch being thrown
@@ -540,9 +556,11 @@ if __name__ == "__main__":
     zero = np.zeros((env.nworld, 2, env.action_size))
     for _ in range(3):
         obs, reward, done, parts = env.step(zero)
+    assert parts["on_floor"].shape == (env.nworld, 2), parts["on_floor"].shape
     print(f"idle: reward red {reward[:, 0].mean():.3f}, "
           f"distance {parts['distance'].mean():.3f} m, "
           f"in_range {parts['in_range'].mean():.3f}, "
+          f"on_floor {parts['on_floor'].mean():.3f}, "
           f"obs finite {bool(np.isfinite(obs).all())}")
 
     ctrl0 = np.asarray(env._ctrl0)

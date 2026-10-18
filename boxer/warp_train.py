@@ -343,6 +343,8 @@ def main(argv=None) -> int:
         done_buf = np.zeros((t_it, rows), np.float32)
         hits_red = hits_blue = 0.0
         dist_mean = imit_mean = carry_mean = 0.0
+        floor_mean = np.zeros(2)
+        both_up_mean = 0.0
         flat_obs = obs.reshape(rows, env.obs_size)
         for t in range(t_it):
             key, sub = jax.random.split(key)
@@ -360,6 +362,8 @@ def main(argv=None) -> int:
             dist_mean += float(np.mean(parts["distance"]))
             imit_mean += float(np.mean(parts["imit"]))
             carry_mean += float(np.mean(parts["carry"]))
+            floor_mean += np.mean(parts["on_floor"], axis=0)
+            both_up_mean += float(np.mean(1.0 - np.max(parts["on_floor"], axis=1)))
             flat_obs = obs.reshape(rows, env.obs_size)
             step += rows
         terminal_obs = flat_obs.copy()
@@ -408,6 +412,9 @@ def main(argv=None) -> int:
             "hits_red": hits_red, "hits_blue": hits_blue,
             "distance": dist_mean / t_it, "imit": imit_mean / t_it,
             "carry": carry_mean / t_it,
+            "down_red": float(floor_mean[0] / t_it),
+            "down_blue": float(floor_mean[1] / t_it),
+            "both_up": both_up_mean / t_it,
             **{k: float(jp.asarray(v)) for k, v in metrics.items()},
         }
         with progress_log.open("a") as sink:
@@ -415,6 +422,8 @@ def main(argv=None) -> int:
         print(f"[{step:>12,}] it {iteration:>4} {sps:>9,.0f} learner/s  "
               f"hits r/b {hits_red / rows:.2f}/{hits_blue / rows:.2f}  "
               f"dist {dist_mean / t_it:.3f} m  "
+              f"floor {record['down_red']:.2f}/{record['down_blue']:.2f} "
+              f"up{record['both_up']:.2f}  "
               f"r_red {record['reward_red']:+.2f}  "
               f"ploss {record.get('policy_loss', float('nan')):+.3f} "
               f"vloss {record.get('value_loss', float('nan')):.3f} "
