@@ -562,11 +562,16 @@ landed, and the numbers still made no sense, so each layer got measured separate
   opponent are required, and contact itself spends the window. That alone takes 22.4
   hits a round down to 7.85.
 - **an impact threshold cannot exist against a welded target.** Scoring on contact force
-  is what the closest published work does -- RoboStriker, same robot, uses "the
-  proportion of contacts exceeding the force threshold" -- but MJX exposes no force on
-  its contact struct, and the proxy that seemed equivalent (how much approach speed the
-  fist loses) pays a vibrating fist for its own reversal. It was removed rather than
-  tuned.
+  is what the closest published work does --
+  [RoboStriker](https://arxiv.org/abs/2601.22517) (Yin, Cao et al., 2026), which
+  simulates the same robot, "Unitree G1 robots with 29 degrees of freedom", and scores
+  with "the proportion of contacts exceeding the force threshold to the total number of
+  offensive attempts" -- but MJX exposes no force on its contact struct, and the proxy
+  that seemed equivalent (how much approach speed the fist loses) pays a vibrating fist
+  for its own reversal. It was removed rather than tuned. RoboStriker publishes a
+  [project page](https://yinkangning0124.github.io/RoboStriker/) and no code repository,
+  so every mechanism quoted from it here is this repo's own implementation of the
+  described metric, checked against the sentences above rather than run from their code.
 
 **What the 200M arm in this instrument actually is.** 256 rounds, full 10 s length,
 against an opponent that cannot fall and throws nothing: **19.4 punches, 1.96 a second,
