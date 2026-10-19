@@ -350,6 +350,62 @@ Two things the truncation forced into the open:
   has to be masked, which is why the env now returns `timed_out` as a metric and the
   loss uses `cont = 1 - done * (1 - timeout)`.
 
+### The measurement that closed the door
+
+Two arms (the fourth and fifth MJX ones) ended with **0.000 punches to the head** and
+nobody could say whether the fists never arrived or arrived and were refused. The
+falsifier read each gate factor off the state the env returns: 0.00% of 8,000 sampled
+steps had raw contact, the rearm counter never once reset, and 72% of the steps were
+spent glove-on-glove at 0.72 m. So it was arrival, not the counter.
+
+`tools/reach_sweep.py` then measured the geometry instead of arguing about it: 8,194
+uniform arm poses per arm and per separation, pushed through the env's own contact
+buffer with blue holding the guard and with blue's arms at zero.
+
+| separation | poses that score, guard | poses that score, arms down |
+| --- | --- | --- |
+| 0.90, 0.75, 0.65 m | 0.0% | 0.0% |
+| 0.55 m | 0.2% | 0.2% |
+| 0.45 m | 1.3% | 1.3% |
+
+Three conclusions, all of which changed the code: the guard seals nothing (arms-down
+scores the same, so the opponent was never the wall); the arm is ~0.11 m short of the
+torso at the 0.75 m fighting distance the reward was trained on; and the only band
+where a punch can land statically was the band the clinch penalty punished, while
+`in_range` paid its peak at 0.70 m. That is why the warp env's bands are
+`target_range 0.55 / punch_reach 0.45 / clinch_range 0.35` -- the paid optimum has to
+sit inside the reachable set -- and why a punch became a force-threshold event rather
+than a contact margin.
+
+### Traps in the warp path, one run each
+
+- **`put_data` sizes the constraint buffers from the host `MjData` you hand it, which
+  is empty before any forward pass.** In overflow the solver drops constraints
+  **silently**, and a dropped contact reads 0 N -- indistinguishable from a punch that
+  never landed. The first scene check measured force ratios of 0.64-1.56 against the
+  host until `nconmax`/`njmax` were sized by hand (384/2,048 per world; both are
+  per-world, not global). `opt.warn_overflow` is zeroed in the env, so the only
+  standing defence is the self-check's scripted jab, which must peak above 0.05.
+- **A rising hit count is not evidence until the policy's scale is inside its bounds.**
+  The first warp1 run took std 0.71 → 27.4 and entropy +33 → 110 while its "hits" rose
+  fivefold: a tanh-saturated action is a coin flip, and a coin flip that swings a 29
+  joint arm into a body scores on the force threshold. The scale is now
+  `clip(softplus(raw) + 0.001, 0.3, 2.0)` -- the floor because a smaller scale cannot
+  move a 29-joint arm off its mean, the ceiling because past ~2 the mean stops
+  mattering. The completed warp1 then froze the other way (std 0.22, entropy −4.9).
+- **Arena numbers do not cross the two stacks unchanged.** The guard-error block of the
+  observation is computed from site frames in the MJX env and from sensor reads in the
+  warp env: the same quantity measured along two paths, near-identical but not bit
+  identical, so an MJX-arena win rate attached to a warp checkpoint carries that
+  discrepancy until the arena runs on warp natively.
+- **The motion reference has four ways to lie quietly.** CMU's Vicon-dialect ASF/AMC
+  pins elbow deflection at 90° whatever the subject did, which is why the pipeline
+  reads BVH; BVH channel values must be sliced in pre-order DFS or the fists come out
+  at 132-185 m/s; the leading T-pose frame wins any hand-speed threshold, so rest
+  frames are trimmed before a window is chosen; and a session contains many punches,
+  so the strike window is a contiguous fast run measured on the *outward* path, not
+  the fastest single frame.
+
 Caveat that applies to every video here: renders use the policy's deterministic mode
 (`tanh(loc)`), while training samples its actions, so a clip understates hit counts
 relative to the log.
