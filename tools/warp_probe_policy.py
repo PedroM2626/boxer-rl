@@ -122,8 +122,11 @@ def main(argv=None) -> int:
           f"target {env._target_range:.2f} m")
     print(f"  steps in the band: {band.sum() / args.steps:.3f}; "
           f"red in band of a DOWN blue: {carry / args.steps:.3f}")
-    print(f"  hits per world-step: red threw {hits[0] / unit:.5f}, "
-          f"red took {hits[1] / unit:.5f}")
+    print(f"  punch value per world-step (head 1.0, torso 0.5): red threw "
+          f"{hits[0] / unit:.5f}, red took {hits[1] / unit:.5f}; per round of "
+          f"{args.worlds * args.steps / max(ends[0], 1.0):.0f} steps that is "
+          f"{hits[0] / max(ends[0], 1.0):.2f} red, "
+          f"{hits[1] / max(ends[0], 1.0):.2f} against")
     print(f"  mean reward: red {rew[0] / args.steps:+.4f} blue {rew[1] / args.steps:+.4f}")
     return 0
 

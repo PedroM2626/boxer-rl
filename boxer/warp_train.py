@@ -426,6 +426,12 @@ def main(argv=None) -> int:
             "reward_red": float(rew_buf[:, 0::2].mean()),
             "reward_blue": float(rew_buf[:, 1::2].mean()),
             "hits_red": hits_red, "hits_blue": hits_blue,
+            # parts["scored"] carries the target's weight (head 1.0, torso 0.5),
+            # so this is punch VALUE per world-round, not a count of punches -- and
+            # per round is the only denominator that survives the round length
+            # changing under the policy, which it now does.
+            "punch_value_red": hits_red / max(rounds_mean, 1.0),
+            "punch_value_blue": hits_blue / max(rounds_mean, 1.0),
             "distance": dist_mean / t_it, "imit": imit_mean / t_it,
             "carry": carry_mean / t_it,
             "down_red": float(floor_mean[0] / t_it),
@@ -445,7 +451,7 @@ def main(argv=None) -> int:
         with progress_log.open("a") as sink:
             sink.write(json.dumps(record) + "\n")
         print(f"[{step:>12,}] it {iteration:>4} {sps:>9,.0f} learner/s  "
-              f"hits r/b {hits_red / rows:.2f}/{hits_blue / rows:.2f}  "
+              f"punch r/b {record['punch_value_red']:.2f}/{record['punch_value_blue']:.2f}  "
               f"dist {dist_mean / t_it:.3f} m  "
               f"floor {record['down_red']:.2f}/{record['down_blue']:.2f} "
               f"up{record['both_up']:.2f} "

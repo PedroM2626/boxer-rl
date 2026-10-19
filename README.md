@@ -22,7 +22,13 @@ the opponent's head or torso geom, not a proximity heuristic, credited by role a
 gated on the striker's fist closing on the opponent.
 
 **Where this is at:** the physics, the throughput and the measurement machinery work;
-the boxers do not box yet. The best policy holds a guard, closes distance and lands
+the boxers do not box yet -- but the arm running now is the first one that is
+*measurably* standing and hitting. warp4 at 506/611 spends 0.6% of its rollout on the
+floor (warp2: 87%), keeps its head at 1.21 m off the ground (0.26 m), and scores
+**0.65 punch-value per world-round** (head 1.0, torso 0.5 -- a value, not a count) where
+no earlier arm scored anything outside the spawn transient. It has no arena win rate
+yet, because the arena runs on the MJX stack, and the numbers below were measured with
+a different instrument: the best MJX-era policy holds a guard, closes distance and lands
 ~0.3 gated punches a round, and wins 64% of rounds against a passive opponent by being
 the one still standing. Symmetric self-play at the same budget loses 88% of its rounds
 to that passive opponent. Every reward intervention has been reported as a null result
@@ -332,7 +338,7 @@ measurement that killed or kept it.
 | warp1 | first arm on the warp env: force scorecard, imitation channel from the retargeted CMU jab, per-agent down gate | 200.2M, and it **froze**: std 0.70→0.22, entropy +31→−5, hits only in the iteration that opens a round, imitation term exactly 0.00000 for all 611 iterations. The warp-native renderer explained what the log could not: both boxers on the floor within ~1 s, one sitting propped on an arm — and the down test (`upright_z < 0.15`, head `< 0.55`) called that alive, so falling collected the dense terms all round. |
 | warp2 | down test moved to 45° / head 0.85 m; **every** dense term gated on both corners being up; spawn 0.75 m; range narrowed (σ 0.15) and cheapened (w 0.15); std floor 0.3 | Killed at 137.6M by a bug of my own. Reward flatlined at −0.005 (the energy residue), `value_loss` fell to 0.0003, entropy 47→8, std pinned at its floor — a dead gradient, not a converged policy. `tools/warp_probe_policy.py` measured it in the engine: **87% of the round on the floor, both corners up for 11.8% of it.** Gating a boxer's own posture term on the opponent being upright deletes the incentive to stand back up. |
 | warp3 | `upright` pays on the boxer's own posture again (as `env.py:673` does); interaction terms keep the both-up gate; the log gained a floor fraction | 200.2M complete, and it **falsified "the gate was the problem"**: standing early in the round improved (both up over the first 80 steps 0.59→0.73) but the round as a whole still ended at down 0.87 / both-up 0.12, hits never left the ~180-per-round-opening spawn transient, and the late-round state was a torso at `up_z` 0.69 collecting **+0.55/step** for doing nothing. Three of every four learner transitions came from a fight that was already over. |
-| warp4 | ported the rest of `env.py`'s round semantics: a round closes on a knockdown, out of the ring, or beyond `MAX_SEPARATION` (2.4 m), with the respawn happening **per world inside `step()`**, plus `w_alive` 0.2 and the zero-sum `w_ko` 3.0 | In progress. At 484/611: rounds 44→74 control steps, hits per learner 0.11→0.36 with red and blue symmetric, reward +1.00→+1.25 — and, measured with the probe rather than inferred from the log, **a round closes every 87 steps and 100% of closures are falls** (ring 0.00, separation 0.00, widest separation seen 1.6 m of the 2.4 m limit). Same instrument on the same checkpoint: floor fraction 0.006 against warp2's 0.87, head height 1.21 m against 0.26 m, and 0.008 scoring contacts per world-step against 0.00000. |
+| warp4 | ported the rest of `env.py`'s round semantics: a round closes on a knockdown, out of the ring, or beyond `MAX_SEPARATION` (2.4 m), with the respawn happening **per world inside `step()`**, plus `w_alive` 0.2 and the zero-sum `w_ko` 3.0 | In progress (506/611). Rounds 44→74 control steps, reward +1.00→+1.25, and **0.65 punch-value per world-round** in the training log -- value, not count: head 1.0, torso 0.5 -- against 0.00000 for warp2. Measured in its own engine with the probe (128 worlds): a round every 87 steps, **100% of closures are falls** (ring 0.00, separation 0.00, widest separation seen 1.6 m of the 2.4 m limit), floor fraction 0.006 against warp2's 0.87, head height 1.21 m against 0.26 m, 0.71 punch-value per round. |
 
 Two things the truncation forced into the open:
 
@@ -859,7 +865,12 @@ reference and the checkpoints both live under it:
   warp checkpoint without being told.
 - `progress.jsonl` -- one record per iteration: reward per corner, hits per corner,
   distance, imitation, `carry`, `down_red`/`down_blue`/`both_up`, `round_length`,
-  `ko_ends`, `clip_frac`, `entropy`, `std`, `value_loss`, learner steps/s.
+  `end_fell`/`end_ring`/`end_far`, `punch_value_red`/`punch_value_blue`, `clip_frac`,
+  `entropy`, `std`, `value_loss`, learner steps/s. Two things a parser has to survive:
+  the schema grew while arms were running (warp4's early records have no posture or
+  round fields, and its late ones still say `ko_ends`, the flag that could not tell a
+  fall from a walk-out), because a live process runs the code it started with; and
+  `hits_red`/`hits_blue` are weighted values, not counts.
 - `<arm>.log` -- the same numbers as the line-per-iteration stream the trainer
   prints, which is what gets tailed while a run is live.
 
