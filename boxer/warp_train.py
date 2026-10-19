@@ -19,14 +19,19 @@ Deliberate deviations from brax, each documented where it lives:
 * the log-prob is taken at the raw pre-tanh action (brax stores the same
   ``raw_action``), so the density is the textbook squashed one; the
   parameter-free tanh jacobian cancels in the ratio and is omitted.
-* GAE is recomputed inside the loss from the current critic like brax, but a
-  round end keeps the bootstrapped timeout value inside that step's delta,
-  where brax zeroes the truncated delta instead.
+* GAE is recomputed inside the loss from the current critic like brax. Two
+  differences, both because WarpBoxing respawns inside ``step``: a round that
+  runs out its clock keeps its bootstrapped timeout value in the delta, where
+  brax zeroes the whole truncated delta; and a round that ends with a boxer on
+  the floor has its bootstrap masked to zero, because the observation behind a
+  termination is the respawn, and brax gets a zero terminal value for free
+  where we would otherwise pay the agent ~26 discounted reward to fall.
 * the entropy term keeps brax's analytic scale part but drops its sampled
   tanh-jacobian correction.
-* rounds reset synchronously: ``--round-steps`` must be an integer multiple of
-  the iteration length (480 = 6 x 80 control steps at the default 2048
-  worlds), because WarpBoxing resets the whole batch at once.
+* rounds are per world: ``WarpBoxing.step`` respawns the rows that closed one
+  and returns their next round's first observation, so ``--round-steps`` is a
+  cap, not a clock the batch shares, and needs no alignment with the iteration
+  length.
 
 Run in the warp venv with jax pinned to CPU:
 
@@ -153,7 +158,15 @@ def make_update(policy, value, tx, clip_epsilon, entropy_cost, value_cost,
             boot = value.apply(p_v, b["terminal_obs"])[:, 0]
 
             v_next = jp.concatenate([v_seq[:, 1:], boot[:, None]], axis=1)
-            delta = b["reward"] + gamma * v_next - v_seq
+            # A round that ends because the clock ran out is a truncation: the
+            # next observation is a legitimate continuation, so brax's bootstrapped
+            # timeout stays. A round that ends with a boxer on the floor is a
+            # TERMINATION, and the observation behind it is the respawn -- a fresh
+            # standing round worth ~26 discounted reward. Bootstrapping across that
+            # seam pays the agent ~26 for falling, which is the exact bias this
+            # whole change was meant to remove.
+            cont = 1.0 - b["done"] * (1.0 - b["timeout"])
+            delta = b["reward"] + gamma * v_next * cont - v_seq
 
             def rev(acc, x):
                 cut = jp.where(x[1] > 0.0, 0.0, gamma * lam)
@@ -209,8 +222,8 @@ def _parse_args(argv=None):
                             "band where the arm can score; 0.75 puts a step and a half away")
     env_g.add_argument("--action-scale", type=float, default=0.25)
     env_g.add_argument("--round-steps", type=int, default=480,
-                       help="control steps per round; must be a multiple of the "
-                            "iteration length (80 at 2048 worlds): 480 = 6 x 80")
+                       help="cap on control steps per round; rounds also close "
+                            "early on a knockdown, out of ring, or separation")
     env_g.add_argument("--imitation", type=Path, default=None,
                        help="runs/reference/jab_targets.json from "
                             "tools/retarget_dense.py; absent = pure RL, no shaping")
@@ -337,6 +350,7 @@ def main(argv=None) -> int:
         logp_buf = np.zeros((t_it, rows), np.float32)
         rew_buf = np.zeros((t_it, rows), np.float32)
         done_buf = np.zeros((t_it, rows), np.float32)
+        timeout_buf = np.zeros((t_it, rows), np.float32)
         hits_red = hits_blue = 0.0
         dist_mean = imit_mean = carry_mean = 0.0
         floor_mean = np.zeros(2)
@@ -354,6 +368,7 @@ def main(argv=None) -> int:
             logp_buf[t] = np.asarray(logp)
             rew_buf[t] = np.asarray(reward).reshape(rows)
             done_buf[t] = np.repeat(done.astype(np.float32), 2)
+            timeout_buf[t] = np.repeat(parts["timed_out"].astype(np.float32), 2)
             hits_red += float(np.sum(parts["scored"]))
             hits_blue += float(np.sum(parts["taken"]))
             dist_mean += float(np.mean(parts["distance"]))
@@ -391,6 +406,7 @@ def main(argv=None) -> int:
                     "logp_old": jp.asarray(logp_buf[:, idx].T),
                     "reward": jp.asarray(rew_buf[:, idx].T),
                     "done": jp.asarray(done_buf[:, idx].T),
+                    "timeout": jp.asarray(timeout_buf[:, idx].T),
                     "terminal_obs": jp.asarray(term_normed[idx]),
                 }
                 params_p, params_v, opt_state, metrics = update(
