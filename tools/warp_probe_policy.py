@@ -32,7 +32,8 @@ def main(argv=None) -> int:
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     ap.add_argument("checkpoint", help="runs/<warpN>, its checkpoint dir, or a step .pkl")
     ap.add_argument("--steps", type=int, default=480,
-                    help="control steps to roll out; 480 is one full round")
+                    help="control steps to roll out; since the round truncates on "
+                         "a knockdown, 480 is several rounds not one")
     ap.add_argument("--worlds", type=int, default=64)
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--stochastic", action="store_true")

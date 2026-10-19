@@ -1,23 +1,32 @@
 # boxer — two humanoids learning to fight each other in JAX
 
 Two [Unitree G1](https://github.com/google-deepmind/mujoco_menagerie/tree/main/unitree_g1)
-humanoids spar in a single 3D physics world simulated entirely in JAX. Three ways of
+humanoids spar in a single 3D physics world. Three ways of
 training that duel are implemented — symmetric self-play, a frozen opponent, and a
 best-response league with one network per corner — and they are measured against each
 other rather than assumed, which is what the Results section below is.
 
-The environment is a Brax `PipelineEnv` on the **MJX** backend (MuJoCo's JAX
-port), trained with Brax's PPO. Collisions are real — a landed punch is a
-contact between the fist geom and the opponent's head or torso geom, not a
-proximity heuristic, and it is gated on the fist closing on a target while the
-striker is still upright.
+There are two stacks here, and the split is a measurement rather than a preference.
+The original is a Brax `PipelineEnv` on the **MJX** backend trained with Brax's PPO
+(`boxer/env.py`, `boxer/train.py`). The second steps the same composed scene on
+**mujoco_warp** with a numpy environment and a brax-parity PPO learner
+(`boxer/warp_env.py`, `boxer/warp_train.py`). It exists because a punch has to be an
+impact: MJX exposes no per-contact force anywhere — `mjx.Data` has no force or `efc`
+field — so a force-threshold scorecard cannot be written on it, and the proxy that
+looked equivalent (how much approach speed the fist loses) pays a vibrating fist for
+its own reversal. On the same 6 GB card the warp path runs 2,048 worlds at 4,700-6,500
+learner steps/s against MJX's 2,270 at 1,024.
+
+Collisions are real in both: a landed punch is a contact between the fist geom and
+the opponent's head or torso geom, not a proximity heuristic, credited by role and
+gated on the striker's fist closing on the opponent.
 
 **Where this is at:** the physics, the throughput and the measurement machinery work;
 the boxers do not box yet. The best policy holds a guard, closes distance and lands
 ~0.3 gated punches a round, and wins 64% of rounds against a passive opponent by being
 the one still standing. Symmetric self-play at the same budget loses 88% of its rounds
-to that passive opponent. Three reward interventions have been tried and reported as
-null results rather than quietly dropped; the diagnosis and the experiments still open
+to that passive opponent. Every reward intervention has been reported as a null result
+rather than quietly dropped; the diagnosis and the experiments still open
 are in [Results](#results).
 
 ## Results
@@ -308,6 +317,42 @@ Two things this does not fix, both worth knowing before reading a video:
   `broken-wrist` rather than in whatever the module happens to default to now.
   Everything in this README before this change was measured in the broken-wrist
   stance, and remains reproducible with `--guard-pose broken-wrist`.
+
+
+### The warp arms (2026-10-17 onward)
+
+The migration paid for itself before any behaviour appeared: 2,048 worlds at
+**4,700-6,500 learner steps/s** on the same card, against MJX's 2,270 at 1,024, so
+200M learner steps costs ~10 h instead of ~25 h, and per-contact force exists. What
+the four arms produced is below, each with the hypothesis it was testing and the
+measurement that killed or kept it.
+
+| arm | what it changed | measured outcome |
+| --- | --- | --- |
+| warp1 | first arm on the warp env: force scorecard, imitation channel from the retargeted CMU jab, per-agent down gate | 200.2M, and it **froze**: std 0.70→0.22, entropy +31→−5, hits only in the iteration that opens a round, imitation term exactly 0.00000 for all 611 iterations. The warp-native renderer explained what the log could not: both boxers on the floor within ~1 s, one sitting propped on an arm — and the down test (`upright_z < 0.15`, head `< 0.55`) called that alive, so falling collected the dense terms all round. |
+| warp2 | down test moved to 45° / head 0.85 m; **every** dense term gated on both corners being up; spawn 0.75 m; range narrowed (σ 0.15) and cheapened (w 0.15); std floor 0.3 | Killed at 137.6M by a bug of my own. Reward flatlined at −0.005 (the energy residue), `value_loss` fell to 0.0003, entropy 47→8, std pinned at its floor — a dead gradient, not a converged policy. `tools/warp_probe_policy.py` measured it in the engine: **87% of the round on the floor, both corners up for 11.8% of it.** Gating a boxer's own posture term on the opponent being upright deletes the incentive to stand back up. |
+| warp3 | `upright` pays on the boxer's own posture again (as `env.py:673` does); interaction terms keep the both-up gate; the log gained a floor fraction | 200.2M complete, and it **falsified "the gate was the problem"**: standing early in the round improved (both up over the first 80 steps 0.59→0.73) but the round as a whole still ended at down 0.87 / both-up 0.12, hits never left the ~180-per-round-opening spawn transient, and the late-round state was a torso at `up_z` 0.69 collecting **+0.55/step** for doing nothing. Three of every four learner transitions came from a fight that was already over. |
+| warp4 | ported the rest of `env.py`'s round semantics: a round closes on a knockdown, out of the ring, or beyond `MAX_SEPARATION` (2.4 m), with the respawn happening **per world inside `step()`**, plus `w_alive` 0.2 and the zero-sum `w_ko` 3.0 | In progress. At 228/611: rounds 44→63 control steps, hits per world 0.11→0.53 with red and blue symmetric (0.53/0.52), reward +1.00→+1.23 — and 100% of rounds still ending on a fall, nobody surviving the 480-step cap. |
+
+Two things the truncation forced into the open:
+
+- **The knockout needs the truncation to mean anything.** `w_ko` is zero-sum, so
+  paid per step across 320 floor steps both corners down cancel to zero and the
+  channel rewards a mutual collapse over a knockout — the same leak `env.py` records
+  for a boxer diving at the opponent to collect it. The self-check now rolls each
+  corner's torso 90° in the sensor buffer and pins the sign, and forces a
+  termination to prove the respawn happens inside `step()`.
+- **A bootstrap is not free at a round boundary.** `warp4` shipped with the loss
+  adding `gamma * V(next)` at every round end, which is correct for a timeout and
+  wrong for a termination: behind a knockdown the next observation is a fresh
+  standing round, so the terminal step was credited roughly 26 discounted reward
+  *for falling*. brax gets a zero terminal value for free from its pipeline; here it
+  has to be masked, which is why the env now returns `timed_out` as a metric and the
+  loss uses `cont = 1 - done * (1 - timeout)`.
+
+Caveat that applies to every video here: renders use the policy's deterministic mode
+(`tanh(loc)`), while training samples its actions, so a clip understates hit counts
+relative to the log.
 
 
 ## Why this robot model
@@ -667,15 +712,43 @@ logger uses `jax.debug.callback`, which needs a CPU device to place its inputs
 on, and with CUDA as the only platform training dies at the first epoch. On the
 6 GB card stay at 256 worlds; see the VRAM note above.
 
+### Training on mujoco_warp
+
+The warp path needs its own venv (mujoco 3.16 + mujoco-warp + warp-lang, and jax
+pinned to CPU so the learner never competes with warp for the card):
+
+```bash
+bash tools/warp_deps.sh                      # creates /home/pedro/venvs/warp_test
+PYTHONPATH=. /home/pedro/venvs/warp_test/bin/python tools/warp_env_bench.py  # steps/s
+cd /mnt/e/boxer-agent && PYTHONPATH=. JAX_PLATFORMS=cpu \
+  XLA_PYTHON_CLIENT_PREALLOCATE=false \
+  /home/pedro/venvs/warp_test/bin/python -u -m boxer.warp_train \
+    --worlds 2048 --imitation runs/reference/jab_targets_cmu.json --output runs/warp5
+PYTHONPATH=. /home/pedro/venvs/warp_test/bin/python -m boxer.warp_env   # self-check
+```
+
+`python -m boxer.warp_env` is the test suite for this env: it checks sensor parity
+against the host, the scripted jab's force threshold, both arms' imitation peaks, the
+knockout's sign in each direction, and that a terminated round respawns inside `step()`.
+Leave `MUJOCO_GL` unset in this venv — `egl` errors and `osmesa` has no `libGL` here.
+
 ### Watch a fight
 
 ```bash
 PYTHONPATH=. .venv/bin/python -m boxer.rollout runs/boxer/checkpoint --format mp4
 PYTHONPATH=. .venv/bin/python -m boxer.rollout runs/boxer/checkpoint --format html
+# a warp checkpoint, rendered from the warp sim itself (no MJX round-trip):
+PYTHONPATH=. /home/pedro/venvs/warp_test/bin/python tools/warp_video.py runs/warp5 \
+  --length 300 --output runs/warp5_fight.mp4
+# and what that checkpoint actually does, as numbers from its own engine:
+PYTHONPATH=. /home/pedro/venvs/warp_test/bin/python tools/warp_probe_policy.py runs/warp5
 ```
 
 `--format sheet` writes a single contact-sheet PNG of evenly spaced frames,
 which is the quickest way to sanity-check behaviour without a player.
+`warp_probe_policy.py` prints the fraction of the rollout each corner spends on the
+floor and the fraction with both standing — the two numbers a reward log cannot
+substitute for, and the reason two arms were misread as converged.
 
 ## What a run actually produces
 
@@ -694,6 +767,25 @@ one to two orders of magnitude below what humanoid-plus-task RL normally needs,
 and Brax's default policy network is 32 units wide -- sized for an ant, not for
 58 position-controlled joints. `--policy-layers` raises that, and the long run
 under `runs/boxer/` is the attempt to reach standing-and-punching behaviour.
+
+A **warp** run writes four things, and `runs/` is gitignored because the motion
+reference and the checkpoints both live under it:
+
+- `warp_config.json` -- the settings the run was actually built with: worlds,
+  `obs_size`/`action_size`, round cap, spawn distance and action scale, the
+  imitation file and its weight, the layer widths, and the whole PPO block. A run
+  is reproducible from this file plus the commit, not from the CLI history.
+- `checkpoint/step-<N>.pkl` and `checkpoint/latest.txt` -- a plain pickle of numpy
+  leaves (`params_p, params_v, opt_state, running_norm, step`). Flax's msgpack
+  cannot serialise the tuple or optax 0.2.8's state, so this is deliberately dumb.
+  `boxer.policy.load_warp_policy` reads them, and `make_opponent` dispatches to it
+  on the presence of `warp_config.json`, so the arena and both renderers take a
+  warp checkpoint without being told.
+- `progress.jsonl` -- one record per iteration: reward per corner, hits per corner,
+  distance, imitation, `carry`, `down_red`/`down_blue`/`both_up`, `round_length`,
+  `ko_ends`, `clip_frac`, `entropy`, `std`, `value_loss`, learner steps/s.
+- `<arm>.log` -- the same numbers as the line-per-iteration stream the trainer
+  prints, which is what gets tailed while a run is live.
 
 ## What is honest here
 
@@ -736,6 +828,28 @@ under `runs/boxer/` is the attempt to reach standing-and-punching behaviour.
   mjx imports `scipy.linalg` -- including on the CPU path, which makes it easy
   to misdiagnose as a GPU fault. `tools/wsl_gpu_check.sh` reproduces the
   investigation.
+- **A reward bug shipped in `warp4` and was found by reading the loss, not by
+  watching the run.** Once rounds truncate, `delta = r + gamma * V(next) - V` at a
+  round end credits the terminal step with the value of the respawned round --
+  roughly 26 discounted reward for falling -- because the env returns a fresh
+  observation where brax's pipeline would have returned a zero terminal value. The
+  arithmetic was visible before the effect was: `round_length` was crawling (44 to
+  63 steps over 228 iterations) while the survival incentive said it should climb
+  faster. Fixed by masking the bootstrap on termination
+  (`cont = 1 - done * (1 - timeout)`), which is why the env now returns
+  `timed_out`. `warp4`'s own curve is therefore measured under a bias toward
+  finishing rounds on the floor, and is quoted as such.
+- **Two arms were read as converged because the log could not see posture.** warp1
+  and warp2 both plateaued at a reward that looked like a policy, and the number
+  that would have said "they are lying on the floor for 87% of the round" was not
+  recorded. `down_red`, `down_blue`, `both_up`, `round_length` and `ko_ends` are in
+  the log now, and `tools/warp_probe_policy.py` exists so a checkpoint's behaviour
+  can be measured in its own engine instead of inferred from its reward.
+- **The imitation channel has never done anything.** It measured 0.00000 for all 611
+  iterations of warp1 at `sigma = 0.3` rad, and 0.0007-0.0023 at the widened
+  `sigma = 0.6` used since. It is kept because it is cheap and because a shaped term
+  that never fires is evidence about the arm's reachable set, not because any result
+  in this README depends on it.
 - A short run does not produce a boxer. The gauntlet is posture first (staying
   upright on 29 position-controlled joints is the hard part), then footwork,
   then punching. Expect the first tens of millions of steps to be mostly about
