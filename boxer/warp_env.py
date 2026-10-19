@@ -42,11 +42,16 @@ Differences from the MJX env, each tied to a measurement:
   0.6 rad: warp1's 0.3 rad was unreachable from a random arm and the term
   measured exactly 0.0 through all 611 iterations.
 
-v0 keeps the observation vector's structure but reduces the reward to the
-measured core (upright, in_range, facing, hit events, clinch, energy, ring);
-the guard-hold and strike-shaping channels of the MJX env are not ported yet.
-Runs only in the warp venv (mujoco 3.16 + mujoco-warp + mujoco_menagerie);
-``boxer/scene.py`` is jax-free so it imports unchanged.
+The reward carries the measured core (upright, alive, knockdown, in_range,
+facing, hit events, clinch, energy, ring) and truncates per world the way
+``boxer/env.py`` does: a round closes as soon as one boxer is down, out of the
+ring, or further than ``MAX_SEPARATION`` from the other, and ``step`` respawns
+those worlds and returns their next round's first observation. The knockdown is
+zero-sum and therefore one-shot -- paid per step across the 320 floor steps an
+untruncated round spends, it would reward a mutual collapse instead of a
+knockout. The guard-hold and strike-shaping channels of the MJX env are still
+not ported. Runs only in the warp venv (mujoco 3.16 + mujoco-warp +
+mujoco_menagerie); ``boxer/scene.py`` is jax-free so it imports unchanged.
 """
 from __future__ import annotations
 
@@ -61,6 +66,9 @@ from boxer import scene
 
 WORLD_UP = np.array([0.0, 0.0, 1.0])
 WORLD_FORWARD = np.array([1.0, 0.0, 0.0])
+# boxer/env.py:32. Past this the two are not in a fight anymore and the round is
+# over whether or not anyone is on the floor.
+MAX_SEPARATION = 2.4
 
 # Observation entries that do not scale with the joint count; mirrors
 # boxer/env.py's _OBS_FIXED: 3 up-axis + 3 torso velocity + 3 gyro + 6 guard
@@ -118,7 +126,7 @@ class WarpBoxing:
                  w_upright: float = 0.8, w_range: float = 0.15,
                  w_facing: float = 0.2, w_hit: float = 10.0,
                  w_clinch: float = 0.5, w_energy: float = 0.05,
-                 w_ring: float = 1.0,
+                 w_ring: float = 1.0, w_alive: float = 0.2, w_ko: float = 3.0,
                  imitation_path: str | None = None, w_imit: float = 0.3,
                  imit_sigma: float = 0.6, imit_speed_ref: float = 5.0):
         self.nworld, self.n_frames = nworld, n_frames
@@ -139,7 +147,7 @@ class WarpBoxing:
         self._imit_sigma, self._imit_speed_ref = imit_sigma, imit_speed_ref
         self._w = dict(upright=w_upright, range=w_range, facing=w_facing,
                        hit=w_hit, clinch=w_clinch, energy=w_energy, ring=w_ring,
-                       imit=w_imit)
+                       alive=w_alive, ko=w_ko, imit=w_imit)
 
         self._model = scene.build_model(spawn_distance=spawn_distance, visual=False)
         self._qpos0, self._ctrl0 = scene.stance(self._model, guard_pose)
@@ -248,6 +256,8 @@ class WarpBoxing:
         self._steps = np.zeros(nworld, dtype=np.int64)
         self._steps_off = np.full((nworld, 2), rearm_steps, dtype=np.int64)
         self._last_action = np.zeros((nworld, 2, self.action_size))
+        # reset(seed) reseeds it; step() draws the per-world respawns from it.
+        self._rng = np.random.default_rng(0)
 
     def _arm_columns(self, side: str, arm: str = "right") -> np.ndarray:
         """Columns of the recorded arm's four fitted joints inside me["qpos"]."""
@@ -294,33 +304,48 @@ class WarpBoxing:
                     qvel=self._qvel_sync[:, index["dof_adr"]])
 
     def reset(self, seed: int = 0) -> np.ndarray:
-        rng = np.random.default_rng(seed)
-        qpos = np.tile(self._qpos0.astype(np.float32), (self.nworld, 1))
+        self._rng = np.random.default_rng(seed)
+        self._qpos_sync = np.tile(self._qpos0.astype(np.float32), (self.nworld, 1))
+        self._qvel_sync = np.zeros((self.nworld, self._model.nv), np.float32)
+        return self._randomize(self._rng, np.ones(self.nworld, dtype=bool))
+
+    def _randomize(self, rng, rows: np.ndarray) -> np.ndarray:
+        """Start a round in the selected worlds and return their fresh obs.
+
+        Rows, not all: env.py closes a round the moment a boxer is down, out of
+        the ring or out of reach of the other, and the worlds that are still
+        fighting have to keep fighting. Writing the spawn into a mask is what
+        makes that per-world instead of a global clock.
+        """
+        index = np.flatnonzero(rows)
+        if not len(index):
+            return np.zeros((0, 2, self.obs_size), dtype=np.float32)
+        sub = np.tile(self._qpos0.astype(np.float32), (len(index), 1))
         for i, side in enumerate(scene.SIDES):
             free = self._sides[side]["free_adr"]
             sign = -1.0 if i == 0 else 1.0
-            lateral = rng.normal(0.0, self._spawn_jitter, self.nworld)
-            forward = rng.normal(0.0, self._spawn_jitter, self.nworld)
-            qpos[:, free + 0] += sign * forward
-            qpos[:, free + 1] += sign * lateral
-            yaw = rng.uniform(-self._yaw_jitter, self._yaw_jitter, self.nworld)
-            stance = qpos[:, free + 3:free + 7].copy()
-            qpos[:, free + 3:free + 7] = _quat_mul(stance, _yaw_quat(yaw))
-            qpos[:, self._sides[side]["qpos_adr"]] += rng.normal(
-                0.0, self._pose_noise, (self.nworld, self.action_size))
+            lateral = rng.normal(0.0, self._spawn_jitter, len(index))
+            forward = rng.normal(0.0, self._spawn_jitter, len(index))
+            sub[:, free + 0] += sign * forward
+            sub[:, free + 1] += sign * lateral
+            yaw = rng.uniform(-self._yaw_jitter, self._yaw_jitter, len(index))
+            stance = sub[:, free + 3:free + 7].copy()
+            sub[:, free + 3:free + 7] = _quat_mul(stance, _yaw_quat(yaw))
+            sub[:, self._sides[side]["qpos_adr"]] += rng.normal(
+                0.0, self._pose_noise, (len(index), self.action_size))
+        self._qpos_sync[rows] = sub
         # env.py seeds the round with small random joint velocities too.
-        qvel = rng.normal(0.0, self._pose_noise * 2.5,
-                          (self.nworld, self._model.nv)).astype(np.float32)
+        self._qvel_sync[rows] = rng.normal(0.0, self._pose_noise * 2.5,
+                                           (len(index), self._model.nv)).astype(np.float32)
         ctrl = np.tile(np.asarray(self._ctrl0, dtype=np.float32), (self.nworld, 1))
-        self._d.qpos.assign(qpos)
-        self._d.qvel.assign(qvel)
+        self._d.qpos.assign(self._qpos_sync)
+        self._d.qvel.assign(self._qvel_sync)
         self._d.ctrl.assign(ctrl)
         mjwarp.forward(self._m, self._d)  # sensors must reflect the jittered pose
-        self._qpos_sync, self._qvel_sync = qpos, qvel
-        self._steps[:] = 0
-        self._steps_off[:] = self._rearm_steps  # both spawn apart: start armed
-        self._last_action[:] = 0.0
-        return self._observe(self._d.sensordata.numpy())
+        self._steps[rows] = 0
+        self._steps_off[rows] = self._rearm_steps  # both spawn apart: start armed
+        self._last_action[rows] = 0.0
+        return self._observe(self._d.sensordata.numpy())[rows]
 
     def step(self, actions: np.ndarray):
         """One control step. ``actions``: (nworld, 2, action_size) in [-1, 1]."""
@@ -340,7 +365,15 @@ class WarpBoxing:
         self._qvel_sync = self._d.qvel.numpy()
         hit = self._scorecard(sensors)
         reward, done, metrics = self._reward(actions, hit, sensors)
-        return self._observe(sensors), reward, done, metrics
+        obs = self._observe(sensors)
+        if bool(done.any()):
+            # Autoreset, brax/PGAX semantics: the observation returned for a world
+            # that just closed its round is the FIRST observation of the next one,
+            # and done=1 is what tells the learner not to bootstrap across the
+            # seam. Rounds now end per world, so the batch is no longer on a
+            # shared clock.
+            obs[done] = self._randomize(self._rng, done)
+        return obs, reward, done, metrics
 
     def _scorecard(self, sensors: np.ndarray) -> np.ndarray:
         """(nworld, 2) hit values: best target weight struck this step.
@@ -409,6 +442,11 @@ class WarpBoxing:
         frames = (red, blue)
         downs = [(quat_rotate(f["quat"], WORLD_UP[None, :])[:, 2] < self._down_up_z)
                  | (f["head"][:, 2] < self._down_head_z) for f in frames]
+        # env.py:805-809 -- the round also closes when a boxer is out of the ring
+        # or the two are further apart than a fight.
+        outside = [np.linalg.norm(f["torso"][:, :2], axis=1) > scene.RING_RADIUS
+                   for f in frames]
+        separation = np.linalg.norm(red["torso"] - blue["torso"], axis=1)
         rewards, parts = np.zeros((self.nworld, 2)), {}
         for i, (me, foe) in enumerate(((red, blue), (blue, red))):
             quat = me["quat"]
@@ -445,7 +483,20 @@ class WarpBoxing:
             foe_armed = self._steps_off[:, 1 - i] >= self._rearm_steps
             scored = np.where(armed, hit[:, i], 0.0)
             taken = np.where(foe_armed, hit[:, 1 - i], 0.0)
+            # env.py:160/672 and 837-842 -- the two channels the v0 port dropped,
+            # and the reason three warp arms treated a round as free time on the
+            # floor. Being up pays on its own; the knockdown is zero-sum, so the
+            # corner left standing collects w_ko and the one lying under it pays
+            # the same. It is a ONE-SHOT payment only because the round closes on
+            # this step: paid per step across 320 floor steps it would reward a
+            # mutual collapse (both down cancels to zero) instead of a knockout,
+            # which is the leak env.py:161-165 already recorded for this term.
+            alive = np.where(down, 0.0, 1.0)
+            ko = (alive * np.where(downs[1 - i], 1.0, 0.0)
+                  - np.where(down, 1.0, 0.0) * np.where(downs[1 - i], 0.0, 1.0))
             rewards[:, i] = (w["upright"] * upright
+                             + w["alive"] * alive
+                             + w["ko"] * ko
                              + w["range"] * in_range * engaged
                              + w["facing"] * facing * engaged
                              + w["hit"] * (scored - taken)
@@ -477,6 +528,7 @@ class WarpBoxing:
                              # training log's reward and distance cannot tell
                              # "walked away" from "fell over and got gated off"
                              on_floor=np.stack(downs, axis=1).astype(np.float32),
+                             alive=alive, ko=ko,
                              # metric only, no reward attached yet: how often red is
                              # inside punching distance of a DOWN blue -- the state
                              # the range term pays without any punch being thrown
@@ -487,7 +539,18 @@ class WarpBoxing:
         # to re-arm.
         self._steps_off = np.where(hit > 0.0, 0, self._steps_off + 1)
         self._steps += 1
-        done = self._steps >= self._round_steps
+        # env.py:809 -- a round closes for BOTH corners the moment one of them is
+        # down, out of the ring, or further than MAX_SEPARATION from the other.
+        # Without this the 480-step round keeps simulating a finished fight: warp3
+        # measured 320 of its steps with both boxers on the floor, and a knockout
+        # paid per step over those would reward a mutual collapse (both down
+        # cancels the zero-sum term), so the channel needs the truncation to mean
+        # what it means in env.py.
+        timed_out = self._steps >= self._round_steps
+        knocked = (downs[0] | downs[1] | outside[0] | outside[1]
+                   | (separation > MAX_SEPARATION))
+        done = timed_out | knocked
+        parts.update(knockout=knocked, timed_out=timed_out)
         return rewards, done, parts
 
     def _observe(self, sensors: np.ndarray) -> np.ndarray:
@@ -563,38 +626,80 @@ if __name__ == "__main__":
           f"on_floor {parts['on_floor'].mean():.3f}, "
           f"obs finite {bool(np.isfinite(obs).all())}")
 
-    ctrl0 = np.asarray(env._ctrl0)
-    red_ids = env._sides[scene.RED]["actuators"]
-    blue_ids = env._sides[scene.BLUE]["actuators"]
+    # The two channels env.py has and this port dropped, checked by construction.
+    # Roll blue's torso 90 deg about its own forward axis in the sensor buffer: the
+    # step must read blue down, credit red the knockout, and close the round.
+    def tilt(side):
+        adr = env._sensor_adr[side + "torso_quat"]
+        dim = env._sensor_dim[side + "torso_quat"]
+        sensors = env._d.sensordata.numpy().copy()
+        roll90 = np.tile(np.array([0.7071068, 0.7071068, 0.0, 0.0], np.float32),
+                         (env.nworld, 1))  # 90 deg about the torso's own x axis
+        sensors[:, adr:adr + dim] = _quat_mul(sensors[:, adr:adr + dim], roll90)
+        return env._reward(zero, np.zeros((env.nworld, 2), np.float32), sensors)
+
+    for side, who in ((scene.BLUE, 1), (scene.RED, 0)):
+        reward_t, done_t, parts_t = tilt(side)
+        assert parts_t["on_floor"][:, who].all(), f"{side} tilt not read as down"
+        assert bool(done_t.all()), f"{side} knockdown did not close the round"
+        ko = float(parts_t["ko"].mean())  # parts carries RED's side of the zero-sum
+        expected = -1.0 if who == 0 else 1.0
+        assert abs(ko - expected) < 1e-6, f"ko sign {ko:+.2f}, expected {expected:+.0f}"
+        print(f"{side} torso rolled 90 deg: read down, knockout to red {ko:+.0f}, "
+              f"round closed in {int(done_t.sum())}/{env.nworld} worlds")
+
+    # Autoreset: force every world to terminate on this step and check that the
+    # observation handed back is the NEXT round's first one, not the corpse of this.
+    env._down_head_z = 5.0
+    obs_r, reward_r, done_r, parts_r = env.step(zero)
+    env._down_head_z = 0.85
+    assert done_r.all() and not env._steps.any(), "the respawn did not reset the clock"
+    fresh = float(obs_r[:, 0, -2].mean())
+    print(f"autoreset: {int(done_r.sum())} worlds respawned inside step(), "
+          f"distance back to {fresh:.3f} m (spawn {env._spawn_distance:.2f})")
+    assert abs(fresh - env._spawn_distance) < 0.15, "respawn did not re-seed the stance"
+
+    # The jab check needs a spawn it can predict: the tilt and autoreset checks
+    # above drew two more respawns from this env's rng, and with the default
+    # 0.12 m / 0.3 rad jitter the scripted swing simply misses. Build a still
+    # one instead -- same scorecard, no luck in it.
+    jab_env = WarpBoxing(nworld=8, spawn_jitter=0.0, yaw_jitter=0.0, pose_noise=0.0)
+    jab_env.reset(0)
+    ctrl0 = np.asarray(jab_env._ctrl0)
+    red_ids = jab_env._sides[scene.RED]["actuators"]
+    blue_ids = jab_env._sides[scene.BLUE]["actuators"]
 
     def column(ids, name):
-        aid = mujoco.mj_name2id(env._model, mujoco.mjtObj.mjOBJ_ACTUATOR, name)
+        aid = mujoco.mj_name2id(jab_env._model, mujoco.mjtObj.mjOBJ_ACTUATOR, name)
         return int(np.flatnonzero(ids == aid)[0])
 
     def amp(ids, name, ctrl_value):
         col = column(ids, name)
-        return (ctrl_value - ctrl0[ids[col]]) / env._action_scale
+        return (ctrl_value - ctrl0[ids[col]]) / jab_env._action_scale
 
     # The reach_sweep probe pose: shoulder pitch -1.5, elbow 0.0 puts a fist
     # on the torso at this distance; blue's arms go to their zero pose so no
     # forearm blocks the line.
     jab_pitch = amp(red_ids, "red/left_shoulder_pitch_joint", -1.5)
     jab_elbow = amp(red_ids, "red/left_elbow_joint", 0.0)
-    action = np.zeros((env.nworld, 2, env.action_size))
+    action = np.zeros((jab_env.nworld, 2, jab_env.action_size))
     for half in ("left", "right"):
         for joint in scene.ARM_JOINTS:
             action[:, 1, column(blue_ids, f"blue/{half}_{joint}_joint")] = \
                 amp(blue_ids, f"blue/{half}_{joint}_joint", 0.0)
 
-    hits = 0.0
+    hits, jab_ends, jab_floor = 0.0, 0, 0.0
     for step in range(110):
         punch = max(0.0, np.sin(2.0 * np.pi * step / 30.0)) ** 2
         action[:, 0, column(red_ids, "red/left_shoulder_pitch_joint")] = jab_pitch * punch
         action[:, 0, column(red_ids, "red/left_elbow_joint")] = jab_elbow * punch
-        obs, reward, done, parts = env.step(action)
+        obs, reward, done, parts = jab_env.step(action)
         hits = max(hits, float(parts["hit"].max()))
+        jab_ends += int(done.any())
+        jab_floor = max(jab_floor, float(parts["on_floor"].max()))
     print(f"scripted jab over 110 steps: peak hit value {hits:.2f} "
-          f"(force threshold {env._force_threshold:.0f} N)")
+          f"(force threshold {jab_env._force_threshold:.0f} N), rounds closed "
+          f"{jab_ends}, on-floor seen {jab_floor:.0f}")
     assert np.isfinite(obs).all() and hits > 0.0, "self-check failed"
 
     # Imitation channel: drive the arm the targets name along the retargeted

@@ -256,10 +256,6 @@ def main(argv=None) -> int:
                          f"({transitions:,}) must be divisible by the learner "
                          f"count ({rows})")
     iteration_steps = transitions // rows
-    if args.round_steps % iteration_steps:
-        raise SystemExit(f"--round-steps {args.round_steps} must be a multiple "
-                         f"of the iteration length {iteration_steps}: rounds "
-                         "reset synchronously at iteration boundaries")
     minibatch = args.batch_size * args.unroll_length
     if iteration_steps * rows % minibatch:
         raise SystemExit("geometry error: transitions not divisible by the "
@@ -345,6 +341,7 @@ def main(argv=None) -> int:
         dist_mean = imit_mean = carry_mean = 0.0
         floor_mean = np.zeros(2)
         both_up_mean = 0.0
+        rounds_mean = ko_end_mean = 0.0
         flat_obs = obs.reshape(rows, env.obs_size)
         for t in range(t_it):
             key, sub = jax.random.split(key)
@@ -364,14 +361,15 @@ def main(argv=None) -> int:
             carry_mean += float(np.mean(parts["carry"]))
             floor_mean += np.mean(parts["on_floor"], axis=0)
             both_up_mean += float(np.mean(1.0 - np.max(parts["on_floor"], axis=1)))
+            rounds_mean += float(np.sum(done))
+            ko_end_mean += float(np.sum(parts["knockout"]))
             flat_obs = obs.reshape(rows, env.obs_size)
             step += rows
         terminal_obs = flat_obs.copy()
 
-        # rounds close exactly on iteration tails (the geometry check above
-        # guarantees it); reset before the SGD touches nothing physics-side.
-        if bool(np.any(done_buf[-1] > 0.0)):
-            obs = env.reset(seed=args.seed + iteration)
+        # No round clock here any more: WarpBoxing.step respawns the worlds that
+        # closed a round and hands back their first observation, with done=1 so
+        # the GAE mask refuses to bootstrap across the seam.
 
         # stats update before SGD, brax order: the stored raw observations are
         # re-normalised with the fresh statistics for the updates, while the
@@ -415,6 +413,11 @@ def main(argv=None) -> int:
             "down_red": float(floor_mean[0] / t_it),
             "down_blue": float(floor_mean[1] / t_it),
             "both_up": both_up_mean / t_it,
+            # how long a fight lasts now, and how much of it ends with someone on
+            # the floor rather than the clock running out
+            "rounds": rounds_mean,
+            "round_length": t_it * env.nworld / max(rounds_mean, 1.0),
+            "ko_ends": ko_end_mean / max(rounds_mean, 1.0),
             **{k: float(jp.asarray(v)) for k, v in metrics.items()},
         }
         with progress_log.open("a") as sink:
@@ -423,7 +426,8 @@ def main(argv=None) -> int:
               f"hits r/b {hits_red / rows:.2f}/{hits_blue / rows:.2f}  "
               f"dist {dist_mean / t_it:.3f} m  "
               f"floor {record['down_red']:.2f}/{record['down_blue']:.2f} "
-              f"up{record['both_up']:.2f}  "
+              f"up{record['both_up']:.2f} "
+              f"round {record['round_length']:.0f}st ko{record['ko_ends']:.2f}  "
               f"r_red {record['reward_red']:+.2f}  "
               f"ploss {record.get('policy_loss', float('nan')):+.3f} "
               f"vloss {record.get('value_loss', float('nan')):.3f} "
