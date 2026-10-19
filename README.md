@@ -432,6 +432,34 @@ Caveat that applies to every video here: renders use the policy's deterministic 
 relative to the log.
 
 
+### What is still open
+
+The intro promises this list, so here it is -- each item with the measurement that would
+close it.
+
+1. **A run without the termination-bootstrap bias.** warp4 started before that fix, so
+   its curve is measured while falling paid ~26 discounted reward. warp5 is the same
+   arm with the mask. Reading rule: if `round_length` climbs well past ~75 steps, the
+   truncation was the wall; if it sits there, the wall is balance physics and the
+   objective is not the problem.
+2. **No win rate exists for any warp arm.** The arena, `--mode frozen` and the
+   alternating league are MJX-only, and the guard-error block reads site frames there
+   against sensors here. Either the modes get ported or the arena learns to run the warp
+   env natively; until then "does it box" is answered by probe numbers, not by fights.
+3. **Nobody has ever run out a clock.** `end_fell` is 1.00 across the arm: every round
+   ends with someone down. Until a round survives its 480 steps, "stays on its feet" is
+   unproven no matter how low the floor fraction reads.
+4. **Head versus torso is not measured.** `punch_value` sums the scorecard's weights
+   (1.0 and 0.5), so the log cannot say whether the punches that land are head shots or
+   body shots -- and the null that started this whole migration was *0.000 to the head*.
+   The scorecard already knows which surface was hit; the metric just does not carry it.
+5. **The imitation channel is still a null** (0.0007-0.0023 across three arms). Either it
+   fires in a run that actually punches, or it comes out.
+6. **The policy's scale is creeping.** 0.70 to 1.57 across warp4 against a 2.0 ceiling.
+   A run that touches the ceiling has its hit counts back in tanh-saturated noise, which
+   is exactly the failure mode warp1 taught me to read.
+
+
 ## Why this robot model
 
 The brief said to reuse a consolidated model rather than author one. Two
@@ -506,14 +534,22 @@ which is declared coordinates on both sides.
 ```
 boxer/scene.py     composes the two-boxer MuJoCo scene with mujoco.MjSpec
 boxer/env.py       BoxingEnv: Brax PipelineEnv on the mjx backend
+boxer/warp_env.py  WarpBoxing: the same scene on mujoco_warp, numpy, with the
+                   force-threshold scorecard and per-world round truncation
 boxer/selfplay.py  multi-agent bookkeeping + the shared-policy and frozen-opponent
                    wrappers
-boxer/policy.py    checkpoint loading and the scripted opponents
+boxer/policy.py    checkpoint loading (brax and warp checkpoints) and the scripted
+                   opponents
 boxer/arena.py     fixed-matchup evaluation (win rate, punches landed)
-boxer/train.py     PPO training entry point
+boxer/train.py     PPO training entry point, MJX/brax
+boxer/warp_train.py  PPO training entry point, warp GPU physics + jax CPU learner
 boxer/bench.py     throughput measurement
 boxer/rollout.py   renders a trained policy to video / HTML / stills
-tools/             WSL2 GPU bootstrap and health check
+tools/warp_video.py  renders a warp checkpoint from the warp sim itself
+tools/warp_probe_policy.py  what a checkpoint actually does, measured in its engine
+tools/reach_sweep.py, tools/warp_hit_directions.py, tools/fist_probe.py
+                   the measurements the design decisions rest on
+tools/             WSL2 GPU bootstrap, dependency scripts and health checks
 ```
 
 **Scene.** `mujoco.MjSpec.attach` puts two copies of `g1_mjx.xml` into one root
@@ -565,6 +601,11 @@ described below.
 `boxer.alternating` layers `frozen` into a third mode where **each corner keeps
 its own network** — see below.
 
+**The warp trainer has none of these modes.** `boxer.warp_train` is self-play only:
+`--mode`, the frozen-opponent wrappers and the alternating league live in the MJX path
+and were not ported. That is the reason no warp arm has a win rate attached to it, and
+it is the biggest thing missing from the newer stack.
+
 ```bash
 # learn against an opponent that only holds its guard
 python -m boxer.train --mode frozen --opponent passive --worlds 256
@@ -602,8 +643,20 @@ ever beats the shared policy.
 
 ### What counts as a punch
 
-A landed punch is gated on three conditions, and each one was added because
-measurement or a render killed the pair before it. Measured: two boxers holding a
+**Two gates live in this repo, and the newer one is the definition.** The bullets below
+are the MJX env's gate -- margin and torso-relative speed -- because MJX cannot read
+force at all. The warp env scores with the metric the published recipe uses: a contact
+of at least **50 N** on a weighted target surface (head 1.0, torso 0.5,
+pelvis/hip/thigh 0.35, arms 0), credited **by role** -- the geom carrying a fist or
+forearm surface of one corner, landing on a scoring surface of the other -- and gated on
+that striker's palm closing on the opponent at >= 1.0 m/s. Attribution by role is not
+decoration: the first warp arm credited hits by the order the two geoms happen to appear
+in the contact buffer, red's geoms sort first, so a chest pressed against a chest paid
+red 0.50 and a full blue jab paid blue nothing. `tools/warp_hit_directions.py` is the
+three-case truth table that killed it.
+
+The MJX-era gates, each added because a measurement or a render killed the pair before
+it. Measured: two boxers holding a
 perfectly passive guard drift together from 1.3 m to 0.42 m apart, topple, and
 register ~12 "punches" a round from nothing but the collision.
 
