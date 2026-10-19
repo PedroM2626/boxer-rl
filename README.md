@@ -1012,3 +1012,20 @@ reference and the checkpoints both live under it:
   so it must not be treated as the gate.
 - Renders are only as good as the policy. See the run artefacts under `runs/`.
 
+## License
+
+The code here is MIT (`LICENSE`). That grant deliberately does not reach the third-party
+assets the project consumes, and the difference is not cosmetic:
+
+- the Unitree G1 description is installed from PyPI as `mujoco-menagerie`
+  (Apache-2.0/BSD upstream) and is never vendored into this repo;
+- the motion reference is CMU Graphics Lab MoCap data, pulled by `tools/cmu_fetch.sh`
+  under its own "may be copied, modified, or redistributed without permission" terms,
+  with the acknowledgement CMU asks for;
+- the Mixamo clip that preceded it **cannot** be redistributed, so neither it nor any
+  curve dump derived from it is committed -- reproducing that measurement means running
+  the fetch and the two converters, which is why `runs/reference/` is gitignored.
+
+`LICENSES.md` carries each of those wordings. Everything generated under this license --
+checkpoints, videos, the `runs/` tree -- is yours to do with as you like.
+

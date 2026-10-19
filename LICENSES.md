@@ -2,7 +2,8 @@
 
 Everything here is either a library pulled from a package index at install time or
 motion data whose terms allow redistribution. Nothing is vendored into the
-repository without a licence that permits it.
+repository without a licence that permits it. The code itself is MIT (`LICENSE`);
+this file is about what that licence does *not* grant.
 
 ## Robot description: Unitree G1 (MuJoCo Menagerie)
 
