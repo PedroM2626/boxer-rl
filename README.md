@@ -332,7 +332,7 @@ measurement that killed or kept it.
 | warp1 | first arm on the warp env: force scorecard, imitation channel from the retargeted CMU jab, per-agent down gate | 200.2M, and it **froze**: std 0.70→0.22, entropy +31→−5, hits only in the iteration that opens a round, imitation term exactly 0.00000 for all 611 iterations. The warp-native renderer explained what the log could not: both boxers on the floor within ~1 s, one sitting propped on an arm — and the down test (`upright_z < 0.15`, head `< 0.55`) called that alive, so falling collected the dense terms all round. |
 | warp2 | down test moved to 45° / head 0.85 m; **every** dense term gated on both corners being up; spawn 0.75 m; range narrowed (σ 0.15) and cheapened (w 0.15); std floor 0.3 | Killed at 137.6M by a bug of my own. Reward flatlined at −0.005 (the energy residue), `value_loss` fell to 0.0003, entropy 47→8, std pinned at its floor — a dead gradient, not a converged policy. `tools/warp_probe_policy.py` measured it in the engine: **87% of the round on the floor, both corners up for 11.8% of it.** Gating a boxer's own posture term on the opponent being upright deletes the incentive to stand back up. |
 | warp3 | `upright` pays on the boxer's own posture again (as `env.py:673` does); interaction terms keep the both-up gate; the log gained a floor fraction | 200.2M complete, and it **falsified "the gate was the problem"**: standing early in the round improved (both up over the first 80 steps 0.59→0.73) but the round as a whole still ended at down 0.87 / both-up 0.12, hits never left the ~180-per-round-opening spawn transient, and the late-round state was a torso at `up_z` 0.69 collecting **+0.55/step** for doing nothing. Three of every four learner transitions came from a fight that was already over. |
-| warp4 | ported the rest of `env.py`'s round semantics: a round closes on a knockdown, out of the ring, or beyond `MAX_SEPARATION` (2.4 m), with the respawn happening **per world inside `step()`**, plus `w_alive` 0.2 and the zero-sum `w_ko` 3.0 | In progress. At 228/611: rounds 44→63 control steps, hits per world 0.11→0.53 with red and blue symmetric (0.53/0.52), reward +1.00→+1.23 — and 100% of rounds still ending on a fall, nobody surviving the 480-step cap. |
+| warp4 | ported the rest of `env.py`'s round semantics: a round closes on a knockdown, out of the ring, or beyond `MAX_SEPARATION` (2.4 m), with the respawn happening **per world inside `step()`**, plus `w_alive` 0.2 and the zero-sum `w_ko` 3.0 | In progress. At 484/611: rounds 44→74 control steps, hits per learner 0.11→0.36 with red and blue symmetric, reward +1.00→+1.25 — and, measured with the probe rather than inferred from the log, **a round closes every 87 steps and 100% of closures are falls** (ring 0.00, separation 0.00, widest separation seen 1.6 m of the 2.4 m limit). Same instrument on the same checkpoint: floor fraction 0.006 against warp2's 0.87, head height 1.21 m against 0.26 m, and 0.008 scoring contacts per world-step against 0.00000. |
 
 Two things the truncation forced into the open:
 
@@ -405,6 +405,21 @@ than a contact margin.
   frames are trimmed before a window is chosen; and a session contains many punches,
   so the strike window is a contiguous fast run measured on the *outward* path, not
   the fastest single frame.
+
+- **A round-end flag is not a reason.** The first version of this logged `ko_ends`,
+  the fraction of closed rounds where the truncation flag was set -- which was 1.00 by
+  construction, because the flag *is* the union of "someone fell", "someone left the
+  ring" and "the corners drifted apart". It let me tell you 100% of rounds ended on a
+  knockdown before anything could distinguish them. The env now returns the three
+  reasons separately (`end_fell`, `end_ring`, `end_far`), and the claim was re-measured:
+  falls 1.00, ring 0.00, separation 0.00.
+- **An instrument that reads after the respawn cannot see the fall it is measuring.**
+  With per-world autoreset, `step()` puts the fallen world back on its feet before
+  returning, so recomputing the down flags from the post-step sensors reported a floor
+  fraction of 0.001 where the truth was 0.006 -- a round every 87 steps implies ~0.011,
+  and the fallen state survives exactly one step by design. The probe now reads the
+  env's own pre-respawn `on_floor`, and the posture columns are labelled as
+  post-respawn because they are biased toward whoever is standing.
 
 Caveat that applies to every video here: renders use the policy's deterministic mode
 (`tanh(loc)`), while training samples its actions, so a clip understates hit counts
