@@ -355,7 +355,7 @@ def main(argv=None) -> int:
         dist_mean = imit_mean = carry_mean = 0.0
         floor_mean = np.zeros(2)
         both_up_mean = 0.0
-        rounds_mean = ko_end_mean = 0.0
+        rounds_mean = fell_mean = ring_mean = far_mean = 0.0
         flat_obs = obs.reshape(rows, env.obs_size)
         for t in range(t_it):
             key, sub = jax.random.split(key)
@@ -377,7 +377,9 @@ def main(argv=None) -> int:
             floor_mean += np.mean(parts["on_floor"], axis=0)
             both_up_mean += float(np.mean(1.0 - np.max(parts["on_floor"], axis=1)))
             rounds_mean += float(np.sum(done))
-            ko_end_mean += float(np.sum(parts["knockout"]))
+            fell_mean += float(np.sum(parts["fell"]))
+            ring_mean += float(np.sum(parts["left_ring"]))
+            far_mean += float(np.sum(parts["too_far"]))
             flat_obs = obs.reshape(rows, env.obs_size)
             step += rows
         terminal_obs = flat_obs.copy()
@@ -433,7 +435,11 @@ def main(argv=None) -> int:
             # the floor rather than the clock running out
             "rounds": rounds_mean,
             "round_length": t_it * env.nworld / max(rounds_mean, 1.0),
-            "ko_ends": ko_end_mean / max(rounds_mean, 1.0),
+            # which of the three closure reasons is actually firing, as a fraction
+            # of the rounds closed (they can co-occur, so these need not sum to 1)
+            "end_fell": fell_mean / max(rounds_mean, 1.0),
+            "end_ring": ring_mean / max(rounds_mean, 1.0),
+            "end_far": far_mean / max(rounds_mean, 1.0),
             **{k: float(jp.asarray(v)) for k, v in metrics.items()},
         }
         with progress_log.open("a") as sink:
@@ -443,7 +449,9 @@ def main(argv=None) -> int:
               f"dist {dist_mean / t_it:.3f} m  "
               f"floor {record['down_red']:.2f}/{record['down_blue']:.2f} "
               f"up{record['both_up']:.2f} "
-              f"round {record['round_length']:.0f}st ko{record['ko_ends']:.2f}  "
+              f"round {record['round_length']:.0f}st "
+              f"ends f{record['end_fell']:.2f}/r{record['end_ring']:.2f}"
+              f"/d{record['end_far']:.2f}  "
               f"r_red {record['reward_red']:+.2f}  "
               f"ploss {record.get('policy_loss', float('nan')):+.3f} "
               f"vloss {record.get('value_loss', float('nan')):.3f} "

@@ -58,24 +58,36 @@ def main(argv=None) -> int:
     engaged = np.zeros(args.bins)            # both corners up, the reward gate
     posture = np.zeros((2, 2))               # [torso up-z, head z] x [red, blue]
     band, dist, hits, rew, carry = np.zeros(args.bins), [], np.zeros(2), np.zeros(2), 0.0
+    # closures and their reasons: a truncated round can end because someone fell,
+    # because someone left the ring, or because the two drifted apart, and only the
+    # first of those is the pressure this env was changed to create.
+    ends = np.zeros(4)
+    sep_max = 0.0
     for t in range(args.steps):
         b = min(t * args.bins // args.steps, args.bins - 1)
         bin_len[b] += 1
         action = forward(obs.reshape(args.worlds * 2, env.obs_size)).reshape(
             args.worlds, 2, env.action_size)
-        obs, reward, _done, parts = env.step(action)
-        # the env's own down test, recomputed for BOTH corners from the sensors
+        obs, reward, done_, parts = env.step(action)
+        ends[0] += int(np.sum(done_))
+        ends[1] += float(np.sum(parts["fell"]))
+        ends[2] += float(np.sum(parts["left_ring"]))
+        ends[3] += float(np.sum(parts["too_far"]))
+        sep_max = max(sep_max, float(parts["separation"].max()))
+        # The env's own down flags, taken from the step's metrics. Recomputing them
+        # from the sensors reads the state AFTER the autoreset, which erases the fall
+        # that just closed the round: measured 0.001 where a round every 87 steps
+        # implies ~0.011. The instrument has to look before the respawn, not after.
+        on_floor = parts["on_floor"] > 0.0
+        for i in (0, 1):
+            down[b, i] += np.count_nonzero(on_floor[:, i])
+        engaged[b] += float(np.mean(~on_floor[:, 0] & ~on_floor[:, 1]))
         sensors = env._d.sensordata.numpy()
-        is_down = []
         for i, side in enumerate(scene.SIDES):
             f = env._frame(side, sensors)
-            up = quat_rotate(f["quat"], WORLD_UP[None, :])[:, 2]
-            posture[0, i] += float(np.mean(up))
+            posture[0, i] += float(np.mean(
+                quat_rotate(f["quat"], WORLD_UP[None, :])[:, 2]))
             posture[1, i] += float(np.mean(f["head"][:, 2]))
-            d = (up < env._down_up_z) | (f["head"][:, 2] < env._down_head_z)
-            is_down.append(d)
-            down[b, i] += np.count_nonzero(d)
-        engaged[b] += np.mean(~is_down[0] & ~is_down[1])
         band[b] += float(np.mean(parts["in_range"] > 0.5))
         carry += float(np.mean(parts["carry"] > 0.0))
         dist.append(float(np.mean(parts["distance"])))
@@ -90,12 +102,18 @@ def main(argv=None) -> int:
     print(f"  on the floor: red {frac[:, 0].mean():.3f} of the round, "
           f"blue {frac[:, 1].mean():.3f}; both up (the reward gate) "
           f"{(engaged / np.maximum(bin_len, 1.0)).mean():.3f}")
+    print(f"  rounds closed: {ends[0]:.0f} in {args.steps} steps x {args.worlds} worlds"
+          f" = a round every {args.worlds * args.steps / max(ends[0], 1.0):.0f} steps;"
+          f" reasons per closure: fell {ends[1] / max(ends[0], 1):.2f}, ring "
+          f"{ends[2] / max(ends[0], 1):.2f}, too far {ends[3] / max(ends[0], 1):.2f}"
+          f" (widest separation seen {sep_max:.2f} m)")
     print("  timeline, fraction of the bin:")
     for b in range(args.bins):
         lo, hi = b * args.steps // args.bins, (b + 1) * args.steps // args.bins
         print(f"    steps {lo:4d}-{hi:4d}  down red {frac[b, 0]:.3f} blue {frac[b, 1]:.3f}"
               f"  both up {engaged[b] / bin_len[b]:.3f}  in band {band[b] / bin_len[b]:.3f}")
-    print(f"  torso up-z red {posture[0, 0] / args.steps:.3f} "
+    print(f"  torso up-z (post-respawn, so standing worlds dominate) red "
+          f"{posture[0, 0] / args.steps:.3f} "
           f"blue {posture[0, 1] / args.steps:.3f} (down under {env._down_up_z}); "
           f"head z red {posture[1, 0] / args.steps:.3f} "
           f"blue {posture[1, 1] / args.steps:.3f} (down under {env._down_head_z})")

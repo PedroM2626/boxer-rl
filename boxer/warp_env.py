@@ -547,10 +547,18 @@ class WarpBoxing:
         # cancels the zero-sum term), so the channel needs the truncation to mean
         # what it means in env.py.
         timed_out = self._steps >= self._round_steps
-        knocked = (downs[0] | downs[1] | outside[0] | outside[1]
-                   | (separation > MAX_SEPARATION))
+        # Three different reasons, kept apart on purpose: a single flag that ORs
+        # them cannot tell a fight ended on the floor from one that ended because
+        # the corners wandered 2.4 m apart, and the whole point of truncating is to
+        # make falling cost something -- so which one is closing the rounds is the
+        # number that matters.
+        fell = downs[0] | downs[1]
+        left_ring = outside[0] | outside[1]
+        too_far = separation > MAX_SEPARATION
+        knocked = fell | left_ring | too_far
         done = timed_out | knocked
-        parts.update(knockout=knocked, timed_out=timed_out)
+        parts.update(knockout=knocked, fell=fell, left_ring=left_ring,
+                     too_far=too_far, timed_out=timed_out, separation=separation)
         return rewards, done, parts
 
     def _observe(self, sensors: np.ndarray) -> np.ndarray:
