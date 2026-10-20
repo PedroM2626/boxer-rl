@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run the whole suite, and only if it is green, start the long run.
+# Run the suite in halves, and only if it is green, say so.
 #
 # This is the gate, and it has to be structural. The trainer's own wait loop checks
 # for the *absence* of a competing process, not for a passing suite, so queueing it
@@ -17,12 +17,27 @@ export PYTHONPATH="$PROJECT"
 export JAX_PLATFORMS=cuda,cpu
 cd "$PROJECT"
 
-"$PY" -m pytest tests/ -q > /home/pedro/suite_before_event_arm.log 2>&1
-status=$?
-tail -2 /home/pedro/suite_before_event_arm.log
-if [ "$status" -ne 0 ]; then
-  echo "suite is not green (exit $status); not spending GPU hours on it"
-  exit "$status"
+# Two jobs, not one. The whole suite in a single process kills the WSL VM at
+# 20-25 minutes every time -- four reboots in one night, `uptime` reading 0 min and
+# the log stopping mid-progress with no summary -- while a trainer ran 20.6 h
+# uninterrupted on the same card. So the suite is run in halves and each half
+# reports its own exit status; a gate that cannot tell "passed" from "the VM died"
+# is not a gate.
+"$PY" -m pytest tests/test_env.py -q > /home/pedro/suite_half1.log 2>&1
+status1=$?
+tail -2 /home/pedro/suite_half1.log
+"$PY" -m pytest tests/ -q --ignore=tests/test_env.py > /home/pedro/suite_half2.log 2>&1
+status2=$?
+tail -2 /home/pedro/suite_half2.log
+if [ "$status1" -ne 0 ] || [ "$status2" -ne 0 ]; then
+  echo "suite is not green (halves exit $status1/$status2); not spending GPU hours on it"
+  exit 1
 fi
 
-exec bash tools/long_run_event.sh
+# It stops at the gate on purpose. This used to `exec bash tools/long_run_event.sh`,
+# which is an MJX-era launcher for a different arm -- a gate that silently starts the
+# wrong 11-hour job is worse than no gate. Print the command, let the human aim it.
+echo "suite is green; launch with:"
+echo "  PYTHONPATH=$PROJECT JAX_PLATFORMS=cpu XLA_PYTHON_CLIENT_PREALLOCATE=false \\"
+echo "    nohup /home/pedro/venvs/warp_test/bin/python -u -m boxer.warp_train \\"
+echo "      --worlds 2048 --imitation runs/reference/jab_targets_cmu.json --output runs/warpN &"
