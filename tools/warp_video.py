@@ -117,11 +117,15 @@ def main(argv=None) -> int:
     renderer = mujoco.Renderer(visual, height=args.height, width=args.width)
 
     obs = env.reset(seed=args.seed)
+    # New observation entries are appended, so an older checkpoint reads the leading
+    # slice of whatever this env now produces.
+    ckpt_obs = cfg["obs_size"]
     pick_at = set(np.linspace(0, args.length - 1, args.sheet_tiles).astype(int).tolist())
     frames, picks = [], []
     hits = 0.0
     for t in range(args.length):
-        action = forward(obs.reshape(2, env.obs_size)).reshape(1, 2, env.action_size)
+        action = forward(obs[..., :ckpt_obs].reshape(2, ckpt_obs)).reshape(
+            1, 2, env.action_size)
         obs, reward, done, parts = env.step(action)
         hits += float(parts["scored"][0])
         host.qpos[:] = env._qpos_sync[0]

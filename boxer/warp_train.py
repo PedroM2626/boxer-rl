@@ -355,7 +355,7 @@ def main(argv=None) -> int:
         dist_mean = imit_mean = carry_mean = 0.0
         floor_mean = np.zeros(2)
         both_up_mean = 0.0
-        rounds_mean = fell_mean = ring_mean = far_mean = 0.0
+        rounds_mean = fell_mean = ring_mean = far_mean = judged_mean = 0.0
         # per corner: head, torso, body hits and attempts -- the punch structure the
         # weighted hit value alone cannot express
         punch_stat = np.zeros((2, 4))
@@ -384,6 +384,7 @@ def main(argv=None) -> int:
             fell_mean += float(np.sum(parts["fell"]))
             ring_mean += float(np.sum(parts["left_ring"]))
             far_mean += float(np.sum(parts["too_far"]))
+            judged_mean += float(np.sum(parts["judged_out"]))
             for k in (0, 1):
                 landed = parts["scored_by"][:, k]
                 punch_stat[k, 0] += np.count_nonzero(landed >= 0.999)
@@ -457,6 +458,9 @@ def main(argv=None) -> int:
             "end_fell": fell_mean / max(rounds_mean, 1.0),
             "end_ring": ring_mean / max(rounds_mean, 1.0),
             "end_far": far_mean / max(rounds_mean, 1.0),
+            # the outcome this env was rebuilt to make possible: a fight that ends
+            # because one boxer has taken too much, not because a torso tilted
+            "end_ko": judged_mean / max(rounds_mean, 1.0),
             # per world-round: what landed where, how many swings it cost, and how
             # often the fist was back at its guard. "0.000 to the head" is the
             # measurement this whole stack was rebuilt to be able to make.
@@ -483,7 +487,7 @@ def main(argv=None) -> int:
               f"up{record['both_up']:.2f} "
               f"round {record['round_length']:.0f}st "
               f"ends f{record['end_fell']:.2f}/r{record['end_ring']:.2f}"
-              f"/d{record['end_far']:.2f}  "
+              f"/d{record['end_far']:.2f}/k{record['end_ko']:.2f}  "
               f"r_red {record['reward_red']:+.2f}  "
               f"ploss {record.get('policy_loss', float('nan')):+.3f} "
               f"vloss {record.get('value_loss', float('nan')):.3f} "

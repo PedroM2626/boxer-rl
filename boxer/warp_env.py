@@ -42,6 +42,17 @@ Differences from the MJX env, each tied to a measurement:
   0.6 rad: warp1's 0.3 rad was unreachable from a random arm and the term
   measured exactly 0.0 through all 611 iterations.
 
+* the fight has a state of its own: clean hits accumulate as damage (the weight of
+  what landed -- head 1.0, torso 0.5, body 0.35), a hit also stuns its victim out of
+  swinging for ``stun_steps``, and a corner at ``damage_cap`` is out, which closes the
+  round and pays the survivor the zero-sum knockout. warp6's arithmetic is why: a swing
+  that lands 37% of the time returns 10 x 0.49 x 0.37 = +1.81 against a 0.5 charge, so
+  hitting is always profitable, and a punch that lands changed the score but not the
+  fight. Damage is the state that makes an early punch compound; the stun is what makes
+  being hit cost more than the points it gives away. Both corners' damage and the
+  victim's stun are in the observation -- three entries, so ``OBS_FIXED`` is 44 and the
+  vector is 131 wide -- because a state the policy cannot see is a state it cannot pace.
+
 The reward carries the measured core (upright, alive, knockdown, in_range,
 facing, hit events, clinch, energy, ring) and truncates per world the way
 ``boxer/env.py`` does: a round closes as soon as one boxer is down, out of the
@@ -73,8 +84,15 @@ MAX_SEPARATION = 2.4
 # Observation entries that do not scale with the joint count; mirrors
 # boxer/env.py's _OBS_FIXED: 3 up-axis + 3 torso velocity + 3 gyro + 6 guard
 # error + 6 palm velocities, then 3 opponent torso + 3 opponent head + 6
-# opponent palms + 3 opponent tilt + 3 ring centre + 2 distance/facing.
-OBS_FIXED = 41
+# opponent palms + 3 opponent tilt + 3 ring centre + 2 distance/facing, plus the
+# 3 fight-state entries this env adds: own damage, opponent damage, stunned.
+OBS_FIXED = 44
+# Where the distance entry sits, named because the self-check reads it out of the
+# observation to prove a respawn really re-seeded the stance. The observation ends
+# with ... ring centre (3), distance/facing (2), fight state (3), so distance is
+# five from the end -- and a bare -2 silently stopped pointing at it the day the
+# fight-state block went on, which is how this got caught.
+OBS_DISTANCE = -5
 
 # What a landed contact is worth, by what it landed on: env.py's TARGET_WEIGHTS.
 # Arms are zero so blocking stays a physical event that scores nothing.
@@ -123,6 +141,7 @@ class WarpBoxing:
                  rearm_steps: int = 20, round_steps: int = 500,
                  down_up_z: float = 0.70, down_head_z: float = 0.85,
                  punch_speed_min: float = 1.0,
+                 damage_cap: float = 5.0, stun_steps: int = 10,
                  w_upright: float = 0.8, w_range: float = 0.15,
                  w_facing: float = 0.2, w_hit: float = 10.0,
                  w_clinch: float = 0.5, w_energy: float = 0.05,
@@ -145,6 +164,15 @@ class WarpBoxing:
         # ~1 s and then sat propped on their arms collecting the dense terms.
         self._down_up_z, self._down_head_z = down_up_z, down_head_z
         self._punch_speed_min = punch_speed_min
+        # Damage is the weight of every clean hit absorbed (head 1.0, torso 0.5,
+        # body 0.35), so `damage_cap` 5.0 is five head shots or ten to the body.
+        # The reason it exists is warp6's arithmetic: a swing that lands 37% of the
+        # time returns +1.81 against a 0.5 charge, so hitting is always profitable
+        # and the hit channel is symmetric and instantaneous -- a punch changes the
+        # score, never the fight. Accumulated damage is the state that makes an
+        # early punch compound into a later advantage, and the stun window is what
+        # makes being hit cost more than the points it gives away.
+        self._damage_cap, self._stun_steps = damage_cap, stun_steps
         self._imit_sigma, self._imit_speed_ref = imit_sigma, imit_speed_ref
         self._w = dict(upright=w_upright, range=w_range, facing=w_facing,
                        hit=w_hit, clinch=w_clinch, energy=w_energy, ring=w_ring,
@@ -267,6 +295,9 @@ class WarpBoxing:
         # is a rising edge, so one jab is one attempt and a vibrating fist is many).
         self._came_back = np.ones((nworld, 2), dtype=bool)
         self._was_committed = np.zeros((nworld, 2), dtype=bool)
+        # Damage absorbed and steps of stun left, per world and corner.
+        self._damage = np.zeros((nworld, 2), dtype=np.float32)
+        self._stun = np.zeros((nworld, 2), dtype=np.int32)
         self._last_action = np.zeros((nworld, 2, self.action_size))
         # reset(seed) reseeds it; step() draws the per-world respawns from it.
         self._rng = np.random.default_rng(0)
@@ -358,6 +389,8 @@ class WarpBoxing:
         self._steps_off[rows] = self._rearm_steps  # both spawn apart: start armed
         self._came_back[rows] = True   # they spawn in the guard, so the fist is home
         self._was_committed[rows] = False
+        self._damage[rows] = 0.0
+        self._stun[rows] = 0
         self._last_action[rows] = 0.0
         return self._observe(self._d.sensordata.numpy())[rows]
 
@@ -505,14 +538,29 @@ class WarpBoxing:
             # whether it may score, and no hit can ever be armed (measured: raw
             # contact 0.50, scored 0.00, with the gate open).
             armed[:, i] = ((self._steps_off[:, i] >= self._rearm_steps)
-                           & self._came_back[:, i])
+                           & self._came_back[:, i]
+                           & (self._stun[:, i] == 0))
             self._came_back[:, i] = np.where(touched, False,
                                              np.where(home, True, self._came_back[:, i]))
         scored_by = np.where(armed, hit, 0.0)  # what each corner landed, armed or not
+        # What each corner ABSORBED this step, from the other corner's armed punch.
+        # Damage accumulates and a clean hit also stuns the victim out of its next few
+        # swings -- the part that makes trading blows a loss instead of a wash. The
+        # stun is read before it is written, for the same ordering reason as the
+        # re-arm flag: the step that lands a hit must not be the step that loses the
+        # ability to land it.
+        absorbed = scored_by[:, ::-1].copy()
+        self._damage += absorbed
+        self._stun = np.where(absorbed > 0.0, self._stun_steps,
+                              np.maximum(self._stun - 1, 0)).astype(np.int32)
+        # Out on the feet or out on damage ends the fight the same way; `downs` stays
+        # the physical floor test so the posture metric keeps its meaning.
+        outs = [downs[i] | (self._damage[:, i] >= self._damage_cap) for i in (0, 1)]
         for i, (me, foe) in enumerate(((red, blue), (blue, red))):
             quat = me["quat"]
             upright = quat_rotate(quat, WORLD_UP[None, :])[:, 2]
             down = downs[i]
+            out = outs[i]  # down, or out on accumulated damage
             # Two gates, two jobs. ``engaged`` (BOTH corners up) holds the
             # interaction terms: warp1 ended the round propped on one arm next to
             # a fallen foe because a per-agent gate still paid range and facing
@@ -527,7 +575,7 @@ class WarpBoxing:
             # 47 -> 8 and std pinned at its 0.3 floor -- a dead gradient, not a
             # converged policy. Standing had to pay again before falling could
             # lose.
-            engaged = np.where(down | downs[1 - i], 0.0, 1.0)
+            engaged = np.where(out | outs[1 - i], 0.0, 1.0)
             offset = foe["torso"] - me["torso"]
             distance = np.linalg.norm(offset, axis=1)
             forward = quat_rotate(quat, WORLD_FORWARD[None, :])
@@ -550,9 +598,9 @@ class WarpBoxing:
             # this step: paid per step across 320 floor steps it would reward a
             # mutual collapse (both down cancels to zero) instead of a knockout,
             # which is the leak env.py:161-165 already recorded for this term.
-            alive = np.where(down, 0.0, 1.0)
-            ko = (alive * np.where(downs[1 - i], 1.0, 0.0)
-                  - np.where(down, 1.0, 0.0) * np.where(downs[1 - i], 0.0, 1.0))
+            alive = np.where(out, 0.0, 1.0)
+            ko = (alive * np.where(outs[1 - i], 1.0, 0.0)
+                  - np.where(out, 1.0, 0.0) * np.where(outs[1 - i], 0.0, 1.0))
             rewards[:, i] = (w["upright"] * upright
                              + w["alive"] * alive
                              + w["ko"] * ko
@@ -621,12 +669,18 @@ class WarpBoxing:
         # make falling cost something -- so which one is closing the rounds is the
         # number that matters.
         fell = downs[0] | downs[1]
+        # A fight can now also end the way a fight ends: one corner has absorbed
+        # enough clean punches to be out, whoever its torso is doing.
+        damage = self._damage >= self._damage_cap
+        judged_out = damage[:, 0] | damage[:, 1]
         left_ring = outside[0] | outside[1]
         too_far = separation > MAX_SEPARATION
-        knocked = fell | left_ring | too_far
+        knocked = fell | judged_out | left_ring | too_far
         done = timed_out | knocked
-        parts.update(knockout=knocked, fell=fell, left_ring=left_ring,
-                     too_far=too_far, timed_out=timed_out, separation=separation)
+        parts.update(knockout=knocked, fell=fell, judged_out=judged_out,
+                     left_ring=left_ring, too_far=too_far, timed_out=timed_out,
+                     separation=separation, damage=self._damage,
+                     stun=(self._stun > 0).astype(np.float32))
         return rewards, done, parts
 
     def _observe(self, sensors: np.ndarray) -> np.ndarray:
@@ -661,6 +715,14 @@ class WarpBoxing:
                 local(to_centre),
                 np.stack([distance, np.sum(
                     forward * offset / (distance[:, None] + 1e-6), axis=1)], axis=1),
+                # The state of the fight, which is the only way an early punch can
+                # matter later: damage each corner has absorbed (normalised by the
+                # cap, so 1.0 means "out"), and whether this corner is still stunned
+                # out of swinging. Without these the policy cannot pace -- it can
+                # only watch the score change, which is what warp6 did.
+                np.stack([self._damage[:, i] / self._damage_cap,
+                          self._damage[:, 1 - i] / self._damage_cap,
+                          (self._stun[:, i] > 0).astype(np.float32)], axis=1),
             ], axis=1)
         return obs
 
@@ -688,7 +750,7 @@ if __name__ == "__main__":
     mujoco.mj_forward(env._model, host)
     worst = float(np.max(np.abs(host.sensordata - env._d.sensordata.numpy()[0])))
     print(f"reset: obs {obs.shape}, finite {bool(np.isfinite(obs).all())}, "
-          f"distance {obs[:, 0, -2].mean():.3f} m, "
+          f"distance {obs[:, 0, OBS_DISTANCE].mean():.3f} m, "
           f"sensor freshness |diff| {worst:.1e}")
     assert worst < 1e-4, "reset sensors are stale"
 
@@ -730,10 +792,33 @@ if __name__ == "__main__":
     obs_r, reward_r, done_r, parts_r = env.step(zero)
     env._down_head_z = 0.85
     assert done_r.all() and not env._steps.any(), "the respawn did not reset the clock"
-    fresh = float(obs_r[:, 0, -2].mean())
+    fresh = float(obs_r[:, 0, OBS_DISTANCE].mean())
     print(f"autoreset: {int(done_r.sum())} worlds respawned inside step(), "
           f"distance back to {fresh:.3f} m (spawn {env._spawn_distance:.2f})")
     assert abs(fresh - env._spawn_distance) < 0.15, "respawn did not re-seed the stance"
+
+    # Damage, stun and the knockout are the fight's own state, so they are tested
+    # against the reward function rather than through physics: five clean hits of
+    # head weight on blue must stun it and then close the round as a knockout.
+    env.reset(0)
+    sensors_now = env._d.sensordata.numpy()
+    ko_done, ko_parts = None, None
+    for _ in range(5):
+        # Re-arm both corners by hand: the first hit spends red's rearm window and
+        # marks its fist away from guard, and this test is about damage, stun and
+        # the knockout, not about the window those are separate assertions for.
+        env._steps_off[:] = env._rearm_steps
+        env._came_back[:] = True
+        landed = np.zeros((env.nworld, 2), np.float32)
+        landed[:, 0] = 1.0                       # red lands a clean head-value hit
+        _r, ko_done, ko_parts = env._reward(zero, landed, sensors_now)
+    assert np.allclose(env._damage[:, 1], 5.0), env._damage[:, 1]
+    assert bool(ko_parts["judged_out"].all()), "five clean hits did not end the fight"
+    assert bool(ko_done.all()), "a knockout did not close the round"
+    assert ko_parts["stun"][:, 1].all(), "the victim was not stunned by a clean hit"
+    print(f"health: 5 clean hits put blue out (damage "
+          f"{env._damage[:, 1].mean():.1f}/{env._damage_cap:.1f}), stun "
+          f"{env._stun[:, 1].mean():.0f} steps, round closed as a knockout")
 
     # The jab check needs a spawn it can predict: the tilt and autoreset checks
     # above drew two more respawns from this env's rng, and with the default

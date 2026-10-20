@@ -52,6 +52,9 @@ def main(argv=None) -> int:
                      round_steps=cfg["round_steps"],
                      imitation_path=cfg["imitation"]["path"])
     obs = env.reset(seed=args.seed)
+    # The observation vector grows when a fight-state entry is added, and the new
+    # entries go on the end, so an older checkpoint reads the leading slice.
+    ckpt_obs = cfg["obs_size"]
 
     down = np.zeros((args.bins, 2))          # (world, step) pairs on the floor
     bin_len = np.zeros(args.bins)
@@ -66,7 +69,7 @@ def main(argv=None) -> int:
     for t in range(args.steps):
         b = min(t * args.bins // args.steps, args.bins - 1)
         bin_len[b] += 1
-        action = forward(obs.reshape(args.worlds * 2, env.obs_size)).reshape(
+        action = forward(obs[..., :ckpt_obs].reshape(-1, ckpt_obs)).reshape(
             args.worlds, 2, env.action_size)
         obs, reward, done_, parts = env.step(action)
         ends[0] += int(np.sum(done_))
