@@ -344,6 +344,7 @@ measurement that killed or kept it.
 | warp3 | `upright` pays on the boxer's own posture again (as `env.py:673` does); interaction terms keep the both-up gate; the log gained a floor fraction | 200.2M complete, and it **falsified "the gate was the problem"**: standing early in the round improved (both up over the first 80 steps 0.59→0.73) but the round as a whole still ended at down 0.87 / both-up 0.12, hits never left the ~180-per-round-opening spawn transient, and the late-round state was a torso at `up_z` 0.69 collecting **+0.55/step** for doing nothing. Three of every four learner transitions came from a fight that was already over. |
 | warp4 | ported the rest of `env.py`'s round semantics: a round closes on a knockdown, out of the ring, or beyond `MAX_SEPARATION` (2.4 m), with the respawn happening **per world inside `step()`**, plus `w_alive` 0.2 and the zero-sum `w_ko` 3.0 | **200.2M complete (10.94 h), the first arm that boxes.** Round length 50→78 control steps; **punch value per world-round 0.09→0.70** (means 0.157 over the first 100 iterations, 0.677 over the last 80 -- monotone over the whole run, not a round-opening spike); reward +1.06→+1.26; floor 0.007. Probed deterministically on the final checkpoint: a round every 90 steps, 0.72 punch-value thrown and 0.73 taken -- so the mean action punches, not the noise -- and every closure by falling (ring 0.00, separation 0.00). Ran with the termination-bootstrap bias below, so its curve is a floor. |
 | warp5 | same arm, with the termination bootstrap masked (`cont = 1 - done * (1 - timeout)`) -- falling stopped paying the value of the next round | **200.2M complete (10.67 h), and the answer to the question warp4 left open.** Round length 51 → 94 → 201 → 382 control steps against a 480 cap; **punch value per world-round 0.08 → 3.17** (last 60 iterations average 3.09); floor fraction 0.010 → 0.001; the corners closed the gap from 0.68 m to **0.52 m**, inside the band the arm can score in; and `end_fell` fell from 1.00 to 0.58 -- **42% of rounds now end because the clock ran out, which has never happened in any arm before**. Probed deterministically on the final checkpoint: a round every 476 steps, 1.56 punch-value thrown and 1.36 taken per round, nobody ever on the floor. Two honest caveats: punch *rate* per step is lower than warp4's (0.0033 vs 0.0082 -- warp4's rate was inflated by the collapse scrum of its 90-step rounds), and the rendered behaviour is a sustained close-range arm-to-arm engagement rather than a jab in and out. |
+| warp6 | a punch becomes a discrete, costed action. An **attempt** -- the rising edge of the fist closing on the opponent at `punch_speed_min`, computed from palm velocity along the line between torsos so it exists without contact, with hysteresis at half the threshold so one swing is one attempt -- costs `w_attempt` 0.5 against the +10 hit; and re-arming now requires the fist to have **returned to its guard**, within 0.25 m of its own torso-frame target, not merely 20 steps without contact. Plus the metrics that make the claim checkable: hits split by surface, attempts per round, accuracy, and the fraction of steps the fist is home. | Running. Chosen by measurement rather than taste: warp5 sits at 0.83 torso-equivalent contacts/s against the 2.5/s ceiling its own rearm window allows, with an imitation term of 0.00155, so the mill is the cheapest legal policy under the old objective -- and RoboStriker's metric is a *ratio* whose denominator this env never had. From a random policy at launch: `head 0.00/0.00`, `acc 0.07`, `home 0.07`, reward +0.98. |
 
 Two things the truncation forced into the open:
 
@@ -455,10 +456,12 @@ close it.
 3. **~~Nobody has ever run out a clock.~~ Answered by warp5.** `end_fell` fell from 1.00 to
    0.58 over its own run: 42% of rounds now end because the 480 steps ran out. In the
    deterministic probe a round lasts 476 of 480 steps and only 12% of closures are falls.
-4. **Head versus torso is not measured.** `punch_value` sums the scorecard's weights
-   (1.0 and 0.5), so the log cannot say whether the punches that land are head shots or
-   body shots -- and the null that started this whole migration was *0.000 to the head*.
-   The scorecard already knows which surface was hit; the metric just does not carry it.
+4. **Head versus torso is instrumented, and not yet answered.** `punch_value` sums the
+   scorecard's weights (1.0 and 0.5), so no warp arm before warp6 could say whether the
+   punches that land are head shots or body shots -- and the null that started this whole
+   migration was *0.000 to the head*. warp5's 3.1 value per round is therefore not yet a
+   claim about punching the head. warp6 logs `head_r`/`torso_r`/`body_r` per round; the
+   first reading, from a random policy, is `head 0.00`.
 5. **The imitation channel is still a null** (0.0007-0.0023 across three arms). Either it
    fires in a run that actually punches, or it comes out.
 6. **The policy's scale is creeping.** 0.70 to 1.63 across warp4 against a 2.0 ceiling.
@@ -466,13 +469,16 @@ close it.
    is exactly the failure mode warp1 taught me to read. warp5's was not monotone -- it
    rose to 1.36, fell back to 1.18 mid-run and ended at 1.58 -- so the ceiling is still the
    thing to watch on any arm longer than this.
-7. **The behaviour is a clinch, not a jab.** warp5 parks at 0.52-0.56 m with its arms
-   crossed on the opponent's chest, and the render reads as sustained grappling at arm
-   length. The reward does not object: the clinch penalty only starts below `punch_reach`
-   (0.45 m), so leaning in at 0.52 m is free, and a punch that scores is worth 10 while the
-   whole dense budget of a round is worth about 3.8. The open measurement is whether
-   pushing the corners apart (or pricing the lean) converts the pressure into punches
-   through, rather than into falls.
+7. **The behaviour is a mill, not a jab -- and warp6 is the test of that.** warp5 parks at
+   0.52-0.56 m with its arms crossed on the opponent's chest, at 0.83 torso-equivalent
+   contacts per second against the 2.5/s its own rearm window allows, and an imitation term
+   of 0.00155: the geometry of their punches resembles a recorded jab not at all. Nothing in
+   the objective objected -- the clinch penalty only starts below 0.45 m, a swing is free,
+   and the fist never has to come back. warp6 charges the swing and demands the return. The
+   falsifier is already in the log: if `accuracy_r` rises while `attempts_r` falls and
+   `head_r` stops being 0.00, the mill was an incentive and not a physical limit; if
+   attempts collapse toward zero instead, the charge is priced wrong and punching is being
+   taxed out of existence, which would be my error and not the robot's.
 
 
 ## Why this robot model
@@ -664,7 +670,12 @@ force at all. The warp env scores with the metric the published recipe uses: a c
 of at least **50 N** on a weighted target surface (head 1.0, torso 0.5,
 pelvis/hip/thigh 0.35, arms 0), credited **by role** -- the geom carrying a fist or
 forearm surface of one corner, landing on a scoring surface of the other -- and gated on
-that striker's palm closing on the opponent at >= 1.0 m/s. Attribution by role is not
+that striker's palm closing on the opponent at >= 1.0 m/s. Since warp6 two more
+conditions apply, both added because warp5 showed the scorecard alone rewards a mill:
+the swing is **charged** as an attempt whether or not it lands (0.5 against the +10 hit),
+which is the denominator RoboStriker's hit-rate ratio has, and the fist must have
+**returned to its guard** since it last touched the opponent before its next contact can
+score. Attribution by role is not
 decoration: the first warp arm credited hits by the order the two geoms happen to appear
 in the contact buffer, red's geoms sort first, so a chest pressed against a chest paid
 red 0.50 and a full blue jab paid blue nothing. `tools/warp_hit_directions.py` is the
@@ -933,7 +944,10 @@ reference and the checkpoints both live under it:
   warp checkpoint without being told.
 - `progress.jsonl` -- one record per iteration: reward per corner, hits per corner,
   distance, imitation, `carry`, `down_red`/`down_blue`/`both_up`, `round_length`,
-  `end_fell`/`end_ring`/`end_far`, `punch_value_red`/`punch_value_blue`, `clip_frac`,
+  `end_fell`/`end_ring`/`end_far`, `punch_value_red`/`punch_value_blue`, and from warp6
+  the punch structure itself: `head_r`/`torso_r`/`body_r` per world-round (and the
+  other corner's `head_b`/`torso_b`/`body_b`), `attempts_r`/`attempts_b`, `accuracy_r`,
+  `at_home` -- plus `clip_frac`,
   `entropy`, `std`, `value_loss`, learner steps/s. Two things a parser has to survive:
   the schema grew while arms were running (warp4's early records have no posture or
   round fields, and its late ones still say `ko_ends`, the flag that could not tell a
