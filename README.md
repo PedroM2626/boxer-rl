@@ -344,6 +344,7 @@ measurement that killed or kept it.
 | warp4 | ported the rest of `env.py`'s round semantics: a round closes on a knockdown, out of the ring, or beyond `MAX_SEPARATION` (2.4 m), with the respawn happening **per world inside `step()`**, plus `w_alive` 0.2 and the zero-sum `w_ko` 3.0 | **200.2M complete (10.94 h), the first arm that boxes.** Round length 50→78 control steps; **punch value per world-round 0.09→0.70** (means 0.157 over the first 100 iterations, 0.677 over the last 80 -- monotone over the whole run, not a round-opening spike); reward +1.06→+1.26; floor 0.007. Probed deterministically on the final checkpoint: a round every 90 steps, 0.72 punch-value thrown and 0.73 taken -- so the mean action punches, not the noise -- and every closure by falling (ring 0.00, separation 0.00). Ran with the termination-bootstrap bias below, so its curve is a floor. |
 | warp5 | same arm, with the termination bootstrap masked (`cont = 1 - done * (1 - timeout)`) -- falling stopped paying the value of the next round | **200.2M complete (10.67 h), and the answer to the question warp4 left open.** Round length 51 → 94 → 201 → 382 control steps against a 480 cap; **punch value per world-round 0.08 → 3.17** (last 60 iterations average 3.09); floor fraction 0.010 → 0.001; the corners closed the gap from 0.68 m to **0.52 m**, inside the band the arm can score in; and `end_fell` fell from 1.00 to 0.58 -- **42% of rounds now end because the clock ran out, which has never happened in any arm before**. Probed deterministically on the final checkpoint: a round every 476 steps, 1.56 punch-value thrown and 1.36 taken per round, nobody ever on the floor. Two honest caveats: punch *rate* per step is lower than warp4's (0.0033 vs 0.0082 -- warp4's rate was inflated by the collapse scrum of its 90-step rounds), and the rendered behaviour is a sustained close-range arm-to-arm engagement rather than a jab in and out. |
 | warp6 | a punch becomes a discrete, costed action. An **attempt** -- the rising edge of the fist closing on the opponent at `punch_speed_min`, computed from palm velocity along the line between torsos so it exists without contact, with hysteresis at half the threshold so one swing is one attempt -- costs `w_attempt` 0.5 against the +10 hit; and re-arming now requires the fist to have **returned to its guard**, within 0.25 m of its own torso-frame target, not merely 20 steps without contact. Plus the metrics that make the claim checkable: hits split by surface, attempts per round, accuracy, and the fraction of steps the fist is home. | Running. Chosen by measurement rather than taste: warp5 sits at 0.83 torso-equivalent contacts/s against the 2.5/s ceiling its own rearm window allows, with an imitation term of 0.00155, so the mill is the cheapest legal policy under the old objective -- and RoboStriker's metric is a *ratio* whose denominator this env never had. From a random policy at launch: `head 0.00/0.00`, `acc 0.07`, `home 0.07`, reward +0.98. **200.2M complete (9.94 h). **The gates bought accuracy, not restraint.** Accuracy -- the fraction of swings that land -- rose **0.062 → 0.370**, and punch value per world-round **0.09 → 3.65** (warp5: 3.17), with the policy's scale ending at 1.39 where warp5 reached 1.58. But swing *volume* went up, not down: 3.6 attempts per round at iteration 1 is 2.36/s, it dipped to 1.13/s mid-run, and it finished at **20.0 per round = 2.79/s** -- more flailing per second than the random policy started with. The arithmetic says why: a swing that lands 37% of the time at a mean value of 0.49 returns 10 × 0.49 × 0.37 = +1.81 against a charge of 0.5, so swinging is individually profitable and the price is too small to matter. Probed deterministically: 4.22 value thrown and 4.14 taken per round of 427 steps, floor 0.001, 0.54 m apart. **And the head number, stated precisely: `head_r` is 0.0025 per round averaged over the last 60 iterations, 0.0067 at its best, against 6.4 torso contacts -- roughly one head shot per 400 rounds.** The gates did their job (discrete, converting punches) and what they exposed is that nothing in this reward makes a punch *count for anything beyond its own moment*: the hit is paid and un-paid symmetrically, so nothing compounds. |
+| warp7 | the fight gets a state: clean hits accumulate as **damage** at their surface weight (head 1.0, torso 0.5, body 0.35), a corner at `damage_cap` 3.0 is **out** -- which closes the round and pays the survivor the zero-sum knockout -- and every clean hit **stuns** its victim out of scoring for 10 control steps. Own damage, opponent damage and stunned join the observation (128 → 131) | Running. The lever the head-gap measurement pointed at: head shots retire a boxer in three hits against six to the body, which is the first reason in this project's history to aim high rather than often. Three questions it has to answer, in order: is `end_ko` ever > 0 (the first cap of 5.0 made the knockout dormant -- warp6's best round delivers 3.55 damage -- so this was caught and fixed before the run, not after); does `head_r` leave ~0; and does `accuracy_r` keep rising without the swing rate collapsing. |
 
 Two things the truncation forced into the open:
 
@@ -387,6 +388,30 @@ where a punch can land statically was the band the clinch penalty punished, whil
 `target_range 0.55 / punch_reach 0.45 / clinch_range 0.35` -- the paid optimum has to
 sit inside the reachable set -- and why a punch became a force-threshold event rather
 than a contact margin.
+
+### The measurement that reopened the head question
+
+The same instrument, seven arms later, on the policy that finally punches: `tools/warp_head_gap.py`
+rolls a checkpoint out and tracks the fist's distance to each target surface against the
+geometry that decides contact -- a fist capsule of radius 0.035 touching the head sphere of
+radius 0.06 means a centre distance of 0.095 m. On warp6's final checkpoint (128 worlds,
+deterministic, 122,880 corner-steps):
+
+| | fist-to-head | fist-to-torso |
+| --- | --- | --- |
+| median distance | 0.361 m | 0.206 m |
+| closest ever | 0.092 m | 0.024 m |
+| corner-steps inside touching range | 1 | 1,241 (1.0%) |
+| scoring events landed there | 0 of 2,004 | 1,968 |
+
+and the head sits **+0.319 m** above the fist at the median (the torso, −0.036 m). So the
+answer is **AIM, not REACH**: the elevation exists -- the fist got inside touching range,
+once, in 122,880 chances -- and nothing has ever bought it. That is why the head's damage
+weight matters now (warp7): a head shot retires a boxer in three hits where the body takes
+six, which is the first time in this project that aiming high is worth more than hitting
+often. What this measurement deliberately did *not* do is move `target_range`: the sweep
+above already says the paid band is at the edge of what the arm can reach, and changing two
+things at once would have made warp7 unreadable.
 
 ### Traps in the warp path, one run each
 
