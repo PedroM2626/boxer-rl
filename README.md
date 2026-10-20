@@ -22,19 +22,22 @@ the opponent's head or torso geom, not a proximity heuristic, credited by role a
 gated on the striker's fist closing on the opponent.
 
 **Where this is at:** the physics, the throughput and the measurement machinery work, and
-as of warp4 the boxers also exchange scoring punches. Measured on the final checkpoint in
-its own engine: **0.72 punch-value per world-round thrown and 0.73 taken** (head 1.0,
-torso 0.5 -- a value, not a count), a round every 90 control steps, 0.6% of the rollout on
-the floor, against 0.00000 punches and 87% floor for warp2. Three things are still *not*
-demonstrated: no round has ever run out its clock (every closure is a fall), the log
-cannot separate head shots from body shots, and there is no win rate for any warp arm
-because the arena and the frozen/league modes are MJX-only. The MJX-era record, measured
-with a different instrument: the best policy there holds a guard, closes distance and
-lands ~0.3 gated punches a round, and wins 64% of rounds against a passive opponent by
-being the one still standing, while symmetric self-play at the same budget loses 88% of
-its rounds to that passive opponent. Every reward intervention has been reported as a
-null result rather than quietly dropped; the diagnosis and the experiments still open
-are in [Results](#results).
+as of warp5 the boxers fight a round almost to its end. Measured on the final checkpoint
+in its own engine, deterministic actions: **a round every 476 of 480 control steps**, 1.56
+punch-value thrown and 1.36 taken per round (head 1.0, torso 0.5 -- a value, not a count),
+**nobody ever on the floor**, at 0.53 m apart -- inside the band the arm can score in. In
+the sampled training rollouts the same policy averages 3.1 punch-value a round and closes
+42% of its rounds on the clock rather than on a fall, which no arm managed before. What is
+still *not* demonstrated: a head-versus-body split (the log cannot say whether a landed
+punch was a jab or a body shot, and the null that started this migration was 0.000 to the
+head), a win rate (the arena and the frozen/league modes are MJX-only), and clean punching
+-- the render reads as sustained close-range arm-to-arm work, not a jab in and out. The
+MJX-era record, measured with a different instrument: the best policy there holds a guard,
+closes distance and lands ~0.3 gated punches a round, and wins 64% of rounds against a
+passive opponent by being the one still standing, while symmetric self-play at the same
+budget loses 88% of its rounds to that passive opponent. Every reward intervention has been
+reported as a null result rather than quietly dropped; the diagnosis and the experiments
+still open are in [Results](#results).
 
 ## Results
 
@@ -339,7 +342,8 @@ measurement that killed or kept it.
 | warp1 | first arm on the warp env: force scorecard, imitation channel from the retargeted CMU jab, per-agent down gate | 200.2M, and it **froze**: std 0.70→0.22, entropy +31→−5, hits only in the iteration that opens a round, imitation term exactly 0.00000 for all 611 iterations. The warp-native renderer explained what the log could not: both boxers on the floor within ~1 s, one sitting propped on an arm — and the down test (`upright_z < 0.15`, head `< 0.55`) called that alive, so falling collected the dense terms all round. |
 | warp2 | down test moved to 45° / head 0.85 m; **every** dense term gated on both corners being up; spawn 0.75 m; range narrowed (σ 0.15) and cheapened (w 0.15); std floor 0.3 | Killed at 137.6M by a bug of my own. Reward flatlined at −0.005 (the energy residue), `value_loss` fell to 0.0003, entropy 47→8, std pinned at its floor — a dead gradient, not a converged policy. `tools/warp_probe_policy.py` measured it in the engine: **87% of the round on the floor, both corners up for 11.8% of it.** Gating a boxer's own posture term on the opponent being upright deletes the incentive to stand back up. |
 | warp3 | `upright` pays on the boxer's own posture again (as `env.py:673` does); interaction terms keep the both-up gate; the log gained a floor fraction | 200.2M complete, and it **falsified "the gate was the problem"**: standing early in the round improved (both up over the first 80 steps 0.59→0.73) but the round as a whole still ended at down 0.87 / both-up 0.12, hits never left the ~180-per-round-opening spawn transient, and the late-round state was a torso at `up_z` 0.69 collecting **+0.55/step** for doing nothing. Three of every four learner transitions came from a fight that was already over. |
-| warp4 | ported the rest of `env.py`'s round semantics: a round closes on a knockdown, out of the ring, or beyond `MAX_SEPARATION` (2.4 m), with the respawn happening **per world inside `step()`**, plus `w_alive` 0.2 and the zero-sum `w_ko` 3.0 | **200.2M complete (10.94 h), and it is the first arm that boxes.** Round length 50→78 control steps; **punch value per world-round 0.09→0.70** (mean of the first 100 iterations 0.157, of the last 80 0.677 -- a monotone rise over the whole run, not a round-opening spike); reward +1.06→+1.26; floor fraction 0.007. Measured in its own engine on the final checkpoint, 128 worlds, *deterministic* actions: a round every 90 steps, **0.72 punch-value per round thrown and 0.73 taken** -- so the mean action punches, the noise is not doing it -- with closures 100% by falling (ring 0.00, separation 0.00, widest drift 1.85 m of the 2.4 m limit). Two things it did not fix: no round has ever run out its clock, and the policy's scale crept 0.70→1.63 toward its 2.0 ceiling. |
+| warp4 | ported the rest of `env.py`'s round semantics: a round closes on a knockdown, out of the ring, or beyond `MAX_SEPARATION` (2.4 m), with the respawn happening **per world inside `step()`**, plus `w_alive` 0.2 and the zero-sum `w_ko` 3.0 | **200.2M complete (10.94 h), the first arm that boxes.** Round length 50→78 control steps; **punch value per world-round 0.09→0.70** (means 0.157 over the first 100 iterations, 0.677 over the last 80 -- monotone over the whole run, not a round-opening spike); reward +1.06→+1.26; floor 0.007. Probed deterministically on the final checkpoint: a round every 90 steps, 0.72 punch-value thrown and 0.73 taken -- so the mean action punches, not the noise -- and every closure by falling (ring 0.00, separation 0.00). Ran with the termination-bootstrap bias below, so its curve is a floor. |
+| warp5 | same arm, with the termination bootstrap masked (`cont = 1 - done * (1 - timeout)`) -- falling stopped paying the value of the next round | **200.2M complete (10.67 h), and the answer to the question warp4 left open.** Round length 51 → 94 → 201 → 382 control steps against a 480 cap; **punch value per world-round 0.08 → 3.17** (last 60 iterations average 3.09); floor fraction 0.010 → 0.001; the corners closed the gap from 0.68 m to **0.52 m**, inside the band the arm can score in; and `end_fell` fell from 1.00 to 0.58 -- **42% of rounds now end because the clock ran out, which has never happened in any arm before**. Probed deterministically on the final checkpoint: a round every 476 steps, 1.56 punch-value thrown and 1.36 taken per round, nobody ever on the floor. Two honest caveats: punch *rate* per step is lower than warp4's (0.0033 vs 0.0082 -- warp4's rate was inflated by the collapse scrum of its 90-step rounds), and the rendered behaviour is a sustained close-range arm-to-arm engagement rather than a jab in and out. |
 
 Two things the truncation forced into the open:
 
@@ -438,27 +442,37 @@ relative to the log.
 The intro promises this list, so here it is -- each item with the measurement that would
 close it.
 
-1. **A run without the termination-bootstrap bias.** warp4 started before that fix, so its
-   curve is measured while falling paid ~26 discounted reward -- its 50→78 step rounds are
-   a floor, not a ceiling. warp5 is the same arm with the mask, running now. Reading rule:
-   if `round_length` climbs well past ~78 steps, the truncation was the wall; if it sits
-   there, the wall is balance physics and the objective is not the problem.
+1. **~~A run without the termination-bootstrap bias.~~ Answered by warp5.** With the mask,
+   round length went 78 → 382 control steps and punch value per round 0.70 → 3.17 on the
+   same 200M budget. So the wall was the objective, not the balance physics: the boxers
+   could stand and fight the whole time and were being paid ~26 discounted reward to stop.
+   The question that replaces it is whether 382 of 480 is where this reward plateaus, and
+   what the remaining 42% of fall-endings are made of.
 2. **No win rate exists for any warp arm.** The arena, `--mode frozen` and the
    alternating league are MJX-only, and the guard-error block reads site frames there
    against sensors here. Either the modes get ported or the arena learns to run the warp
    env natively; until then "does it box" is answered by probe numbers, not by fights.
-3. **Nobody has ever run out a clock.** `end_fell` is 1.00 across the arm: every round
-   ends with someone down. Until a round survives its 480 steps, "stays on its feet" is
-   unproven no matter how low the floor fraction reads.
+3. **~~Nobody has ever run out a clock.~~ Answered by warp5.** `end_fell` fell from 1.00 to
+   0.58 over its own run: 42% of rounds now end because the 480 steps ran out. In the
+   deterministic probe a round lasts 476 of 480 steps and only 12% of closures are falls.
 4. **Head versus torso is not measured.** `punch_value` sums the scorecard's weights
    (1.0 and 0.5), so the log cannot say whether the punches that land are head shots or
    body shots -- and the null that started this whole migration was *0.000 to the head*.
    The scorecard already knows which surface was hit; the metric just does not carry it.
 5. **The imitation channel is still a null** (0.0007-0.0023 across three arms). Either it
    fires in a run that actually punches, or it comes out.
-6. **The policy's scale is creeping.** 0.70 to 1.57 across warp4 against a 2.0 ceiling.
+6. **The policy's scale is creeping.** 0.70 to 1.63 across warp4 against a 2.0 ceiling.
    A run that touches the ceiling has its hit counts back in tanh-saturated noise, which
-   is exactly the failure mode warp1 taught me to read.
+   is exactly the failure mode warp1 taught me to read. warp5's was not monotone -- it
+   rose to 1.36, fell back to 1.18 mid-run and ended at 1.58 -- so the ceiling is still the
+   thing to watch on any arm longer than this.
+7. **The behaviour is a clinch, not a jab.** warp5 parks at 0.52-0.56 m with its arms
+   crossed on the opponent's chest, and the render reads as sustained grappling at arm
+   length. The reward does not object: the clinch penalty only starts below `punch_reach`
+   (0.45 m), so leaning in at 0.52 m is free, and a punch that scores is worth 10 while the
+   whole dense budget of a round is worth about 3.8. The open measurement is whether
+   pushing the corners apart (or pricing the lean) converts the pressure into punches
+   through, rather than into falls.
 
 
 ## Why this robot model
