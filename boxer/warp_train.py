@@ -356,6 +356,10 @@ def main(argv=None) -> int:
         floor_mean = np.zeros(2)
         both_up_mean = 0.0
         rounds_mean = fell_mean = ring_mean = far_mean = 0.0
+        # per corner: head, torso, body hits and attempts -- the punch structure the
+        # weighted hit value alone cannot express
+        punch_stat = np.zeros((2, 4))
+        home_mean = 0.0
         flat_obs = obs.reshape(rows, env.obs_size)
         for t in range(t_it):
             key, sub = jax.random.split(key)
@@ -380,6 +384,13 @@ def main(argv=None) -> int:
             fell_mean += float(np.sum(parts["fell"]))
             ring_mean += float(np.sum(parts["left_ring"]))
             far_mean += float(np.sum(parts["too_far"]))
+            for k in (0, 1):
+                landed = parts["scored_by"][:, k]
+                punch_stat[k, 0] += np.count_nonzero(landed >= 0.999)
+                punch_stat[k, 1] += np.count_nonzero((landed >= 0.499) & (landed < 0.999))
+                punch_stat[k, 2] += np.count_nonzero((landed > 0.0) & (landed < 0.499))
+                punch_stat[k, 3] += float(np.sum(parts["attempts"][:, k]))
+            home_mean += float(np.mean(parts["at_home"]))
             flat_obs = obs.reshape(rows, env.obs_size)
             step += rows
         terminal_obs = flat_obs.copy()
@@ -446,12 +457,27 @@ def main(argv=None) -> int:
             "end_fell": fell_mean / max(rounds_mean, 1.0),
             "end_ring": ring_mean / max(rounds_mean, 1.0),
             "end_far": far_mean / max(rounds_mean, 1.0),
+            # per world-round: what landed where, how many swings it cost, and how
+            # often the fist was back at its guard. "0.000 to the head" is the
+            # measurement this whole stack was rebuilt to be able to make.
+            "head_r": punch_stat[0, 0] / max(rounds_mean, 1.0),
+            "torso_r": punch_stat[0, 1] / max(rounds_mean, 1.0),
+            "body_r": punch_stat[0, 2] / max(rounds_mean, 1.0),
+            "head_b": punch_stat[1, 0] / max(rounds_mean, 1.0),
+            "torso_b": punch_stat[1, 1] / max(rounds_mean, 1.0),
+            "body_b": punch_stat[1, 2] / max(rounds_mean, 1.0),
+            "attempts_r": punch_stat[0, 3] / max(rounds_mean, 1.0),
+            "attempts_b": punch_stat[1, 3] / max(rounds_mean, 1.0),
+            "accuracy_r": punch_stat[0, :3].sum() / max(punch_stat[0, 3], 1.0),
+            "at_home": home_mean / t_it,
             **{k: float(jp.asarray(v)) for k, v in metrics.items()},
         }
         with progress_log.open("a") as sink:
             sink.write(json.dumps(record) + "\n")
         print(f"[{step:>12,}] it {iteration:>4} {sps:>9,.0f} learner/s  "
               f"punch r/b {record['punch_value_red']:.2f}/{record['punch_value_blue']:.2f}  "
+              f"head {record['head_r']:.2f}/{record['head_b']:.2f} "
+              f"acc {record['accuracy_r']:.2f} home {record['at_home']:.2f}  "
               f"dist {dist_mean / t_it:.3f} m  "
               f"floor {record['down_red']:.2f}/{record['down_blue']:.2f} "
               f"up{record['both_up']:.2f} "

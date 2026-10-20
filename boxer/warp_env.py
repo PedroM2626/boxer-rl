@@ -127,6 +127,7 @@ class WarpBoxing:
                  w_facing: float = 0.2, w_hit: float = 10.0,
                  w_clinch: float = 0.5, w_energy: float = 0.05,
                  w_ring: float = 1.0, w_alive: float = 0.2, w_ko: float = 3.0,
+                 w_attempt: float = 0.5, retract_radius: float = 0.25,
                  imitation_path: str | None = None, w_imit: float = 0.3,
                  imit_sigma: float = 0.6, imit_speed_ref: float = 5.0):
         self.nworld, self.n_frames = nworld, n_frames
@@ -147,7 +148,13 @@ class WarpBoxing:
         self._imit_sigma, self._imit_speed_ref = imit_sigma, imit_speed_ref
         self._w = dict(upright=w_upright, range=w_range, facing=w_facing,
                        hit=w_hit, clinch=w_clinch, energy=w_energy, ring=w_ring,
-                       alive=w_alive, ko=w_ko, imit=w_imit)
+                       alive=w_alive, ko=w_ko, attempt=w_attempt, imit=w_imit)
+        # A fist this close to its guard spot counts as home, which is what
+        # re-arms it (see _reward). Measured against the palm's own torso-frame
+        # target, not against the torso site at body centre: env.py's retraction
+        # gate used the latter and a fist resting on the opponent read as 0.16 m
+        # retracted, which is why that gate was decoration.
+        self._retract_radius = retract_radius
 
         self._model = scene.build_model(spawn_distance=spawn_distance, visual=False)
         self._qpos0, self._ctrl0 = scene.stance(self._model, guard_pose)
@@ -255,6 +262,11 @@ class WarpBoxing:
 
         self._steps = np.zeros(nworld, dtype=np.int64)
         self._steps_off = np.full((nworld, 2), rearm_steps, dtype=np.int64)
+        # Per world and corner: has the fist come home since it last touched the
+        # opponent, and was the last step already a committed swing (the attempt
+        # is a rising edge, so one jab is one attempt and a vibrating fist is many).
+        self._came_back = np.ones((nworld, 2), dtype=bool)
+        self._was_committed = np.zeros((nworld, 2), dtype=bool)
         self._last_action = np.zeros((nworld, 2, self.action_size))
         # reset(seed) reseeds it; step() draws the per-world respawns from it.
         self._rng = np.random.default_rng(0)
@@ -344,6 +356,8 @@ class WarpBoxing:
         mjwarp.forward(self._m, self._d)  # sensors must reflect the jittered pose
         self._steps[rows] = 0
         self._steps_off[rows] = self._rearm_steps  # both spawn apart: start armed
+        self._came_back[rows] = True   # they spawn in the guard, so the fist is home
+        self._was_committed[rows] = False
         self._last_action[rows] = 0.0
         return self._observe(self._d.sensordata.numpy())[rows]
 
@@ -448,6 +462,53 @@ class WarpBoxing:
                    for f in frames]
         separation = np.linalg.norm(red["torso"] - blue["torso"], axis=1)
         rewards, parts = np.zeros((self.nworld, 2)), {}
+        # Punch bookkeeping for BOTH corners, before the reward loop: damage taken
+        # is paced by the opponent's window, so a corner's armed state has to exist
+        # before either corner's reward is written.
+        armed = np.zeros((self.nworld, 2), dtype=bool)
+        attempts = np.zeros((self.nworld, 2))
+        at_home = np.zeros((self.nworld, 2))
+        for i, (me, foe) in enumerate(((red, blue), (blue, red))):
+            quat = me["quat"]
+            offset = foe["torso"] - me["torso"]
+            distance = np.linalg.norm(offset, axis=1)
+            direction = offset / (distance[:, None] + 1e-6)
+            # The fist closing on the opponent, contact buffer or not. This is the
+            # attempt -- the denominator RoboStriker's hit rate carries and a raw
+            # event count does not, which is why an arm mill is free to score here
+            # and expensive in the paper. Counted on the rising edge, so one jab is
+            # one attempt and a fist vibrating across the threshold is many.
+            closing = np.maximum(np.sum(me["left_palm_vel"] * direction, axis=1),
+                                 np.sum(me["right_palm_vel"] * direction, axis=1))
+            committed = closing >= self._punch_speed_min
+            attempts[:, i] = committed & ~self._was_committed[:, i]
+            # Hysteresis: a swing is one attempt, not one per step of its vibration.
+            # Without the release level the closing speed flickers across the
+            # threshold and the scripted jab measured 51 attempts in ~4 swings,
+            # which would charge a real punch like a mill.
+            still = closing >= 0.5 * self._punch_speed_min
+            self._was_committed[:, i] = still & (committed | self._was_committed[:, i])
+            # Has the fist come back to its own guard spot since it last touched the
+            # opponent. Without this the rearm window only asks for 20 steps of no
+            # contact, so a fist that flickers off and back onto a chest scores
+            # again without ever returning -- which is the mill, unscored as such.
+            palms = np.stack([quat_inv_rotate(quat, me["left_palm"] - me["torso"]),
+                              quat_inv_rotate(quat, me["right_palm"] - me["torso"])],
+                             axis=1)
+            at_home[:, i] = np.linalg.norm(
+                palms - self._guard[i][None, :, :], axis=2).max(axis=1)
+            home = at_home[:, i] <= self._retract_radius
+            touched = hit[:, i] > 0.0
+            # Order matters: armed reads the flag as of the PREVIOUS step, and only
+            # then does this step's contact clear it. Computed the other way round,
+            # the step that touches marks the fist away from guard before asking
+            # whether it may score, and no hit can ever be armed (measured: raw
+            # contact 0.50, scored 0.00, with the gate open).
+            armed[:, i] = ((self._steps_off[:, i] >= self._rearm_steps)
+                           & self._came_back[:, i])
+            self._came_back[:, i] = np.where(touched, False,
+                                             np.where(home, True, self._came_back[:, i]))
+        scored_by = np.where(armed, hit, 0.0)  # what each corner landed, armed or not
         for i, (me, foe) in enumerate(((red, blue), (blue, red))):
             quat = me["quat"]
             upright = quat_rotate(quat, WORLD_UP[None, :])[:, 2]
@@ -479,10 +540,8 @@ class WarpBoxing:
             ring = np.clip(centre - 0.75 * scene.RING_RADIUS, 0.0, 10.0)
             # env.py: a hit scores only when this boxer is armed, and damage
             # taken is paced by the FOE's rearm window, not one's own.
-            armed = self._steps_off[:, i] >= self._rearm_steps
-            foe_armed = self._steps_off[:, 1 - i] >= self._rearm_steps
-            scored = np.where(armed, hit[:, i], 0.0)
-            taken = np.where(foe_armed, hit[:, 1 - i], 0.0)
+            scored = np.where(armed[:, i], hit[:, i], 0.0)
+            taken = np.where(armed[:, 1 - i], hit[:, 1 - i], 0.0)
             # env.py:160/672 and 837-842 -- the two channels the v0 port dropped,
             # and the reason three warp arms treated a round as free time on the
             # floor. Being up pays on its own; the knockdown is zero-sum, so the
@@ -500,6 +559,7 @@ class WarpBoxing:
                              + w["range"] * in_range * engaged
                              + w["facing"] * facing * engaged
                              + w["hit"] * (scored - taken)
+                             - w["attempt"] * attempts[:, i]
                              - w["clinch"] * clinch * engaged
                              - w["energy"] * np.mean(actions[:, i, :] ** 2, axis=1)
                              - w["ring"] * ring)
@@ -529,6 +589,14 @@ class WarpBoxing:
                              # "walked away" from "fell over and got gated off"
                              on_floor=np.stack(downs, axis=1).astype(np.float32),
                              alive=alive, ko=ko,
+                             # both corners, because the punch channel is the one
+                             # question the log cannot ask of one side alone: the
+                             # hit value carries the target's weight (1.0 head, 0.5
+                             # torso, 0.35 pelvis/hip/thigh), so the surface split,
+                             # the attempts that produced it and the fist's distance
+                             # from its own guard all come out per corner.
+                             scored_by=scored_by, attempts=attempts,
+                             at_home=at_home,
                              # metric only, no reward attached yet: how often red is
                              # inside punching distance of a DOWN blue -- the state
                              # the range term pays without any punch being thrown
@@ -696,7 +764,7 @@ if __name__ == "__main__":
             action[:, 1, column(blue_ids, f"blue/{half}_{joint}_joint")] = \
                 amp(blue_ids, f"blue/{half}_{joint}_joint", 0.0)
 
-    hits, jab_ends, jab_floor = 0.0, 0, 0.0
+    hits, jab_ends, jab_floor, jab_att = 0.0, 0, 0.0, 0.0
     for step in range(110):
         punch = max(0.0, np.sin(2.0 * np.pi * step / 30.0)) ** 2
         action[:, 0, column(red_ids, "red/left_shoulder_pitch_joint")] = jab_pitch * punch
@@ -705,10 +773,46 @@ if __name__ == "__main__":
         hits = max(hits, float(parts["hit"].max()))
         jab_ends += int(done.any())
         jab_floor = max(jab_floor, float(parts["on_floor"].max()))
+        jab_att += float(parts["attempts"][:, 0].sum())
     print(f"scripted jab over 110 steps: peak hit value {hits:.2f} "
           f"(force threshold {jab_env._force_threshold:.0f} N), rounds closed "
-          f"{jab_ends}, on-floor seen {jab_floor:.0f}")
+          f"{jab_ends}, on-floor seen {jab_floor:.0f}, attempts {jab_att:.0f}")
     assert np.isfinite(obs).all() and hits > 0.0, "self-check failed"
+    assert jab_att > 0.0, "a full-speed swing registered no attempt"
+
+    # The re-arm gate asks for the fist to come HOME, not merely for the contact to
+    # break. Same gesture twice from the same spawn: armed, it must score; denied its
+    # "came back" flag, the raw hit must still happen and score nothing.
+    action[:, 0, column(red_ids, "red/left_shoulder_pitch_joint")] = jab_pitch
+    action[:, 0, column(red_ids, "red/left_elbow_joint")] = jab_elbow
+
+    def jab_window(deny):
+        """The proven 110-step profile twice, from the same spawn: once armed, once
+        with the fist denied its return to guard. The window has to be as long as the
+        profile that scored -- a 30-step window sees no contact at all, which is itself
+        worth knowing: the scripted jab lands late, not on the first swing."""
+        jab_env.reset(0)
+        scored_max = hit_max = 0.0
+        for step in range(110):
+            punch = max(0.0, np.sin(2.0 * np.pi * step / 30.0)) ** 2
+            action[:, 0, column(red_ids, "red/left_shoulder_pitch_joint")] = \
+                jab_pitch * punch
+            action[:, 0, column(red_ids, "red/left_elbow_joint")] = jab_elbow * punch
+            if deny:
+                jab_env._came_back[:, 0] = False   # the fist never returned
+            obs, reward, done, parts = jab_env.step(action)
+            scored_max = max(scored_max, float(parts["scored_by"][:, 0].max()))
+            hit_max = max(hit_max, float(parts["hit"].max()))
+        return scored_max, hit_max
+
+    scored_ok, hit_ref = jab_window(False)
+    scored_denied, hit_denied = jab_window(True)
+    print(f"re-arm gate: same jab scores {scored_ok:.2f} armed and "
+          f"{scored_denied:.2f} denied, with raw contact {hit_ref:.2f} / "
+          f"{hit_denied:.2f} under both (guard radius "
+          f"{jab_env._retract_radius:.2f} m)")
+    assert hit_ref > 0.0 and scored_ok > 0.0, "the scripted jab stopped scoring at all"
+    assert scored_denied == 0.0 and hit_denied > 0.0, "the re-arm gate is not biting"
 
     # Imitation channel: drive the arm the targets name along the retargeted
     # strike poses and the shaped term must light up. Skipped when no targets
