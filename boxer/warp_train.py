@@ -224,6 +224,12 @@ def _parse_args(argv=None):
     env_g.add_argument("--round-steps", type=int, default=480,
                        help="cap on control steps per round; rounds also close "
                             "early on a knockdown, out of ring, or separation")
+    env_g.add_argument("--damage-cap", type=float, default=3.0,
+                       help="damage that puts a corner out; warp6's best round lands "
+                            "3.55, so anything above ~4 makes the knockout dormant "
+                            "and only the stun would be in effect")
+    env_g.add_argument("--stun-steps", type=int, default=10,
+                       help="control steps a clean hit stuns its victim out of scoring")
     env_g.add_argument("--imitation", type=Path, default=None,
                        help="runs/reference/jab_targets.json from "
                             "tools/retarget_dense.py; absent = pure RL, no shaping")
@@ -287,6 +293,7 @@ def main(argv=None) -> int:
                      spawn_distance=args.spawn_distance,
                      action_scale=args.action_scale,
                      round_steps=args.round_steps,
+                     damage_cap=args.damage_cap, stun_steps=args.stun_steps,
                      imitation_path=str(args.imitation) if args.imitation else None,
                      w_imit=args.w_imit)
     policy = MLP(tuple(args.policy_layers), 2 * env.action_size)
@@ -310,6 +317,7 @@ def main(argv=None) -> int:
         "obs_size": env.obs_size, "round_steps": args.round_steps,
         "n_frames": args.n_frames, "spawn_distance": args.spawn_distance,
         "action_scale": args.action_scale,
+        "damage_cap": args.damage_cap, "stun_steps": args.stun_steps,
         "imitation": {"path": str(args.imitation) if args.imitation else None,
                       "w_imit": args.w_imit},
         "policy_layers": list(args.policy_layers),

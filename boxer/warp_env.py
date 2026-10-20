@@ -141,7 +141,7 @@ class WarpBoxing:
                  rearm_steps: int = 20, round_steps: int = 500,
                  down_up_z: float = 0.70, down_head_z: float = 0.85,
                  punch_speed_min: float = 1.0,
-                 damage_cap: float = 5.0, stun_steps: int = 10,
+                 damage_cap: float = 3.0, stun_steps: int = 10,
                  w_upright: float = 0.8, w_range: float = 0.15,
                  w_facing: float = 0.2, w_hit: float = 10.0,
                  w_clinch: float = 0.5, w_energy: float = 0.05,
@@ -165,13 +165,17 @@ class WarpBoxing:
         self._down_up_z, self._down_head_z = down_up_z, down_head_z
         self._punch_speed_min = punch_speed_min
         # Damage is the weight of every clean hit absorbed (head 1.0, torso 0.5,
-        # body 0.35), so `damage_cap` 5.0 is five head shots or ten to the body.
-        # The reason it exists is warp6's arithmetic: a swing that lands 37% of the
-        # time returns +1.81 against a 0.5 charge, so hitting is always profitable
-        # and the hit channel is symmetric and instantaneous -- a punch changes the
-        # score, never the fight. Accumulated damage is the state that makes an
-        # early punch compound into a later advantage, and the stun window is what
-        # makes being hit cost more than the points it gives away.
+        # body 0.35). The cap has to sit BELOW what a good round can deliver or the
+        # knockout never fires: warp6's final rounds land 7.1 torso contacts, which
+        # is 3.55 damage, so a cap of 5.0 -- the first number I wrote here -- made
+        # the whole mechanism dormant and only the stun would have been in effect.
+        # 3.0 is six torso shots or three to the head, reachable inside a long round.
+        # The reason it exists at all is warp6's arithmetic: a swing that lands 37%
+        # of the time returns +1.81 against a 0.5 charge, so hitting is always
+        # profitable and the hit channel is symmetric and instantaneous -- a punch
+        # changes the score, never the fight. Accumulated damage is the state that
+        # makes an early punch compound into a later advantage, and the stun window
+        # is what makes being hit cost more than the points it gives away.
         self._damage_cap, self._stun_steps = damage_cap, stun_steps
         self._imit_sigma, self._imit_speed_ref = imit_sigma, imit_speed_ref
         self._w = dict(upright=w_upright, range=w_range, facing=w_facing,
@@ -803,7 +807,7 @@ if __name__ == "__main__":
     env.reset(0)
     sensors_now = env._d.sensordata.numpy()
     ko_done, ko_parts = None, None
-    for _ in range(5):
+    for _ in range(int(round(env._damage_cap))):
         # Re-arm both corners by hand: the first hit spends red's rearm window and
         # marks its fist away from guard, and this test is about damage, stun and
         # the knockout, not about the window those are separate assertions for.
@@ -812,11 +816,11 @@ if __name__ == "__main__":
         landed = np.zeros((env.nworld, 2), np.float32)
         landed[:, 0] = 1.0                       # red lands a clean head-value hit
         _r, ko_done, ko_parts = env._reward(zero, landed, sensors_now)
-    assert np.allclose(env._damage[:, 1], 5.0), env._damage[:, 1]
-    assert bool(ko_parts["judged_out"].all()), "five clean hits did not end the fight"
+    assert np.allclose(env._damage[:, 1], env._damage_cap), env._damage[:, 1]
+    assert bool(ko_parts["judged_out"].all()), "clean hits did not end the fight"
     assert bool(ko_done.all()), "a knockout did not close the round"
     assert ko_parts["stun"][:, 1].all(), "the victim was not stunned by a clean hit"
-    print(f"health: 5 clean hits put blue out (damage "
+    print(f"health: {int(round(env._damage_cap))} clean hits put blue out (damage "
           f"{env._damage[:, 1].mean():.1f}/{env._damage_cap:.1f}), stun "
           f"{env._stun[:, 1].mean():.0f} steps, round closed as a knockout")
 

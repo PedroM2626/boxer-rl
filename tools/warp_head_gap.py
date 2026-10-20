@@ -112,11 +112,19 @@ def main(argv=None) -> int:
     print(f"  scoring events: head {hits['head']:.0f}, torso {hits['torso']:.0f}, "
           f"body {hits['body']:.0f} -> head is "
           f"{100 * hits['head'] / max(tot, 1):.2f}% of landed punches")
-    verdict = ("REACH: the fist never enters touching range of the head"
-               if reach["head"] / both < 0.001 and gh.min() > 2 * CONTACT_RANGE
-               else "AIM: the fist gets there but does not hit, or hits and does not "
-                    "score")
-    print(f"  reading: {verdict}")
+    inside, landed = reach["head"], sum(hits.values())
+    print(f"  reading: the fist enters touching range of the head on {inside} of "
+          f"{both} corner-steps and converts {hits['head']:.0f} of {landed:.0f} "
+          f"scoring events there")
+    if inside == 0:
+        print("    -> REACH: at the distance the reward pays, the head is never in "
+              "range; no incentive fixes that, the band or the pose has to change")
+    elif hits["head"] == 0:
+        print("    -> AIM: the elevation is available and unexploited -- the policy "
+              "keeps its fists at torso height and never buys the +0.32 m")
+    else:
+        print("    -> neither: the head is reached and scored; the rate is the "
+              "question, not the possibility")
     return 0
 
 
