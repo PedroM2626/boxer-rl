@@ -4,6 +4,10 @@ set -euo pipefail
 project_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$project_dir"
 if [[ "${1:-}" == "--background" ]]; then
+  if [[ -n "${WSL_INTEROP:-}" ]]; then
+    printf '%s\n' 'Use tools/start_skills_200m.ps1 from PowerShell to keep the WSL host alive.' >&2
+    exit 2
+  fi
   shift
   mkdir -p runs
   nohup bash "$project_dir/tools/run_skills_200m.sh" "$@" \

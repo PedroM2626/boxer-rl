@@ -1,6 +1,6 @@
 # Assisted boxing: 200M continuation
 
-Status: **prepared**. Updated: 2026-10-21T16:47:51.763336+00:00.
+Status: **running**. Updated: 2026-10-21T16:50:10.888112+00:00.
 
 Requested budget: 200,000,000 learner transitions total, including the 2,109,440-transition seed. A world step counts twice.
 

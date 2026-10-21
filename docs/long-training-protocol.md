@@ -32,16 +32,30 @@ This is an estimate from local measurements, not a completion guarantee.
 
 ## Run, inspect, stop and resume
 
-Run inside Linux/WSL2 from the repository root, after installing
-`requirements-warp.txt` in the Warp environment:
+Install `requirements-warp.txt` in the Warp environment. On Windows, start
+from PowerShell in the repository root:
+
+```powershell
+.\tools\start_skills_200m.ps1 -Publish
+```
+
+This launches a hidden, persistent Windows WSL host. A detached Linux shell
+alone did not survive the WSL command's exit in this setup, so the wrapper
+keeps the supervisor in the foreground of its own Windows host process.
+`runs/skills_200m_host.json` records that host's PID and start time. The Linux
+PID and live training phase are recorded separately in `job_state.json`.
+
+Inside native Linux, or an already persistent WSL host, inspect the plan and
+run the supervisor:
 
 ```bash
 bash tools/run_skills_200m.sh --plan-only
-bash tools/run_skills_200m.sh --background --publish
+bash tools/run_skills_200m.sh --publish
 ```
 
 `BOXER_PYTHON` overrides the default `$HOME/venvs/warp_test/bin/python`.
-Without `--background`, the supervisor runs in the foreground. Without
+Native Linux also supports `--background`; WSL requires the Windows wrapper
+for detached execution. Without
 `--publish`, it does not commit or push. On this Windows/WSL setup the wrapper
 uses Git for Windows and its configured SSH alias to access the remote.
 On Linux, use `--git-executable`, `--git-worktree` and `--branch` if needed.
@@ -125,3 +139,14 @@ Two real GPU resumes were also completed in the ignored
 `runs/skills_resume_smoke` experiment: 2,109,440 -> 2,150,400 -> 2,170,880.
 The new checkpoint checksum and saved random key were verified. The long run
 starts from the preserved 2,109,440 seed, not from this temporary validation run.
+
+A real 16-round, corner-swapped integration evaluation caught an initially
+unpaired signed-margin field. Both corner margins are now reported, and a
+regression test verifies their signs and point-win attribution after pooling.
+The five learner/arena unit tests passed after the correction. The successful
+[preflight evaluation](results/skills_200m/preflight_seed_eval.json) verifies
+that judged outcomes add to one and swapped margins remain negatives of each
+other. This is an integration check, not evidence of improvement from training.
+
+The Windows host wrapper was validated by observing a persistent Windows WSL
+process, an active Linux supervisor/learner and increasing progress records.

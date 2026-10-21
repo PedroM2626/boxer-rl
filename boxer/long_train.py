@@ -113,7 +113,7 @@ def write_report(state):
              "automatically called the best. Points readings settle standing timeouts "
              "using legal punch value; the original KO/fall win readings are retained.", "",
              "| Requested milestone | Actual checkpoint | Self-play hits A / B | "
-             "Self-play head hits A / B | Win with points vs seed |", 
+             "Self-play head hits A / B | Win with points vs seed |",
              "| --- | --- | --- | --- | --- |"]
     for stage in state.get("completed", []):
         self_results = [r["results"] for r in stage["evaluations"] if r["kind"] == "self"]

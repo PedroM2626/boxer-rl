@@ -65,3 +65,16 @@ def test_points_reading_settles_only_standing_timeouts():
     assert a_judged.tolist() == [True, False, True]
     assert b_judged.tolist() == [False, True, False]
     assert not draw.any()
+
+
+def test_corner_pooling_preserves_signed_margins_and_points_wins():
+    from boxer.warp_arena import pool
+    forward = dict(rounds=10, a_punch_value_margin=2., b_punch_value_margin=-2.,
+                   a_win_with_points=.7, b_win_with_points=.3)
+    reverse = dict(rounds=10, a_punch_value_margin=1., b_punch_value_margin=-1.,
+                   a_win_with_points=.6, b_win_with_points=.4)
+    result = pool(forward, reverse)
+    assert result["a_punch_value_margin"] == pytest.approx(.5)
+    assert result["b_punch_value_margin"] == pytest.approx(-.5)
+    assert result["a_win_with_points"] == pytest.approx(.55)
+    assert result["a_win_with_points"] + result["b_win_with_points"] == pytest.approx(1)
