@@ -106,6 +106,19 @@ def outcomes(done: np.ndarray, out_by: np.ndarray):
             ~red_out & ~blue_out)
 
 
+def points_decisions(done, out_by, damage, timed_out):
+    """Additional judges' readings for standing timeouts; original wins stay intact."""
+    world, _, end = round_bounds(done)
+    a_win, b_win, draw, undecided = outcomes(done, out_by)
+    eligible = undecided & (timed_out[end, world] > .5)
+    # Damage absorbed by B is the punch value landed by A, and vice versa.
+    margin = damage[end, world, 1] - damage[end, world, 0]
+    a_points = eligible & (margin > 1e-6)
+    b_points = eligible & (margin < -1e-6)
+    tied = eligible & ~(a_points | b_points)
+    return a_points, b_points, a_win | a_points, b_win | b_points, draw | tied
+
+
 def play(env: WarpBoxing, policy_a, policy_b, steps: int,
          seed: int = 0, long_steps: int = LONG_DEFAULT) -> dict[str, float]:
     """Rolls ``steps`` control steps of ``env.nworld`` parallel rounds, A as red.
@@ -139,6 +152,8 @@ def play(env: WarpBoxing, policy_a, policy_b, steps: int,
 
     world, start, end = round_bounds(log["done"])
     a_win, b_win, draw, undecided = outcomes(log["done"], log["out_by"])
+    a_points, b_points, a_judged, b_judged, drawn_judged = points_decisions(
+        log["done"], log["out_by"], log["damage"], log["timed_out"])
     scored = log["scored"].astype(np.float64)
     totals = {
         "punch": per_round(scored, world, start, end),
@@ -195,6 +210,10 @@ def play(env: WarpBoxing, policy_a, policy_b, steps: int,
     return {
         "a_win": mean(a_win), "b_win": mean(b_win),
         "draw": mean(draw), "undecided": mean(undecided),
+        "a_win_points": mean(a_points), "b_win_points": mean(b_points),
+        "a_win_with_points": mean(a_judged), "b_win_with_points": mean(b_judged),
+        "draw_with_points": mean(drawn_judged),
+        "undecided_with_points": mean(~(a_judged | b_judged | drawn_judged)),
         "a_win_ko": mean(a_win & knocked_out[:, 1]),
         "a_win_down": mean(a_win & ~knocked_out[:, 1]),
         "b_win_ko": mean(b_win & knocked_out[:, 0]),
@@ -223,6 +242,7 @@ def play(env: WarpBoxing, policy_a, policy_b, steps: int,
         # body 0.35). It is a value, not a count of punches -- see head/torso/body.
         "a_punch_value": mean(totals["punch"][:, 0]),
         "b_punch_value": mean(totals["punch"][:, 1]),
+        "a_punch_value_margin": mean(totals["punch"][:, 0] - totals["punch"][:, 1]),
         "a_head": mean(totals["head"][:, 0]), "a_torso": mean(totals["torso"][:, 0]),
         "a_body": mean(totals["body"][:, 0]),
         "b_head": mean(totals["head"][:, 1]), "b_torso": mean(totals["torso"][:, 1]),
@@ -468,13 +488,17 @@ def main(argv=None) -> int:
               flush=True)
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
+        # Empty subsets (for example, no long rounds) have undefined means,
+        # represented by JSON null rather than the non-standard NaN token.
+        serializable = {k: None if isinstance(v, float) and not np.isfinite(v) else v
+                        for k, v in result.items()}
         args.output.write_text(json.dumps(dict(
             environment=runs[0][1].get("environment", "direct"),
             balance_assistance=runs[0][1].get("balance_assistance", False),
             policy_a=args.policy_a, policy_b=args.policy_b,
             geometry=built, worlds=env.nworld, steps=steps, seed=args.seed,
             stochastic=args.stochastic, swapped=not args.no_swap,
-            results=result), indent=2) + "\n")
+            results=serializable), indent=2, allow_nan=False) + "\n")
     return 0
 
 

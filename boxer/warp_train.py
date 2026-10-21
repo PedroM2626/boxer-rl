@@ -52,6 +52,7 @@ import optax
 
 from boxer.warp_env import WarpBoxing
 from boxer.warp_config import make_env
+from boxer.checkpoint_io import atomic_json, load_checkpoint, require_finite, save_checkpoint
 
 if jax.devices()[0].platform != "cpu":
     raise SystemExit(
@@ -504,6 +505,9 @@ def main(argv=None) -> int:
         "guard_pose": "boxing" if args.environment == "skills" else "natural",
         "balance_assistance": args.environment == "skills",
         "skill_prior": args.environment == "skills" and args.skill_prior,
+        "seed": args.seed,
+        "target_learner_steps": args.total_steps,
+        "checkpoint_interval_iterations": args.save_every,
         "worlds": args.worlds, "action_size": env.action_size,
         "obs_size": env.obs_size, "round_steps": args.round_steps,
         "n_frames": args.n_frames, "spawn_distance": args.spawn_distance,
@@ -527,15 +531,13 @@ def main(argv=None) -> int:
         previous = json.loads(config_path.read_text())
         keys = ("environment", "guard_pose", "action_size", "obs_size", "n_frames",
                 "spawn_distance", "action_scale", "round_steps", "damage_cap",
-                "stun_steps", "policy_layers", "value_layers")
+                "stun_steps", "policy_layers", "value_layers", "mode", "seed", "ppo")
         defaults = {"environment": "direct", "guard_pose": "natural"}
         mismatch = {k: (previous.get(k, defaults.get(k)), config[k])
                     for k in keys if (k in previous or k in defaults)
                     and previous.get(k, defaults.get(k)) != config[k]}
         if mismatch:
             raise SystemExit(f"--resume settings differ (recorded, requested): {mismatch}")
-    config_path.write_text(json.dumps(config, indent=2) + "\n")
-
     ckpt_dir = args.output / "checkpoint"
     latest = ckpt_dir / "latest.txt"
     step = 0
@@ -543,14 +545,22 @@ def main(argv=None) -> int:
     if args.resume:
         if not latest.exists():
             raise SystemExit(f"--resume: no {latest} under {ckpt_dir}")
-        path = ckpt_dir / f"step-{latest.read_text().strip()}.pkl"
-        params_p, params_v, opt_state, norm_state, step = pickle.loads(
-            path.read_bytes())
+        payload, saved_state = load_checkpoint(ckpt_dir)
+        params_p, params_v, opt_state, norm_state, step = payload
+        path = ckpt_dir / f"step-{step}.pkl"
         norm.load(norm_state)
+        if "rng_key" in saved_state:
+            key = jp.asarray(saved_state["rng_key"], dtype=jp.uint32)
+        else:
+            # Legacy checkpoints did not save a sampling key. Avoid replaying
+            # the beginning of the original random stream on every restart.
+            key = jax.random.fold_in(key, step)
         resumed = True
         print(f"resumed {path} at {step:,} learner steps", flush=True)
     if not resumed:
         opt_state = tx.init((params_p, params_v))
+    config["resume_from_step"] = int(step)
+    atomic_json(config_path, config)
 
     obs = env.reset(seed=args.seed)
     progress_log = args.output / "progress.jsonl"
@@ -643,6 +653,8 @@ def main(argv=None) -> int:
             flat_obs = learner_obs(obs)
             step += rows
         terminal_obs = flat_obs.copy()
+        require_finite(observations=obs_buf, rewards=rew_buf, actions=raw_buf,
+                       behavior_log_probabilities=logp_buf)
 
         # No round clock here any more: WarpBoxing.step respawns the worlds that
         # closed a round and hands back their first observation, with done=1 so
@@ -672,6 +684,7 @@ def main(argv=None) -> int:
                 params_p, params_v, opt_state, metrics = update(
                     params_p, params_v, opt_state, batch)
 
+        require_finite(**{k: np.asarray(v) for k, v in metrics.items()})
         norm.update(obs_buf.reshape(-1, env.obs_size))
 
         now = time.time()
@@ -747,13 +760,11 @@ def main(argv=None) -> int:
 
         if iteration % args.save_every == 0 or iteration == total_iterations:
             ckpt_dir.mkdir(parents=True, exist_ok=True)
-            path = ckpt_dir / f"step-{step}.pkl"
             blob = (jax.tree.map(np.asarray, params_p),
                     jax.tree.map(np.asarray, params_v),
                     jax.tree.map(np.asarray, opt_state),
                     norm.state(), int(step))
-            path.write_bytes(pickle.dumps(blob))
-            (ckpt_dir / "latest.txt").write_text(str(step))
+            path = save_checkpoint(ckpt_dir, blob, key)
             print(f"checkpoint -> {path}", flush=True)
 
     print(f"done: {step:,} learner steps, checkpoint at {ckpt_dir}", flush=True)

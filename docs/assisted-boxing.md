@@ -48,7 +48,9 @@ before the impact, since a clean impact can stop the fist within that substep.
 The original retraction, rearming, damage and stun rules remain in use. Head
 hits are worth 1.0, torso hits 0.5. The final training run uses a damage cap of
 6.0 and a 12 s round clock. Timeouts with both corners standing are reported
-as undecided by the arena; there is no points-decision judge yet.
+as undecided by the original arena win columns. The long-run evaluator adds
+separate points-decision readings, without changing the training reward or
+overwriting those historical outcome columns.
 
 The assisted curriculum reduces the dense posture income and adds four reward
 units per clean hit value to the existing competitive hit reward. It also

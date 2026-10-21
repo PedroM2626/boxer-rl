@@ -2,6 +2,13 @@
 
 ## Assisted boxing: the runnable sparring path
 
+The next experiment continues the pinned 2.11M seed to **200M total learner
+transitions**, with checkpoints, evaluation and video at 10M, 25M, 50M, 100M,
+150M and 200M. It runs to the planned budget through short-term plateaus.
+[Protocol and operations](docs/long-training-protocol.md) explain background
+execution, recovery and automatic commits/pushes; the
+[live published experiment report](docs/skills-200m.md) tracks completed milestones.
+
 The `skills` environment adds a hierarchical controller: a shared PPO policy
 chooses punches, head/body aim, advance, circle and guard for both G1 boxers.
 The motor controller executes complete extension/retraction cycles. Hits require

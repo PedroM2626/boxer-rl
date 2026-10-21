@@ -45,3 +45,23 @@ def test_numpy_inference_matches_flax_and_sampling_has_its_own_seed():
     b = numpy_forward(cfg, params, norm, stochastic=True, seed=9)
     np.testing.assert_array_equal(a(obs), b(obs))
     assert not np.array_equal(a(obs), b(obs + .1))
+
+
+def test_points_reading_settles_only_standing_timeouts():
+    from boxer.warp_arena import outcomes, points_decisions
+    done = np.zeros((4, 3))
+    done[-1] = 1
+    out = np.zeros((4, 3, 2))
+    out[-1, 2, 1] = 1  # Physical knockout still wins, regardless of points.
+    damage = np.zeros_like(out)
+    damage[-1] = [[1, 2], [2, 1], [3, 1]]
+    clock = np.zeros_like(done)
+    clock[-1] = 1
+    original = outcomes(done, out)
+    assert original[0].tolist() == [False, False, True]
+    a_points, b_points, a_judged, b_judged, draw = points_decisions(done, out, damage, clock)
+    assert a_points.tolist() == [True, False, False]
+    assert b_points.tolist() == [False, True, False]
+    assert a_judged.tolist() == [True, False, True]
+    assert b_judged.tolist() == [False, True, False]
+    assert not draw.any()
