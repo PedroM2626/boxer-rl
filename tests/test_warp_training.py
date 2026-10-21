@@ -1,0 +1,47 @@
+"""PPO termination and inference contracts, without a physics rollout."""
+import numpy as np
+import pytest
+
+pytest.importorskip("mujoco_warp")
+pytest.importorskip("flax")
+
+import jax
+import jax.numpy as jp
+import optax
+from boxer.warp_train import MLP, make_update, normal_logp, numpy_forward, split_params
+
+
+@pytest.mark.parametrize("timeout", [0.0, 1.0])
+def test_respawn_value_never_bootstraps_a_finished_round(timeout):
+    policy, critic = MLP((), 2), MLP((), 1)
+    pp = {"params": {"Dense_0": {"kernel": jp.zeros((1, 2)),
+                                 "bias": jp.zeros(2)}}}
+    pv = {"params": {"Dense_0": {"kernel": jp.zeros((1, 1)),
+                                 "bias": jp.array([10.0])}}}
+    tx = optax.sgd(0)
+    update = make_update(policy, critic, tx, .2, 0, .5, .99, .95, (.05, 2.0))
+    loc, scale = split_params(policy.apply(pp, jp.zeros((1, 1))))
+    batch = dict(obs=jp.zeros((1, 1, 1)), raw_action=jp.zeros((1, 1, 1)),
+                 logp_old=normal_logp(loc, scale, jp.zeros((1, 1))),
+                 reward=jp.array([[2.0]]), done=jp.ones((1, 1)),
+                 timeout=jp.full((1, 1), timeout), terminal_obs=jp.ones((1, 1)))
+    _, _, _, metrics = update(pp, pv, tx.init((pp, pv)), batch)
+    # target=2, predicted=10, squared error=64. A respawn bootstrap gives 3.61.
+    assert float(metrics["value_loss"]) == pytest.approx(64)
+    assert float(metrics["clip_frac"]) == 0
+
+
+def test_numpy_inference_matches_flax_and_sampling_has_its_own_seed():
+    policy = MLP((8,), 12)
+    params = policy.init(jax.random.PRNGKey(3), jp.zeros((1, 5)))
+    norm = {"mean": np.arange(5) * .1, "var": np.arange(5) + 1}
+    cfg = dict(policy_layers=[8], action_size=6)
+    obs = np.random.default_rng(2).normal(size=(4, 5)).astype(np.float32)
+    loc, _ = split_params(policy.apply(params, (obs - norm["mean"]) /
+                                       np.sqrt(norm["var"] + 1e-8)))
+    predict = numpy_forward(cfg, params, norm)
+    np.testing.assert_allclose(predict(obs), np.tanh(loc), atol=1e-6)
+    a = numpy_forward(cfg, params, norm, stochastic=True, seed=9)
+    b = numpy_forward(cfg, params, norm, stochastic=True, seed=9)
+    np.testing.assert_array_equal(a(obs), b(obs))
+    assert not np.array_equal(a(obs), b(obs + .1))

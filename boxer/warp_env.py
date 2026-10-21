@@ -151,6 +151,7 @@ class WarpBoxing:
                  imit_sigma: float = 0.6, imit_speed_ref: float = 5.0):
         self.nworld, self.n_frames = nworld, n_frames
         self._spawn_distance = spawn_distance
+        self._guard_pose = guard_pose
         self._action_scale = action_scale
         self._spawn_jitter, self._yaw_jitter = spawn_jitter, yaw_jitter
         self._pose_noise = pose_noise
@@ -405,8 +406,7 @@ class WarpBoxing:
             adr = self._sides[side]["actuators"]
             ctrl[:, adr] += self._action_scale * actions[:, i, :]
         self._d.ctrl.assign(ctrl)
-        for _ in range(self.n_frames):
-            mjwarp.step(self._m, self._d)
+        hit = self._advance()
         # np.array, not np.asarray: a jax-derived input may arrive read-only,
         # and reset zeroes this buffer in place.
         self._last_action = np.array(actions, dtype=np.float32)
@@ -414,9 +414,13 @@ class WarpBoxing:
         sensors = self._d.sensordata.numpy()
         self._qpos_sync = self._d.qpos.numpy()
         self._qvel_sync = self._d.qvel.numpy()
-        hit = self._scorecard(sensors)
+        if hit is None:
+            hit = self._scorecard(sensors)
         reward, done, metrics = self._reward(actions, hit, sensors)
         obs = self._observe(sensors)
+        if getattr(self, "capture_render_state", False):
+            self.render_qpos = self._qpos_sync.copy()
+            self.render_qvel = self._qvel_sync.copy()
         if bool(done.any()):
             # Autoreset, brax/PGAX semantics: the observation returned for a world
             # that just closed its round is the FIRST observation of the next one,
@@ -426,7 +430,14 @@ class WarpBoxing:
             obs[done] = self._randomize(self._rng, done)
         return obs, reward, done, metrics
 
-    def _scorecard(self, sensors: np.ndarray) -> np.ndarray:
+    def _advance(self):
+        """Advance physics; subclasses may collect impacts at substep resolution."""
+        for _ in range(self.n_frames):
+            mjwarp.step(self._m, self._d)
+        return None
+
+    def _scorecard(self, sensors: np.ndarray,
+                   before: np.ndarray | None = None) -> np.ndarray:
         """(nworld, 2) hit values: best target weight struck this step.
 
         Active contacts occupy the packed prefix ``[0, nacon)`` of the buffer;
@@ -477,6 +488,16 @@ class WarpBoxing:
         direction /= np.linalg.norm(direction, axis=1, keepdims=True) + 1e-6
         toward = np.sum(palm[who, self._striker_palm[strikers[valid]], where]
                         * direction, axis=1)
+        if before is not None:
+            # A real impact can stop the fist inside one physics step. Testing
+            # only its post-impact speed rejects exactly those clean punches.
+            previous = [self._frame(side, before) for side in scene.SIDES]
+            velocity = np.stack([[f["left_palm_vel"], f["right_palm_vel"]]
+                                 for f in previous])
+            approach = np.sum(
+                velocity[who, self._striker_palm[strikers[valid]], where] * direction,
+                axis=1)
+            toward = np.maximum(toward, approach)
         scored = strong & (toward >= self._punch_speed_min)
         np.maximum.at(value, (where, who),
                       self._target_w[targets[valid]] * scored)

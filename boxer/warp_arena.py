@@ -26,10 +26,13 @@ Run it with ``--self-check`` to test the accounting without a matchup.
 from __future__ import annotations
 
 import argparse
+import json
+from pathlib import Path
 
 import numpy as np
 
 from boxer.warp_env import WarpBoxing
+from boxer.warp_config import make_env
 from boxer.warp_train import make_opponent, warp_run
 
 # The scorecard's target weights, banded on a single hit's value: head 1.0, torso
@@ -54,6 +57,7 @@ GEOMETRY = (
     ("round_steps", int, 500, "_round_steps"),
     ("damage_cap", float, 3.0, "_damage_cap"),
     ("stun_steps", int, 10, "_stun_steps"),
+    ("guard_pose", str, "natural", "_guard_pose"),
 )
 
 
@@ -274,8 +278,8 @@ def matchup(env: WarpBoxing, spec_a: str, spec_b: str, steps: int,
     ``stochastic`` samples each checkpoint's actions the way training did instead
     of taking its mode; the two can rank the same pair of arms differently.
     """
-    a = make_opponent(spec_a, env, stochastic=stochastic)
-    b = make_opponent(spec_b, env, stochastic=stochastic)
+    a = make_opponent(spec_a, env, stochastic=stochastic, seed=seed)
+    b = make_opponent(spec_b, env, stochastic=stochastic, seed=seed + 1)
     forward = play(env, a, b, steps, seed, long_steps=long_steps)
     if not swap_sides:
         return forward
@@ -409,6 +413,7 @@ def _parse_args(argv=None):
                          "this many control steps; 150 is 3 s of the 50 Hz clock")
     ap.add_argument("--stochastic", action="store_true",
                     help="sample from each policy instead of taking its mean action")
+    ap.add_argument("--output", type=Path, help="write geometry and results as JSON")
     ap.add_argument("--self-check", action="store_true",
                     help="test the round accounting and stop")
     return ap.parse_args(argv)
@@ -428,7 +433,11 @@ def main(argv=None) -> int:
         raise SystemExit("both corners are scripted, so there is nothing to score: "
                          "give at least one checkpoint")
     overrides = {name: getattr(args, name) for name, _t, _d, _a in GEOMETRY}
-    env = WarpBoxing(**env_kwargs(runs[0][1], args.worlds, overrides))
+    kinds = {cfg.get("environment", "direct") for _, cfg in runs}
+    if len(kinds) > 1:
+        raise SystemExit("direct and skills checkpoints require different control spaces")
+    kwargs = env_kwargs(runs[0][1], args.worlds, overrides)
+    env = make_env(runs[0][1], **kwargs)
     # Printed before any number: an agent trained at one action scale and evaluated
     # at another is a different agent, not a worse one, and the spawn distance and
     # the round clock change what it sees just as much.
@@ -437,7 +446,7 @@ def main(argv=None) -> int:
           + f" obs={env.obs_size} (from {runs[0][0]})", flush=True)
     for spec, cfg in runs:
         clash = {key: (value, built[key]) for key, value in cfg.items()
-                 if key in built and float(value) != float(built[key])}
+                 if key in built and value != built[key]}
         if clash:
             raise SystemExit(
                 f"{spec} trained with {clash} (recorded, running) and this arena is "
@@ -457,6 +466,15 @@ def main(argv=None) -> int:
     for key, value in result.items():
         print(f"  {key:>16}: {int(value) if key == 'rounds' else f'{value:.3f}'}",
               flush=True)
+    if args.output:
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        args.output.write_text(json.dumps(dict(
+            environment=runs[0][1].get("environment", "direct"),
+            balance_assistance=runs[0][1].get("balance_assistance", False),
+            policy_a=args.policy_a, policy_b=args.policy_b,
+            geometry=built, worlds=env.nworld, steps=steps, seed=args.seed,
+            stochastic=args.stochastic, swapped=not args.no_swap,
+            results=result), indent=2) + "\n")
     return 0
 
 

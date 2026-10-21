@@ -29,7 +29,8 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from boxer import scene  # noqa: E402
-from boxer.warp_env import WarpBoxing, quat_rotate, WORLD_UP  # noqa: E402
+from boxer.warp_env import quat_rotate, WORLD_UP  # noqa: E402
+from boxer.warp_config import make_env  # noqa: E402
 from boxer.warp_train import numpy_forward, warp_run  # noqa: E402
 
 
@@ -49,13 +50,9 @@ def main(argv=None) -> int:
     _root, step, cfg = warp_run(str(args.checkpoint))
     with step.open("rb") as handle:
         params_p, _v, _o, norm, trained = pickle.load(handle)
-    forward = numpy_forward(cfg, params_p, norm, args.stochastic)
+    forward = numpy_forward(cfg, params_p, norm, args.stochastic, seed=args.seed)
 
-    env = WarpBoxing(nworld=args.worlds, n_frames=cfg["n_frames"],
-                     spawn_distance=cfg["spawn_distance"],
-                     action_scale=cfg["action_scale"],
-                     round_steps=cfg["round_steps"],
-                     imitation_path=cfg["imitation"]["path"])
+    env = make_env(cfg, nworld=args.worlds)
     obs = env.reset(seed=args.seed)
     # The observation vector grows when a fight-state entry is added, and the new
     # entries go on the end, so an older checkpoint reads the leading slice.

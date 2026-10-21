@@ -117,7 +117,16 @@ GUARD_ARMS_BROKEN_WRIST = {
 }
 
 #: Names a run can record so an evaluation rebuilds the pose it trained with.
-GUARD_POSES = {"natural": GUARD_ARMS, "broken-wrist": GUARD_ARMS_BROKEN_WRIST}
+# A compact guard for the hierarchical controller. Joint signs on a G1 do not
+# follow human elbow conventions: its supported negative elbow range folds the
+# palm back towards the chest. These poses were fitted with forward kinematics,
+# with wrists inside 0.15 rad, rather than extending both arms at the opponent.
+GUARD_ARMS_BOXING = {
+    "left": (-0.21912, 0.12333, 0.10506, -0.55734, -0.008, -0.150, -0.043),
+    "right": (-0.21912, -0.12326, -0.10503, -0.55732, 0.009, -0.150, 0.043),
+}
+GUARD_POSES = {"natural": GUARD_ARMS, "broken-wrist": GUARD_ARMS_BROKEN_WRIST,
+               "boxing": GUARD_ARMS_BOXING}
 
 
 def guard_arms(name: str) -> dict:

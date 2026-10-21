@@ -19,13 +19,11 @@ Deliberate deviations from brax, each documented where it lives:
 * the log-prob is taken at the raw pre-tanh action (brax stores the same
   ``raw_action``), so the density is the textbook squashed one; the
   parameter-free tanh jacobian cancels in the ratio and is omitted.
-* GAE is recomputed inside the loss from the current critic like brax. Two
-  differences, both because WarpBoxing respawns inside ``step``: a round that
-  runs out its clock keeps its bootstrapped timeout value in the delta, where
-  brax zeroes the whole truncated delta; and a round that ends with a boxer on
-  the floor has its bootstrap masked to zero, because the observation behind a
-  termination is the respawn, and brax gets a zero terminal value for free
-  where we would otherwise pay the agent ~26 discounted reward to fall.
+* GAE is recomputed inside the loss from the current critic like brax. All
+  round endings, including the boxing clock, mask bootstrapping: ``step``
+  already returned a respawn, whose value does not belong to the old round.
+* observation statistics stay fixed from collection through SGD, so the first
+  likelihood ratio is one before the optimizer changes any parameters.
 * the entropy term keeps brax's analytic scale part but drops its sampled
   tanh-jacobian correction.
 * rounds are per world: ``WarpBoxing.step`` respawns the rows that closed one
@@ -53,6 +51,7 @@ import numpy as np
 import optax
 
 from boxer.warp_env import WarpBoxing
+from boxer.warp_config import make_env
 
 if jax.devices()[0].platform != "cpu":
     raise SystemExit(
@@ -129,7 +128,8 @@ def normal_logp(loc, scale, action):
                   axis=-1)
 
 
-def numpy_forward(cfg: dict, params_p: dict, norm: dict, stochastic: bool = False):
+def numpy_forward(cfg: dict, params_p: dict, norm: dict, stochastic: bool = False,
+                  seed=None):
     """The trained policy as plain numpy, for driving a corner without jax.
 
     Lives here rather than in boxer/policy.py because that module imports brax,
@@ -145,6 +145,7 @@ def numpy_forward(cfg: dict, params_p: dict, norm: dict, stochastic: bool = Fals
     ppo = cfg.get("ppo", {})
     bounds = (ppo.get("std_min", cfg.get("std_min", 0.05)),
               ppo.get("std_max", cfg.get("std_max", 2.0)))
+    rng = np.random.default_rng(seed)
 
     def forward(obs: np.ndarray) -> np.ndarray:
         x = (obs.astype(np.float64) - mean) / width
@@ -156,7 +157,7 @@ def numpy_forward(cfg: dict, params_p: dict, norm: dict, stochastic: bool = Fals
         if not stochastic:
             return np.tanh(loc)
         scale = np.clip(np.log1p(np.exp(out[:, action_size:])) + TANH_MIN_STD, *bounds)
-        return np.tanh(loc + scale * np.random.randn(*loc.shape))
+        return np.tanh(loc + scale * rng.standard_normal(loc.shape))
 
     return forward
 
@@ -189,7 +190,7 @@ def warp_run(spec: str) -> tuple[Path, Path, dict]:
     return root, step, json.loads(config.read_text())
 
 
-def make_opponent(spec: str, env, stochastic: bool = False):
+def make_opponent(spec: str, env, stochastic: bool = False, seed=None):
     """A fixed source of actions for one corner: passive, jabber, or a checkpoint.
 
     Takes the spec string rather than the parsed args so ``boxer.warp_arena`` can
@@ -213,6 +214,9 @@ def make_opponent(spec: str, env, stochastic: bool = False):
         return lambda obs, t: np.zeros((env.nworld, env.action_size), np.float32)
 
     if spec == "jabber":
+        if hasattr(env, "physics"):
+            from boxer.skills_env import scripted_actions
+            return lambda obs, t: scripted_actions(env, t)[:, 1]
         import mujoco
 
         from boxer import scene
@@ -252,13 +256,17 @@ def make_opponent(spec: str, env, stochastic: bool = False):
         return jabber
 
     _root, ckpt, cfg = warp_run(spec)
+    if cfg["action_size"] != env.action_size:
+        raise SystemExit(f"opponent has {cfg['action_size']} actions but the "
+                         f"environment requires {env.action_size}; direct and "
+                         "skills policies require matching control spaces")
     with ckpt.open("rb") as handle:
         params_p, _v, _o, norm, trained = pickle.load(handle)
     if cfg["obs_size"] > env.obs_size:
         raise SystemExit(f"opponent {ckpt.name} needs {cfg['obs_size']} observation "
                          f"dims and this env produces {env.obs_size}: the older vector "
                          "is not a slice of a smaller one")
-    forward = numpy_forward(cfg, params_p, norm, stochastic=stochastic)
+    forward = numpy_forward(cfg, params_p, norm, stochastic=stochastic, seed=seed)
     if cfg["obs_size"] < env.obs_size:
         # New observation entries are appended, so the leading slice is exactly what
         # the older policy was trained on. This is what lets a warp6 arm drive blue
@@ -302,14 +310,9 @@ def make_update(policy, value, tx, clip_epsilon, entropy_cost, value_cost,
             boot = value.apply(p_v, b["terminal_obs"])[:, 0]
 
             v_next = jp.concatenate([v_seq[:, 1:], boot[:, None]], axis=1)
-            # A round that ends because the clock ran out is a truncation: the
-            # next observation is a legitimate continuation, so brax's bootstrapped
-            # timeout stays. A round that ends with a boxer on the floor is a
-            # TERMINATION, and the observation behind it is the respawn -- a fresh
-            # standing round worth ~26 discounted reward. Bootstrapping across that
-            # seam pays the agent ~26 for falling, which is the exact bias this
-            # whole change was meant to remove.
-            cont = 1.0 - b["done"] * (1.0 - b["timeout"])
+            # Every done observation belongs to a new round. The boxing clock
+            # ends an episode too; its respawn value is never a terminal value.
+            cont = 1.0 - b["done"]
             delta = b["reward"] + gamma * v_next * cont - v_seq
 
             def rev(acc, x):
@@ -360,8 +363,14 @@ def _parse_args(argv=None):
     run.add_argument("--save-every", type=int, default=15,
                      help="iterations between checkpoints (~40 over a 200M run)")
     env_g = ap.add_argument_group("environment")
+    env_g.add_argument("--environment", choices=("direct", "skills"), default="direct",
+                       help="direct joint targets, or boxing skills with explicit "
+                            "physical balance assistance")
+    env_g.add_argument("--skill-prior", action=argparse.BooleanOptionalAction,
+                       default=True, help="initialize skills policies with an active "
+                       "body-punch prior; all six decisions remain trainable")
     env_g.add_argument("--n-frames", type=int, default=5)
-    env_g.add_argument("--spawn-distance", type=float, default=0.75,
+    env_g.add_argument("--spawn-distance", type=float, default=None,
                        help="warp1 trained at 1.3 m and never closed inside the 0.45-0.55 m "
                             "band where the arm can score; 0.75 puts a step and a half away")
     env_g.add_argument("--action-scale", type=float, default=0.25)
@@ -416,11 +425,19 @@ def _parse_args(argv=None):
                      default=[128, 128, 128, 128])
     ppo.add_argument("--value-layers", type=int, nargs="+",
                      default=[256, 256, 256, 256, 256])
-    return ap.parse_args(argv)
+    args = ap.parse_args(argv)
+    if args.spawn_distance is None:
+        args.spawn_distance = 0.62 if args.environment == "skills" else 0.75
+    if args.environment == "skills":
+        args.action_scale = 1.0
+    return args
 
 
 def main(argv=None) -> int:
     args = _parse_args(argv)
+    if (args.output / "checkpoint" / "latest.txt").exists() and not args.resume:
+        raise SystemExit(f"{args.output} already contains a checkpoint; use --resume "
+                         "with matching settings, or choose a new output directory")
     # In frozen mode only red learns: blue is driven by a fixed source and its
     # transitions must not enter the update, or the "frozen" opponent is really
     # just a second learner that happens to start from the same weights.
@@ -446,14 +463,14 @@ def main(argv=None) -> int:
           f"{args.num_updates_per_batch} epochs x {n_minib} minibatches of "
           f"{minibatch:,}", flush=True)
 
-    env = WarpBoxing(nworld=args.worlds, n_frames=args.n_frames,
+    env = make_env({"environment": args.environment}, nworld=args.worlds, n_frames=args.n_frames,
                      spawn_distance=args.spawn_distance,
                      action_scale=args.action_scale,
                      round_steps=args.round_steps,
                      damage_cap=args.damage_cap, stun_steps=args.stun_steps,
                      imitation_path=str(args.imitation) if args.imitation else None,
                      w_imit=args.w_imit)
-    opponent = make_opponent(args.opponent, env) if frozen else None
+    opponent = make_opponent(args.opponent, env, seed=args.seed + 1) if frozen else None
     if frozen:
         print(f"mode frozen: red learns, blue is {args.opponent}; "
               f"{rows} learners (one corner)", flush=True)
@@ -468,12 +485,25 @@ def main(argv=None) -> int:
 
     key = jax.random.PRNGKey(args.seed)
     params_p = policy.init({"params": key}, jp.zeros((1, env.obs_size)))
+    if args.environment == "skills" and args.skill_prior:
+        from flax.core import unfreeze
+        params_p = unfreeze(params_p)
+        output = params_p["params"][f"Dense_{len(args.policy_layers)}"]
+        output["kernel"] = output["kernel"] * 0.1
+        output["bias"] = output["bias"].at[:6].set(
+            jp.array([0.9, 0.9, -0.9, 0.0, 0.0, -0.9]))
+        print("skills: active body-punch prior; physical balance assistance ON", flush=True)
     params_v = value.init({"params": jax.random.split(key)[1]},
                           jp.zeros((1, env.obs_size)))
     norm = RunningNorm(env.obs_size)
 
     args.output.mkdir(parents=True, exist_ok=True)
-    (args.output / "warp_config.json").write_text(json.dumps({
+    config = {
+        "environment": args.environment,
+        "environment_version": 1,
+        "guard_pose": "boxing" if args.environment == "skills" else "natural",
+        "balance_assistance": args.environment == "skills",
+        "skill_prior": args.environment == "skills" and args.skill_prior,
         "worlds": args.worlds, "action_size": env.action_size,
         "obs_size": env.obs_size, "round_steps": args.round_steps,
         "n_frames": args.n_frames, "spawn_distance": args.spawn_distance,
@@ -489,7 +519,22 @@ def main(argv=None) -> int:
             "num_updates_per_batch", "learning_rate", "entropy_cost",
             "discounting", "gae_lambda", "clipping_epsilon", "value_cost",
             "std_min", "std_max")},
-    }, indent=2) + "\n")
+    }
+    config_path = args.output / "warp_config.json"
+    if args.resume:
+        if not config_path.exists():
+            raise SystemExit(f"--resume requires {config_path}")
+        previous = json.loads(config_path.read_text())
+        keys = ("environment", "guard_pose", "action_size", "obs_size", "n_frames",
+                "spawn_distance", "action_scale", "round_steps", "damage_cap",
+                "stun_steps", "policy_layers", "value_layers")
+        defaults = {"environment": "direct", "guard_pose": "natural"}
+        mismatch = {k: (previous.get(k, defaults.get(k)), config[k])
+                    for k in keys if (k in previous or k in defaults)
+                    and previous.get(k, defaults.get(k)) != config[k]}
+        if mismatch:
+            raise SystemExit(f"--resume settings differ (recorded, requested): {mismatch}")
+    config_path.write_text(json.dumps(config, indent=2) + "\n")
 
     ckpt_dir = args.output / "checkpoint"
     latest = ckpt_dir / "latest.txt"
@@ -510,6 +555,9 @@ def main(argv=None) -> int:
     obs = env.reset(seed=args.seed)
     progress_log = args.output / "progress.jsonl"
     clock = {"start": time.time(), "step": step, "tick": time.time()}
+    round_value = np.zeros((env.nworld, 2))
+    round_punch = np.zeros((env.nworld, 2, 4))
+    round_age = np.zeros(env.nworld, dtype=np.int64)
 
     start_iteration = step // per_iteration
     for i in range(1, total_iterations - start_iteration + 1):
@@ -529,6 +577,8 @@ def main(argv=None) -> int:
         # per corner: head, torso, body hits and attempts -- the punch structure the
         # weighted hit value alone cannot express
         punch_stat = np.zeros((2, 4))
+        closed_value = np.zeros(2)
+        closed_duration = 0
         home_mean = 0.0
 
         def learner_obs(o):
@@ -576,10 +626,19 @@ def main(argv=None) -> int:
             judged_mean += float(np.sum(parts["judged_out"]))
             for k in (0, 1):
                 landed = parts["scored_by"][:, k]
-                punch_stat[k, 0] += np.count_nonzero(landed >= 0.999)
-                punch_stat[k, 1] += np.count_nonzero((landed >= 0.499) & (landed < 0.999))
-                punch_stat[k, 2] += np.count_nonzero((landed > 0.0) & (landed < 0.499))
-                punch_stat[k, 3] += float(np.sum(parts["attempts"][:, k]))
+                round_punch[:, k, 0] += landed >= 0.999
+                round_punch[:, k, 1] += (landed >= 0.499) & (landed < 0.999)
+                round_punch[:, k, 2] += (landed > 0.0) & (landed < 0.499)
+                round_punch[:, k, 3] += parts["attempts"][:, k]
+            round_value += parts["scored_by"]
+            round_age += 1
+            if done.any():
+                punch_stat += round_punch[done].sum(axis=0)
+                closed_value += round_value[done].sum(axis=0)
+                closed_duration += int(round_age[done].sum())
+                round_punch[done] = 0
+                round_value[done] = 0
+                round_age[done] = 0
             home_mean += float(np.mean(parts["at_home"]))
             flat_obs = learner_obs(obs)
             step += rows
@@ -589,10 +648,8 @@ def main(argv=None) -> int:
         # closed a round and hands back their first observation, with done=1 so
         # the GAE mask refuses to bootstrap across the seam.
 
-        # stats update before SGD, brax order: the stored raw observations are
-        # re-normalised with the fresh statistics for the updates, while the
-        # behaviour log-probs stay those computed under the older ones.
-        norm.update(obs_buf.reshape(-1, env.obs_size))
+        # Keep the rollout's normalizer fixed through SGD. Otherwise PPO's
+        # first ratio differs from 1 before any parameter update took place.
         normed = norm.normalize(
             obs_buf.reshape(-1, env.obs_size)).reshape(t_it, rows, -1)
         term_normed = norm.normalize(terminal_obs)
@@ -615,6 +672,8 @@ def main(argv=None) -> int:
                 params_p, params_v, opt_state, metrics = update(
                     params_p, params_v, opt_state, batch)
 
+        norm.update(obs_buf.reshape(-1, env.obs_size))
+
         now = time.time()
         interval, delta = now - clock["tick"], step - clock["step"]
         clock["step"], clock["tick"] = step, now
@@ -623,7 +682,7 @@ def main(argv=None) -> int:
             "step": int(step), "iteration": iteration,
             "walltime": now - clock["start"],
             "learner_steps_per_second": sps,
-            "world_steps_per_second": sps / 2,
+            "world_steps_per_second": sps / (1 if frozen else 2),
             "reward_red": float(rew_buf[:, 0::2].mean()),
             "reward_blue": float(rew_buf[:, 1::2].mean()),
             "hits_red": hits_red, "hits_blue": hits_blue,
@@ -631,8 +690,10 @@ def main(argv=None) -> int:
             # so this is punch VALUE per world-round, not a count of punches -- and
             # per round is the only denominator that survives the round length
             # changing under the policy, which it now does.
-            "punch_value_red": hits_red / max(rounds_mean, 1.0),
-            "punch_value_blue": hits_blue / max(rounds_mean, 1.0),
+            "punch_value_red": closed_value[0] / max(rounds_mean, 1.0),
+            "punch_value_blue": closed_value[1] / max(rounds_mean, 1.0),
+            "hit_value_per_1000_steps_red": hits_red * 1000 / (t_it * env.nworld),
+            "hit_value_per_1000_steps_blue": hits_blue * 1000 / (t_it * env.nworld),
             "distance": dist_mean / t_it, "imit": imit_mean / t_it,
             "carry": carry_mean / t_it,
             "down_red": float(floor_mean[0] / t_it),
@@ -641,7 +702,7 @@ def main(argv=None) -> int:
             # how long a fight lasts now, and how much of it ends with someone on
             # the floor rather than the clock running out
             "rounds": rounds_mean,
-            "round_length": t_it * env.nworld / max(rounds_mean, 1.0),
+            "round_length": closed_duration / max(rounds_mean, 1.0),
             # which of the three closure reasons is actually firing, as a fraction
             # of the rounds closed (they can co-occur, so these need not sum to 1)
             "end_fell": fell_mean / max(rounds_mean, 1.0),
