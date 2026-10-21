@@ -46,7 +46,8 @@ settled by fights rather than by training reward.
 What is still *not* demonstrated, in order of how much it matters: **no head shots** --
 `head_r` peaked at 0.0035 a round and ended at 0.0000 even though a head hit now does twice
 the damage of a body hit, so the weight was not the blocker, and in the head-to-head warp7
-landed 0.000 head value a round against warp6's 0.003; and the render is close-range
+landed 0.000 head value a round against warp6's 0.003, and no arm pose in a 1,260-point
+scripted sweep scores one at all at 0.45, 0.52 or 0.60 m; and the render is close-range
 work -- extended body punches mixed with arms bound at chest height, not a jab in and out.
 The MJX-era record, measured with a different instrument: the best policy there holds a
 guard, closes distance and lands ~0.3 gated punches a round, and wins 64% of rounds against
@@ -430,6 +431,56 @@ often. What this measurement deliberately did *not* do is move `target_range`: t
 above already says the paid band is at the edge of what the arm can reach, and changing two
 things at once would have made warp7 unreadable.
 
+**Corrected on 2026-10-21, by the experiment this paragraph asked for.** "AIM" was too
+generous a reading of one corner-step in 122,880: `tools/warp_head_sweep.py` drives every
+arm pose in a 1,260-point grid at the head on purpose, closing at up to 11.0 m/s against a
+1.0 m/s gate, with the palm site inside the head's touching distance at 0.52 m -- and scores
+**nothing** on the head at any distance, while the same sweep lands 129-184 torso hits. The
+elevation the arm can buy by itself is not enough to hit the head; see item 4 of "What is
+still open" for what that leaves unanswered.
+
+### The first league table (2026-10-21)
+
+`boxer/warp_arena.py` scores a matchup on WarpBoxing itself: whoever is out on the step a
+round closes decided it, corners exchanged and pooled, 256 worlds x 480 steps per roll and
+two rolls per pairing (~4 min on the 3060). Every fraction below is over the rounds that
+closed. "retired" counts wins where the loser was out on the damage cap; "topple" counts
+wins against a loser that absorbed **no scored damage at all** in that round -- a shove, not
+a punch.
+
+| A vs B | A wins | B wins | A retired/topple | B retired/topple | rounds | round length | `end_ko` |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| warp6 vs warp4 | 0.242 | **0.739** | 0.000 / 0.150 | 0.000 / 0.168 | 3,364 | 1.36 s | 0.000 |
+| warp6 vs warp5 | 0.294 | **0.684** | 0.125 / 0.103 | 0.018 / 0.060 | 955 | 3.75 s | 0.143 |
+| warp5 vs warp4 | 0.118 | **0.868** | 0.000 / 0.051 | 0.000 / 0.240 | 3,353 | 1.35 s | 0.000 |
+| warp7 vs warp6 | 0.387 | **0.560** | 0.188 / 0.015 | 0.425 / 0.025 | 672 | 5.13 s | 0.613 |
+| warp7 vs warp5 | 0.293 | **0.550** | 0.152 / 0.045 | 0.007 / 0.045 | 671 | 5.41 s | 0.159 |
+| warp7 vs passive | 0.501 | 0.458 | 0.000 / 0.501 | 0.000 / 0.458 | 3,520 | 1.30 s | 0.000 |
+
+**The order is the reverse of the chronology, and it is transitive**: warp4 beats warp5 and
+warp6, warp5 beats warp6 and warp7, warp6 beats warp7. Four changes that each moved a
+training metric in the right direction each lost the previous arm's fight.
+
+The reason is in the round length, not in the punch columns. Every pairing the older arms
+win finishes at **1.35 s with `end_ko` 0.000** -- the fight ends because somebody tips over,
+not because anybody was hurt, and warp4 drags any opponent into that regime. warp6 and warp7
+against each other last 5.13 s and settle 61% of rounds on the damage cap, which is the only
+matchup in the table that looks like boxing; there warp6 wins by *retiring* warp7 (0.425 of
+rounds against 0.188). The single most uncomfortable number: **warp5 flails 34.1 attempts a
+round at 0.049 accuracy and still beats warp7 in 55% of rounds, while warp7 lands twice the
+punch value (1.64 against 0.83)** -- landing more, and far more accurately, loses, because
+the loss is a fall and not a score.
+
+Two things follow, and neither is a compute decision. The win rate as currently defined
+measures *who is standing when someone stops standing*; making it measure boxing is a rule
+choice (score only wins where the loser was hit, which the `retired` column already reports
+per pairing). And the scene's old attractor is still there: the arena's own self-check roll
+-- two passive boxers, nobody attacking -- has one of them down inside 200 steps on its own,
+so "somebody is on the floor at 1.3 s" is partly the stance rather than the fight. See
+"The falls are not about the opponent" above; the league says the same thing from the other
+side, and it says the arms that hide it best in self-play are the ones that lose it fastest
+in a fight.
+
 ### Traps in the warp path, one run each
 
 - **`put_data` sizes the constraint buffers from the host `MjData` you hand it, which
@@ -515,18 +566,24 @@ close it.
 3. **~~Nobody has ever run out a clock.~~ Answered by warp5.** `end_fell` fell from 1.00 to
    0.58 over its own run: 42% of rounds now end because the 480 steps ran out. In the
    deterministic probe a round lasts 476 of 480 steps and only 12% of closures are falls.
-4. **Head versus torso: measured, priced, and still zero.** warp6 logged 0.0025 head hits
-   per round (one per ~400) against 6.4 torso contacts, so warp7 made a head hit do **twice
-   the damage** of a body hit -- three head shots retire a boxer where six to the body do.
-   It changed nothing: `head_r` peaked at 0.0035 a round mid-run and ended at 0.0000. And
-   the gap measurement says why a price is not the lever: the fist lives **0.361 m from the
-   head, 0.319 m below it**, and entered touching range once in 122,880 corner-steps. warp7
-   also closed the range to 0.515 m without ever lifting a punch, which weakens the
-   "distance is the blocker" story too. What is left is the elevation itself -- ~40 degrees
-   the guard pose never shows and the imitation clip's jab does not ask for, since the
-   recorded human jab travels horizontal (+1.25 degrees). **The open experiment is to score
-   a head shot at all, once, from a scripted sweep at 0.52 m, before deciding whether the
-   head belongs in the objective at all.**
+4. **~~Head versus torso: measured, priced, and still zero.~~ The scripted sweep ran on
+   2026-10-21 (`tools/warp_head_sweep.py`), and the head is not an aim problem.** 1,260 poses
+   of red's four left-arm joints, swept over their model ranges, one pose per world, driven
+   from the stance in 0.16 s -- 877 to 926 of them closing faster than the 1.0 m/s the
+   scorecard asks for, up to **11.0 m/s** -- at 0.45, 0.52 and 0.60 m, with blue's arms down
+   so nothing blocks the line. At every distance: **zero head contacts over the force
+   threshold, armed or raw** -- the two channels agree exactly, so the rearm gate is not
+   hiding them -- while the same sweep scores 129-184 torso hits at the expected 0.50, which
+   is the control that says the instrument works. The palm site does reach 0.088 m from the
+   head site at 0.52 m, inside the 0.095 m touching distance, and still never puts 50 N on
+   the head geom.
+   What it does *not* settle is the rest of the body. The sweep moves the arm only, and live
+   fights do land head shots, rarely -- warp6 at 0.0025 a round, 0.003 head value a round
+   against warp7 in the league table -- so the head is reachable with the torso and the step
+   in it, which no arm-only grid supplies. The question is now narrower than "aim or reach":
+   do the rare live head hits coincide with a torso lean, and would sweeping the waist and
+   knees make one scorable on purpose. Until that is answered, the head's 2x damage weight is
+   paying for something this arm cannot deliver by itself.
 5. **The imitation channel is still a null** (0.0007-0.0023 across three arms). Either it
    fires in a run that actually punches, or it comes out.
 6. **The policy's scale is creeping, and warp7 is the worst of it.** warp4 ended at 1.63
@@ -641,7 +698,8 @@ boxer/bench.py     throughput measurement
 boxer/rollout.py   renders a trained policy to video / HTML / stills
 tools/warp_video.py  renders a warp checkpoint from the warp sim itself
 tools/warp_probe_policy.py  what a checkpoint actually does, measured in its engine
-tools/reach_sweep.py, tools/warp_hit_directions.py, tools/fist_probe.py
+tools/reach_sweep.py, tools/warp_hit_directions.py, tools/fist_probe.py,
+tools/warp_head_sweep.py
                    the measurements the design decisions rest on
 tools/             WSL2 GPU bootstrap, dependency scripts and health checks
 ```
