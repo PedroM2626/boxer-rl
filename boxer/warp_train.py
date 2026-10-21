@@ -120,11 +120,132 @@ def split_params(parameters, std_bounds=(0.05, 2.0)):
 
 
 def normal_logp(loc, scale, action):
-    # brax evaluates the Normal at the stored post-tanh action; its
-    # parameter-free tanh jacobian cancels in the ratio, so it is omitted.
+    # The density is evaluated at the RAW pre-tanh action, which is what brax
+    # stores as policy_extras["raw_action"] and scores (losses.py takes
+    # log_prob of the Normal at u, not at tanh(u)); the parameter-free tanh
+    # jacobian cancels in the ratio either way, so it is omitted here.
     z = (action - loc) / scale
     return jp.sum(-0.5 * z ** 2 - jp.log(scale) - 0.5 * jp.log(2 * jp.pi),
                   axis=-1)
+
+
+def numpy_forward(cfg: dict, params_p: dict, norm: dict, stochastic: bool = False):
+    """The trained policy as plain numpy, for driving a corner without jax.
+
+    Lives here rather than in boxer/policy.py because that module imports brax,
+    and the warp venv deliberately has no brax in it: the physics is warp's and
+    the learner is jax-on-CPU, and anything that drags in a third stack also
+    drags in its CUDA context.
+    """
+    layers = [params_p["params"][f"Dense_{i}"]
+              for i in range(len(cfg["policy_layers"]) + 1)]
+    mean, var = np.asarray(norm["mean"]), np.asarray(norm["var"])
+    width = np.sqrt(var + 1e-8)
+    action_size = cfg["action_size"]
+    ppo = cfg.get("ppo", {})
+    bounds = (ppo.get("std_min", cfg.get("std_min", 0.05)),
+              ppo.get("std_max", cfg.get("std_max", 2.0)))
+
+    def forward(obs: np.ndarray) -> np.ndarray:
+        x = (obs.astype(np.float64) - mean) / width
+        for layer in layers[:-1]:
+            x = x @ layer["kernel"] + layer["bias"]
+            x = x / (1.0 + np.exp(-x))  # silu
+        out = x @ layers[-1]["kernel"] + layers[-1]["bias"]
+        loc = out[:, :action_size]
+        if not stochastic:
+            return np.tanh(loc)
+        scale = np.clip(np.log1p(np.exp(out[:, action_size:])) + TANH_MIN_STD, *bounds)
+        return np.tanh(loc + scale * np.random.randn(*loc.shape))
+
+    return forward
+
+
+def make_opponent(args, env):
+    """The blue corner's actions in --mode frozen: passive, jabber, or a checkpoint.
+
+    Returns ``fn(obs_blue, t) -> (nworld, action_size)``. The scripted two are the
+    same opponents the MJX arena uses, rebuilt here without brax: `passive` holds
+    the guard, and `jabber` throws the reach_sweep pose on a 30-step cycle, which is
+    the rhythm the imitation channel was fitted from. Measured against a learner that
+    holds its guard at the 0.45 m test distance, the jabber's best armed hit is 0.35
+    -- a pelvis/hip/thigh surface, not the torso's 0.5 or the head's 1.0 -- so it is
+    pressure and something to defend against, not a boxer.
+    """
+    if args.opponent == "passive":
+        return lambda obs, t: np.zeros((env.nworld, env.action_size), np.float32)
+
+    if args.opponent == "jabber":
+        import mujoco
+
+        from boxer import scene
+        blue = env._sides[scene.BLUE]["actuators"]
+        ctrl0 = np.asarray(env._ctrl0)
+
+        def joint(name):
+            aid = mujoco.mj_name2id(env._model, mujoco.mjtObj.mjOBJ_ACTUATOR,
+                                    scene.BLUE + name)
+            col = int(np.flatnonzero(blue == aid)[0])
+            # The action is a relative joint target: reaching a commanded ctrl value
+            # needs (target - ctrl0) / action_scale, the same conversion the env's
+            # own self-check uses for its scripted jab.
+            return col, aid
+
+        cols = {}
+        for arm in ("left", "right"):
+            pc, pid = joint(f"{arm}_shoulder_pitch_joint")
+            ec, eid = joint(f"{arm}_elbow_joint")
+            cols[arm] = (pc, (-1.5 - ctrl0[pid]) / env._action_scale,
+                         ec, (0.0 - ctrl0[eid]) / env._action_scale)
+
+        def jabber(obs, t):
+            # Alternating arms on a 30-step cycle, the rhythm the imitation channel
+            # was fitted from. Both arms because the two sign conventions are not
+            # interchangeable and a jabber that only ever lifts one arm quietly
+            # tests only half of them.
+            cycle = t // 30
+            arm = "left" if cycle % 2 == 0 else "right"
+            pc, pv, ec, ev = cols[arm]
+            punch = max(0.0, np.sin(2.0 * np.pi * (t % 30) / 30.0)) ** 2
+            out = np.zeros((env.nworld, env.action_size), np.float32)
+            out[:, pc] = pv * punch
+            out[:, ec] = ev * punch
+            return out
+
+        return jabber
+
+    import json
+    import pickle
+    from pathlib import Path
+
+    path = Path(args.opponent)
+    ckpt = path
+    if path.is_dir():
+        cand = path / "checkpoint" / "latest.txt"
+        if cand.exists():
+            ckpt = path / "checkpoint" / f"step-{cand.read_text().strip()}.pkl"
+        elif (path / "warp_config.json").exists():
+            raise SystemExit(f"--opponent {path}: no checkpoint/latest.txt in it")
+    cfg = json.loads((path / "warp_config.json").read_text()
+                     if (path / "warp_config.json").exists()
+                     else path.parent.parent.joinpath("warp_config.json").read_text())
+    with ckpt.open("rb") as handle:
+        params_p, _v, _o, norm, trained = pickle.load(handle)
+    if cfg["obs_size"] > env.obs_size:
+        raise SystemExit(f"--opponent {ckpt.name} needs {cfg['obs_size']} observation "
+                         f"dims and this env produces {env.obs_size}: the older vector "
+                         "is not a slice of a smaller one")
+    forward = numpy_forward(cfg, params_p, norm, stochastic=False)
+    if cfg["obs_size"] < env.obs_size:
+        # New observation entries are appended, so the leading slice is exactly what
+        # the older policy was trained on. This is what lets a warp6 arm drive blue
+        # against a warp7 learner -- the opponent pool the paper's fictitious
+        # self-play needs, if this ever grows one.
+        print(f"opponent: {ckpt.name} observes {cfg['obs_size']} of this env's "
+              f"{env.obs_size} dims; feeding it the leading slice", flush=True)
+    width = cfg["obs_size"]
+    print(f"opponent: {ckpt.name}, trained to {trained:,} learner steps", flush=True)
+    return lambda obs, t: forward(obs[:, :width]).astype(np.float32)
 
 
 def make_act(policy, std_bounds):
@@ -233,6 +354,15 @@ def _parse_args(argv=None):
     env_g.add_argument("--imitation", type=Path, default=None,
                        help="runs/reference/jab_targets.json from "
                             "tools/retarget_dense.py; absent = pure RL, no shaping")
+    env_g.add_argument("--mode", choices=("selfplay", "frozen"), default="selfplay",
+                       help="selfplay drives both corners from the one network; frozen "
+                            "trains red against a fixed blue and only keeps red's "
+                            "transitions -- the mode that answers "
+                            "'can it stand and punch at all' without the "
+                            "non-stationary opponent")
+    env_g.add_argument("--opponent", default="passive",
+                       help="frozen mode only: passive, jabber, or a path to a warp "
+                            "run or step-*.pkl to drive blue")
     env_g.add_argument("--w-imit", type=float, default=0.3)
     ppo = ap.add_argument_group("ppo")
     ppo.add_argument("--unroll-length", type=int, default=20)
@@ -268,7 +398,11 @@ def _parse_args(argv=None):
 
 def main(argv=None) -> int:
     args = _parse_args(argv)
-    rows = args.worlds * 2
+    # In frozen mode only red learns: blue is driven by a fixed source and its
+    # transitions must not enter the update, or the "frozen" opponent is really
+    # just a second learner that happens to start from the same weights.
+    frozen = args.mode == "frozen"
+    rows = args.worlds if frozen else args.worlds * 2
     transitions = args.batch_size * args.num_minibatches * args.unroll_length
     if transitions % rows:
         raise SystemExit(f"batch_size * num_minibatches * unroll_length "
@@ -296,6 +430,10 @@ def main(argv=None) -> int:
                      damage_cap=args.damage_cap, stun_steps=args.stun_steps,
                      imitation_path=str(args.imitation) if args.imitation else None,
                      w_imit=args.w_imit)
+    opponent = make_opponent(args, env) if frozen else None
+    if frozen:
+        print(f"mode frozen: red learns, blue is {args.opponent}; "
+              f"{rows} learners (one corner)", flush=True)
     policy = MLP(tuple(args.policy_layers), 2 * env.action_size)
     value = MLP(tuple(args.value_layers), 1)
     std_bounds = (args.std_min, args.std_max)
@@ -318,6 +456,7 @@ def main(argv=None) -> int:
         "n_frames": args.n_frames, "spawn_distance": args.spawn_distance,
         "action_scale": args.action_scale,
         "damage_cap": args.damage_cap, "stun_steps": args.stun_steps,
+        "mode": args.mode, "opponent": args.opponent if frozen else None,
         "imitation": {"path": str(args.imitation) if args.imitation else None,
                       "w_imit": args.w_imit},
         "policy_layers": list(args.policy_layers),
@@ -368,19 +507,38 @@ def main(argv=None) -> int:
         # weighted hit value alone cannot express
         punch_stat = np.zeros((2, 4))
         home_mean = 0.0
-        flat_obs = obs.reshape(rows, env.obs_size)
+
+        def learner_obs(o):
+            """(nworld, 2, D) -> the observations the update sees: both corners in
+            self-play, red alone in frozen mode."""
+            return o[:, 0] if frozen else o.reshape(rows, env.obs_size)
+
+        def learner_flat(x):
+            return x[:, 0] if frozen else x.reshape(rows)
+
+        def learner_flag(v):
+            v = v.astype(np.float32)
+            return v if frozen else np.repeat(v, 2)
+
+        flat_obs = learner_obs(obs)
         for t in range(t_it):
             key, sub = jax.random.split(key)
             actions, raw, logp = act(params_p, jp.asarray(
                 norm.normalize(flat_obs)), sub)
-            obs, reward, done, parts = env.step(
-                np.asarray(actions).reshape(env.nworld, 2, -1))
+            a_learn = np.asarray(actions)
+            if frozen:
+                full = np.zeros((env.nworld, 2, env.action_size), np.float32)
+                full[:, 0] = a_learn
+                full[:, 1] = opponent(obs[:, 1], t)
+            else:
+                full = a_learn.reshape(env.nworld, 2, -1)
+            obs, reward, done, parts = env.step(full)
             obs_buf[t] = flat_obs
             raw_buf[t] = np.asarray(raw)
             logp_buf[t] = np.asarray(logp)
-            rew_buf[t] = np.asarray(reward).reshape(rows)
-            done_buf[t] = np.repeat(done.astype(np.float32), 2)
-            timeout_buf[t] = np.repeat(parts["timed_out"].astype(np.float32), 2)
+            rew_buf[t] = learner_flat(np.asarray(reward))
+            done_buf[t] = learner_flag(done)
+            timeout_buf[t] = learner_flag(parts["timed_out"])
             hits_red += float(np.sum(parts["scored"]))
             hits_blue += float(np.sum(parts["taken"]))
             dist_mean += float(np.mean(parts["distance"]))
@@ -400,7 +558,7 @@ def main(argv=None) -> int:
                 punch_stat[k, 2] += np.count_nonzero((landed > 0.0) & (landed < 0.499))
                 punch_stat[k, 3] += float(np.sum(parts["attempts"][:, k]))
             home_mean += float(np.mean(parts["at_home"]))
-            flat_obs = obs.reshape(rows, env.obs_size)
+            flat_obs = learner_obs(obs)
             step += rows
         terminal_obs = flat_obs.copy()
 
