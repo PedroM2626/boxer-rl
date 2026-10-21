@@ -683,7 +683,19 @@ class WarpBoxing:
         done = timed_out | knocked
         parts.update(knockout=knocked, fell=fell, judged_out=judged_out,
                      left_ring=left_ring, too_far=too_far, timed_out=timed_out,
-                     separation=separation, damage=self._damage,
+                     separation=separation,
+                     # A copy, and it has to be one: ``step`` respawns the worlds
+                     # that closed a round AFTER this dict is built, and `_randomize`
+                     # zeroes the live ``self._damage`` in place. A reference would
+                     # hand the caller the next round's state -- every round that
+                     # ended on the damage cap reading zero damage, which is how the
+                     # first arena matchup reported 0.000 knockout wins while
+                     # ``end_ko`` said 63% of rounds ended on the cap.
+                     damage=self._damage.copy(),
+                     # per corner, for anything that has to decide who lost: `fell`
+                     # and `judged_out` above are either-or, and an arena needs to
+                     # know WHICH corner is out on the step the round ends.
+                     out_by=np.stack(outs, axis=1).astype(np.float32),
                      stun=(self._stun > 0).astype(np.float32))
         return rewards, done, parts
 
@@ -820,6 +832,16 @@ if __name__ == "__main__":
     assert bool(ko_parts["judged_out"].all()), "clean hits did not end the fight"
     assert bool(ko_done.all()), "a knockout did not close the round"
     assert ko_parts["stun"][:, 1].all(), "the victim was not stunned by a clean hit"
+    # The damage the caller is told about must survive the respawn that ``step``
+    # performs after this dict is built. The health test calls `_reward` directly,
+    # so only the identity check pins it here -- the arena, which reads the dict
+    # through `step`, is what found the violation: with a view of the live state,
+    # every round that ended on the damage cap reported 0.00 damage and 0.000
+    # knockout wins.
+    assert ko_parts["damage"] is not env._damage, (
+        "the reported damage is a view of the live fight state, which step() zeroes "
+        "when it respawns the worlds that closed a round")
+    assert ko_parts["damage"][:, 1].min() >= env._damage_cap
     print(f"health: {int(round(env._damage_cap))} clean hits put blue out (damage "
           f"{env._damage[:, 1].mean():.1f}/{env._damage_cap:.1f}), stun "
           f"{env._stun[:, 1].mean():.0f} steps, round closed as a knockout")
