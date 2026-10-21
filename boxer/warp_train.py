@@ -161,21 +161,58 @@ def numpy_forward(cfg: dict, params_p: dict, norm: dict, stochastic: bool = Fals
     return forward
 
 
-def make_opponent(args, env):
-    """The blue corner's actions in --mode frozen: passive, jabber, or a checkpoint.
+def warp_run(spec: str) -> tuple[Path, Path, dict]:
+    """(run root, checkpoint file, recorded config) for a warp run.
 
-    Returns ``fn(obs_blue, t) -> (nworld, action_size)``. The scripted two are the
+    Accepts the run directory, the checkpoint file inside it, or a specific
+    ``step-*.pkl``. One resolver for every reader of a run: the trainer's frozen
+    opponent, ``tools/warp_video.py`` and ``boxer/warp_arena.py`` each walked
+    those paths their own way before, and a reader that disagrees about which
+    checkpoint a run directory means scores a different agent than the trainer
+    trained.
+    """
+    path = Path(spec)
+    if path.is_file() and path.suffix == ".pkl":
+        step = path
+        root = path.parent.parent if path.parent.name == "checkpoint" else path.parent
+    else:
+        root = path
+        latest = root / "checkpoint" / "latest.txt"
+        if not latest.is_file():
+            raise SystemExit(f"{root}: not a boxer.warp_train run "
+                             "(no checkpoint/latest.txt)")
+        step = root / "checkpoint" / f"step-{latest.read_text().strip()}.pkl"
+    config = root / "warp_config.json"
+    if not config.is_file():
+        raise SystemExit(f"{config}: not a boxer.warp_train run "
+                         "(no warp_config.json)")
+    return root, step, json.loads(config.read_text())
+
+
+def make_opponent(spec: str, env, stochastic: bool = False):
+    """A fixed source of actions for one corner: passive, jabber, or a checkpoint.
+
+    Takes the spec string rather than the parsed args so ``boxer.warp_arena`` can
+    build the same opponents for a matchup without pretending to be a trainer, and
+    can put either corner behind either of them.
+
+    Returns ``fn(obs, t) -> (nworld, action_size)``. The scripted two are the
     same opponents the MJX arena uses, rebuilt here without brax: `passive` holds
     the guard, and `jabber` throws the reach_sweep pose on a 30-step cycle, which is
     the rhythm the imitation channel was fitted from. Measured against a learner that
     holds its guard at the 0.45 m test distance, the jabber's best armed hit is 0.35
     -- a pelvis/hip/thigh surface, not the torso's 0.5 or the head's 1.0 -- so it is
     pressure and something to defend against, not a boxer.
+
+    ``stochastic`` samples a checkpoint's actions the way training did instead of
+    taking the mode: a policy can rank differently under its own noise than on the
+    deterministic action a real robot would run, so the choice is a reported part of
+    a measurement, not a cosmetic flag.
     """
-    if args.opponent == "passive":
+    if spec == "passive":
         return lambda obs, t: np.zeros((env.nworld, env.action_size), np.float32)
 
-    if args.opponent == "jabber":
+    if spec == "jabber":
         import mujoco
 
         from boxer import scene
@@ -214,28 +251,14 @@ def make_opponent(args, env):
 
         return jabber
 
-    import json
-    import pickle
-    from pathlib import Path
-
-    path = Path(args.opponent)
-    ckpt = path
-    if path.is_dir():
-        cand = path / "checkpoint" / "latest.txt"
-        if cand.exists():
-            ckpt = path / "checkpoint" / f"step-{cand.read_text().strip()}.pkl"
-        elif (path / "warp_config.json").exists():
-            raise SystemExit(f"--opponent {path}: no checkpoint/latest.txt in it")
-    cfg = json.loads((path / "warp_config.json").read_text()
-                     if (path / "warp_config.json").exists()
-                     else path.parent.parent.joinpath("warp_config.json").read_text())
+    _root, ckpt, cfg = warp_run(spec)
     with ckpt.open("rb") as handle:
         params_p, _v, _o, norm, trained = pickle.load(handle)
     if cfg["obs_size"] > env.obs_size:
-        raise SystemExit(f"--opponent {ckpt.name} needs {cfg['obs_size']} observation "
+        raise SystemExit(f"opponent {ckpt.name} needs {cfg['obs_size']} observation "
                          f"dims and this env produces {env.obs_size}: the older vector "
                          "is not a slice of a smaller one")
-    forward = numpy_forward(cfg, params_p, norm, stochastic=False)
+    forward = numpy_forward(cfg, params_p, norm, stochastic=stochastic)
     if cfg["obs_size"] < env.obs_size:
         # New observation entries are appended, so the leading slice is exactly what
         # the older policy was trained on. This is what lets a warp6 arm drive blue
@@ -430,7 +453,7 @@ def main(argv=None) -> int:
                      damage_cap=args.damage_cap, stun_steps=args.stun_steps,
                      imitation_path=str(args.imitation) if args.imitation else None,
                      w_imit=args.w_imit)
-    opponent = make_opponent(args, env) if frozen else None
+    opponent = make_opponent(args.opponent, env) if frozen else None
     if frozen:
         print(f"mode frozen: red learns, blue is {args.opponent}; "
               f"{rows} learners (one corner)", flush=True)

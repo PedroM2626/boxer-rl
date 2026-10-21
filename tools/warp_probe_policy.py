@@ -13,7 +13,6 @@ Those two need opposite fixes, so this measures which one it is.
 from __future__ import annotations
 
 import argparse
-import json
 import pickle
 import sys
 from pathlib import Path
@@ -24,7 +23,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from boxer import scene  # noqa: E402
 from boxer.warp_env import WarpBoxing, quat_rotate, WORLD_UP  # noqa: E402
-from tools.warp_video import make_forward, resolve  # noqa: E402
+from boxer.warp_train import numpy_forward, warp_run  # noqa: E402
 
 
 def main(argv=None) -> int:
@@ -40,11 +39,10 @@ def main(argv=None) -> int:
     ap.add_argument("--bins", type=int, default=8, help="timeline bins")
     args = ap.parse_args(argv)
 
-    root, step = resolve(str(args.checkpoint))
-    cfg = json.loads((root / "warp_config.json").read_text())
+    _root, step, cfg = warp_run(str(args.checkpoint))
     with step.open("rb") as handle:
         params_p, _v, _o, norm, trained = pickle.load(handle)
-    forward = make_forward(cfg, params_p, norm, args.stochastic)
+    forward = numpy_forward(cfg, params_p, norm, args.stochastic)
 
     env = WarpBoxing(nworld=args.worlds, n_frames=cfg["n_frames"],
                      spawn_distance=cfg["spawn_distance"],

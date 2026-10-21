@@ -14,7 +14,6 @@ the head -- against the collision geometry that decides contact.
 from __future__ import annotations
 
 import argparse
-import json
 import pickle
 import sys
 from pathlib import Path
@@ -25,7 +24,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from boxer import scene  # noqa: E402
 from boxer.warp_env import WarpBoxing  # noqa: E402
-from tools.warp_video import make_forward, resolve  # noqa: E402
+from boxer.warp_train import numpy_forward, warp_run  # noqa: E402
 
 # A fist (capsule radius 0.035) touching the head sphere (radius 0.06) has its
 # centre 0.095 m from the head centre; that is what "in contact range" means here.
@@ -42,11 +41,10 @@ def main(argv=None) -> int:
     ap.add_argument("--stochastic", action="store_true")
     args = ap.parse_args(argv)
 
-    root, step = resolve(str(args.checkpoint))
-    cfg = json.loads((root / "warp_config.json").read_text())
+    _root, step, cfg = warp_run(str(args.checkpoint))
     with step.open("rb") as handle:
         params_p, _v, _o, norm, trained = pickle.load(handle)
-    forward = make_forward(cfg, params_p, norm, args.stochastic)
+    forward = numpy_forward(cfg, params_p, norm, args.stochastic)
     env = WarpBoxing(nworld=args.worlds, n_frames=cfg["n_frames"],
                      spawn_distance=cfg["spawn_distance"],
                      action_scale=cfg["action_scale"],

@@ -12,9 +12,10 @@ Physics: ``WarpBoxing`` with one world, exactly the training build (visual geoms
 discarded). Pictures: a parallel visual build of the same scene -- the two
 models share ``nq``/``nv``, so ``qpos``/``qvel`` transfer verbatim and
 ``mj_forward`` on the visual model puts the meshes where the simulation says
-they are. The policy forward is plain numpy over the checkpoint's leaves, so
-this process never imports jax and never shares the card with a second CUDA
-context.
+they are. The policy forward is the trainer's numpy port (``boxer.warp_train
+.numpy_forward``) over the checkpoint's leaves: no jax computation runs here, and
+the warp venv ships a CPU-only jaxlib, so the CUDA card stays warp's alone either
+way.
 
     MUJOCO_GL=egl PYTHONPATH=. /home/pedro/venvs/warp_test/bin/python \
         tools/warp_video.py runs/warp1 --length 400 --output fights/warp1_final.mp4
@@ -22,7 +23,6 @@ context.
 from __future__ import annotations
 
 import argparse
-import json
 import pickle
 from pathlib import Path
 
@@ -32,52 +32,9 @@ import numpy as np
 
 from boxer import scene
 from boxer.warp_env import WarpBoxing
+from boxer.warp_train import numpy_forward, warp_run
 
-TANH_MIN_STD = 0.001
 CONTROL_DT = 0.02  # 5 physics substeps of 4 ms
-
-
-def resolve(run: str) -> tuple[Path, Path]:
-    """(run root, checkpoint file) from a run directory, a .pkl, or a dir."""
-    p = Path(run)
-    if p.is_file() and p.suffix == ".pkl":
-        step = p
-        root = p.parent.parent if p.parent.name == "checkpoint" else p.parent
-    else:
-        root = p
-        latest = root / "checkpoint" / "latest.txt"
-        if not latest.exists():
-            raise SystemExit(f"{root}: no checkpoint/latest.txt -- not a warp run")
-        step = root / "checkpoint" / f"step-{latest.read_text().strip()}.pkl"
-    config = root / "warp_config.json"
-    if not config.is_file():
-        raise SystemExit(f"{root}: no warp_config.json -- not a boxer.warp_train run")
-    return root, step
-
-
-def make_forward(cfg: dict, params_p: dict, norm: dict, stochastic: bool):
-    layers = [params_p["params"][f"Dense_{i}"]
-              for i in range(len(cfg["policy_layers"]) + 1)]
-    mean, var = np.asarray(norm["mean"]), np.asarray(norm["var"])
-    width = np.sqrt(var + 1e-8)
-    action_size = cfg["action_size"]
-    ppo = cfg.get("ppo", {})
-    bounds = (ppo.get("std_min", cfg.get("std_min", 0.05)),
-              ppo.get("std_max", cfg.get("std_max", 2.0)))
-
-    def forward(obs: np.ndarray) -> np.ndarray:
-        x = (obs.astype(np.float64) - mean) / width
-        for layer in layers[:-1]:
-            x = x @ layer["kernel"] + layer["bias"]
-            x = x / (1.0 + np.exp(-x))  # silu
-        out = x @ layers[-1]["kernel"] + layers[-1]["bias"]
-        loc = out[:, :action_size]
-        if not stochastic:
-            return np.tanh(loc)
-        scale = np.clip(np.log1p(np.exp(out[:, action_size:])) + TANH_MIN_STD, *bounds)
-        return np.tanh(loc + scale * np.random.randn(*loc.shape))
-
-    return forward
 
 
 def main(argv=None) -> int:
@@ -97,8 +54,7 @@ def main(argv=None) -> int:
     ap.add_argument("--sheet-tiles", type=int, default=9)
     args = ap.parse_args(argv)
 
-    root, step = resolve(str(args.checkpoint))
-    cfg = json.loads((root / "warp_config.json").read_text())
+    _root, step, cfg = warp_run(str(args.checkpoint))
     with step.open("rb") as handle:
         params_p, _params_v, _opt, norm, trained_steps = pickle.load(handle)
     print(f"{step.name}: policy trained to {trained_steps:,} learner steps "
