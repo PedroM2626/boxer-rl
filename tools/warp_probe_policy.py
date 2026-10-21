@@ -7,8 +7,15 @@ which is either "they stood up and walked away" or "they fell, and every dense
 term is gated on BOTH corners being upright so the fall zeroes the gradient".
 Those two need opposite fixes, so this measures which one it is.
 
+It has kept the job and gained the rest of the single-policy story: how many
+rounds close and for which reason, the floor fraction along a timeline rather
+than as one mean, how long the corners stay in the band the arm can score from,
+and punch value per world-step. What it still cannot say is whether the
+checkpoint is any good at fighting -- one corner's behaviour is not a result.
+That is `python -m boxer.warp_arena`, which scores two opponents.
+
     PYTHONPATH=. /home/pedro/venvs/warp_test/bin/python \
-        tools/warp_probe_policy.py runs/warp2 --steps 480
+        tools/warp_probe_policy.py runs/warp7 --steps 480
 """
 from __future__ import annotations
 
