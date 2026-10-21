@@ -22,21 +22,23 @@ the opponent's head or torso geom, not a proximity heuristic, credited by role a
 gated on the striker's fist closing on the opponent.
 
 **Where this is at:** the physics, the throughput and the measurement machinery work, and
-as of warp6 the boxers throw punches that convert. Measured on the final checkpoint in its
-own engine, deterministic actions: **4.22 punch-value thrown and 4.14 taken per round of 427
-steps** (head 1.0, torso 0.5 -- a value, not a count), 0.1% of the rollout on the floor,
-0.54 m apart, and **37% of swings land**, up from 6% at the start of that run. What is still
-*not* demonstrated, in order of how much it matters: **the swinging never stopped** -- the
-policy finishes at 2.79 swings per second against 2.36 for a random policy, so the arm is a
-convertible mill, not a boxer; **head shots are roughly one per 400 rounds** (0.0025 per
-round over the last 60 iterations, against 6.4 torso contacts); there is no win rate for any
-warp arm because the arena and the frozen/league modes are MJX-only. The MJX-era record,
-measured with a different instrument: the best policy there holds a guard, closes distance and
-lands ~0.3 gated punches a round, and wins 64% of rounds against a passive opponent by being
-the one still standing, while symmetric self-play at the same budget loses 88% of its rounds
-to that passive opponent. Every reward intervention has been reported as a null result rather
-than quietly dropped; the diagnosis and the experiments still open are in
-[Results](#results).
+as of warp7 the two boxers stand, trade punches that land, and sometimes end a fight on
+damage. Measured on its final checkpoint in its own engine: rounds of **364 of 480 control
+steps**, **43% of swings converting** (against 6% at the start of the run and 37% for warp6),
+2.17 punch-value per world-round, 0.1% of the rollout on the floor, corners 0.515 m apart,
+and **5-9% of rounds closing on a knockout** rather than a torso tilting past 45 degrees.
+What is still *not* demonstrated, in order of how much it matters: **no head shots** --
+`head_r` peaked at 0.0035 a round and ended at 0.0000 even though a head hit now does twice
+the damage of a body hit, so the weight was not the blocker; **no win rate**, because the
+arena still runs on the MJX stack (the trainer can now freeze an opponent, which was the
+prerequisite, but the matchup evaluator has not been ported); and the render is close-range
+work -- extended body punches mixed with arms bound at chest height, not a jab in and out.
+The MJX-era record, measured with a different instrument: the best policy there holds a
+guard, closes distance and lands ~0.3 gated punches a round, and wins 64% of rounds against
+a passive opponent by being the one still standing, while symmetric self-play at the same
+budget loses 88% of its rounds to that passive opponent. Every reward intervention has been
+reported as a null result rather than quietly dropped; the diagnosis and the experiments
+still open are in [Results](#results).
 
 ## Results
 
@@ -344,7 +346,7 @@ measurement that killed or kept it.
 | warp4 | ported the rest of `env.py`'s round semantics: a round closes on a knockdown, out of the ring, or beyond `MAX_SEPARATION` (2.4 m), with the respawn happening **per world inside `step()`**, plus `w_alive` 0.2 and the zero-sum `w_ko` 3.0 | **200.2M complete (10.94 h), the first arm that boxes.** Round length 50→78 control steps; **punch value per world-round 0.09→0.70** (means 0.157 over the first 100 iterations, 0.677 over the last 80 -- monotone over the whole run, not a round-opening spike); reward +1.06→+1.26; floor 0.007. Probed deterministically on the final checkpoint: a round every 90 steps, 0.72 punch-value thrown and 0.73 taken -- so the mean action punches, not the noise -- and every closure by falling (ring 0.00, separation 0.00). Ran with the termination-bootstrap bias below, so its curve is a floor. |
 | warp5 | same arm, with the termination bootstrap masked (`cont = 1 - done * (1 - timeout)`) -- falling stopped paying the value of the next round | **200.2M complete (10.67 h), and the answer to the question warp4 left open.** Round length 51 → 94 → 201 → 382 control steps against a 480 cap; **punch value per world-round 0.08 → 3.17** (last 60 iterations average 3.09); floor fraction 0.010 → 0.001; the corners closed the gap from 0.68 m to **0.52 m**, inside the band the arm can score in; and `end_fell` fell from 1.00 to 0.58 -- **42% of rounds now end because the clock ran out, which has never happened in any arm before**. Probed deterministically on the final checkpoint: a round every 476 steps, 1.56 punch-value thrown and 1.36 taken per round, nobody ever on the floor. Two honest caveats: punch *rate* per step is lower than warp4's (0.0033 vs 0.0082 -- warp4's rate was inflated by the collapse scrum of its 90-step rounds), and the rendered behaviour is a sustained close-range arm-to-arm engagement rather than a jab in and out. |
 | warp6 | a punch becomes a discrete, costed action. An **attempt** -- the rising edge of the fist closing on the opponent at `punch_speed_min`, computed from palm velocity along the line between torsos so it exists without contact, with hysteresis at half the threshold so one swing is one attempt -- costs `w_attempt` 0.5 against the +10 hit; and re-arming now requires the fist to have **returned to its guard**, within 0.25 m of its own torso-frame target, not merely 20 steps without contact. Plus the metrics that make the claim checkable: hits split by surface, attempts per round, accuracy, and the fraction of steps the fist is home. | Running. Chosen by measurement rather than taste: warp5 sits at 0.83 torso-equivalent contacts/s against the 2.5/s ceiling its own rearm window allows, with an imitation term of 0.00155, so the mill is the cheapest legal policy under the old objective -- and RoboStriker's metric is a *ratio* whose denominator this env never had. From a random policy at launch: `head 0.00/0.00`, `acc 0.07`, `home 0.07`, reward +0.98. **200.2M complete (9.94 h). **The gates bought accuracy, not restraint.** Accuracy -- the fraction of swings that land -- rose **0.062 → 0.370**, and punch value per world-round **0.09 → 3.65** (warp5: 3.17), with the policy's scale ending at 1.39 where warp5 reached 1.58. But swing *volume* went up, not down: 3.6 attempts per round at iteration 1 is 2.36/s, it dipped to 1.13/s mid-run, and it finished at **20.0 per round = 2.79/s** -- more flailing per second than the random policy started with. The arithmetic says why: a swing that lands 37% of the time at a mean value of 0.49 returns 10 × 0.49 × 0.37 = +1.81 against a charge of 0.5, so swinging is individually profitable and the price is too small to matter. Probed deterministically: 4.22 value thrown and 4.14 taken per round of 427 steps, floor 0.001, 0.54 m apart. **And the head number, stated precisely: `head_r` is 0.0025 per round averaged over the last 60 iterations, 0.0067 at its best, against 6.4 torso contacts -- roughly one head shot per 400 rounds.** The gates did their job (discrete, converting punches) and what they exposed is that nothing in this reward makes a punch *count for anything beyond its own moment*: the hit is paid and un-paid symmetrically, so nothing compounds. |
-| warp7 | the fight gets a state: clean hits accumulate as **damage** at their surface weight (head 1.0, torso 0.5, body 0.35), a corner at `damage_cap` 3.0 is **out** -- which closes the round and pays the survivor the zero-sum knockout -- and every clean hit **stuns** its victim out of scoring for 10 control steps. Own damage, opponent damage and stunned join the observation (128 → 131) | Running. The lever the head-gap measurement pointed at: head shots retire a boxer in three hits against six to the body, which is the first reason in this project's history to aim high rather than often. Three questions it has to answer, in order: is `end_ko` ever > 0 (the first cap of 5.0 made the knockout dormant -- warp6's best round delivers 3.55 damage -- so this was caught and fixed before the run, not after); does `head_r` leave ~0; and does `accuracy_r` keep rising without the swing rate collapsing. |
+| warp7 | the fight gets a state: clean hits accumulate as **damage** at their surface weight (head 1.0, torso 0.5, body 0.35), a corner at `damage_cap` 3.0 is **out** -- which closes the round and pays the survivor the zero-sum knockout -- and every clean hit **stuns** its victim out of scoring for 10 control steps. Own damage, opponent damage and stunned join the observation (128 → 131) | **200.2M complete (10.04 h). It changed the shape of the fight, not the style.** The knockout fires: `end_ko` sits at 0.05-0.09, so 5-9% of rounds now end on damage instead of a tilted torso (with the first cap of 5.0 it would have slept through the whole run). The mill halved: 2.37 swings/s at the start, **1.39 at the end**, while accuracy rose 0.057 → **0.433**. Rounds 76 → 364 of 480 steps, floor 0.001, distance 0.61 → 0.515 m. Two things it did not do: punch value per round came out BELOW warp6 (2.17 against 3.65 -- fewer swings, and the stun removes scoring windows, so this metric no longer compares across regimes), and **the head still never lands**: `head_r` peaked at 0.0035 a round at iteration 340 and was 0.0000 at the end, so doubling the damage weight did not buy the +0.32 m of elevation. The policy's scale also ended at 1.75, the highest of any completed arm against a 2.0 ceiling. |
 
 Two things the truncation forced into the open:
 
@@ -473,44 +475,47 @@ close it.
    could stand and fight the whole time and were being paid ~26 discounted reward to stop.
    The question that replaces it is whether 382 of 480 is where this reward plateaus, and
    what the remaining 42% of fall-endings are made of.
-2. **No win rate exists for any warp arm.** The arena, `--mode frozen` and the
-   alternating league are MJX-only, and the guard-error block reads site frames there
-   against sensors here. Either the modes get ported or the arena learns to run the warp
-   env natively; until then "does it box" is answered by probe numbers, not by fights.
+2. **No win rate exists for any warp arm.** The blocker is half gone: `boxer.warp_train
+   --mode frozen --opponent passive|jabber|<checkpoint>` now trains one corner against a
+   fixed other, which is the machinery a matchup needs. What is missing is the arena
+   itself running the warp env -- `boxer/arena.py` is MJX, and the guard-error block reads
+   site frames there against sensors here, so an MJX number on a warp checkpoint is
+   already approximate. Until that is ported, "does it box" is answered by probe numbers,
+   not by fights.
 3. **~~Nobody has ever run out a clock.~~ Answered by warp5.** `end_fell` fell from 1.00 to
    0.58 over its own run: 42% of rounds now end because the 480 steps ran out. In the
    deterministic probe a round lasts 476 of 480 steps and only 12% of closures are falls.
-4. **Head versus torso is measured, and the answer is near zero -- stated precisely, because my
-   first version of this sentence said "zero" and that was wrong.** warp6 logged `head_r` at
-   0.0025 per round averaged over its last 60 iterations, 0.0067 at its best, against 6.4 torso
-   contacts: about one head shot per 400 rounds. So the punches that convert are body shots.
-   The candidate causes are distinguishable and none is settled: the guard envelope puts the
-   fist +0.05 m above torso centre against the head's +0.43 m, so a head shot costs ~40 degrees
-   of elevation the body shot does not; `target_range` is 0.55 m, where the sweep says the head
-   is out of reach and the torso is not; and the head is worth 10 against the body's 5, which
-   the arm may simply not be able to buy at this distance. **The experiment that would decide it is to log the
-   fist-to-head gap during a round, not to change a weight and hope.**
+4. **Head versus torso: measured, priced, and still zero.** warp6 logged 0.0025 head hits
+   per round (one per ~400) against 6.4 torso contacts, so warp7 made a head hit do **twice
+   the damage** of a body hit -- three head shots retire a boxer where six to the body do.
+   It changed nothing: `head_r` peaked at 0.0035 a round mid-run and ended at 0.0000. And
+   the gap measurement says why a price is not the lever: the fist lives **0.361 m from the
+   head, 0.319 m below it**, and entered touching range once in 122,880 corner-steps. warp7
+   also closed the range to 0.515 m without ever lifting a punch, which weakens the
+   "distance is the blocker" story too. What is left is the elevation itself -- ~40 degrees
+   the guard pose never shows and the imitation clip's jab does not ask for, since the
+   recorded human jab travels horizontal (+1.25 degrees). **The open experiment is to score
+   a head shot at all, once, from a scripted sweep at 0.52 m, before deciding whether the
+   head belongs in the objective at all.**
 5. **The imitation channel is still a null** (0.0007-0.0023 across three arms). Either it
    fires in a run that actually punches, or it comes out.
-6. **The policy's scale is creeping.** 0.70 to 1.63 across warp4 against a 2.0 ceiling.
-   A run that touches the ceiling has its hit counts back in tanh-saturated noise, which
-   is exactly the failure mode warp1 taught me to read. warp5's was not monotone -- it
-   rose to 1.36, fell back to 1.18 mid-run and ended at 1.58 -- so the ceiling is still the
-   thing to watch on any arm longer than this.
-7. **The mill is arithmetic, and warp6 converted it rather than breaking it.** The falsifier I
-   wrote had two branches: accuracy up with swing rate down would mean the mill was an
-   incentive; swing rate collapsing would mean I had priced punching out of existence. Neither
-   happened. Accuracy rose 0.062 → 0.370 -- the charge and the retraction gate did change what
-   a swing *is* -- while the swing rate went from 2.36 to **2.79 per second**, up from the
-   random policy's own. So the arm is now a mill that lands. The arithmetic is plain: 0.37 ×
-   4.9 = +1.81 per swing against a 0.5 charge, and nothing short of a break-even price (~1.8)
-   changes that. The deeper reason a price is the wrong lever is that the hit channel is
-   symmetric and instantaneous (+10 here, −10 there), so a landed punch changes the score and
-   not the fight: nothing about being hit makes the next exchange worse for the one who was
-   hit. **Consequence needs state.** A damage/health channel is the smallest thing that makes
-   early punches compound into later advantage, and the first thing that gives a fighter a
-   reason to not be hit -- which is warp7's open design question, and it changes the
-   instrument, so results before it stop being comparable.
+6. **The policy's scale is creeping, and warp7 is the worst of it.** warp4 ended at 1.63
+   against a 2.0 ceiling, warp5 at 1.58, warp6 at 1.39 -- and warp7, the calmest fight of
+   the four, ended at **1.75** with entropy 56. The ceiling is what stops this becoming
+   warp1's 27.4, but a run that presses it has its hit counts back in tanh-saturated noise.
+   Nobody has yet explained why the scale grows while the reward is flat: it is the one
+   trend in these arms that none of the five changes has touched.
+7. **The mill: priced by warp6, halved by warp7.** The falsifier had two branches and warp6
+   resolved neither -- accuracy rose 0.062 → 0.370 while the swing rate went *up* to 2.79/s,
+   because a swing returning 0.37 × 4.9 = +1.81 against a 0.5 charge is always profitable.
+   warp7's consequence did what the price could not: the rate fell to **1.39 swings/s** and
+   accuracy reached 0.433, with 5-9% of rounds finishing on a knockout. The cost is
+   explicit: punch value per round dropped to 2.17 from warp6's 3.65, and value per *second*
+   to 0.006 from 0.010 -- the stun removes scoring windows on both sides, so the fight is
+   calmer, not bigger. That makes "punch value per round" a metric that cannot compare the
+   two regimes, and it is stated here rather than quietly redefined. What has still not been
+   measured is whether calmer and more accurate is *better boxing*: that needs an opponent
+   who is not the policy's own mirror, which is item 2.
 
 
 ## Why this robot model
