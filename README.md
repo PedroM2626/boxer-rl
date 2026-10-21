@@ -444,42 +444,53 @@ still open" for what that leaves unanswered.
 `boxer/warp_arena.py` scores a matchup on WarpBoxing itself: whoever is out on the step a
 round closes decided it, corners exchanged and pooled, 256 worlds x 480 steps per roll and
 two rolls per pairing (~4 min on the 3060). Every fraction below is over the rounds that
-closed. "retired" counts wins where the loser was out on the damage cap; "topple" counts
-wins against a loser that absorbed **no scored damage at all** in that round -- a shove, not
-a punch.
+closed. **strong** is a win against a loser that had absorbed at least 1.0 of damage when it
+went down -- a head shot, or two torso shots -- which is above what a body leaning on an arm
+gives for free (0.35). **long** is the win rate inside the rounds that lasted at least 150
+control steps (3 s), and `long_share` says what fraction of the rounds those were: where
+`long_share` is near zero, the long columns are a handful of rounds and mean nothing.
 
-| A vs B | A wins | B wins | A retired/topple | B retired/topple | rounds | round length | `end_ko` |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| warp6 vs warp4 | 0.242 | **0.739** | 0.000 / 0.150 | 0.000 / 0.168 | 3,364 | 1.36 s | 0.000 |
-| warp6 vs warp5 | 0.294 | **0.684** | 0.125 / 0.103 | 0.018 / 0.060 | 955 | 3.75 s | 0.143 |
-| warp5 vs warp4 | 0.118 | **0.868** | 0.000 / 0.051 | 0.000 / 0.240 | 3,353 | 1.35 s | 0.000 |
-| warp7 vs warp6 | 0.387 | **0.560** | 0.188 / 0.015 | 0.425 / 0.025 | 672 | 5.13 s | 0.613 |
-| warp7 vs warp5 | 0.293 | **0.550** | 0.152 / 0.045 | 0.007 / 0.045 | 671 | 5.41 s | 0.159 |
-| warp7 vs passive | 0.501 | 0.458 | 0.000 / 0.501 | 0.000 / 0.458 | 3,520 | 1.30 s | 0.000 |
+| A vs B | A wins | B wins | A strong | B strong | `long_share` | A in long | B in long | round length | `end_ko` |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| warp6 vs warp4 | 0.238 | **0.740** | 0.013 | **0.109** | 0.003 | 0.250 | 0.750 | 1.35 s | 0.000 |
+| warp6 vs warp5 | 0.297 | **0.676** | 0.124 | **0.384** | 0.561 | 0.173 | 0.788 | 3.71 s | 0.126 |
+| warp5 vs warp4 | 0.114 | **0.871** | 0.011 | **0.078** | 0.006 | 0.855 | 0.145 | 1.34 s | 0.000 |
+| warp7 vs warp6 | 0.384 | **0.544** | 0.325 | **0.467** | 0.820 | 0.366 | 0.551 | 5.12 s | 0.585 |
+| warp7 vs warp5 | 0.282 | **0.553** | 0.189 | **0.334** | 0.729 | 0.234 | 0.555 | 5.39 s | 0.156 |
+| warp7 vs passive | 0.498 | 0.450 | 0.053 | 0.000 | 0.002 | 0.417 | 0.583 | 1.30 s | 0.000 |
 
 **The order is the reverse of the chronology, and it is transitive**: warp4 beats warp5 and
 warp6, warp5 beats warp6 and warp7, warp6 beats warp7. Four changes that each moved a
-training metric in the right direction each lost the previous arm's fight.
+training metric in the right direction each lost the previous arm's fight. **The two stricter
+readings do not rescue the newest arms** -- the strong-win column gives the same order, and by
+a wider margin than the win rate does (warp5 outscores warp6 3.1x on strong wins against 2.3x
+on wins). What the columns change is what a win *means*, and that is a property of the pair.
 
-The reason is in the round length, not in the punch columns. Every pairing the older arms
-win finishes at **1.35 s with `end_ko` 0.000** -- the fight ends because somebody tips over,
-not because anybody was hurt, and warp4 drags any opponent into that regime. warp6 and warp7
-against each other last 5.13 s and settle 61% of rounds on the damage cap, which is the only
-matchup in the table that looks like boxing; there warp6 wins by *retiring* warp7 (0.425 of
-rounds against 0.188). The single most uncomfortable number: **warp5 flails 34.1 attempts a
-round at 0.049 accuracy and still beats warp7 in 55% of rounds, while warp7 lands twice the
-punch value (1.64 against 0.83)** -- landing more, and far more accurately, loses, because
-the loss is a fall and not a score.
+**`long_share` is the most informative number in the table and it belongs to no arm.** warp4
+drags every pairing it is in down to 1.35 s -- 0.3% of its rounds with warp6 last past 3 s,
+0.6% with warp5 -- so its 0.109 strong wins are damage concentrated inside a shove, and its
+0.855-in-long against warp5 is roughly twenty rounds, not a result. warp6 and warp7 are the
+only pair that fights: 82% of their rounds pass 3 s, 58.5% end on the damage cap, and there
+the strong column says what the win column says -- **warp6 boxes better than warp7** (0.467
+against 0.325). So the honest summary is not "the arm that deals most damage" versus "the arm
+that wins most": the arms that win are the ones that end the fight before damage can decide
+it, and the one that boxes best is warp6, which is only visible in the single pairing where a
+fight happens at all.
 
-Two things follow, and neither is a compute decision. The win rate as currently defined
-measures *who is standing when someone stops standing*; making it measure boxing is a rule
-choice (score only wins where the loser was hit, which the `retired` column already reports
-per pairing). And the scene's old attractor is still there: the arena's own self-check roll
--- two passive boxers, nobody attacking -- has one of them down inside 200 steps on its own,
-so "somebody is on the floor at 1.3 s" is partly the stance rather than the fight. See
-"The falls are not about the opponent" above; the league says the same thing from the other
-side, and it says the arms that hide it best in self-play are the ones that lose it fastest
-in a fight.
+The single most uncomfortable number: **warp5 flails 34.1 attempts a round at 0.049 accuracy
+and still beats warp7 in 55% of rounds, while warp7 lands twice the punch value (1.62 against
+0.84)** -- landing more, and far more accurately, loses, because the loss is a fall and not a
+score. And the scene's old attractor sits underneath all of it: the arena's own self-check
+roll -- two passive boxers, nobody attacking -- has one of them down inside 200 steps on its
+own, so "somebody is on the floor at 1.3 s" is partly the stance rather than the fight. See
+"The falls are not about the opponent" above.
+
+What the two stricter readings settle is the decision, not the ranking. The ranking is robust
+-- warp4 > warp5 > warp6 > warp7 on wins, on strong wins, and on the win rate inside long
+rounds wherever enough long rounds exist to say so. But that means **a rule which scored only
+damage-borne wins would still crown warp4**, so "make the scoreboard measure boxing" does not
+select for boxing on this scene. The thing that would has to make rounds last, and that is the
+stability problem, not the metric.
 
 ### Traps in the warp path, one run each
 
@@ -511,6 +522,12 @@ in a fight.
   `a_win_ko 0.000` while `end_ko` in the same table said 63% of rounds ended on the cap.
   The env's own health test could not see it because it calls `_reward` directly, so the
   self-check now asserts the reported array is not the live one.
+- **A re-run of the same matchup is not the same number.** warp7 vs warp6, same seed, same
+  code, four separate runs: `a_win` 0.384-0.395, `b_win` 0.538-0.560, 672-687 rounds. Warp's
+  contact reductions are not bit-reproducible on the GPU and two bodies in contact amplify the
+  difference, so the arena's own run-to-run spread is about one point of win rate. Gaps below
+  ~3 points are noise; the 14-16 point gaps between arms, and the 3x gaps on strong wins, clear
+  it by an order of magnitude.
 - **The motion reference has four ways to lie quietly.** CMU's Vicon-dialect ASF/AMC
   pins elbow deflection at 90° whatever the subject did, which is why the pipeline
   reads BVH; BVH channel values must be sliced in pre-order DFS or the fists come out
@@ -557,12 +574,14 @@ close it.
    warp7 at **0.395 of rounds won against warp6's 0.538** (676 closed rounds), and a second
    roll at double the sample and another seed put it at 0.421 against 0.520 (1,347 rounds).
    The books balance the way they have to: `a_win_ko + b_win_ko` = 0.568 against `end_ko`
-   0.569, and the two fall columns 0.366 against `end_fell` 0.375. The question this replaces
-   is the ordering
-   of the arms -- the newest one lost to the one before it, on the metric the training log
-   cannot see, so "which checkpoint is the champion" now needs a league table rather than a
-   narrative, and the arms that have never been scored in the warp arena (warp1-warp5) still
-   have to be.
+   0.569, and the two fall columns 0.366 against `end_fell` 0.375. The league table that
+   followed is above, and the ordering it gives is the reverse of the chronology on every
+   criterion the arena now reports -- wins, strong wins, and wins inside rounds long enough to
+   be called fights. So what is open is no longer which metric to read but why the newest arms
+   lose a fight they win on punch quality: they are the ones on the floor at 1.3 s, and a rule
+   that scored only damage-borne wins would still crown the scrum (that was checked, not
+   assumed). warp1-warp3 have still never been scored -- warp1 trained at a 1.3 m spawn and the
+   arena refuses to mix geometries on purpose.
 3. **~~Nobody has ever run out a clock.~~ Answered by warp5.** `end_fell` fell from 1.00 to
    0.58 over its own run: 42% of rounds now end because the 480 steps ran out. In the
    deterministic probe a round lasts 476 of 480 steps and only 12% of closures are falls.
