@@ -59,7 +59,7 @@ def main(argv=None) -> int:
         params_p, _params_v, _opt, norm, trained_steps = pickle.load(handle)
     print(f"{step.name}: policy trained to {trained_steps:,} learner steps "
           f"({ 'sampled' if args.stochastic else 'deterministic'} actions)", flush=True)
-    forward = make_forward(cfg, params_p, norm, args.stochastic)
+    forward = numpy_forward(cfg, params_p, norm, args.stochastic)
 
     spawn = cfg["spawn_distance"]
     env = WarpBoxing(nworld=1, n_frames=cfg["n_frames"], spawn_distance=spawn,
