@@ -8,8 +8,11 @@ $boxingHostRecord = Join-Path $boxingRuns 'skills_200m_host.json'
 if (Test-Path -LiteralPath $boxingHostRecord) {
     $boxingPrevious = Get-Content -LiteralPath $boxingHostRecord -Raw | ConvertFrom-Json
     $boxingExisting = Get-Process -Id $boxingPrevious.pid -ErrorAction SilentlyContinue
+    # PowerShell may deserialize ISO JSON strings as DateTime. Compare UTC
+    # ticks rather than a formatted string against a deserialized object.
+    $boxingRecordedStart = [datetime]$boxingPrevious.started_utc
     if ($boxingExisting -and $boxingExisting.ProcessName -eq 'wsl' -and
-        $boxingExisting.StartTime.ToUniversalTime().ToString('o') -eq $boxingPrevious.started_utc) {
+        $boxingExisting.StartTime.ToUniversalTime().Ticks -eq $boxingRecordedStart.ToUniversalTime().Ticks) {
         throw "A training WSL host is already running: PID $($boxingPrevious.pid)."
     }
 }
