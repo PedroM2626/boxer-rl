@@ -1,6 +1,6 @@
 # Assisted boxing: 200M continuation
 
-Status: **running**. Updated: 2026-10-21T18:26:45.661315+00:00.
+Status: **running**. Updated: 2026-10-21T20:04:29.486934+00:00.
 
 Requested budget: 200,000,000 learner transitions total, including the 2,109,440-transition seed. A world step counts twice.
 
@@ -14,6 +14,7 @@ Milestones are evaluated with deterministic self-play and against the pinned 2.1
 | --- | --- | --- | --- | --- |
 | 10,000,000 | 10,014,720 | 4.590 / 4.500 | 0.000 / 0.000 | 0.363 |
 | 25,000,000 | 25,006,080 | 4.578 / 4.445 | 0.000 / 0.004 | 0.539 |
+| 50,000,000 | 50,012,160 | 3.734 / 3.500 | 0.234 / 0.180 | 0.895 |
 
 Machine-readable records: [milestones](results/skills_200m/state.json).
 Weights: `checkpoints/skills_200m/`. Videos: `fights/skills_200m/`.
