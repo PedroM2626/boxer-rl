@@ -146,7 +146,14 @@ def play(env: WarpBoxing, policy_a, policy_b, steps: int,
     # punches, and one out only because its torso rolled past the down threshold
     # lost to a fall. Without the split, winning because you fell on top of the
     # other boxer is indistinguishable from winning on the scorecards.
-    knocked_out = log["damage"][end, world] >= env._damage_cap
+    absorbed = log["damage"][end, world]
+    knocked_out = absorbed >= env._damage_cap
+    # And a second split, because the first one is not enough. The down test is
+    # physical, so a shove that topples an opponent wins the round even though no
+    # punch was ever scored -- `end_ko` 0.000 with a win rate of 0.740 is exactly
+    # that fight. `*_win_topple` is a win against a corner that finished the round
+    # having absorbed nothing; `*_win_hit` is a win against a corner that was scored
+    # on first. They partition the wins, and only the second one is boxing.
     survived = (end - start + 1)[finite]
     dt = env.n_frames * float(env._model.opt.timestep)
 
@@ -166,6 +173,10 @@ def play(env: WarpBoxing, policy_a, policy_b, steps: int,
         "a_win_down": mean(a_win & ~knocked_out[:, 1]),
         "b_win_ko": mean(b_win & knocked_out[:, 0]),
         "b_win_down": mean(b_win & ~knocked_out[:, 0]),
+        "a_win_topple": mean(a_win & (absorbed[:, 1] <= 0.0)),
+        "a_win_hit": mean(a_win & (absorbed[:, 1] > 0.0)),
+        "b_win_topple": mean(b_win & (absorbed[:, 0] <= 0.0)),
+        "b_win_hit": mean(b_win & (absorbed[:, 0] > 0.0)),
         "rounds": int(finite.sum()),
         "dropped_rounds": float(1.0 - finite.mean()) if finite.size else 1.0,
         # how the rounds ended, as fractions of closed rounds; these can co-occur
@@ -312,10 +323,10 @@ def _check() -> int:
            and np.allclose(totals[0], [3.0, 0.0])
            and np.allclose(totals[1], [2.0, 1.5]))
 
-    env = WarpBoxing(nworld=8, round_steps=40, spawn_jitter=0.0, yaw_jitter=0.0,
+    env = WarpBoxing(nworld=8, round_steps=200, spawn_jitter=0.0, yaw_jitter=0.0,
                      pose_noise=0.0)
     statue = make_opponent("passive", env)
-    result = play(env, statue, statue, steps=60, seed=0)
+    result = play(env, statue, statue, steps=240, seed=0)
     total = sum(result[key] for key in ("a_win", "b_win", "draw", "undecided"))
     expect("two statues close rounds and the fractions add up to 1",
            result["rounds"] > 0 and abs(total - 1.0) < 1e-9
@@ -323,6 +334,12 @@ def _check() -> int:
     expect("nobody attacks, so nobody lands a punch",
            result["a_punch_value"] == 0.0 and result["b_punch_value"] == 0.0
            and result["a_attempts"] == 0.0 and result["b_attempts"] == 0.0)
+    # The topple/hit split has to be a partition of the wins, not a third opinion
+    # about them: every win either scored on the loser or did not.
+    expect("the win attributions partition the wins without overlap",
+           abs(result["a_win_topple"] + result["a_win_hit"] - result["a_win"]) < 1e-9
+           and abs(result["b_win_topple"] + result["b_win_hit"] - result["b_win"]) < 1e-9
+           and abs(result["a_win_ko"] + result["a_win_down"] - result["a_win"]) < 1e-9)
     print(f"  roll: {result['rounds']} rounds, undecided {result['undecided']:.2f}, "
           f"end_fell {result['end_fell']:.2f}, end_ko {result['end_ko']:.2f}, "
           f"end_time {result['end_time']:.2f}, floor "
