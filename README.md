@@ -23,7 +23,8 @@ gated on the striker's fist closing on the opponent.
 
 **Where this is at:** the physics, the throughput and the measurement machinery work, and
 as of warp7 the two boxers stand, trade punches that land, and sometimes end a fight on
-damage. Measured on its final checkpoint in its own engine: rounds of **364 of 480 control
+damage -- though "as of" no longer means "best", because the fights below rank warp6 above
+it. Measured on its final checkpoint in its own engine: rounds of **364 of 480 control
 steps**, **43% of swings converting** (against 6% at the start of the run and 37% for warp6),
 2.17 punch-value per world-round, 0.1% of the rollout on the floor, corners 0.515 m apart,
 and **5-9% of rounds closing on a knockout** rather than a torso tilting past 45 degrees.
