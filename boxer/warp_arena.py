@@ -37,6 +37,13 @@ from boxer.warp_train import make_opponent, warp_run
 # number and a log number can be compared without re-deriving either.
 HEAD, TORSO = 0.999, 0.499
 
+# A win counts as a boxing win only if the loser had absorbed at least this much
+# when it went down: 1.0 is one clean head shot or two torso shots, which is above
+# the brush of a body leaning on an arm (0.35) that a scrum hands out for free.
+# And a round counts as a fight only past this many control steps (150 = 3 s),
+# because the pairings that end at 1.35 s decide who is standing, not who boxes.
+STRONG, LONG_DEFAULT = 1.0, 150
+
 # Geometry a run trained under: name -> (type, default, env attribute). The
 # defaults are WarpBoxing's own; a run's warp_config.json overrides them, and a
 # flag overrides that.
@@ -96,12 +103,13 @@ def outcomes(done: np.ndarray, out_by: np.ndarray):
 
 
 def play(env: WarpBoxing, policy_a, policy_b, steps: int,
-         seed: int = 0) -> dict[str, float]:
+         seed: int = 0, long_steps: int = LONG_DEFAULT) -> dict[str, float]:
     """Rolls ``steps`` control steps of ``env.nworld`` parallel rounds, A as red.
 
     Returns means over the rounds that closed inside the window, plus ``rounds``,
     how many there were. ``a_win + b_win + draw + undecided`` is 1 as long as one
-    round closed.
+    round closed. ``long_steps`` sets where a round starts counting as a fight
+    rather than a scuffle (see ``LONG_DEFAULT``).
     """
     # log name -> the name WarpBoxing reports it under
     CHANNELS = (("out_by", "out_by"), ("damage", "damage"), ("scored", "scored_by"),
@@ -154,11 +162,25 @@ def play(env: WarpBoxing, policy_a, policy_b, steps: int,
     # that fight. `*_win_topple` is a win against a corner that finished the round
     # having absorbed nothing; `*_win_hit` is a win against a corner that was scored
     # on first. They partition the wins, and only the second one is boxing.
-    survived = (end - start + 1)[finite]
+    length = end - start + 1
+    # Two stricter readings, because "any damage at all" is a low bar in a scrum --
+    # leaning on an arm absorbs 0.35 -- and a 1.35 s round has no time to be a fight.
+    # `*_win_strong` asks that the loser had absorbed a clean shot (>= STRONG) when it
+    # went down; `*_win_long` is the win rate inside the rounds that lasted at least
+    # `long_steps` steps, over those rounds only, with `long_share` saying how many
+    # there were. Neither replaces the win rate above; both are answers to "did it
+    # box", which the win rate alone is not.
+    long_round = length >= long_steps
+    kept_long = finite & long_round
+    survived = length[finite]
     dt = env.n_frames * float(env._model.opt.timestep)
 
     def mean(values) -> float:
         kept = np.asarray(values, dtype=np.float64)[finite]
+        return float(kept.mean()) if kept.size else float("nan")
+
+    def mean_over(mask, values) -> float:
+        kept = np.asarray(values, dtype=np.float64)[mask]
         return float(kept.mean()) if kept.size else float("nan")
 
     def ratio(numerator, denominator) -> float:
@@ -177,6 +199,12 @@ def play(env: WarpBoxing, policy_a, policy_b, steps: int,
         "a_win_hit": mean(a_win & (absorbed[:, 1] > 0.0)),
         "b_win_topple": mean(b_win & (absorbed[:, 0] <= 0.0)),
         "b_win_hit": mean(b_win & (absorbed[:, 0] > 0.0)),
+        "a_win_strong": mean(a_win & (absorbed[:, 1] >= STRONG)),
+        "b_win_strong": mean(b_win & (absorbed[:, 0] >= STRONG)),
+        # win rate inside the rounds long enough to be fights, over those rounds only
+        "a_win_long": mean_over(kept_long, a_win), "b_win_long": mean_over(kept_long, b_win),
+        "long_share": float(kept_long.sum() / max(finite.sum(), 1)),
+        "long_steps": float(long_steps),
         "rounds": int(finite.sum()),
         "dropped_rounds": float(1.0 - finite.mean()) if finite.size else 1.0,
         # how the rounds ended, as fractions of closed rounds; these can co-occur
@@ -233,7 +261,8 @@ def pool(forward: dict[str, float], reverse: dict[str, float]) -> dict[str, floa
 
 def matchup(env: WarpBoxing, spec_a: str, spec_b: str, steps: int,
             seed: int = 0, swap_sides: bool = True,
-            stochastic: bool = False) -> dict[str, float]:
+            stochastic: bool = False,
+            long_steps: int = LONG_DEFAULT) -> dict[str, float]:
     """Plays two opponents, optionally with the corners exchanged and pooled.
 
     ``swap_sides`` matters more than it looks: the two corners of the scene are not
@@ -247,10 +276,11 @@ def matchup(env: WarpBoxing, spec_a: str, spec_b: str, steps: int,
     """
     a = make_opponent(spec_a, env, stochastic=stochastic)
     b = make_opponent(spec_b, env, stochastic=stochastic)
-    forward = play(env, a, b, steps, seed)
+    forward = play(env, a, b, steps, seed, long_steps=long_steps)
     if not swap_sides:
         return forward
-    return pool(forward, play(env, b, a, steps, seed + 10_000))
+    return pool(forward, play(env, b, a, steps, seed + 10_000,
+                              long_steps=long_steps))
 
 
 def checkpoints(specs) -> list[tuple[str, dict]]:
@@ -340,6 +370,15 @@ def _check() -> int:
            abs(result["a_win_topple"] + result["a_win_hit"] - result["a_win"]) < 1e-9
            and abs(result["b_win_topple"] + result["b_win_hit"] - result["b_win"]) < 1e-9
            and abs(result["a_win_ko"] + result["a_win_down"] - result["a_win"]) < 1e-9)
+    # And the stricter readings have to sit inside each other: a retirement is a
+    # strong win, a strong win is a win the loser was scored on, none of them can
+    # exceed the win rate. A number out of that order is the attribution being wrong,
+    # not the fight being strange.
+    for side in ("a", "b"):
+        expect(f"{side}'s win readings nest (ko <= strong <= hit <= win)",
+               result[f"{side}_win_ko"] <= result[f"{side}_win_strong"] + 1e-9
+               and result[f"{side}_win_strong"] <= result[f"{side}_win_hit"] + 1e-9
+               and result[f"{side}_win_hit"] <= result[f"{side}_win"] + 1e-9)
     print(f"  roll: {result['rounds']} rounds, undecided {result['undecided']:.2f}, "
           f"end_fell {result['end_fell']:.2f}, end_ko {result['end_ko']:.2f}, "
           f"end_time {result['end_time']:.2f}, floor "
@@ -365,6 +404,9 @@ def _parse_args(argv=None):
         overrides.add_argument(f"--{name.replace('_', '-')}", dest=name, type=kind,
                                default=None, help="override the recorded value")
     ap.add_argument("--no-swap", action="store_true", help="do not exchange corners")
+    ap.add_argument("--long-steps", type=int, default=LONG_DEFAULT,
+                    help="a round counts as a fight (and enters *_win_long) only past "
+                         "this many control steps; 150 is 3 s of the 50 Hz clock")
     ap.add_argument("--stochastic", action="store_true",
                     help="sample from each policy instead of taking its mean action")
     ap.add_argument("--self-check", action="store_true",
@@ -407,7 +449,8 @@ def main(argv=None) -> int:
           f"steps, corners {'swapped and pooled' if not args.no_swap else 'fixed'}, "
           f"{'stochastic' if args.stochastic else 'deterministic'})\n", flush=True)
     result = matchup(env, args.policy_a, args.policy_b, steps, seed=args.seed,
-                     swap_sides=not args.no_swap, stochastic=args.stochastic)
+                     swap_sides=not args.no_swap, stochastic=args.stochastic,
+                     long_steps=args.long_steps)
     if not result["rounds"]:
         raise SystemExit(f"no round closed in {steps} steps: raise --steps or "
                          "lower --round-steps")
