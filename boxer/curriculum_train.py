@@ -1,0 +1,193 @@
+"""GPU PPO for an unassisted full-body curriculum stage.
+
+Checkpoints contain normalizer, actor and critic, with a verified model contract.
+Brax does not expose Adam state here; restarting is explicitly a warm start.
+"""
+from __future__ import annotations
+
+import argparse
+import datetime as dt
+import functools
+import hashlib
+import json
+from pathlib import Path
+import pickle
+import subprocess
+import sys
+import time
+
+import jax
+import jax.numpy as jp
+import numpy as np
+from brax.training.acme import running_statistics
+from brax.training.agents.ppo import networks, train as ppo
+from mujoco_playground import wrapper
+
+from boxer.checkpoint_io import atomic_bytes, atomic_json
+from boxer.curriculum_env import UnassistedG1, STAGES, PLAYGROUND_REVISION, MENAGERIE_REVISION, stage_config
+
+
+def utc():
+    return dt.datetime.now(dt.timezone.utc).isoformat()
+
+
+def jax_compat():
+    if not hasattr(jax, "device_put_replicated"):
+        def replicate(tree, devices):
+            stacked = jax.tree.map(lambda x: jp.stack([x] * len(devices)), tree)
+            mesh = jax.sharding.Mesh(tuple(devices), axis_names=("replica",))
+            return jax.device_put(stacked, jax.sharding.NamedSharding(
+                mesh, jax.sharding.PartitionSpec("replica")))
+        jax.device_put_replicated = replicate
+
+
+def network_factory():
+    return functools.partial(networks.make_ppo_networks,
+        policy_hidden_layer_sizes=(256, 128, 128),
+        value_hidden_layer_sizes=(256, 128, 128),
+        policy_obs_key="state", value_obs_key="privileged_state")
+
+
+def contract(env):
+    m = env.mj_model
+    return dict(playground_revision=PLAYGROUND_REVISION,
+                menagerie_revision=MENAGERIE_REVISION,
+                actuators=[m.actuator(i).name for i in range(m.nu)],
+                position_gains=m.actuator_gainprm[:, 0].tolist(),
+                default_pose=np.asarray(env._default_pose).tolist(),
+                action_scale=float(env._config.action_scale), dt=env.dt,
+                observation_size={k: list(v) if isinstance(v, tuple) else int(v)
+                                  for k, v in env.observation_size.items()},
+                policy_layers=[256, 128, 128], value_layers=[256, 128, 128],
+                normalization_variance_epsilon=0.01, assistance=False)
+
+
+def save_policy(root, params, metadata):
+    payload = pickle.dumps(jax.device_get(params), protocol=pickle.HIGHEST_PROTOCOL)
+    filename = f"step-{metadata['stage_steps']}.pkl"
+    metadata = dict(metadata, sha256=hashlib.sha256(payload).hexdigest(), file=filename,
+                    optimizer_saved=False)
+    atomic_bytes(root / filename, payload)
+    atomic_json(root / (filename + ".json"), metadata)
+    atomic_json(root / "latest.json", metadata)
+
+
+def load_policy_params(root):
+    root = Path(root)
+    manifest = json.loads((root / "latest.json").read_text())
+    payload = (root / manifest["file"]).read_bytes()
+    if hashlib.sha256(payload).hexdigest() != manifest["sha256"]:
+        raise ValueError(f"checkpoint checksum mismatch: {root}")
+    return pickle.loads(payload), manifest
+
+
+def inference(env, params):
+    net = network_factory()(env.observation_size, env.action_size,
+                           preprocess_observations_fn=running_statistics.normalize)
+    return networks.make_inference_fn(net)(params, deterministic=True)
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--stage", choices=STAGES, default="balance")
+    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--steps", type=int, default=200_000_000)
+    parser.add_argument("--worlds", type=int, default=1024)
+    parser.add_argument("--checkpoints", type=int, default=200)
+    parser.add_argument("--seed", type=int, default=41)
+    parser.add_argument("--init-from", type=Path)
+    parser.add_argument("--warm-start", action="store_true")
+    parser.add_argument("--publish-run", type=Path)
+    parser.add_argument("--preview-snapshots", action="store_true")
+    parser.add_argument("--git-executable", default="git")
+    parser.add_argument("--git-worktree")
+    args = parser.parse_args(argv)
+    jax_compat()
+    if args.worlds < 1 or args.worlds & (args.worlds - 1):
+        raise ValueError("worlds must be a positive power of two")
+    config = stage_config(args.stage)
+    config.naconmax = max(8192, args.worlds * 16)
+    env = UnassistedG1(args.stage, config=config)
+    env_contract = contract(env)
+    checkpoint = args.output / "checkpoint"
+    if (checkpoint / "latest.json").exists() and not args.warm_start:
+        raise ValueError("output already has a policy; use a new directory or --warm-start")
+    params, initial, offset = None, None, 0
+    if args.warm_start or args.init_from:
+        source = checkpoint if args.warm_start else args.init_from
+        params, initial = load_policy_params(source)
+        if initial["contract"] != env_contract:
+            raise ValueError("policy/model contract differs; refusing an unsafe transplant")
+        if args.warm_start:
+            if initial["stage"] != args.stage:
+                raise ValueError("warm start stage differs")
+            offset = initial["stage_steps"]
+        print("Warm start: actor, critic and normalizer restored; Adam and RNG are fresh.", flush=True)
+    if offset >= args.steps:
+        raise ValueError("stage budget already reached")
+    batch_size = max(128, args.worlds // 4)
+    block = batch_size * 20 * 4
+    epochs = max(1, min(args.checkpoints, (args.steps - offset) // block))
+    actual = epochs * max(1, -(-(args.steps - offset) // (epochs * block))) * block
+    config = dict(stage=args.stage, requested_steps=args.steps, offset_steps=offset,
+                  invocation_steps=actual, worlds=args.worlds, seed=args.seed,
+                  batch_size=batch_size, num_minibatches=4, unroll_length=20,
+                  contract=env_contract, environment=env._config.to_dict(),
+                  optimizer_resume=False,
+                  initialized_from=str(args.init_from) if args.init_from else None)
+    args.output.mkdir(parents=True, exist_ok=True)
+    atomic_json(args.output / "config.json", config)
+    started = time.monotonic()
+    last_publication = -5_000_000
+
+    def checkpoint_fn(step, make_policy, policy_params):
+        del make_policy
+        leaves = jax.tree.leaves(jax.device_get(policy_params))
+        if not all(np.isfinite(x).all() for x in leaves):
+            raise FloatingPointError("non-finite policy; preserving the previous checkpoint")
+        save_policy(checkpoint, policy_params, dict(stage=args.stage,
+            stage_steps=offset + int(step), invocation_steps=int(step),
+            updated_utc=utc(), contract=env_contract))
+
+    def progress(step, metrics):
+        nonlocal last_publication
+        record = dict(stage=args.stage, stage_steps=offset + int(step),
+                      updated_utc=utc(), elapsed_seconds=time.monotonic() - started,
+                      metrics={k: float(np.asarray(v)) for k, v in metrics.items()})
+        atomic_json(args.output / "progress.json", record)
+        with (args.output / "progress.jsonl").open("a") as stream:
+            stream.write(json.dumps(record, allow_nan=False) + "\n")
+        print(json.dumps(record), flush=True)
+        if ((args.publish_run or args.preview_snapshots) and int(step) > 0
+                and (int(step) - last_publication >= 5_000_000
+                     or int(step) >= actual)):
+            if args.preview_snapshots:
+                # The parent waits with Adam resident; evaluation does not
+                # interrupt/restart optimization and has a small separate batch.
+                with (args.output / "preview.log").open("a") as stream:
+                    subprocess.run([sys.executable, "-u", "-m", "boxer.curriculum_eval",
+                        str(checkpoint), "--worlds", "8", "--preview",
+                        "--output", str(args.output / "preview.json"),
+                        "--video", str(args.output / "preview.mp4")],
+                        stdout=stream, stderr=subprocess.STDOUT, check=True)
+            if args.publish_run:
+                from boxer.curriculum_job import publish
+                publish(args.publish_run, args.stage, args.git_executable, args.git_worktree)
+            last_publication = int(step)
+
+    print(json.dumps(config), flush=True)
+    ppo.train(environment=env, num_timesteps=args.steps - offset,
+        num_envs=args.worlds, episode_length=500,
+        wrap_env_fn=wrapper.wrap_for_brax_training,
+        learning_rate=3e-4, entropy_cost=0.005, discounting=0.97,
+        unroll_length=20, batch_size=batch_size, num_minibatches=4,
+        num_updates_per_batch=4, normalize_observations=True,
+        normalize_observations_std_eps=0.01,
+        max_grad_norm=1.0, network_factory=network_factory(), seed=args.seed,
+        num_evals=epochs + 1, num_eval_envs=8, run_evals=False,
+        restore_params=params, policy_params_fn=checkpoint_fn, progress_fn=progress)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

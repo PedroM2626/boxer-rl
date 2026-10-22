@@ -1,0 +1,155 @@
+"""Unassisted G1 balance/locomotion, built on the pinned MuJoCo Playground task.
+
+All 29 joints, including all 12 leg joints, are policy actions. No pelvis
+springs, root tracking, gravity compensation or pose playback are used.
+"""
+from __future__ import annotations
+
+import os
+from pathlib import Path
+import subprocess
+
+import jax
+import jax.numpy as jp
+import numpy as np
+from etils import epath
+
+from mujoco_playground._src import mjx_env
+from mujoco_playground._src.locomotion.g1 import joystick
+
+from boxer.scene import ARM_JOINTS, GUARD_ARMS_BOXING
+
+PLAYGROUND_REVISION = "12ad7f3842791ced39f27e5ac96d066bbe361653"
+MENAGERIE_REVISION = "1b86ece576591213e2b666ebf59508454200ca97"
+STAGES = ("balance", "walk", "approach")
+
+
+def configure_assets():
+    cached = Path(os.environ.get("BOXER_CURRICULUM_MENAGERIE",
+                                 Path.home() / ".cache/boxing-curriculum/menagerie"))
+    if cached.exists():
+        revision = subprocess.check_output(
+            ["git", "-C", str(cached), "rev-parse", "HEAD"], text=True).strip()
+        if revision != MENAGERIE_REVISION:
+            raise ValueError(f"curriculum assets need {MENAGERIE_REVISION}, found {revision}")
+        mjx_env.MENAGERIE_PATH = epath.Path(cached)
+    else:
+        mjx_env.ensure_menagerie_exists()
+
+
+def stage_config(stage, impl="warp"):
+    if stage not in STAGES:
+        raise ValueError(f"unknown curriculum stage {stage!r}")
+    cfg = joystick.default_config()
+    cfg.impl = impl
+    cfg.episode_length = 500
+    # One global contact allocation for a modest laptop batch, rather than the
+    # upstream 8192-world default. Each robot has very few feet-only contacts.
+    cfg.naconmax = 8192
+    cfg.push_config.enable = False
+    cfg.noise_config.level = 0.25
+    cfg.reward_config.scales.action_rate = -0.01
+    if stage == "balance":
+        cfg.lin_vel_x = [0.0, 0.0]
+        cfg.lin_vel_y = [0.0, 0.0]
+        cfg.ang_vel_yaw = [0.0, 0.0]
+        cfg.reward_config.scales.feet_phase = 0.0
+        cfg.reward_config.scales.feet_air_time = 0.0
+        cfg.reward_config.scales.alive = 1.0
+        cfg.reward_config.scales.pose = -0.25
+        cfg.reward_config.scales.base_height = -5.0
+        cfg.reward_config.base_height_target = 0.755
+    else:
+        cfg.lin_vel_x = [-0.35, 0.55]
+        cfg.lin_vel_y = [-0.25, 0.25]
+        cfg.ang_vel_yaw = [-0.5, 0.5]
+    return cfg
+
+
+class UnassistedG1(joystick.Joystick):
+    """Same action/observation contract in standing and command-following tasks."""
+
+    def __init__(self, stage="balance", impl="warp", config=None):
+        configure_assets()
+        self.stage = stage
+        super().__init__(config=config or stage_config(stage, impl))
+        # Carry a compact boxing guard while balancing/walking, so transferring
+        # to the boxing posture will not suddenly shift the centre of mass.
+        for hand, values in GUARD_ARMS_BOXING.items():
+            for joint, value in zip(ARM_JOINTS, values):
+                index = int(self.mj_model.joint(f"{hand}_{joint}_joint").qposadr[0])
+                self._init_q = self._init_q.at[index].set(value)
+                self._default_pose = self._default_pose.at[index - 7].set(value)
+        self.leg_action_indices = np.array([
+            a for a in range(self.mj_model.nu)
+            if any(word in self.mj_model.actuator(a).name
+                   for word in ("hip", "knee", "ankle"))], dtype=np.int32)
+        if len(self.leg_action_indices) != 12 or self.action_size != 29:
+            raise ValueError("unexpected G1 joint contract")
+        if not np.array_equal(self.mj_model.jnt_qposadr[
+                self.mj_model.actuator_trnid[:, 0]], np.arange(7, 36)):
+            raise ValueError("actuator order must match the observed joint order")
+        if self.mj_model.neq or np.any(self.mj_model.body_gravcomp):
+            raise ValueError("unassisted curriculum forbids welds and gravity compensation")
+
+    def _metrics(self, data, info):
+        velocity = self.get_local_linvel(data, "pelvis")
+        return dict(
+            upright=self.get_gravity(data, "torso")[-1],
+            root_height=data.qpos[2],
+            linear_tracking_error=jp.linalg.norm(velocity[:2] - info["command"][:2]),
+            yaw_tracking_error=jp.abs(self.get_gyro(data, "pelvis")[2] - info["command"][2]),
+            forward_speed=velocity[0],
+            leg_motion=jp.mean(jp.abs(data.qpos[7:][self.leg_action_indices]
+                                    - self._default_pose[self.leg_action_indices])),
+        )
+
+    def reset(self, rng):
+        state = super().reset(rng)
+        if self.stage == "approach":
+            # The target is a navigation marker, never a physical support.
+            forward = state.data.site_xmat[self._pelvis_imu_site_id][:2, 0]
+            distance = jax.random.uniform(jax.random.fold_in(rng, 91),
+                                          minval=1.8, maxval=2.2)
+            state.info["goal"] = state.data.qpos[:2] + distance * forward
+            state = self._approach_command(state)
+        state.metrics.update(self._metrics(state.data, state.info))
+        if self.stage == "approach":
+            state.metrics["goal_distance"] = jp.linalg.norm(
+                state.info["goal"] - state.data.qpos[:2])
+        return state
+
+    def step(self, state, action):
+        state = super().step(state, action)
+        if self.stage == "approach":
+            state = self._approach_command(state)
+        state.metrics.update(self._metrics(state.data, state.info))
+        if self.stage == "approach":
+            state.metrics["goal_distance"] = jp.linalg.norm(
+                state.info["goal"] - state.data.qpos[:2])
+        return state
+
+    def _approach_command(self, state):
+        delta = state.info["goal"] - state.data.qpos[:2]
+        rotation = state.data.site_xmat[self._pelvis_imu_site_id]
+        local = rotation[:2, :2].T @ delta
+        # Stop at boxing range. Only a requested velocity is changed: the
+        # policy must produce the torques that move and balance the robot.
+        distance = jp.linalg.norm(delta)
+        speed = jp.clip((distance - 0.75) * 0.8, 0.0, 0.45)
+        direction = local / jp.maximum(distance, 1e-6)
+        state.info["command"] = jp.array([
+            speed * direction[0], speed * direction[1],
+            jp.clip(jp.arctan2(local[1], local[0]), -0.5, 0.5)])
+        contact = jp.array([
+            state.data.sensordata[self.mj_model.sensor_adr[sensor]] > 0
+            for sensor in self._feet_floor_found_sensor])
+        return state.replace(obs=self._get_obs(state.data, state.info, contact))
+
+    def _get_termination(self, data):
+        # The upstream task allows extreme tilt before termination. A standing
+        # curriculum must end when the torso falls or the pelvis drops, rather
+        # than letting a prone robot collect a zero-velocity reward.
+        return (super()._get_termination(data)
+                | (self.get_gravity(data, "torso")[-1] < 0.60)
+                | (data.qpos[2] < 0.55))

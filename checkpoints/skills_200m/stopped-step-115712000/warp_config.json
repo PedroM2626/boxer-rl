@@ -1,0 +1,48 @@
+{
+  "environment": "skills",
+  "environment_version": 1,
+  "guard_pose": "boxing",
+  "balance_assistance": true,
+  "skill_prior": true,
+  "seed": 0,
+  "target_learner_steps": 150000000,
+  "checkpoint_interval_iterations": 50,
+  "worlds": 256,
+  "action_size": 6,
+  "obs_size": 140,
+  "round_steps": 600,
+  "n_frames": 5,
+  "spawn_distance": 0.62,
+  "action_scale": 1.0,
+  "damage_cap": 6.0,
+  "stun_steps": 10,
+  "mode": "selfplay",
+  "opponent": null,
+  "imitation": {
+    "path": null,
+    "w_imit": 0.3
+  },
+  "policy_layers": [
+    64,
+    64
+  ],
+  "value_layers": [
+    128,
+    128
+  ],
+  "ppo": {
+    "unroll_length": 20,
+    "batch_size": 256,
+    "num_minibatches": 4,
+    "num_updates_per_batch": 4,
+    "learning_rate": 0.0003,
+    "entropy_cost": 0.005,
+    "discounting": 0.99,
+    "gae_lambda": 0.95,
+    "clipping_epsilon": 0.2,
+    "value_cost": 0.5,
+    "std_min": 0.3,
+    "std_max": 2.0
+  },
+  "resume_from_step": 100003840
+}

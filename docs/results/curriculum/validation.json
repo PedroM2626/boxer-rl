@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-21",
+  "timezone": "America/Sao_Paulo",
+  "tests": {
+    "command": "python -m pytest tests/test_curriculum.py tests/test_curriculum_job.py tests/test_long_train.py -q",
+    "passed": 12,
+    "checks": [
+      "Free root, 29 controlled joints and 12 leg actions",
+      "Leg actions change physical qpos and actuator targets",
+      "No applied root forces or gravity compensation",
+      "Falls, missing displacement and non-finite metrics reject promotion",
+      "Corrupt checkpoints fail checksum validation",
+      "A failed stage gate prevents the next stage",
+      "Publishing jobs cannot share the artifact namespace"
+    ]
+  },
+  "gpu_smoke_runs": {
+    "initial_development_balance": 20480,
+    "balance_with_normalization_floor": 61440,
+    "walk_transfer": 40960,
+    "approach_transfer": 40960,
+    "weights_and_losses_finite": true,
+    "promotion_claimed": false
+  },
+  "dependencies": {
+    "setup_script_completed": true,
+    "installed_packages_compatible": 101,
+    "playground_revision": "12ad7f3842791ced39f27e5ac96d066bbe361653",
+    "menagerie_revision": "1b86ece576591213e2b666ebf59508454200ca97"
+  }
+}

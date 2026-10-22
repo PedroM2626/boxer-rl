@@ -124,6 +124,11 @@ def write_report(state):
                      f"{hits('a'):.3f} / {hits('b'):.3f} | "
                      f"{avg(self_results, 'a_head'):.3f} / {avg(self_results, 'b_head'):.3f} | "
                      f"{avg(baseline, 'a_win_with_points'):.3f} |")
+    if state.get("stop_reason"):
+        lines += ["", "## Interruption", "", state["stop_reason"], "",
+                  f"Last observed learner counter: {state.get('last_observed_learner_steps', 0):,}. "
+                  f"Last complete checkpoint: {state.get('current_checkpoint_steps', 0):,}. "
+                  "See [the unassisted curriculum](curriculum.md) for the replacement experiment."]
     lines += ["", "Machine-readable records: [milestones](results/skills_200m/state.json).",
               "Weights: `checkpoints/skills_200m/`. Videos: `fights/skills_200m/`.", "",
               "Raw progress, subprocess logs and the live job state remain under "

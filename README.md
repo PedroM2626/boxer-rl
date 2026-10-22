@@ -1,13 +1,43 @@
 # boxer — two humanoids learning to fight each other in JAX
 
-## Assisted boxing: the runnable sparring path
+## Current experiment: unassisted balance and locomotion curriculum
 
-The next experiment continues the pinned 2.11M seed to **200M total learner
-transitions**, with checkpoints, evaluation and video at 10M, 25M, 50M, 100M,
-150M and 200M. It runs to the planned budget through short-term plateaus.
+The assisted continuation was stopped at the user's request after **116,633,600
+observed transitions**; its last complete checkpoint, **115,712,000**, is
+preserved. That controller cannot learn footwork because it holds leg targets
+and stabilizes the pelvis.
+
+The replacement learns **all 29 joints, including 12 leg joints**, using the
+established G1 task from a pinned MuJoCo Playground revision. The body is free:
+no pelvis springs, welds, gravity compensation or root movement controller.
+Standing, command-following walking and navigation toward a marker starting
+1.8–2.2 m away have deterministic physical promotion gates. The default budget
+is **200M transitions per foundation stage**. Oscillating rewards do not stop it.
+Navigation stops at boxing range; the marker is not yet a physical opponent.
+The later transfer to two interacting boxers remains a separate experiment
+after the locomotion gates pass. This is not a claim that unassisted boxing
+has already been learned.
+
+```powershell
+# First install the separate WSL runtime: bash tools/setup_curriculum.sh
+powershell -ExecutionPolicy Bypass -File tools/start_curriculum.ps1 -Publish
+# After an interruption, add -WarmStart. This restores weights and observation
+# statistics with fresh Adam and RNG; it is not a full-state continuation.
+```
+
+See [curriculum design, gates and operations](docs/curriculum.md).
+Local job state: `runs/curriculum/state.json`; training progress:
+`runs/curriculum/balance/progress.json`. Published snapshots:
+`checkpoints/curriculum/`; measurements: `docs/results/curriculum/`.
+All source, documentation, logs and video labels are in English.
+
+## Archived assisted boxing: runnable sparring reference
+
+The stopped experiment continued the pinned 2.11M seed toward **200M total
+learner transitions**. Completed milestones were 10M, 25M, 50M and 100M.
 [Protocol and operations](docs/long-training-protocol.md) explain background
 execution, recovery and automatic commits/pushes; the
-[live published experiment report](docs/skills-200m.md) tracks completed milestones.
+[published experiment report](docs/skills-200m.md) records the interruption and completed milestones.
 
 The `skills` environment adds a hierarchical controller: a shared PPO policy
 chooses punches, head/body aim, advance, circle and guard for both G1 boxers.

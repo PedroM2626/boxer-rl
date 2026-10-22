@@ -1,6 +1,6 @@
 # Assisted boxing: 200M continuation
 
-Status: **failed**. Updated: 2026-10-22T00:16:59.648091+00:00.
+Status: **stopped_by_user**. Updated: 2026-10-22T00:18:49.839603+00:00.
 
 Requested budget: 200,000,000 learner transitions total, including the 2,109,440-transition seed. A world step counts twice.
 
@@ -17,6 +17,12 @@ Milestones are evaluated with deterministic self-play and against the pinned 2.1
 | 50,000,000 | 50,012,160 | 3.734 / 3.500 | 0.234 / 0.180 | 0.895 |
 | 100,000,000 | 100,003,840 | 5.062 / 5.066 | 0.637 / 0.629 | 0.953 |
 
+## Interruption
+
+User requested replacing assisted sparring with an unassisted balance and locomotion curriculum.
+
+Last observed learner counter: 116,633,600. Last complete checkpoint: 115,712,000. See [the unassisted curriculum](curriculum.md) for the replacement experiment.
+
 Machine-readable records: [milestones](results/skills_200m/state.json).
 Weights: `checkpoints/skills_200m/`. Videos: `fights/skills_200m/`.
 
@@ -25,5 +31,3 @@ Raw progress, subprocess logs and the live job state remain under `runs/skills_2
 A resume preserves actor, critic, optimizer, normalization and the saved PPO sampling key. Each milestone starts fresh physical rounds; simulator state is not restored. Legacy seeds without a saved key fold the seed step into the new key. This is not a bit-identical uninterrupted rollout.
 
 The computer and WSL must remain running. The job uses an exclusive run lock, atomic checkpoint writes and explicit output-path ownership for automatic Git commits. Unrelated staged changes block publishing.
-
-Failure: `training interrupted`.
