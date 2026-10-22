@@ -21,7 +21,8 @@ accepts an optional **training-only** `--tracking-sigma` value, enabling a
 controlled comparison without changing task defaults or the physical evaluator.
 The value changes both linear and angular exponential tracking kernels, so an
 experiment must be interpreted as joint velocity-reward sensitivity, not a
-linear-only intervention. No experimental training has been launched yet.
+linear-only intervention. The comparison was subsequently launched as recorded
+below; no experimental candidate has been adopted.
 
 ## Bounded comparison protocol
 
@@ -63,3 +64,42 @@ the default unchanged, and preserving the evaluator's original reward width,
 rollback-accounting, and process-overflow guard tests also passed. No extra GPU
 training was started and no claim about experimental learning outcomes follows
 from these tests.
+
+## Launched comparison, 2026-10-22 13:38 UTC review
+
+Directional failures persisted beyond 100M walking transitions. The main job
+was deliberately stopped after the complete 112,066,560 walking gate, retaining
+**315,392,000 main consumed transitions** and its existing 400M ceiling. Its
+checkpoint, config, and gate history are archived in
+`checkpoints/curriculum/walking-comparison-seed-112066560/`, with policy SHA-256
+`3866fd8b00d815b3d70b0c4cb5f2f235e5cd2ebf6b94af128c4f9e4c25814574`.
+The supervisor's generic `stopped_by_user` signal status records this authorized
+automatic intervention, rather than a new human stop request.
+
+The hidden persistent WSL host now runs `boxer.curriculum_compare`. It holds
+both the main run lock and publication namespace lock, preventing an overlapping
+main supervisor. Its local output is `runs/diagnosis/tracking-112066560/`:
+
+- One shared unchanged full baseline gate evaluates the immutable source.
+- The `default` and `sharp` arms each request at most 10M fresh transitions,
+  using the same policy, normalizer, critic, seed 42, and 1,024 worlds.
+- Each arm receives its own unchanged full post-training physical gate. The
+  runner rejects mismatched hashes, previews, missing directions, and invalid
+  gate metadata. It records actual rounded diagnostic transitions separately.
+- After success or an ordinary experiment error, the host automatically warm
+  starts the **original main policy**, with its original shared ceiling and
+  publication enabled. No candidate is selected automatically. Explicit SIGTERM
+  or SIGINT instead stops the runner without starting a new learner.
+
+The comparison's live phase, diagnostic accounting, errors, and final status
+are in its `state.json`; `baseline.json` and each arm's `evaluation.json` hold
+physical results. Host logs are `runs/tracking_comparison_host*.log`. The shared
+`runs/curriculum_host.json` identifies this persistent host, which later becomes
+the main supervisor through exec. This review launches the experiment; its
+outcome remains pending and must be assessed before any training change.
+
+Eighteen focused CPU tests passed for the launched runner and existing safety
+contracts. They include identical source/seed across arms, preserved original
+policy bytes, separate diagnostic accounting including partial failures,
+preview rejection, and refusal to overlap an active main lock. Bash syntax
+validation passed. These checks do not substitute for physical outcomes.

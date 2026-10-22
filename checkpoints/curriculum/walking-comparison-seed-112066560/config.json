@@ -1,0 +1,231 @@
+{
+  "stage": "walk_easy",
+  "requested_steps": 196674560,
+  "offset_steps": 0,
+  "invocation_steps": 196608000,
+  "worlds": 1024,
+  "seed": 42,
+  "batch_size": 256,
+  "num_minibatches": 4,
+  "unroll_length": 20,
+  "contract": {
+    "playground_revision": "12ad7f3842791ced39f27e5ac96d066bbe361653",
+    "menagerie_revision": "1b86ece576591213e2b666ebf59508454200ca97",
+    "actuators": [
+      "left_hip_pitch_joint",
+      "left_hip_roll_joint",
+      "left_hip_yaw_joint",
+      "left_knee_joint",
+      "left_ankle_pitch_joint",
+      "left_ankle_roll_joint",
+      "right_hip_pitch_joint",
+      "right_hip_roll_joint",
+      "right_hip_yaw_joint",
+      "right_knee_joint",
+      "right_ankle_pitch_joint",
+      "right_ankle_roll_joint",
+      "waist_yaw_joint",
+      "waist_roll_joint",
+      "waist_pitch_joint",
+      "left_shoulder_pitch_joint",
+      "left_shoulder_roll_joint",
+      "left_shoulder_yaw_joint",
+      "left_elbow_joint",
+      "left_wrist_roll_joint",
+      "left_wrist_pitch_joint",
+      "left_wrist_yaw_joint",
+      "right_shoulder_pitch_joint",
+      "right_shoulder_roll_joint",
+      "right_shoulder_yaw_joint",
+      "right_elbow_joint",
+      "right_wrist_roll_joint",
+      "right_wrist_pitch_joint",
+      "right_wrist_yaw_joint"
+    ],
+    "position_gains": [
+      75.0,
+      75.0,
+      75.0,
+      75.0,
+      20.0,
+      2.0,
+      75.0,
+      75.0,
+      75.0,
+      75.0,
+      20.0,
+      2.0,
+      75.0,
+      75.0,
+      75.0,
+      75.0,
+      75.0,
+      75.0,
+      75.0,
+      2.0,
+      2.0,
+      2.0,
+      75.0,
+      75.0,
+      75.0,
+      75.0,
+      2.0,
+      2.0,
+      2.0
+    ],
+    "default_pose": [
+      -0.31200000643730164,
+      0.0,
+      0.0,
+      0.6690000295639038,
+      -0.3630000054836273,
+      0.0,
+      -0.31200000643730164,
+      0.0,
+      0.0,
+      0.6690000295639038,
+      -0.3630000054836273,
+      0.0,
+      0.0,
+      0.0,
+      0.0729999989271164,
+      -0.21911999583244324,
+      0.1233299970626831,
+      0.10506000369787216,
+      -0.5573400259017944,
+      -0.00800000037997961,
+      -0.15000000596046448,
+      -0.0430000014603138,
+      -0.21911999583244324,
+      -0.123259998857975,
+      -0.10503000020980835,
+      -0.5573199987411499,
+      0.008999999612569809,
+      -0.15000000596046448,
+      0.0430000014603138
+    ],
+    "action_scale": 0.5,
+    "dt": 0.02,
+    "observation_size": {
+      "privileged_state": [
+        216
+      ],
+      "state": [
+        103
+      ]
+    },
+    "policy_layers": [
+      256,
+      128,
+      128
+    ],
+    "value_layers": [
+      256,
+      128,
+      128
+    ],
+    "normalization_variance_epsilon": 0.01,
+    "assistance": false
+  },
+  "environment": {
+    "action_repeat": 1,
+    "action_scale": 0.5,
+    "ang_vel_yaw": [
+      -0.125,
+      0.125
+    ],
+    "command_config": {
+      "a": [
+        1.0,
+        0.8,
+        1.0
+      ],
+      "b": [
+        0.9,
+        0.25,
+        0.5
+      ]
+    },
+    "ctrl_dt": 0.02,
+    "episode_length": 500,
+    "history_len": 1,
+    "impl": "warp",
+    "lin_vel_x": [
+      -0.0875,
+      0.1375
+    ],
+    "lin_vel_y": [
+      -0.0625,
+      0.0625
+    ],
+    "naconmax": 16384,
+    "njmax": 256,
+    "noise_config": {
+      "level": 0.25,
+      "scales": {
+        "gravity": 0.05,
+        "gyro": 0.2,
+        "joint_pos": 0.03,
+        "joint_vel": 1.5,
+        "linvel": 0.1
+      }
+    },
+    "push_config": {
+      "enable": true,
+      "interval_range": [
+        3.0,
+        5.0
+      ],
+      "magnitude_range": [
+        0.1,
+        0.3
+      ]
+    },
+    "restricted_joint_range": false,
+    "reward_config": {
+      "base_height_target": 0.5,
+      "max_contact_force": 500.0,
+      "max_foot_height": 0.15,
+      "scales": {
+        "action_rate": -0.01,
+        "alive": 0.0,
+        "ang_vel_xy": -0.15,
+        "base_height": 0.0,
+        "collision": -0.1,
+        "contact_force": -0.01,
+        "dof_acc": 0.0,
+        "dof_pos_limits": -1.0,
+        "energy": 0.0,
+        "feet_air_time": 2.0,
+        "feet_clearance": 0.0,
+        "feet_height": 0.0,
+        "feet_phase": 1.0,
+        "feet_slip": -0.25,
+        "joint_deviation_hip": -0.25,
+        "joint_deviation_knee": -0.1,
+        "lin_vel_z": 0.0,
+        "orientation": -2.0,
+        "pose": -0.1,
+        "stand_still": -1.0,
+        "termination": -100.0,
+        "torques": 0.0,
+        "tracking_ang_vel": 0.75,
+        "tracking_lin_vel": 1.0
+      },
+      "tracking_sigma": 0.25
+    },
+    "sim_dt": 0.002,
+    "soft_joint_pos_limit_factor": 0.95
+  },
+  "optimizer_resume": false,
+  "protocol": "recovery-v3",
+  "adaptive_gates": true,
+  "learning_rate": 0.0001,
+  "full_reset": true,
+  "policy_source_steps": 203325440,
+  "recovery_seed_sha256": "5ef6bab214257fdccd967f2533452b2ef00ab3b8874515ff245e6e72772db636",
+  "forced_restart": false,
+  "gate_every": 5000000,
+  "total_offset": 203325440,
+  "initialized_from": "/mnt/e/boxer-agent/runs/curriculum/balance/checkpoint"
+}

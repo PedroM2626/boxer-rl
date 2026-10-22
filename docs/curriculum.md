@@ -10,7 +10,9 @@ the initial/default allocation, not an additional per-level requirement.
 
 The [walking tracking comparison](curriculum-tracking-experiment.md) documents
 the subsequent directional plateau and a bounded training-only reward experiment.
-The active job and physical benchmark remain unchanged while it is prepared.
+The main job is temporarily paused at 315.392M consumed transitions for that
+isolated comparison. The physical benchmark is unchanged; the experiment host
+automatically resumes the original main policy afterward, pending analysis.
 
 ## Current protocol
 
