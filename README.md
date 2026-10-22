@@ -10,9 +10,12 @@ and stabilizes the pelvis.
 The replacement learns **all 29 joints, including 12 leg joints**, using the
 established G1 task from a pinned MuJoCo Playground revision. The body is free:
 no pelvis springs, welds, gravity compensation or root movement controller.
-Standing, command-following walking and navigation toward a marker starting
-1.8–2.2 m away have deterministic physical promotion gates. The default budget
-is **200M transitions per foundation stage**. Oscillating rewards do not stop it.
+Standing with gentle movement practice, slow walking, full walking and navigation
+toward a marker starting 1.8–2.2 m away have periodic physical promotion gates.
+Two consecutive complete passes advance the same policy immediately. Standing
+practice is retained during walking. **200M is an initial shared total ceiling**,
+including the 66.23M already trained; it is not a mandatory budget per stage.
+Oscillating rewards do not stop it.
 Navigation stops at boxing range; the marker is not yet a physical opponent.
 The later transfer to two interacting boxers remains a separate experiment
 after the locomotion gates pass. This is not a claim that unassisted boxing
@@ -20,14 +23,14 @@ has already been learned.
 
 ```powershell
 # First install the separate WSL runtime: bash tools/setup_curriculum.sh
-powershell -ExecutionPolicy Bypass -File tools/start_curriculum.ps1 -Publish
+powershell -ExecutionPolicy Bypass -File tools/start_curriculum.ps1 -Publish -WarmStart
 # After an interruption, add -WarmStart. This restores weights and observation
 # statistics with fresh Adam and RNG; it is not a full-state continuation.
 ```
 
 See [curriculum design, gates and operations](docs/curriculum.md).
 Local job state: `runs/curriculum/state.json`; training progress:
-`runs/curriculum/balance/progress.json`. Published snapshots:
+`runs/curriculum/<level>/progress.json`. Published snapshots:
 `checkpoints/curriculum/`; measurements: `docs/results/curriculum/`.
 All source, documentation, logs and video labels are in English.
 

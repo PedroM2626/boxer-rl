@@ -1,7 +1,7 @@
 """Persistent curriculum supervisor and scoped milestone publication.
 
-Stages run their full budget before a deterministic physical promotion gate.
-No training reward threshold, plateau detector or timer advances a stage.
+One policy progresses after repeated physical gates, under a shared total
+budget ceiling. No training reward threshold or timer advances a stage.
 """
 from __future__ import annotations
 
@@ -17,9 +17,9 @@ import subprocess
 import sys
 
 from boxer.checkpoint_io import atomic_bytes, atomic_json
+from boxer.curriculum_control import STAGES, promotion_ready
 
 ROOT = Path(__file__).resolve().parents[1]
-STAGES = ("balance", "walk", "approach")
 OWNED = ("checkpoints/curriculum", "docs/results/curriculum", "fights/curriculum")
 
 
@@ -42,7 +42,7 @@ def publish(run, stage, git_executable="git", git_worktree=None):
     atomic_json(destination / "latest.json", metadata)
     atomic_bytes(destination / "config.json", (source / "config.json").read_bytes())
     reports = ROOT / "docs/results/curriculum"
-    for name in ("progress.json", "evaluation.json", "preview.json"):
+    for name in ("progress.json", "evaluation.json", "preview.json", "gate_history.json", "training_result.json"):
         if (source / name).exists():
             atomic_bytes(reports / f"{stage}-{name}", (source / name).read_bytes())
     if (source / "evaluation.mp4").exists():
@@ -69,32 +69,59 @@ def publish(run, stage, git_executable="git", git_worktree=None):
 
 def run_child(command, log):
     with log.open("a") as stream:
-        child = subprocess.Popen(command, cwd=ROOT, stdout=stream, stderr=subprocess.STDOUT)
+        child = subprocess.Popen(command, cwd=ROOT, stdout=stream, stderr=subprocess.STDOUT,
+                                 start_new_session=True)
         try:
             code = child.wait()
         except BaseException:
-            child.terminate()
+            try:
+                os.killpg(child.pid, signal.SIGTERM)
+            except ProcessLookupError:
+                pass
             try:
                 child.wait(timeout=25)
             except subprocess.TimeoutExpired:
-                child.kill()
+                os.killpg(child.pid, signal.SIGKILL)
                 child.wait()
             raise
     if code:
         raise RuntimeError(f"child exited {code}; inspect {log}")
 
 
+def saved_steps(run, stage):
+    path = Path(run) / stage / "checkpoint/latest.json"
+    return int(json.loads(path.read_text())["stage_steps"]) if path.exists() else 0
+
+
+def total_steps(run):
+    return sum(saved_steps(run, stage) for stage in STAGES)
+
+
+def certified(stage_dir, stage):
+    history_path, checkpoint = stage_dir / "gate_history.json", stage_dir / "checkpoint/latest.json"
+    if not history_path.exists() or not checkpoint.exists():
+        return False
+    history = json.loads(history_path.read_text())
+    metadata = json.loads(checkpoint.read_text())
+    return (promotion_ready(history, stage)
+            and history[-1]["stage_steps"] == metadata["stage_steps"]
+            and history[-1]["checkpoint_sha256"] == metadata["sha256"])
+
+
 def main(argv=None):
     import fcntl
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=Path("runs/curriculum"))
-    parser.add_argument("--steps-per-stage", type=int, default=200_000_000)
+    parser.add_argument("--max-total-steps", type=int, default=200_000_000)
+    parser.add_argument("--gate-every", type=int, default=5_000_000)
     parser.add_argument("--worlds", type=int, default=1024)
     parser.add_argument("--publish", action="store_true")
     parser.add_argument("--warm-start", action="store_true")
     parser.add_argument("--git-executable", default="git")
     parser.add_argument("--git-worktree")
     args = parser.parse_args(argv)
+    if args.max_total_steps <= 0 or args.gate_every <= 0:
+        raise ValueError("total ceiling and gate interval must be positive")
     args.output = args.output.resolve()
     args.output.mkdir(parents=True, exist_ok=True)
     with ExitStack() as stack:
@@ -112,12 +139,14 @@ def main(argv=None):
         if previous and not args.warm_start:
             raise ValueError("existing job requires --warm-start (fresh Adam and RNG)")
         state = dict(status="running", phase="starting", pid=os.getpid(),
-                     started_utc=utc(), steps_per_stage=args.steps_per_stage,
-                     completed=previous.get("completed", []), assistance=False,
+                     started_utc=utc(), protocol="adaptive-v2",
+                     max_total_steps=args.max_total_steps, gate_every=args.gate_every,
+                     completed=[stage for stage in STAGES
+                                if certified(args.output / stage, stage)], assistance=False,
                      publishing=args.publish)
 
         def record(**changes):
-            state.update(changes, updated_utc=utc())
+            state.update(changes, total_steps=total_steps(args.output), updated_utc=utc())
             atomic_json(state_file, state)
             print(json.dumps(state), flush=True)
 
@@ -133,41 +162,45 @@ def main(argv=None):
                     continue
                 stage_dir = args.output / stage
                 stage_dir.mkdir(exist_ok=True)
-                manifest_path = stage_dir / "checkpoint/latest.json"
-                saved = json.loads(manifest_path.read_text()) if manifest_path.exists() else {}
+                saved = saved_steps(args.output, stage)
+                used = total_steps(args.output)
+                remaining = args.max_total_steps - used
+                block = max(128, args.worlds // 4) * 20 * 4
+                if remaining < block:
+                    record(status="budget_reached", phase="stopped", stage=stage,
+                           reason="Shared total ceiling reached; no automatic promotion or reset.")
+                    if args.publish and (saved or index):
+                        publish(args.output, stage if saved else STAGES[index - 1],
+                                args.git_executable, args.git_worktree)
+                    return 0
                 record(phase="training", stage=stage)
-                if saved.get("stage_steps", 0) < args.steps_per_stage:
-                    command = [sys.executable, "-u", "-m", "boxer.curriculum_train",
-                        "--stage", stage, "--output", str(stage_dir),
-                        "--steps", str(args.steps_per_stage), "--worlds", str(args.worlds),
-                        "--seed", str(41 + index), "--preview-snapshots"]
-                    if saved:
-                        command += ["--warm-start"]
-                    elif index:
-                        command += ["--init-from", str(args.output / STAGES[index - 1] / "checkpoint")]
-                    if args.publish:
-                        command += ["--publish-run", str(args.output),
-                            "--git-executable", args.git_executable]
-                        if args.git_worktree:
-                            command += ["--git-worktree", args.git_worktree]
-                    run_child(command, stage_dir / "train.log")
-                record(phase="evaluating", stage=stage)
-                run_child([sys.executable, "-u", "-m", "boxer.curriculum_eval",
-                    str(stage_dir / "checkpoint"), "--output", str(stage_dir / "evaluation.json"),
-                    "--video", str(stage_dir / "evaluation.mp4")], stage_dir / "eval.log")
-                result = json.loads((stage_dir / "evaluation.json").read_text())
-                if not result["passed"]:
-                    record(status="gate_not_passed", phase="stopped",
-                           reason="Full stage budget completed; physical gate did not pass. No promotion.")
+                command = [sys.executable, "-u", "-m", "boxer.curriculum_train",
+                    "--stage", stage, "--output", str(stage_dir),
+                    "--steps", str(saved + remaining), "--worlds", str(args.worlds),
+                    "--seed", str(41 + index), "--adaptive-gates",
+                    "--gate-every", str(args.gate_every), "--total-offset", str(used - saved)]
+                if saved:
+                    command += ["--warm-start"]
+                elif index:
+                    command += ["--init-from", str(args.output / STAGES[index - 1] / "checkpoint")]
+                if args.publish:
+                    command += ["--publish-run", str(args.output),
+                        "--git-executable", args.git_executable]
+                    if args.git_worktree:
+                        command += ["--git-worktree", args.git_worktree]
+                run_child(command, stage_dir / "train.log")
+                if not certified(stage_dir, stage):
+                    record(status="budget_reached", phase="stopped",
+                           reason="Available training budget ended without two consecutive physical passes. No promotion.")
                 else:
                     state["completed"].append(stage)
                     record(phase="stage_completed")
                 if args.publish:
                     publish(args.output, stage, args.git_executable, args.git_worktree)
-                if not result["passed"]:
+                if not certified(stage_dir, stage):
                     return 0
             record(status="foundation_completed", phase="stopped",
-                   reason="Standing, walking and navigation gates passed. Paired boxing transfer is a separate experiment.")
+                   reason="Two consecutive gates passed at every level. Paired boxing transfer is a separate experiment.")
             if args.publish:
                 publish(args.output, "approach", args.git_executable, args.git_worktree)
         except KeyboardInterrupt:

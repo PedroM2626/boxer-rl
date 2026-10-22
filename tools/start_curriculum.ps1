@@ -1,4 +1,4 @@
-param([switch]$Publish, [switch]$WarmStart, [int]$StepsPerStage = 200000000, [int]$Worlds = 1024)
+param([switch]$Publish, [switch]$WarmStart, [int]$MaxTotalSteps = 200000000, [int]$GateEvery = 5000000, [int]$Worlds = 1024)
 # A hidden persistent Windows host keeps foreground WSL training alive.
 $ErrorActionPreference = 'Stop'
 $boxingProject = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
@@ -14,7 +14,7 @@ if (Test-Path -LiteralPath $boxingHostRecord) {
         throw "A curriculum WSL host is already running: PID $($boxingPrevious.pid)."
     }
 }
-$boxingArguments = @('-e', 'bash', 'tools/run_curriculum.sh', '--steps-per-stage', $StepsPerStage, '--worlds', $Worlds)
+$boxingArguments = @('-e', 'bash', 'tools/run_curriculum.sh', '--max-total-steps', $MaxTotalSteps, '--gate-every', $GateEvery, '--worlds', $Worlds)
 if ($Publish) { $boxingArguments += '--publish' }
 if ($WarmStart) { $boxingArguments += '--warm-start' }
 $boxingHost = Start-Process -FilePath 'wsl.exe' -ArgumentList $boxingArguments `
@@ -26,4 +26,4 @@ $boxingHost = Start-Process -FilePath 'wsl.exe' -ArgumentList $boxingArguments `
     started_utc = $boxingHost.StartTime.ToUniversalTime().ToString('o')
     publishing = [bool]$Publish
 } | ConvertTo-Json | Set-Content -LiteralPath $boxingHostRecord
-Write-Output "Started hidden WSL host PID $($boxingHost.Id). Inspect runs/curriculum/state.json and balance/progress.json."
+Write-Output "Started hidden WSL host PID $($boxingHost.Id). Inspect runs/curriculum/state.json and the active level's progress.json."

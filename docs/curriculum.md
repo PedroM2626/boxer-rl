@@ -1,203 +1,193 @@
-# Unassisted G1 curriculum
+# Adaptive unassisted G1 curriculum
 
-## Decision and preserved experiment
+## Current protocol
 
-On 2026-10-21 the user authorized stopping assisted sparring and implementing a
-standing/walking curriculum. The assisted learner had reached **116,633,600
-observed transitions**. Its last durable checkpoint, **115,712,000**, is
-archived under `checkpoints/skills_200m/stopped-step-115712000/`, including the
-actor, critic, optimizer, normalization and saved sampling key. Its 100M
-evaluation remains the last evaluated assisted milestone. Interruption was a
-requested change of experiment, not evidence that 200M steps were completed.
+The user approved replacing fixed per-stage budgets with performance-based
+promotion and gradually mixed standing/walking practice on 2026-10-21.
+**200M transitions is now an initial shared ceiling across the foundation,
+including the 66,232,320 transitions already trained. It is not a minimum or a
+200M allocation for every stage.** It may finish earlier when skills pass their
+gates. A budget is not evidence that a skill has been learned.
 
-The assisted six-action policy holds the legs at posture targets and applies
-pelvis springs. More training cannot turn those unavailable controls into learned
-balance. The replacement starts a fresh 29-action policy, with a compact boxing
-guard, and learns the legs and the rest of the body together.
+One full-body actor controls all 29 joints, including the 12 leg joints. Each
+level loads the preceding actor, critic and observation statistics after checking
+the same model/action/observation contract. No random policy replaces a trained
+one. This is a single policy learning progressively harder tasks, rather than
+independent agents relearning each task from scratch.
 
-## Physical control contract
+There are no pelvis springs, root welds, gravity compensation, root position
+controllers or gait playback. Position servos produce joint torques at 50 Hz;
+ten 2 ms MuJoCo steps resolve each action. The policy uses 103 actor inputs and
+the critic 216 privileged inputs. The compact boxing guard and all joint actions
+remain available throughout. Normalization has variance epsilon 0.01 so new
+nonzero commands cannot explode previously constant input dimensions.
 
-`boxer/curriculum_env.py` subclasses the official MuJoCo Playground G1 joystick
-environment. Every position actuator receives a policy action at 50 Hz; ten
-2 ms physics substeps resolve each action. Actions offset the default pose by
-up to 0.5 rad. The actor sees 103 inputs, including requested local velocity,
-proprioception, previous actions and gait phase. The critic has 216 privileged
-inputs. All 12 hip/knee/ankle actuators are controllable. Position servos create
-physical joint torques; no servo moves the floating base directly.
+## Mixed practice and increasing difficulty
 
-There are no root welds, stabilizing pelvis springs, gravity compensation,
-root tracking forces or prescribed gait playback. The training push feature is
-disabled initially. Evaluation may inject a documented horizontal velocity
-impulse; this is a disturbance, not assistance. A trial ends on the first fall
-(pelvis below 0.55 m or torso up component below 0.60), the upstream leg-contact
-termination, or non-finite state. Evaluation never resets a fallen trial and
-counts it as surviving.
-
-The upstream feet-only training model is used for locomotion. It does not yet
-contain the two-boxer head/body/fist collision scene. Its physical floor
-contacts and joint dynamics are real, but its locomotion results must not be
-presented as boxing contact results.
-
-## Stages and promotion gates
-
-The supervisor runs each foundation stage for its full configured budget before
-evaluating it. Default: **200M transitions per stage**, potentially 600M across
-all three. One transition is one robot's 20 ms control step. PPO rounds budgets
-up to whole training blocks; actual counters are recorded in every snapshot.
-The two-boxer experiment has a different counting convention and is not added
-to these counters. Early random-policy falls and short-term reward plateaus do
-not cancel training.
-
-| Stage | Training task | Gate, for every evaluation seed and command |
+| Level | Training command distribution | Complete physical gate |
 | --- | --- | --- |
-| Balance | Zero requested translation/yaw, standing height and posture rewards, no stepping-phase reward | At least 95% survive 10 s, linear tracking error ≤0.15 m/s, yaw error ≤0.25 rad/s; same thresholds after a 0.2 m/s impulse on each horizontal axis at 4 s |
-| Walk | Forward/backward/lateral/yaw command tracking, retaining the boxing guard | At least 90% survive 10 s; linear error ≤0.20 m/s and yaw error ≤0.25 rad/s; translation in each requested direction ≥45% of commanded speed ×10 s |
-| Approach | A fixed navigation marker begins 1.8–2.2 m ahead; request velocity toward it and stop at 0.75 m | At least 90% survive and finish within 0.95 m; tracking errors as in walking |
+| Balance | 70% zero commands; otherwise very gentle forward/backward, lateral and yaw requests (x -0.03 to +0.05 m/s, y +/-0.02 m/s, yaw +/-0.05 rad/s) | At least 95% survive 10 s, linear error <=0.15 m/s and yaw error <=0.25 rad/s; repeat with a horizontal impulse at 4 s |
+| Walk easy | 40% zero commands; otherwise 25% of full walking ranges | At least 90% survive every direction, linear error <=0.20 m/s, yaw error <=0.25 rad/s and actual directed displacement >=45% of requested speed x10 s |
+| Walk | 40% zero commands; x -0.35 to +0.55 m/s, y +/-0.25 m/s, yaw +/-0.5 rad/s | Same physical criteria at full evaluation commands |
+| Approach | Navigate toward a fixed marker initially 1.8-2.2 m ahead, stopping around 0.75 m away | At least 90% survive and finish within 0.95 m, with walking tracking-error limits |
 
-The deterministic gate uses seeds **7 and 23**, with **32 independent reset
-states per trial**. Walking tests standing, +0.40/-0.25 m/s forward/backward,
-±0.20 m/s laterally and ±0.40 rad/s yaw. Velocity error excludes the first
-second of settling; survival includes it. A failed direction cannot be hidden
-by averaging successful directions. Distances come from simulated root qpos,
-never from commanded velocity or animation. Failed trials contribute zero to
-the required direction's displacement. Rewards do not decide promotion.
+Standing practice is retained when walking starts. The air-time reward is zero
+for zero commands, so standing trials do not reward unnecessary hopping. The
+balance level begins learning small movement corrections before its standing
+gate passes. Reward changes and command ranges are recorded in each config.
 
-A failed gate after the full budget stops in `gate_not_passed` and preserves
-the policy for inspection. There is no automatic promotion or endless restart.
-A successful stage seeds the next stage's actor, critic and normalization.
-Normalization uses a variance epsilon of 0.01 (standard-deviation floor 0.1).
-Zero command dimensions in standing must not produce enormous normalized
-inputs when walking commands are introduced. Adam and the sampling RNG are fresh at the stage change. This is deliberate
-fine-tuning, not an optimizer-state resume.
+Evaluation uses seeds **7 and 23**, with **32 reset states per trial**. Walking
+tests standing, +0.40/-0.25 m/s forward/backward, +/-0.20 m/s lateral and
++/-0.40 rad/s yaw; easy walking tests one quarter of those commands. Balance
+tests both undisturbed trials and a [0.2, -0.2] m/s horizontal velocity impulse
+at four seconds. That impulse is a disturbance, never a stabilizing controller.
 
-## Transfer to two boxers
+Every trial ends at its first fall: pelvis below 0.55 m, torso up component
+below 0.60, the upstream leg-contact termination, or non-finite state. Failed
+trials never reset into the survival count. Tracking errors exclude the first
+second of settling; survival includes it. Distances come from simulated qpos,
+and a fallen trial contributes zero to the required directed displacement.
+The evaluation gate checks every seed, disturbance and requested direction.
 
-The final intended task is two free humanoids spawning around two metres apart,
-approaching, defending and landing legal fist contacts while maintaining their
-own balance. **This paired transfer is not implemented by the foundation job.**
-The supervisor explicitly ends in `foundation_completed` after the approach
-gate; it does not relaunch the assisted environment or call navigation boxing.
+## Adaptive advancement and budget
 
-Before paired training, the locomotion actor must be integrated with the real
-fist/head/torso collision scene and checked against the recorded joint order,
-gains, default pose, action scaling and observation contract. The older
-Menagerie boxing scene and the Playground feet-only model cannot be assumed
-interchangeable. Evaluation must then measure real clean punches, falls,
-footwork and engagement from the wider spawn distance, including swapped
-corners and held-out seeds. A learned locomotion controller can be a lower
-layer, but the old pelvis springs and fixed leg targets must remain disabled.
+The learner performs a full gate before optimization and approximately every
+**5M new transitions**, rounded to checkpoint boundaries. The optimizer stays
+resident while a small evaluation subprocess runs. Failed gates reset the
+passing streak and training continues; they do not restart PPO or stop it for
+a short plateau. No training reward threshold advances a level.
 
-## Reproducible runtime and operation
+**Two consecutive complete passes on distinct checkpoints are required.** A
+preview, fewer than 32 worlds, a missing direction, wrong stage, stale checkpoint
+hash or identical policy cannot certify promotion. The supervisor independently
+checks the gate history and latest checkpoint before starting the next level.
+Promotion ends the current PPO invocation immediately; it does not wait for a
+fixed 200M horizon. The next level fine-tunes the same networks and normalizer
+with fresh Adam and RNG, as explicitly recorded in its config.
 
-The dedicated Linux/WSL environment is `$HOME/venvs/boxing_curriculum`; the
-existing assisted Warp environment is not modified. Run:
+All levels share `--max-total-steps` (default 200M). Earlier foundation work is
+included once; the old assisted experiment is separate and is not added. The
+learner rounds its requested remaining ceiling DOWN to complete PPO epochs, so
+it cannot overshoot the shared ceiling. A small remainder can be unused.
+Without two passing gates, exhausting that allocation ends in `budget_reached`,
+with no automatic promotion, endless retry or random reset. An explicit later
+extension can use `-MaxTotalSteps <larger-total> -WarmStart`.
+
+This protocol does not assert that any particular level needs 200M steps or
+that the foundation will succeed within that initial total.
+
+## Preserved training and recovery semantics
+
+The preceding fixed-budget balance run stopped at a durable checkpoint of
+**66,232,320** transitions. An immutable pre-migration snapshot and original
+config are in `checkpoints/curriculum/archive-fixed-budget-66232320/`. Its last
+small preview is not a promotion certificate. The current run warm-starts that
+policy and keeps the cumulative counter, with gentle mixed commands enabled.
+
+**Brax 0.14.2's policy callback does not expose Adam or simulator/RNG state.**
+Snapshots include the actor, critic, normalizer and exact contract, but are
+marked `optimizer_saved: false`. This one-time migration therefore initializes
+Adam and RNG again; it is not a full-state continuation. The same limitation
+applies after shutdown or interruption and at a level change. It does not apply
+to periodic evaluations within one live PPO invocation: Adam remains resident.
+
+The earlier assisted boxing run stopped at 116,633,600 observed transitions,
+with its last durable checkpoint at 115,712,000. That independent experiment
+and its real contact-scoring results remain archived in
+`checkpoints/skills_200m/stopped-step-115712000/` and `docs/skills-200m.md`.
+Its six-action policy is not used as a replacement for learned leg control.
+
+## Operation and published artifacts
+
+The isolated Linux/WSL GPU runtime is `$HOME/venvs/boxing_curriculum`:
 
 ```bash
 bash tools/setup_curriculum.sh
 ```
 
-`requirements-curriculum.txt` pins JAX CUDA, Brax, MuJoCo/MJX/Warp and the upstream
-Playground commit. Asset setup fetches only the G1 directory at the pinned
-Menagerie commit. Set `BOXER_CURRICULUM_MENAGERIE` to choose another cache path;
-the environment rejects a different Git revision. Setup requires either `uv`
-(also detected in the existing project venv) or Python 3.12 with venv/pip.
-The 6 GB laptop uses 1,024 worlds by default, smaller than the official large-GPU configuration. CUDA
-physics and PPO share one GPU. Set `XLA_PYTHON_CLIENT_PREALLOCATE=false` and
-`JAX_PLATFORMS=cuda,cpu`; the CPU device is needed for Brax callbacks.
+Setup uses uv (also detected in the existing project venv) or Python 3.12 with
+venv/pip. It installs `requirements-curriculum.txt` and fetches only the pinned
+G1 asset directory. `BOXER_CURRICULUM_MENAGERIE` chooses another asset cache;
+the environment rejects a different revision. The default is 1,024 worlds on
+the 6 GB laptop, with `JAX_PLATFORMS=cuda,cpu`, preallocation disabled and EGL
+rendering. Existing assisted-training environments are not modified.
 
-Start a persistent hidden Windows WSL host from the repository:
+From PowerShell in the repository, start a persistent hidden WSL host:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File tools/start_curriculum.ps1 -Publish
+powershell -ExecutionPolicy Bypass -File tools/start_curriculum.ps1 -Publish -WarmStart
+# A fresh output without prior state does not need -WarmStart.
 ```
 
-The launcher protects against a duplicate live host and the supervisor holds an
-exclusive Linux file lock. Publishing also holds a shared artifact-namespace
-lock so a differently named run cannot overwrite the same published policies.
-Keep Windows and WSL running. Outputs:
+`-MaxTotalSteps` sets the shared total ceiling, `-GateEvery` sets the evaluation
+interval, and `-Worlds` sets the parallel batch. `BOXER_CURRICULUM_PYTHON`
+selects another interpreter. Keep Windows and WSL running. The launcher checks
+for a duplicate host; the supervisor holds both a run lock and a publication
+namespace lock. Stopping the supervisor terminates the entire learner process
+group, including an active evaluator, while retaining completed checkpoints.
 
-- `runs/curriculum/state.json`: supervisor PID, phase, stage and completion.
-- `runs/curriculum/<stage>/progress.json` and `progress.jsonl`: actual counters,
-  throughput and training metrics. The first compilation may take minutes.
-- `runs/curriculum/<stage>/checkpoint/`: atomic, checksum-verified snapshots.
-- `runs/curriculum/<stage>/train.log` and `eval.log`: full subprocess logs.
-- `checkpoints/curriculum/<stage>/`: latest published policy and model contract.
-- `docs/results/curriculum/`: published progress and completed gate evaluations.
-- `fights/curriculum/`: deterministic videos after a stage budget completes.
+- `runs/curriculum/state.json`: supervisor status, active level and total at the last supervisor event.
+- `runs/curriculum/<level>/progress.json`: live level and total transition counters and PPO metrics.
+- `runs/curriculum/<level>/checkpoint/`: numbered atomic, checksum-verified policies.
+- `runs/curriculum/<level>/gates/`: exact historical gate results for each evaluated checkpoint.
+- `runs/curriculum/<level>/gate_history.json`: full promotion history.
+- `runs/curriculum/<level>/training_result.json`: passing streak and promotion/budget status.
+- `checkpoints/curriculum/<level>/`: latest published policy and complete contract/config.
+- `docs/results/curriculum/`: published progress, gate history and job state.
+- `fights/curriculum/<level>.mp4`: one actual simulated trajectory from the latest full gate.
 
-At the first snapshot and roughly every five million transitions, a development
-preview also evaluates eight resets at seed 7 and renders one trajectory. PPO
-waits with its optimizer resident, then continues; this preview does not restart
-training. Preview JSON is marked `kind: development_preview` and `passed: null`,
-and **cannot promote a stage**. Its video is `<stage>-preview.mp4`; the complete
-two-seed gate and final evaluation video remain separate. This makes early
-falls and later changes visible without interpreting a short preview as proof.
+With `-Publish`, completed gates export artifacts, commit and push only the
+owned curriculum paths. Git retains previous policies. Unrelated staged files
+block publication. Preview files from the original protocol remain historical
+records; their own counters/hashes identify them and they cannot promote a level.
+Failures retain the last valid checkpoint and are recorded explicitly.
 
-Checkpoints are saved approximately every million transitions. At the first
-checkpoint, approximately every five million transitions afterwards, and the
-stage's final checkpoint, `-Publish` exports the actor, critic, observation normalizer,
-config and manifest, then commits and pushes only the owned curriculum artifact
-paths. Git keeps earlier snapshots; local numbered snapshots are also retained.
-Unrelated staged changes block publication. A publication/child failure is
-reported and stops the job with its latest valid local checkpoint preserved.
-The gate result is published before any next stage begins.
-
-To stop, send SIGTERM to the Linux supervisor PID from `state.json`:
+Stop by sending SIGTERM to the Linux supervisor PID from `state.json`:
 
 ```powershell
 wsl -e kill -TERM <supervisor-pid>
 ```
 
-To recover, use the same launcher with `-WarmStart`. **Brax 0.14.2 does not expose
-the optimizer or rollout state in its policy callback.** These new snapshots
-restore the actor, critic and normalizer, but initialize Adam, RNG and physical
-rounds again. Cumulative stage counters include the restored checkpoint, and
-only the remaining budget runs. They are explicitly marked `optimizer_saved:
-false`; they are not equivalent to the full-state assisted checkpoints.
-
-For a manual single-stage experiment and deterministic evaluation:
+For standalone evaluation:
 
 ```bash
 export PYTHONPATH=. JAX_PLATFORMS=cuda,cpu XLA_PYTHON_CLIENT_PREALLOCATE=false MUJOCO_GL=egl
-"$HOME/venvs/boxing_curriculum/bin/python" -m boxer.curriculum_train \
-  --stage balance --output runs/my_balance --steps 200000000
 "$HOME/venvs/boxing_curriculum/bin/python" -m boxer.curriculum_eval \
-  runs/my_balance/checkpoint --output runs/my_balance/evaluation.json \
-  --video runs/my_balance/evaluation.mp4
-"$HOME/venvs/boxing_curriculum/bin/python" -m pytest \
-  tests/test_curriculum.py tests/test_curriculum_job.py -q
+  runs/curriculum/balance/checkpoint --output runs/manual_gate.json
 ```
 
-## Initial validation
+## Scope, validation and upstream attribution
 
-A 20,480-transition GPU smoke run saved and reloaded the new policy. Its
-deterministic standing evaluation failed, as expected at this budget: zero
-10-second survivors, with mean survival roughly 0.74/0.89 s at seeds 7/23
-(eight reset states per seed). This verifies that the measurement detects
-falls; it is not evidence of learned balance. The long run starts separately
-from fresh parameters rather than transplanting this smoke policy.
+The foundation uses the established feet-only G1 locomotion model. It has real
+floor contacts and joint dynamics, but does not contain a physical opponent or
+the boxing fist/head/torso collision scene. The navigation marker is not a
+support or a boxer. After all levels pass, the supervisor ends honestly in
+`foundation_completed`. Transfer to two free boxers remains a separate
+integration and contact-validation experiment; this job never silently
+re-enables pelvis springs or calls navigation boxing.
 
-A separate 61,440-transition, 1,024-world balance pilot with the normalization
-floor reached about **43,810 transitions/s** in its last training epoch after
-compilation, with finite weights and losses. This is a short throughput
-measurement, not a sustained-speed guarantee or an evaluation of balance.
+Before paired training, check joint order, gains, default pose, action scaling,
+observations and physical dynamics against the boxing scene. Then evaluate real
+legal fist contacts, falls, footwork and engagement from wider spawns, exchanging
+corners and using held-out seeds. The two scenes are not assumed interchangeable.
 
-The balance-to-walk and walk-to-approach warm starts each completed 40,960
-additional smoke transitions with finite weights and losses. Twelve focused
-tests passed, including physical leg authority, checksum rejection, failed-gate
-handling, publication exclusion and the assisted report regression checks.
-The setup script completed and the dependency checker accepted all 101 installed
-packages. [Validation records](results/curriculum/validation.json), pilot metrics
-and the runtime package list are committed under `docs/results/curriculum/`.
+Historical smoke tests, pilot metrics and dependency versions remain under
+`docs/results/curriculum/`. Adaptive tests additionally verify early exit before
+the budget, repeated complete gates, shared accounting, stale/preview rejection,
+command mixtures and physical leg authority. These are engineering validations,
+not evidence that locomotion or boxing has already been mastered.
 
-## Upstream attribution
+The adaptive change passed **20 focused tests**. A separate GPU diagnostic
+warm-started the preserved actor into easy walking, executed 20,480 transitions
+and completed two 14-trial gates (32 resets per trial, seeds 7/23). Both gates
+failed, so it exhausted its deliberately small diagnostic allocation without
+promotion. Parameters and losses remained finite. This diagnostic is separate
+from the main counter and is not its initialization source. See the
+[adaptive validation record](results/curriculum/adaptive-validation.json).
 
-This implementation depends on the Apache-2.0 licensed
-[MuJoCo Playground](https://github.com/google-deepmind/mujoco_playground)
-G1 joystick task at `12ad7f3842791ced39f27e5ac96d066bbe361653` and
-[MuJoCo Menagerie](https://github.com/google-deepmind/mujoco_menagerie)
-G1 assets at `1b86ece576591213e2b666ebf59508454200ca97`.
-The upstream repository's licenses remain with those dependencies. No humanoid
-model or animation was invented for this experiment. The architecture, reward
-changes, physical gates, checkpoint manifests and job management here are
-project additions.
+Dependencies are the Apache-2.0 licensed
+[MuJoCo Playground](https://github.com/google-deepmind/mujoco_playground) G1 task
+at `12ad7f3842791ced39f27e5ac96d066bbe361653` and
+[MuJoCo Menagerie](https://github.com/google-deepmind/mujoco_menagerie) assets at
+`1b86ece576591213e2b666ebf59508454200ca97`. Upstream licenses remain with those
+dependencies; no humanoid model or animation was invented for this experiment.

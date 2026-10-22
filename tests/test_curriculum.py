@@ -59,3 +59,17 @@ def test_real_physics_has_free_root_and_leg_action_authority():
     # A robot placed too low is a fall, even if its linear speed is zero.
     fallen = state.data.replace(qpos=state.data.qpos.at[2].set(.4))
     assert bool(env._get_termination(fallen))
+
+
+@pytest.mark.parametrize("stage,probability", [("balance", .70), ("walk_easy", .40), ("walk", .40)])
+def test_command_mixture_preserves_standing_as_ranges_expand(stage, probability):
+    env = object.__new__(UnassistedG1)
+    env.stage, env._config = stage, stage_config(stage)
+    commands = np.asarray(jax.jit(jax.vmap(env.sample_command))(
+        jax.random.split(jax.random.PRNGKey(41), 10000)))
+    assert abs(np.mean(np.all(commands == 0, axis=1)) - probability) < .03
+    assert np.any(np.linalg.norm(commands, axis=1) > 0)
+    for axis, name in enumerate(("lin_vel_x", "lin_vel_y", "ang_vel_yaw")):
+        low, high = env._config[name]
+        assert commands[:, axis].min() >= low - 1e-6
+        assert commands[:, axis].max() <= high + 1e-6

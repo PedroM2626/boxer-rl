@@ -1,0 +1,45 @@
+{
+  "protocol": "adaptive-v2",
+  "date": "2026-10-21",
+  "timezone": "America/Sao_Paulo",
+  "preserved_foundation_steps": 66232320,
+  "initial_shared_ceiling": 200000000,
+  "periodic_gate_interval": 5000000,
+  "consecutive_passes_required": 2,
+  "tests": {
+    "command": "python -m pytest tests/test_curriculum.py tests/test_curriculum_control.py tests/test_curriculum_job.py tests/test_curriculum_adaptive_train.py tests/test_long_train.py -q",
+    "passed": 20,
+    "checks": [
+      "Early promotion ends PPO before its ceiling",
+      "Failed gates keep one PPO invocation running without restarting Adam",
+      "Two complete passes on distinct checkpoints are mandatory",
+      "Previews, small samples, missing directions and stale stages cannot promote",
+      "Shared accounting includes preceding levels and respects the total ceiling",
+      "Standing practice is retained while command ranges expand",
+      "Leg actions change real physics with no root support forces",
+      "Checkpoint corruption and overlapping publication jobs are rejected"
+    ]
+  },
+  "real_gpu_diagnostic": {
+    "run": "runs/curriculum_adaptive_smoke",
+    "stage": "walk_easy",
+    "initialized_from": "checkpoints/curriculum/archive-fixed-budget-66232320",
+    "additional_transitions": 20480,
+    "complete_gates": 2,
+    "worlds_per_trial": 32,
+    "trials_per_gate": 14,
+    "gate_steps": [0, 20480],
+    "promotion": false,
+    "result": "budget_reached",
+    "parameters_and_losses_finite": true,
+    "included_in_main_training_counter": false,
+    "interpretation": "Bounded engineering validation, not evidence of learned walking. The preserved main policy is resumed separately."
+  },
+  "recovery": {
+    "actor_restored": true,
+    "critic_restored": true,
+    "observation_statistics_restored": true,
+    "optimizer_restored": false,
+    "reason": "Brax policy snapshots do not expose Adam; migration and level changes are explicit warm starts. Live gate evaluations retain Adam in the learner process."
+  }
+}

@@ -16,34 +16,7 @@ import numpy as np
 from boxer.checkpoint_io import atomic_json
 from boxer.curriculum_env import UnassistedG1, stage_config
 from boxer.curriculum_train import contract, inference, load_policy_params, utc
-
-
-COMMANDS = [(0.0, 0.0, 0.0), (0.4, 0.0, 0.0), (-0.25, 0.0, 0.0),
-            (0.0, 0.2, 0.0), (0.0, -0.2, 0.0),
-            (0.0, 0.0, 0.4), (0.0, 0.0, -0.4)]
-
-
-def passes_gate(stage, trials):
-    # Every seed and command has to pass; averaging a failed direction away
-    # would promote a policy that cannot actually navigate the ring.
-    if stage not in ("balance", "walk", "approach") or not trials:
-        return False
-    for trial in trials:
-        if not all(np.isfinite(trial[key]) for key in (
-                "survival_rate", "linear_tracking_error", "yaw_tracking_error",
-                "directed_distance", "required_distance", "arrival_rate")):
-            return False
-        if trial["survival_rate"] < (0.95 if stage == "balance" else 0.90):
-            return False
-        if trial["linear_tracking_error"] > (0.15 if stage == "balance" else 0.20):
-            return False
-        if trial["yaw_tracking_error"] > 0.25:
-            return False
-        if stage == "walk" and trial["required_distance"] > trial["directed_distance"]:
-            return False
-        if stage == "approach" and trial["arrival_rate"] < 0.90:
-            return False
-    return True
+from boxer.curriculum_control import STAGES, COMMANDS, commands_for, passes_gate
 
 
 def evaluate(checkpoint, stage=None, worlds=32, seeds=(7, 23), video=None, preview=False):
@@ -77,13 +50,13 @@ def evaluate(checkpoint, stage=None, worlds=32, seeds=(7, 23), video=None, previ
                             after, before)
         return jax.tree.map(choose, previous, current)
     trials, frames = [], []
-    commands = COMMANDS if stage == "walk" else [COMMANDS[0]]
+    commands = commands_for(stage)
     # Balance includes a velocity impulse: this is an evaluation disturbance,
     # not a stabilizing root controller or a training assistance force.
     disturbances = [False, True] if stage == "balance" else [False]
     if preview:
         seeds = (seeds[0],)
-        commands = [COMMANDS[1]] if stage == "walk" else [COMMANDS[0]]
+        commands = [commands[1]] if stage in ("walk_easy", "walk") else [COMMANDS[0]]
         disturbances = [False]
     for seed in seeds:
         for command in commands:
@@ -176,7 +149,7 @@ def render(env, frames, output, metadata):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("checkpoint", type=Path)
-    parser.add_argument("--stage", choices=("balance", "walk", "approach"))
+    parser.add_argument("--stage", choices=STAGES)
     parser.add_argument("--worlds", type=int, default=32)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--video", type=Path)

@@ -25,6 +25,11 @@ from mujoco_playground import wrapper
 
 from boxer.checkpoint_io import atomic_bytes, atomic_json
 from boxer.curriculum_env import UnassistedG1, STAGES, PLAYGROUND_REVISION, MENAGERIE_REVISION, stage_config
+from boxer.curriculum_control import consecutive_passes, promotion_ready
+
+
+class PromotionComplete(Exception):
+    """End PPO at a verified checkpoint once the physical gates pass twice."""
 
 
 def utc():
@@ -99,9 +104,15 @@ def main(argv=None):
     parser.add_argument("--warm-start", action="store_true")
     parser.add_argument("--publish-run", type=Path)
     parser.add_argument("--preview-snapshots", action="store_true")
+    parser.add_argument("--adaptive-gates", action="store_true")
+    parser.add_argument("--gate-every", type=int, default=5_000_000)
+    parser.add_argument("--total-offset", type=int, default=0,
+                        help="transitions from earlier stages, excluding this stage")
     parser.add_argument("--git-executable", default="git")
     parser.add_argument("--git-worktree")
     args = parser.parse_args(argv)
+    if args.gate_every <= 0 or args.total_offset < 0:
+        raise ValueError("gate interval must be positive and total offset non-negative")
     jax_compat()
     if args.worlds < 1 or args.worlds & (args.worlds - 1):
         raise ValueError("worlds must be a positive power of two")
@@ -127,18 +138,75 @@ def main(argv=None):
         raise ValueError("stage budget already reached")
     batch_size = max(128, args.worlds // 4)
     block = batch_size * 20 * 4
-    epochs = max(1, min(args.checkpoints, (args.steps - offset) // block))
-    actual = epochs * max(1, -(-(args.steps - offset) // (epochs * block))) * block
+    blocks = (args.steps - offset) // block
+    if blocks < 1 or args.checkpoints < 1:
+        raise ValueError("remaining budget must fit a PPO block and checkpoints must be positive")
+    epochs = min(args.checkpoints, blocks)
+    # Round DOWN, so a ceiling is never silently exceeded by PPO's ceil schedule.
+    actual = epochs * (blocks // epochs) * block
     config = dict(stage=args.stage, requested_steps=args.steps, offset_steps=offset,
                   invocation_steps=actual, worlds=args.worlds, seed=args.seed,
                   batch_size=batch_size, num_minibatches=4, unroll_length=20,
                   contract=env_contract, environment=env._config.to_dict(),
                   optimizer_resume=False,
+                  protocol="adaptive-v2", adaptive_gates=args.adaptive_gates,
+                  gate_every=args.gate_every, total_offset=args.total_offset,
                   initialized_from=str(args.init_from) if args.init_from else None)
     args.output.mkdir(parents=True, exist_ok=True)
     atomic_json(args.output / "config.json", config)
     started = time.monotonic()
     last_publication = -5_000_000
+    history_path = args.output / "gate_history.json"
+    history = json.loads(history_path.read_text()) if history_path.exists() else []
+    last_gate = history[-1]["stage_steps"] - offset if history else -args.gate_every
+
+    def job_phase(phase, step, **extra):
+        if args.publish_run and (args.publish_run / "state.json").exists():
+            path = args.publish_run / "state.json"
+            state = json.loads(path.read_text())
+            state.update(phase=phase, stage=args.stage,
+                         total_steps=args.total_offset + offset + int(step),
+                         updated_utc=utc(), **extra)
+            atomic_json(path, state)
+
+    def assess(step):
+        nonlocal last_gate
+        manifest = json.loads((checkpoint / "latest.json").read_text())
+        current = offset + int(step)
+        if (history and history[-1]["stage_steps"] == current
+                and history[-1]["checkpoint_sha256"] == manifest["sha256"]):
+            last_gate = int(step)
+            return
+        gate_path = args.output / "gates" / f"step-{current}.json"
+        job_phase("evaluating", step)
+        with (args.output / "eval.log").open("a") as stream:
+            subprocess.run([sys.executable, "-u", "-m", "boxer.curriculum_eval",
+                str(checkpoint), "--output", str(gate_path),
+                "--video", str(args.output / "evaluation.mp4")],
+                stdout=stream, stderr=subprocess.STDOUT, check=True)
+        result = json.loads(gate_path.read_text())
+        if (result["stage_steps"] != current
+                or result["checkpoint_sha256"] != manifest["sha256"]):
+            raise ValueError("gate result does not identify the current checkpoint")
+        history.append(result)
+        atomic_json(history_path, history)
+        atomic_json(args.output / "evaluation.json", result)
+        ready = promotion_ready(history, args.stage)
+        atomic_json(args.output / "training_result.json", dict(
+            status="promoted" if ready else "gate_pending", stage=args.stage,
+            stage_steps=current, total_steps=args.total_offset + current,
+            consecutive_passes=consecutive_passes(history, args.stage),
+            required_passes=2, updated_utc=utc()))
+        print(json.dumps(dict(event="physical_gate", stage_steps=current,
+            passed=result["passed"], consecutive_passes=consecutive_passes(history, args.stage))), flush=True)
+        last_gate = int(step)
+        job_phase("gate_passed" if ready else "training", step,
+                  consecutive_passes=consecutive_passes(history, args.stage))
+        if args.publish_run:
+            from boxer.curriculum_job import publish
+            publish(args.publish_run, args.stage, args.git_executable, args.git_worktree)
+        if ready:
+            raise PromotionComplete
 
     def checkpoint_fn(step, make_policy, policy_params):
         del make_policy
@@ -147,17 +215,25 @@ def main(argv=None):
             raise FloatingPointError("non-finite policy; preserving the previous checkpoint")
         save_policy(checkpoint, policy_params, dict(stage=args.stage,
             stage_steps=offset + int(step), invocation_steps=int(step),
-            updated_utc=utc(), contract=env_contract))
+            total_steps=args.total_offset + offset + int(step),
+            protocol="adaptive-v2", updated_utc=utc(), contract=env_contract))
+        if args.adaptive_gates and int(step) == 0:
+            assess(step)
 
     def progress(step, metrics):
         nonlocal last_publication
         record = dict(stage=args.stage, stage_steps=offset + int(step),
+                      total_steps=args.total_offset + offset + int(step),
                       updated_utc=utc(), elapsed_seconds=time.monotonic() - started,
                       metrics={k: float(np.asarray(v)) for k, v in metrics.items()})
         atomic_json(args.output / "progress.json", record)
         with (args.output / "progress.jsonl").open("a") as stream:
             stream.write(json.dumps(record, allow_nan=False) + "\n")
         print(json.dumps(record), flush=True)
+        if args.adaptive_gates:
+            if int(step) - last_gate >= args.gate_every or int(step) >= actual:
+                assess(step)
+            return
         if ((args.publish_run or args.preview_snapshots) and int(step) > 0
                 and (int(step) - last_publication >= 5_000_000
                      or int(step) >= actual)):
@@ -176,16 +252,26 @@ def main(argv=None):
             last_publication = int(step)
 
     print(json.dumps(config), flush=True)
-    ppo.train(environment=env, num_timesteps=args.steps - offset,
-        num_envs=args.worlds, episode_length=500,
-        wrap_env_fn=wrapper.wrap_for_brax_training,
-        learning_rate=3e-4, entropy_cost=0.005, discounting=0.97,
-        unroll_length=20, batch_size=batch_size, num_minibatches=4,
-        num_updates_per_batch=4, normalize_observations=True,
-        normalize_observations_std_eps=0.01,
-        max_grad_norm=1.0, network_factory=network_factory(), seed=args.seed,
-        num_evals=epochs + 1, num_eval_envs=8, run_evals=False,
-        restore_params=params, policy_params_fn=checkpoint_fn, progress_fn=progress)
+    try:
+        ppo.train(environment=env, num_timesteps=actual,
+            num_envs=args.worlds, episode_length=500,
+            wrap_env_fn=wrapper.wrap_for_brax_training,
+            learning_rate=3e-4, entropy_cost=0.005, discounting=0.97,
+            unroll_length=20, batch_size=batch_size, num_minibatches=4,
+            num_updates_per_batch=4, normalize_observations=True,
+            normalize_observations_std_eps=0.01,
+            max_grad_norm=1.0, network_factory=network_factory(), seed=args.seed,
+            num_evals=epochs + 1, num_eval_envs=8, run_evals=False,
+            restore_params=params, policy_params_fn=checkpoint_fn, progress_fn=progress)
+    except PromotionComplete:
+        print("Physical gate passed twice; advancing without waiting for the budget ceiling.", flush=True)
+        return 0
+    if args.adaptive_gates:
+        atomic_json(args.output / "training_result.json", dict(
+            status="budget_reached", stage=args.stage, stage_steps=offset + actual,
+            total_steps=args.total_offset + offset + actual,
+            consecutive_passes=consecutive_passes(history, args.stage),
+            required_passes=2, updated_utc=utc()))
     return 0
 
 

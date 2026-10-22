@@ -18,10 +18,10 @@ from mujoco_playground._src import mjx_env
 from mujoco_playground._src.locomotion.g1 import joystick
 
 from boxer.scene import ARM_JOINTS, GUARD_ARMS_BOXING
+from boxer.curriculum_control import STAGES
 
 PLAYGROUND_REVISION = "12ad7f3842791ced39f27e5ac96d066bbe361653"
 MENAGERIE_REVISION = "1b86ece576591213e2b666ebf59508454200ca97"
-STAGES = ("balance", "walk", "approach")
 
 
 def configure_assets():
@@ -50,9 +50,11 @@ def stage_config(stage, impl="warp"):
     cfg.noise_config.level = 0.25
     cfg.reward_config.scales.action_rate = -0.01
     if stage == "balance":
-        cfg.lin_vel_x = [0.0, 0.0]
-        cfg.lin_vel_y = [0.0, 0.0]
-        cfg.ang_vel_yaw = [0.0, 0.0]
+        # Mostly standing, with gentle weight shifts rather than a hard
+        # separation between stationary balance and the first movement commands.
+        cfg.lin_vel_x = [-0.03, 0.05]
+        cfg.lin_vel_y = [-0.02, 0.02]
+        cfg.ang_vel_yaw = [-0.05, 0.05]
         cfg.reward_config.scales.feet_phase = 0.0
         cfg.reward_config.scales.feet_air_time = 0.0
         cfg.reward_config.scales.alive = 1.0
@@ -63,6 +65,10 @@ def stage_config(stage, impl="warp"):
         cfg.lin_vel_x = [-0.35, 0.55]
         cfg.lin_vel_y = [-0.25, 0.25]
         cfg.ang_vel_yaw = [-0.5, 0.5]
+        if stage == "walk_easy":
+            cfg.lin_vel_x = [v * 0.25 for v in cfg.lin_vel_x]
+            cfg.lin_vel_y = [v * 0.25 for v in cfg.lin_vel_y]
+            cfg.ang_vel_yaw = [v * 0.25 for v in cfg.ang_vel_yaw]
     return cfg
 
 
@@ -103,6 +109,19 @@ class UnassistedG1(joystick.Joystick):
             leg_motion=jp.mean(jp.abs(data.qpos[7:][self.leg_action_indices]
                                     - self._default_pose[self.leg_action_indices])),
         )
+
+    def sample_command(self, rng):
+        motion_rng, standing_rng = jax.random.split(rng)
+        command = super().sample_command(motion_rng)
+        # Retain standing practice as movement becomes harder. Upstream already
+        # has a 10% zero-command branch: account for it in the total probability.
+        probability = 0.70 if self.stage == "balance" else 0.40
+        extra_zero = (probability - 0.10) / 0.90
+        return jp.where(jax.random.bernoulli(standing_rng, extra_zero), jp.zeros(3), command)
+
+    def _reward_feet_air_time(self, air_time, first_contact, commands, **kwargs):
+        reward = super()._reward_feet_air_time(air_time, first_contact, commands, **kwargs)
+        return reward * (jp.linalg.norm(commands) > 0.01)
 
     def reset(self, rng):
         state = super().reset(rng)
