@@ -138,6 +138,8 @@ def main(argv=None):
     parser.add_argument("--force-restart", action="store_true")
     parser.add_argument("--walk-easy-tracking-sigma", type=float,
                         help="easy-walking training reward width; other stages and gates are unchanged")
+    parser.add_argument("--walk-easy-lateral-practice", type=float,
+                        help="fraction of moving easy-walking commands dedicated to lateral practice")
     parser.add_argument("--git-executable", default="git")
     parser.add_argument("--git-worktree")
     args = parser.parse_args(argv)
@@ -146,6 +148,10 @@ def main(argv=None):
     if args.walk_easy_tracking_sigma is not None and (
             not math.isfinite(args.walk_easy_tracking_sigma) or args.walk_easy_tracking_sigma <= 0):
         raise ValueError("easy-walking tracking sigma must be finite and positive")
+    if args.walk_easy_lateral_practice is not None and (
+            not math.isfinite(args.walk_easy_lateral_practice)
+            or not 0 <= args.walk_easy_lateral_practice <= 1):
+        raise ValueError("lateral practice must be a finite probability in [0, 1]")
     if args.force_restart and not (args.warm_start and args.restart_from):
         raise ValueError("forced rollback requires a warm start and a recovery source")
     args.output = args.output.resolve()
@@ -207,13 +213,19 @@ def main(argv=None):
                     "--gate-every", str(args.gate_every), "--total-offset", str(used - saved)]
                 if stage == "walk_easy":
                     sigma = args.walk_easy_tracking_sigma
+                    lateral = args.walk_easy_lateral_practice
+                    manifest = json.loads((stage_dir / "checkpoint/latest.json").read_text()) if saved else {}
                     if sigma is None and saved:
-                        sigma = json.loads((stage_dir / "checkpoint/latest.json").read_text()).get(
-                            "training_tracking_sigma")
+                        sigma = manifest.get("training_tracking_sigma")
                     if sigma is not None:
                         if not math.isfinite(sigma) or sigma <= 0:
                             raise ValueError("checkpoint tracking sigma must be finite and positive")
                         command += ["--tracking-sigma", str(sigma)]
+                    if lateral is None:
+                        lateral = manifest.get("lateral_practice_probability", 0.0)
+                    if not math.isfinite(lateral) or not 0 <= lateral <= 1:
+                        raise ValueError("checkpoint lateral practice probability is invalid")
+                    command += ["--lateral-practice-probability", str(lateral)]
                 if saved:
                     command += ["--warm-start"]
                     if args.restart_from:

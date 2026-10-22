@@ -124,7 +124,20 @@ class UnassistedG1(joystick.Joystick):
         # has a 10% zero-command branch: account for it in the total probability.
         probability = 0.70 if self.stage == "balance" else 0.40
         extra_zero = (probability - 0.10) / 0.90
-        return jp.where(jax.random.bernoulli(standing_rng, extra_zero), jp.zeros(3), command)
+        command = jp.where(jax.random.bernoulli(standing_rng, extra_zero), jp.zeros(3), command)
+        lateral_probability = self._config.get("lateral_practice_probability", 0.0)
+        if self.stage == "walk_easy" and lateral_probability > 0:
+            # Replace only moving commands: stationary practice stays at 40%.
+            # This requests footwork; no force, joint target, or gait is imposed.
+            choose, sign, amplitude = jax.random.split(jax.random.fold_in(rng, 606), 3)
+            limit = min(abs(v) for v in self._config.lin_vel_y)
+            speed = jax.random.uniform(amplitude, minval=limit * .5, maxval=limit)
+            speed *= jp.where(jax.random.bernoulli(sign), 1.0, -1.0)
+            lateral = jp.array([0.0, speed, 0.0])
+            replace = (jp.any(command != 0)
+                       & jax.random.bernoulli(choose, lateral_probability))
+            command = jp.where(replace, lateral, command)
+        return command
 
     def _reward_feet_air_time(self, air_time, first_contact, commands, **kwargs):
         reward = super()._reward_feet_air_time(air_time, first_contact, commands, **kwargs)

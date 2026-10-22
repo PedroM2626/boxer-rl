@@ -53,7 +53,8 @@ def test_easy_walking_resume_inherits_recorded_reward_profile(tmp_path, monkeypa
     checkpoint.mkdir(parents=True)
     (output / "state.json").write_text("{}")
     (checkpoint / "latest.json").write_text(json.dumps(dict(stage_steps=1000,
-                                                          training_tracking_sigma=.01)))
+                                                          training_tracking_sigma=.01,
+                                                          lateral_practice_probability=.5)))
     previous = job.STAGES[:job.STAGES.index(active_stage)]
     monkeypatch.setattr(job, "certified", lambda path, stage: stage in previous)
     class Captured(Exception):
@@ -61,8 +62,10 @@ def test_easy_walking_resume_inherits_recorded_reward_profile(tmp_path, monkeypa
     def child(command, log):
         if active_stage == "walk_easy":
             assert command[command.index("--tracking-sigma") + 1] == "0.01"
+            assert command[command.index("--lateral-practice-probability") + 1] == "0.5"
         else:
             assert "--tracking-sigma" not in command
+            assert "--lateral-practice-probability" not in command
         assert "--warm-start" in command and "--restart-from" not in command
         raise Captured
     monkeypatch.setattr(job, "run_child", child)

@@ -44,7 +44,18 @@ def test_training_override_is_recorded_and_does_not_change_gate(tmp_path, monkey
         assert config.reward_config.tracking_sigma == .25
         assert not config.push_config.enable
         assert config.njmax == 90
+        assert config.get("lateral_practice_probability", 0.0) == 0
         raise GateInspected
     monkeypatch.setattr(evaluator, "UnassistedG1", inspect_gate)
     with pytest.raises(GateInspected):
         evaluator.evaluate(tmp_path)
+
+
+@pytest.mark.parametrize("probability", ["-0.1", "1.1", "nan", "inf"])
+def test_invalid_lateral_profile_is_rejected(tmp_path, monkeypatch, probability):
+    def forbidden():
+        pytest.fail("invalid profile must fail before JAX initialization")
+    monkeypatch.setattr(trainer, "jax_compat", forbidden)
+    with pytest.raises(ValueError, match="lateral practice"):
+        trainer.main(["--stage", "walk_easy", "--output", str(tmp_path),
+                      "--lateral-practice-probability", probability])

@@ -15,6 +15,11 @@ supports easy-walking training with tracking width 0.01. The original main polic
 resumes at 319.8976M consumed transitions; no diagnostic actor is substituted.
 The physical benchmark and 400M shared ceiling remain unchanged.
 
+After the lateral displacement plateau persisted, the
+[lateral-practice investigation](curriculum-lateral-practice.md) added targeted
+sideways commands. The current main continuation starts at 360.36608M consumed
+transitions with the same actor and unchanged total ceiling.
+
 ## Current protocol
 
 The user approved replacing fixed per-stage budgets with performance-based
@@ -42,7 +47,7 @@ nonzero commands cannot explode previously constant input dimensions.
 | Level | Training command distribution | Complete physical gate |
 | --- | --- | --- |
 | Balance | 70% zero commands; otherwise very gentle forward/backward, lateral and yaw requests (x -0.03 to +0.05 m/s, y +/-0.02 m/s, yaw +/-0.05 rad/s) | At least 95% survive 10 s, linear error <=0.15 m/s and yaw error <=0.25 rad/s; repeat with a horizontal impulse at 4 s |
-| Walk easy | 40% zero commands; otherwise 25% of full walking ranges | At least 90% survive every direction, linear error <=0.20 m/s, yaw error <=0.25 rad/s and actual directed displacement >=45% of requested speed x10 s |
+| Walk easy | 40% zero; 30% pure lateral; 30% mixed commands at 25% of full walking ranges | At least 90% survive every direction, linear error <=0.20 m/s, yaw error <=0.25 rad/s and actual directed displacement >=45% of requested speed x10 s |
 | Walk | 40% zero commands; x -0.35 to +0.55 m/s, y +/-0.25 m/s, yaw +/-0.5 rad/s | Same physical criteria at full evaluation commands |
 | Approach | Navigate toward a fixed marker initially 1.8-2.2 m ahead, stopping around 0.75 m away | At least 90% survive and finish within 0.95 m, with walking tracking-error limits |
 

@@ -92,3 +92,22 @@ def test_command_mixture_preserves_standing_as_ranges_expand(stage, probability)
         low, high = env._config[name]
         assert commands[:, axis].min() >= low - 1e-6
         assert commands[:, axis].max() <= high + 1e-6
+
+
+def test_targeted_lateral_practice_preserves_standing_and_balances_directions():
+    env = object.__new__(UnassistedG1)
+    env.stage, env._config = "walk_easy", stage_config("walk_easy")
+    keys = jax.random.split(jax.random.PRNGKey(606), 10000)
+    original = np.asarray(jax.jit(jax.vmap(env.sample_command))(keys))
+    env._config.lateral_practice_probability = .5
+    commands = np.asarray(jax.jit(jax.vmap(env.sample_command))(keys))
+    stationary = np.all(commands == 0, axis=1)
+    np.testing.assert_array_equal(stationary, np.all(original == 0, axis=1))
+    assert abs(stationary.mean() - .4) < .03
+    pure = (commands[:, 0] == 0) & (commands[:, 2] == 0) & ~stationary
+    assert abs(pure.mean() - .3) < .03
+    assert abs((pure & (commands[:, 1] > 0)).mean() - .15) < .03
+    assert abs((pure & (commands[:, 1] < 0)).mean() - .15) < .03
+    assert np.all(np.abs(commands[pure, 1]) >= .03125)
+    assert np.all(np.abs(commands[pure, 1]) <= .0625)
+    np.testing.assert_array_equal(commands[~pure], original[~pure])

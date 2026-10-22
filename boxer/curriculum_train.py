@@ -110,6 +110,8 @@ def main(argv=None):
     parser.add_argument("--tracking-sigma", type=float,
                         help="training-only velocity reward width for isolated comparisons; "
                              "omission preserves the task default, evaluation is unchanged")
+    parser.add_argument("--lateral-practice-probability", type=float, default=0.0,
+                        help="fraction of moving easy-walking commands replaced by pure lateral requests")
     parser.add_argument("--publish-run", type=Path)
     parser.add_argument("--preview-snapshots", action="store_true")
     parser.add_argument("--adaptive-gates", action="store_true")
@@ -126,12 +128,18 @@ def main(argv=None):
     if args.tracking_sigma is not None and (
             not np.isfinite(args.tracking_sigma) or args.tracking_sigma <= 0):
         raise ValueError("tracking sigma must be finite and positive")
+    if (not np.isfinite(args.lateral_practice_probability)
+            or not 0 <= args.lateral_practice_probability <= 1
+            or (args.lateral_practice_probability and args.stage != "walk_easy")):
+        raise ValueError("lateral practice requires easy walking and a finite probability in [0, 1]")
     jax_compat()
     if args.worlds < 1 or args.worlds & (args.worlds - 1):
         raise ValueError("worlds must be a positive power of two")
     config = stage_config(args.stage)
     if args.tracking_sigma is not None:
         config.reward_config.tracking_sigma = args.tracking_sigma
+    if args.lateral_practice_probability:
+        config.lateral_practice_probability = args.lateral_practice_probability
     config.naconmax = max(8192, args.worlds * 16)
     env = UnassistedG1(args.stage, config=config)
     env_contract = contract(env)
@@ -255,7 +263,8 @@ def main(argv=None):
             total_steps=args.total_offset + offset + int(step),
             protocol="recovery-v3", recovery_seed_sha256=recovery_seed,
             policy_source_steps=source_steps, updated_utc=utc(), contract=env_contract,
-            training_tracking_sigma=float(env._config.reward_config.tracking_sigma)))
+            training_tracking_sigma=float(env._config.reward_config.tracking_sigma),
+            lateral_practice_probability=args.lateral_practice_probability))
         if args.adaptive_gates and int(step) == 0:
             assess(step)
 
