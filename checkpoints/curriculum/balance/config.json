@@ -1,8 +1,8 @@
 {
   "stage": "balance",
-  "requested_steps": 200000000,
-  "offset_steps": 66232320,
-  "invocation_steps": 131072000,
+  "requested_steps": 400000000,
+  "offset_steps": 197304320,
+  "invocation_steps": 200704000,
   "worlds": 1024,
   "seed": 41,
   "batch_size": 256,
@@ -171,14 +171,14 @@
       }
     },
     "push_config": {
-      "enable": false,
+      "enable": true,
       "interval_range": [
-        5.0,
-        10.0
+        3.0,
+        5.0
       ],
       "magnitude_range": [
         0.1,
-        2.0
+        0.3
       ]
     },
     "restricted_joint_range": false,
@@ -218,8 +218,12 @@
     "soft_joint_pos_limit_factor": 0.95
   },
   "optimizer_resume": false,
-  "protocol": "adaptive-v2",
+  "protocol": "recovery-v3",
   "adaptive_gates": true,
+  "learning_rate": 0.0001,
+  "full_reset": true,
+  "policy_source_steps": 181575680,
+  "recovery_seed_sha256": "5ef6bab214257fdccd967f2533452b2ef00ab3b8874515ff245e6e72772db636",
   "gate_every": 5000000,
   "total_offset": 0,
   "initialized_from": null
