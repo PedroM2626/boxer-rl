@@ -155,6 +155,8 @@ def main(argv=None):
     parser.add_argument("--force-restart", action="store_true")
     parser.add_argument("--walk-easy-tracking-sigma", type=float,
                         help="easy-walking training reward width; other stages and gates are unchanged")
+    parser.add_argument("--walk-tracking-sigma", type=float,
+                        help="full-walking training reward width; other stages and gates are unchanged")
     parser.add_argument("--walk-easy-lateral-practice", type=float,
                         help="fraction of moving easy-walking commands dedicated to lateral practice")
     parser.add_argument("--git-executable", default="git")
@@ -165,6 +167,9 @@ def main(argv=None):
     if args.walk_easy_tracking_sigma is not None and (
             not math.isfinite(args.walk_easy_tracking_sigma) or args.walk_easy_tracking_sigma <= 0):
         raise ValueError("easy-walking tracking sigma must be finite and positive")
+    if args.walk_tracking_sigma is not None and (
+            not math.isfinite(args.walk_tracking_sigma) or args.walk_tracking_sigma <= 0):
+        raise ValueError("full-walking tracking sigma must be finite and positive")
     if args.walk_easy_lateral_practice is not None and (
             not math.isfinite(args.walk_easy_lateral_practice)
             or not 0 <= args.walk_easy_lateral_practice <= 1):
@@ -228,9 +233,9 @@ def main(argv=None):
                     "--steps", str(saved + remaining), "--worlds", str(args.worlds),
                     "--seed", str(41 + index), "--adaptive-gates",
                     "--gate-every", str(args.gate_every), "--total-offset", str(used - saved)]
-                if stage == "walk_easy":
-                    sigma = args.walk_easy_tracking_sigma
-                    lateral = args.walk_easy_lateral_practice
+                if stage in ("walk_easy", "walk"):
+                    sigma = (args.walk_easy_tracking_sigma if stage == "walk_easy"
+                             else args.walk_tracking_sigma)
                     manifest = json.loads((stage_dir / "checkpoint/latest.json").read_text()) if saved else {}
                     if sigma is None and saved:
                         sigma = manifest.get("training_tracking_sigma")
@@ -238,6 +243,8 @@ def main(argv=None):
                         if not math.isfinite(sigma) or sigma <= 0:
                             raise ValueError("checkpoint tracking sigma must be finite and positive")
                         command += ["--tracking-sigma", str(sigma)]
+                if stage == "walk_easy":
+                    lateral = args.walk_easy_lateral_practice
                     if lateral is None:
                         lateral = manifest.get("lateral_practice_probability", 0.0)
                     if not math.isfinite(lateral) or not 0 <= lateral <= 1:

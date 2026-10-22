@@ -27,7 +27,7 @@ training result, and supervisor state were preserved under
 Its SHA-256 was checked against both the payload and final gate:
 `606096818b9828f33c0da33b050fd28f074858886bb40d7af56697b91d4a33f5`.
 
-## Controlled experiment now running
+## Controlled experiment
 
 The inherited tracking kernel `exp(-squared_error / 0.25)` may provide weak
 discrimination for some full-walking errors. This is a hypothesis, not a proven
@@ -65,7 +65,7 @@ Its state, baseline, per-arm progress/checkpoints, and full physical results are
 under that output. Host logs are `runs/full_walk_comparison_host*.log` and the
 shared host record is `runs/curriculum_host.json`. The initial live process check
 confirmed one comparison supervisor and one baseline evaluator on the intended
-full-walking stage. The outcome is pending.
+full-walking stage. The completed outcome and continuation decision are recorded below.
 
 ## Continuation rules and accounting
 
@@ -93,3 +93,76 @@ The follow-up automation was updated to read current stages, budgets, and
 diagnostic paths from live state and documentation instead of repeating its
 historical easy-walking/400M assumptions. Its existing 30-minute schedule and
 quiet-on-unchanged notification intent remain unchanged.
+
+## Completed comparison and continuation decision
+
+Both arms completed **9,830,400** transitions, adding **19,660,800 diagnostic
+transitions** separately from main accounting. Control passed **8/14** trials;
+width 0.04 passed **14/14**, including the complete unchanged physical gate.
+Both had minimum survival 31/32. Sharp lateral distances were 1.203/1.167 m
+positive and 0.972/0.971 m negative, exceeding the unchanged 0.9 m minimum.
+Standing linear error fell from 0.262/0.295 to 0.020/0.024 m/s. All sharp yaw
+errors were below 0.152 rad/s. See the [complete trial table](results/curriculum/full-walk-comparison/trials.md)
+and [verification record](results/curriculum/full-walk-comparison/verified-summary.json).
+
+Payload SHA-256 matches each manifest and evaluated checkpoint. All 25 parameter
+leaves in each payload were finite. The three diagnostic logs contained no
+nonfinite, NaN, traceback, or overflow matches. Both policies, manifests, configs,
+progress, and gates are archived under
+`checkpoints/curriculum/full-walk-comparison-29593600-{default,sharp}/`.
+The experimental policy hash is
+`53fde3585351e9add231ba0eebc28c7e16c0abc11ba454939c2d18d8d9aac378`.
+This is one paired training seed and one final checkpoint per arm, using the
+established gate seeds rather than holdouts. It supports the reward change,
+not a general robustness claim or curriculum certification.
+
+**Decision:** retain the main policy after its original-width remainder finishes,
+then use training tracking width **0.04** for full walking. Do not substitute the
+diagnostic actor or copy its passing gate into main history. The original main
+counter remains cumulative, including every prior update. Normal warm start
+retains actor/critic/normalizer and resets Adam/RNG as documented. Full walking
+still needs two distinct consecutive complete main passes.
+
+The reviewed shared ceiling becomes **475,000,000 main transitions**, a bounded
+25M increase over 450M, offering approximately five further gate intervals.
+This is justified by the controlled improvement, rather than reward alone or
+elapsed runtime. Review the final gates before any further extension. Easy and
+balance certifications remain valid; approach and paired boxing remain pending.
+No physics, gate threshold, command distribution, or assistance setting changes.
+
+The supervisor now accepts `--walk-tracking-sigma` (PowerShell
+`-WalkTrackingSigma`) and inherits the full-walking checkpoint's recorded width
+on later ordinary resumes. Each walking stage reads only its own checkpoint;
+easy settings do not leak into full walking, and full settings do not affect
+balance, easy walking, or approach. Evaluation remains independent of this flag.
+Focused CPU validation passed 31 tests before launch; final validation and the
+actual main source/counters are recorded alongside the result artifacts.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tools/start_curriculum.ps1 `
+  -Publish -WarmStart -MaxTotalSteps 475000000 -WalkTrackingSigma 0.04
+```
+
+## Main remainder review and verified launch source
+
+The ordinary original-width remainder ended normally at **449,986,560 main
+transitions**, including **32,112,640 full-walking transitions**. Its last full
+gate passed 6/14 trials and failed overall; no promotion occurred. The
+finite policy SHA-256 is `f6a6ed3856dec4756dab844974bd1aa44f06c0d7ac1b8e28a8fc5ff0e8084d5f`. The payload and final config, history,
+gate, counters, result, and supervisor state are preserved in
+`checkpoints/curriculum/archive-ceiling-450m-step-449986560/`.
+The continuation starts from exactly this policy and counter, with **25,013,440**
+remaining main transitions below 475M, subject to epoch rounding and earlier
+performance-based promotion. All 41 focused CPU tests and the PowerShell parser
+check passed. The [decision record](results/curriculum/full-walk-comparison/continuation-decision.json)
+keeps diagnostic counts separate. Earlier smoke/recovery diagnostics remain in
+their own published reports; the two tracking comparisons together used
+39,321,600 diagnostic transitions.
+
+Launch inspection confirmed one supervisor and one learner, full-walking width
+0.04 in both command and saved configuration, the retained 449,986,560 main
+offset, and the 475M ceiling. No duplicate learner or diagnostic job remained.
+The persistent Windows host PID was 29148; Linux supervisor/learner were 517/538
+at inspection (runtime identities, not identifiers to reuse after restart).
+See the saved continuation state and configuration in the result directory.
+The established 30-minute monitoring schedule remains unchanged.

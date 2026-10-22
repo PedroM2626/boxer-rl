@@ -28,7 +28,8 @@ def test_only_successful_gate_promotes(tmp_path, monkeypatch, pass_first, sigma)
         (destination / "gate_history.json").write_text(json.dumps(history))
     monkeypatch.setattr(job, "run_child", child)
     output = tmp_path / "run"
-    flags = ["--output", str(output), "--max-total-steps", "100000", "--worlds", "1"]
+    flags = ["--output", str(output), "--max-total-steps", "100000", "--worlds", "1",
+             "--walk-tracking-sigma", "0.04"]
     if sigma is not None:
         flags += ["--walk-easy-tracking-sigma", sigma]
     assert job.main(flags) == 0
@@ -47,13 +48,14 @@ def test_only_successful_gate_promotes(tmp_path, monkeypatch, pass_first, sigma)
 
 @pytest.mark.skipif(sys.platform == "win32", reason="Linux supervisor uses flock")
 @pytest.mark.parametrize("active_stage", ["walk_easy", "walk"])
-def test_easy_walking_resume_inherits_recorded_reward_profile(tmp_path, monkeypatch, active_stage):
+@pytest.mark.parametrize("override", [False, True])
+def test_walking_resume_inherits_own_reward_profile(tmp_path, monkeypatch, active_stage, override):
     output = tmp_path / "run"
     checkpoint = output / active_stage / "checkpoint"
     checkpoint.mkdir(parents=True)
     (output / "state.json").write_text("{}")
     (checkpoint / "latest.json").write_text(json.dumps(dict(stage_steps=1000,
-                                                          training_tracking_sigma=.01,
+                                                          training_tracking_sigma=.01 if active_stage == "walk_easy" else .04,
                                                           lateral_practice_probability=.5)))
     previous = job.STAGES[:job.STAGES.index(active_stage)]
     monkeypatch.setattr(job, "certified", lambda path, stage: stage in previous)
@@ -64,13 +66,22 @@ def test_easy_walking_resume_inherits_recorded_reward_profile(tmp_path, monkeypa
             assert command[command.index("--tracking-sigma") + 1] == "0.01"
             assert command[command.index("--lateral-practice-probability") + 1] == "0.5"
         else:
-            assert "--tracking-sigma" not in command
+            assert command[command.index("--tracking-sigma") + 1] == ("0.06" if override else "0.04")
             assert "--lateral-practice-probability" not in command
         assert "--warm-start" in command and "--restart-from" not in command
         raise Captured
     monkeypatch.setattr(job, "run_child", child)
     with pytest.raises(Captured):
-        job.main(["--output", str(output), "--warm-start", "--worlds", "1"])
+        job.main(["--output", str(output), "--warm-start", "--worlds", "1",
+                  "--walk-easy-tracking-sigma", "0.01"]
+                 + (["--walk-tracking-sigma", "0.06"] if override else []))
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="Linux supervisor uses flock")
+@pytest.mark.parametrize("sigma", ["0", "-0.1", "nan", "inf"])
+def test_full_walking_profile_rejects_invalid_width(sigma):
+    with pytest.raises(ValueError, match="full-walking tracking sigma"):
+        job.main(["--walk-tracking-sigma", sigma])
 
 
 @pytest.mark.skipif(sys.platform == "win32", reason="Linux supervisor uses flock")

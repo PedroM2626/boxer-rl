@@ -3,16 +3,18 @@
 **Current stage (2026-10-22):** balance and easy walking are certified. Easy
 walking earned [two complete consecutive passes](results/curriculum/walk-easy-certification/README.md)
 and promoted automatically at **417,873,920 main consumed transitions**.
-Full-range walking now runs with the exact same policy payload and its original
-stage-specific configuration. The [reviewed 450M shared ceiling](curriculum-450m.md)
-remains active. Physical gates are unchanged; every remaining stage must still
-earn two distinct complete passes. Paired boxing remains downstream.
+Full-range walking is adopting training tracking width **0.04** after a
+[controlled comparison](curriculum-full-walk-comparison.md) passed 14/14 physical
+trials versus 8/14 for the original width. The reviewed shared ceiling is now
+**475M main transitions**, a bounded 25M extension. The original main actor and
+all consumed steps are retained; diagnostic policies do not supply certification.
+Two distinct complete consecutive main passes remain mandatory. Paired boxing
+remains downstream.
 
-**Current operation:** the 450M-era run stopped at 447.46752M main transitions.
-The [full-walking comparison](curriculum-full-walk-comparison.md) is now running
-under a persistent host to investigate lateral/yaw regression before another
-main-budget decision. It preserves the original policy and all certifications;
-diagnostic training is counted separately and cannot promote a stage by itself.
+**Current operation:** the original main policy resumed at **449,986,560**
+consumed transitions with full-walking tracking width 0.04 under a hidden
+persistent WSL host. The final old-width gate passed 6/14 trials. Diagnostic
+training is separately accounted and neither arm is imported into main history.
 
 Full walking resumed at 422.89152M main transitions after a
 [supervisor log-read fault](curriculum-log-read-recovery.md). The targeted bounded
@@ -156,7 +158,7 @@ rendering. Existing assisted-training environments are not modified.
 From PowerShell in the repository, start a persistent hidden WSL host:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File tools/start_curriculum.ps1 -Publish -WarmStart -MaxTotalSteps 450000000
+powershell -ExecutionPolicy Bypass -File tools/start_curriculum.ps1 -Publish -WarmStart -MaxTotalSteps 475000000
 # A fresh output without prior state does not need -WarmStart.
 ```
 

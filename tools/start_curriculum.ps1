@@ -1,6 +1,10 @@
-param([switch]$Publish, [switch]$WarmStart, [int]$MaxTotalSteps = 200000000, [int]$GateEvery = 5000000, [int]$Worlds = 1024, [string]$RestartFrom, [switch]$ForceRestart, [double]$WalkEasyTrackingSigma, [double]$WalkEasyLateralPractice)
+param([switch]$Publish, [switch]$WarmStart, [int]$MaxTotalSteps = 200000000, [int]$GateEvery = 5000000, [int]$Worlds = 1024, [string]$RestartFrom, [switch]$ForceRestart, [double]$WalkEasyTrackingSigma, [double]$WalkEasyLateralPractice, [double]$WalkTrackingSigma)
 # A hidden persistent Windows host keeps foreground WSL training alive.
 $ErrorActionPreference = 'Stop'
+if ($PSBoundParameters.ContainsKey('WalkTrackingSigma') -and
+    ($WalkTrackingSigma -le 0 -or [double]::IsNaN($WalkTrackingSigma) -or [double]::IsInfinity($WalkTrackingSigma))) {
+    throw 'Full-walking tracking sigma must be finite and positive.'
+}
 if ($PSBoundParameters.ContainsKey('WalkEasyTrackingSigma') -and
     ($WalkEasyTrackingSigma -le 0 -or [double]::IsNaN($WalkEasyTrackingSigma) -or [double]::IsInfinity($WalkEasyTrackingSigma))) {
     throw 'Easy-walking tracking sigma must be finite and positive.'
@@ -29,6 +33,9 @@ if ($RestartFrom) { $boxingArguments += @('--restart-from', $RestartFrom) }
 if ($ForceRestart) { $boxingArguments += '--force-restart' }
 if ($PSBoundParameters.ContainsKey('WalkEasyTrackingSigma')) {
     $boxingArguments += @('--walk-easy-tracking-sigma', $WalkEasyTrackingSigma.ToString([System.Globalization.CultureInfo]::InvariantCulture))
+}
+if ($PSBoundParameters.ContainsKey('WalkTrackingSigma')) {
+    $boxingArguments += @('--walk-tracking-sigma', $WalkTrackingSigma.ToString([System.Globalization.CultureInfo]::InvariantCulture))
 }
 if ($PSBoundParameters.ContainsKey('WalkEasyLateralPractice')) {
     $boxingArguments += @('--walk-easy-lateral-practice', $WalkEasyLateralPractice.ToString([System.Globalization.CultureInfo]::InvariantCulture))
