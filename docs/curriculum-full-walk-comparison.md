@@ -166,3 +166,35 @@ The persistent Windows host PID was 29148; Linux supervisor/learner were 517/538
 at inspection (runtime identities, not identifiers to reuse after restart).
 See the saved continuation state and configuration in the result directory.
 The established 30-minute monitoring schedule remains unchanged.
+
+## Main follow-up at 465.1008M consumed transitions
+
+The main actor's complete gates after adopting width 0.04 passed 12/14,
+10/14, and 12/14 individual trials at stage counters 37,150,720,
+42,188,800, and 47,226,880. None passed the complete gate, so the passing
+streak remains zero and full walking is not certified. The retained actor is
+learning; the diagnostic's single passing result did not automatically transfer.
+
+At 465,100,800 main transitions, every trial met survival and linear/yaw-error
+criteria. Only negative-lateral distance failed: **0.893/0.892 m**, just below
+the unchanged **0.9 m** requirement. The earlier two corresponding gates reached
+0.188/0.207 and 0.797/0.793 m. Positive lateral now reaches 1.142/1.167 m;
+forward/backward reach 3.769/3.870 and 2.205/2.231 m. Standing linear error is
+0.020/0.027 m/s and minimum trial survival is 31/32. Close measurements still
+fail; no rounding, tolerance, or threshold change is used for certification.
+
+The reviewed checkpoint hash is
+`75e125bf85dbb44506b091e6421c2dd3044f19aa04be521de045a897595a5a51`.
+Payload hashes and finite parameter leaves were checked for balance, easy,
+and the current full-walking policy. Existing balance/easy histories still
+certify both skills. No full-walking log overflow/nonfinite/NaN/traceback match
+was found. The diagnostic comparison is already analyzed, with separate compute.
+
+Continue the same productive learner under the existing **475M** ceiling and
+resident Adam/RNG. There is no reason to restart or change reward/physics at
+this checkpoint. Review its remaining complete gates and final policy before
+any subsequent allocation decision. The single persistent host, supervisor,
+and learner were verified; no second training job was launched.
+The [follow-up record](results/curriculum/full-walk-comparison/main-follow-up-465100800.json)
+saves the exact decision. Existing automatic gate publication preserves the
+complete raw results/history. This review changes documentation only.

@@ -39,7 +39,7 @@ At that point the physical benchmark and then-current 400M ceiling were unchange
 After the lateral displacement plateau persisted, the
 [lateral-practice investigation](curriculum-lateral-practice.md) added targeted
 sideways commands. That continuation started at 360.36608M consumed transitions
-with the same actor and then-current 400M ceiling. The reviewed 450M extension
+with the same actor and then-current 400M ceiling. The later reviewed 475M ceiling
 above is now active.
 
 ## Current protocol
