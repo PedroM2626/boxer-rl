@@ -5,6 +5,7 @@ import argparse
 from contextlib import ExitStack
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import signal
@@ -19,16 +20,31 @@ def read(path):
     return json.loads(Path(path).read_text())
 
 
-def compare(main_run, output, steps=10_000_000, worlds=1024, execute=run_child):
+def compare(main_run, output, steps=10_000_000, worlds=1024, execute=run_child,
+            sharp_sigma=None):
     """Caller holds main run/publication locks; never replace the main policy."""
     main_run, output = Path(main_run), Path(output)
     state = read(main_run / "state.json")
-    if state.get("stage") != "walk_easy" or "balance" not in state.get("completed", []):
-        raise ValueError("comparison requires a transferred easy-walking policy")
+    stage = state.get("stage")
+    required = {"balance"} if stage == "walk_easy" else {"balance", "walk_easy"}
+    if stage not in ("walk_easy", "walk") or not required.issubset(state.get("completed", [])):
+        raise ValueError("comparison requires a transferred walking policy and completed prior stages")
+    sharp_sigma = sharp_sigma if sharp_sigma is not None else (.01 if stage == "walk_easy" else .04)
+    if not math.isfinite(sharp_sigma) or sharp_sigma <= 0:
+        raise ValueError("comparison tracking sigma must be finite and positive")
     if steps <= 0 or worlds <= 0 or worlds & (worlds - 1):
         raise ValueError("positive budget and power-of-two worlds required")
-    source = main_run / "walk_easy"
+    source = main_run / stage
     metadata = read(source / "checkpoint/latest.json")
+    default_sigma = metadata.get("training_tracking_sigma", .25)
+    lateral_probability = metadata.get("lateral_practice_probability", 0.0)
+    if (not math.isfinite(default_sigma) or default_sigma <= 0
+            or math.isclose(default_sigma, sharp_sigma)):
+        raise ValueError("comparison requires distinct finite positive tracking widths")
+    if (not math.isfinite(lateral_probability) or not 0 <= lateral_probability <= 1
+            or (stage != "walk_easy" and lateral_probability)):
+        raise ValueError("comparison source has an unsupported command profile")
+    training_seed = 42 if stage == "walk_easy" else 43
     payload = (source / "checkpoint" / metadata["file"]).read_bytes()
     if hashlib.sha256(payload).hexdigest() != metadata["sha256"]:
         raise ValueError("comparison source checksum mismatch")
@@ -39,10 +55,12 @@ def compare(main_run, output, steps=10_000_000, worlds=1024, execute=run_child):
     for name in ("config.json", "gate_history.json", "progress.json", "training_result.json"):
         if (source / name).exists():
             atomic_bytes(output / ("original-" + name), (source / name).read_bytes())
-    record = dict(status="running", pid=os.getpid(), started_utc=utc(),
+    record = dict(status="running", stage=stage, pid=os.getpid(), started_utc=utc(),
                   main_total_steps=metadata["total_steps"],
                   main_stage_steps=metadata["stage_steps"], seed_sha256=metadata["sha256"],
-                  requested_steps_per_arm=steps, worlds=worlds, training_seed=42,
+                  requested_steps_per_arm=steps, worlds=worlds, training_seed=training_seed,
+                  tracking_widths=dict(default=default_sigma, sharp=sharp_sigma),
+                  lateral_practice_probability=lateral_probability,
                   diagnostic_steps=0, arms={}, automatic_adoption=False)
 
     def update(**changes):
@@ -58,27 +76,31 @@ def compare(main_run, output, steps=10_000_000, worlds=1024, execute=run_child):
         if result["checkpoint_sha256"] != manifest["sha256"]:
             raise ValueError("comparison gate checksum differs from evaluated policy")
         expected = {(seed, command, False) for seed in (7, 23)
-                    for command in commands_for("walk_easy")}
+                    for command in commands_for(stage)}
         trials = result.get("trials", [])
         actual = {(t["seed"], tuple(t["command"]), t["disturbed"]) for t in trials}
-        if (result.get("kind") != "promotion_gate" or result.get("stage") != "walk_easy"
+        if (result.get("kind") != "promotion_gate" or result.get("stage") != stage
                 or result.get("worlds_per_trial") != 32 or result.get("episode_seconds") != 10
                 or result.get("assistance") is not False or len(trials) != 14
                 or actual != expected or result.get("stage_steps") != manifest["stage_steps"]
-                or result.get("passed") != passes_gate("walk_easy", trials)):
+                or any(not math.isclose(t["required_distance"],
+                                        math.hypot(*t["command"][:2]) * 4.5, abs_tol=1e-6)
+                       for t in trials)
+                or result.get("passed") != passes_gate(stage, trials)):
             raise ValueError("comparison requires the unchanged complete physical gate")
         return result
 
     try:
         update(phase="baseline_evaluation")
         evaluate(seed, output / "baseline.json")
-        for name, sigma in (("default", .25), ("sharp", .01)):
+        for name, sigma in (("default", default_sigma), ("sharp", sharp_sigma)):
             arm = output / name
             update(phase="training", active_arm=name)
             execute([sys.executable, "-u", "-m", "boxer.curriculum_train",
-                     "--stage", "walk_easy", "--output", str(arm),
+                     "--stage", stage, "--output", str(arm),
                      "--init-from", str(seed), "--steps", str(steps),
-                     "--worlds", str(worlds), "--seed", "42", "--checkpoints", "10",
+                     "--worlds", str(worlds), "--seed", str(training_seed), "--checkpoints", "10",
+                     "--lateral-practice-probability", str(lateral_probability),
                      "--tracking-sigma", str(sigma)], output / (name + ".log"))
             trained = read(arm / "checkpoint/latest.json")
             record["arms"][name] = dict(tracking_sigma=sigma,
@@ -110,6 +132,8 @@ def main(argv=None):
     parser.add_argument("--steps", type=int, default=10_000_000)
     parser.add_argument("--worlds", type=int, default=1024)
     parser.add_argument("--resume-main", action="store_true")
+    parser.add_argument("--sharp-sigma", type=float,
+                        help="experimental width; defaults to .01 for easy walking, .04 for full walking")
     args = parser.parse_args(argv)
     previous = read(args.main_run / "state.json")
     def interrupt(signum, frame):
@@ -126,7 +150,7 @@ def main(argv=None):
                       diagnostic_output=str(args.output), diagnostic_pid=os.getpid(), updated_utc=utc())
         atomic_json(args.main_run / "state.json", paused)
         try:
-            compare(args.main_run, args.output, args.steps, args.worlds)
+            compare(args.main_run, args.output, args.steps, args.worlds, sharp_sigma=args.sharp_sigma)
         except KeyboardInterrupt:
             raise  # An explicit stop must not start another learner.
         except Exception as error:

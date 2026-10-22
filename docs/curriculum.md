@@ -8,6 +8,12 @@ stage-specific configuration. The [reviewed 450M shared ceiling](curriculum-450m
 remains active. Physical gates are unchanged; every remaining stage must still
 earn two distinct complete passes. Paired boxing remains downstream.
 
+**Current operation:** the 450M-era run stopped at 447.46752M main transitions.
+The [full-walking comparison](curriculum-full-walk-comparison.md) is now running
+under a persistent host to investigate lateral/yaw regression before another
+main-budget decision. It preserves the original policy and all certifications;
+diagnostic training is counted separately and cannot promote a stage by itself.
+
 Full walking resumed at 422.89152M main transitions after a
 [supervisor log-read fault](curriculum-log-read-recovery.md). The targeted bounded
 retry preserves warning inspection and the latest policy; no training or gate
