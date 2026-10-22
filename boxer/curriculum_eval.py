@@ -54,6 +54,9 @@ def evaluate(checkpoint, stage=None, worlds=32, seeds=(7, 23), video=None, previ
         return jax.tree.map(choose, previous, current)
     trials, frames = [], []
     commands = commands_for(stage)
+    # Walking gate videos should show actual commanded footwork, rather than
+    # always capturing the first (stationary) trial. Trial order is unchanged.
+    video_command = commands[1] if stage in ("walk_easy", "walk") else commands[0]
     # Balance includes a velocity impulse: this is an evaluation disturbance,
     # not a stabilizing root controller or a training assistance force.
     disturbances = [False, True] if stage == "balance" else [False]
@@ -73,7 +76,8 @@ def evaluate(checkpoint, stage=None, worlds=32, seeds=(7, 23), video=None, previ
                 linear, yaw, count = 0.0, 0.0, 0
                 displacement = np.zeros((worlds, 2))
                 distance = np.full(worlds, 2.0)
-                capture = video is not None and not frames and seed == seeds[0] and not disturbed
+                capture = (video is not None and not frames and seed == seeds[0]
+                           and not disturbed and command == video_command)
                 for t in range(500):
                     if stage != "approach":
                         cmd = jp.broadcast_to(jp.array(command), (worlds, 3))
@@ -115,7 +119,7 @@ def evaluate(checkpoint, stage=None, worlds=32, seeds=(7, 23), video=None, previ
                 trials.append(trial)
                 print(json.dumps(trial), flush=True)
     if video and frames:
-        render(env, frames, video, metadata)
+        render(env, frames, video, dict(metadata, video_command=list(video_command)))
     return dict(stage=stage, stage_steps=metadata["stage_steps"],
                 checkpoint_sha256=metadata["sha256"], updated_utc=utc(),
                 assistance=False, episode_seconds=10, worlds_per_trial=worlds,
@@ -145,7 +149,9 @@ def render(env, frames, output, metadata):
                 draw = ImageDraw.Draw(image)
                 draw.rectangle((0, 0, 640, 44), fill="black")
                 draw.text((10, 6), f"{metadata['stage'].title()} | {metadata['stage_steps']:,} transitions", fill="white")
-                draw.text((10, 25), "Learned joint control | Free legs | No pelvis support", fill="white")
+                command_label = ("Goal navigation" if metadata["stage"] == "approach"
+                                 else "Command " + str(metadata.get("video_command", "recorded")))
+                draw.text((10, 25), "Free legs | No pelvis support | " + command_label, fill="white")
                 writer.append_data(np.asarray(image))
 
 

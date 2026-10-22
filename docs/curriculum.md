@@ -1,11 +1,12 @@
 # Adaptive unassisted G1 curriculum
 
-**Current continuation (2026-10-22):** the 400M-era job stopped at **397,230,080**
-consumed transitions without certifying easy walking. The
-[reviewed extension](curriculum-450m.md) preserves that final checkpoint and
-continues the same actor under a **450M shared main ceiling**, with tracking
-width 0.01 and lateral-practice probability 0.5 inherited on warm start.
-Physical gates remain unchanged; two distinct complete passes are still required.
+**Current stage (2026-10-22):** balance and easy walking are certified. Easy
+walking earned [two complete consecutive passes](results/curriculum/walk-easy-certification/README.md)
+and promoted automatically at **417,873,920 main consumed transitions**.
+Full-range walking now runs with the exact same policy payload and its original
+stage-specific configuration. The [reviewed 450M shared ceiling](curriculum-450m.md)
+remains active. Physical gates are unchanged; every remaining stage must still
+earn two distinct complete passes. Paired boxing remains downstream.
 
 **Earlier recovery:** the original shared allocation stopped at
 197.30M without repeated gate passes. The [recovery investigation](curriculum-recovery.md)
