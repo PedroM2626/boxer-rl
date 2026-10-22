@@ -192,6 +192,9 @@ observations and physical dynamics against the boxing scene. Then evaluate real
 legal fist contacts, falls, footwork and engagement from wider spawns, exchanging
 corners and using held-out seeds. The two scenes are not assumed interchangeable.
 
+The [CPU transfer audit](curriculum-transfer-audit.md) now records the measured
+gain, pose, timestep, and action-scale differences that the adapter must resolve.
+
 Historical smoke tests, pilot metrics and dependency versions remain under
 `docs/results/curriculum/`. Adaptive tests additionally verify early exit before
 the budget, repeated complete gates, shared accounting, stale/preview rejection,
