@@ -102,6 +102,9 @@ def main(argv=None):
     parser.add_argument("--seed", type=int, default=41)
     parser.add_argument("--init-from", type=Path)
     parser.add_argument("--warm-start", action="store_true")
+    parser.add_argument("--restart-from", type=Path,
+                        help="one-time policy rollback; retain own consumed-step counter")
+    parser.add_argument("--learning-rate", type=float, default=1e-4)
     parser.add_argument("--publish-run", type=Path)
     parser.add_argument("--preview-snapshots", action="store_true")
     parser.add_argument("--adaptive-gates", action="store_true")
@@ -111,7 +114,7 @@ def main(argv=None):
     parser.add_argument("--git-executable", default="git")
     parser.add_argument("--git-worktree")
     args = parser.parse_args(argv)
-    if args.gate_every <= 0 or args.total_offset < 0:
+    if args.gate_every <= 0 or args.total_offset < 0 or args.learning_rate <= 0:
         raise ValueError("gate interval must be positive and total offset non-negative")
     jax_compat()
     if args.worlds < 1 or args.worlds & (args.worlds - 1):
@@ -124,6 +127,7 @@ def main(argv=None):
     if (checkpoint / "latest.json").exists() and not args.warm_start:
         raise ValueError("output already has a policy; use a new directory or --warm-start")
     params, initial, offset = None, None, 0
+    recovery_seed = None
     if args.warm_start or args.init_from:
         source = checkpoint if args.warm_start else args.init_from
         params, initial = load_policy_params(source)
@@ -134,6 +138,18 @@ def main(argv=None):
                 raise ValueError("warm start stage differs")
             offset = initial["stage_steps"]
         print("Warm start: actor, critic and normalizer restored; Adam and RNG are fresh.", flush=True)
+        recovery_seed = initial.get("recovery_seed_sha256")
+    source_steps = initial["stage_steps"] if initial else 0
+    if args.restart_from:
+        if not args.warm_start:
+            raise ValueError("--restart-from requires --warm-start to preserve consumed steps")
+        selected_params, selected = load_policy_params(args.restart_from)
+        if selected["contract"] != env_contract or selected["stage"] != args.stage:
+            raise ValueError("recovery seed stage/model contract differs")
+        if recovery_seed != selected["sha256"]:
+            params, source_steps = selected_params, selected["stage_steps"]
+            recovery_seed = selected["sha256"]
+            print(f"Recovery seed {source_steps}; consumed counter retained at {offset}.", flush=True)
     if offset >= args.steps:
         raise ValueError("stage budget already reached")
     batch_size = max(128, args.worlds // 4)
@@ -149,7 +165,9 @@ def main(argv=None):
                   batch_size=batch_size, num_minibatches=4, unroll_length=20,
                   contract=env_contract, environment=env._config.to_dict(),
                   optimizer_resume=False,
-                  protocol="adaptive-v2", adaptive_gates=args.adaptive_gates,
+                  protocol="recovery-v3", adaptive_gates=args.adaptive_gates,
+                  learning_rate=args.learning_rate, full_reset=True,
+                  policy_source_steps=source_steps, recovery_seed_sha256=recovery_seed,
                   gate_every=args.gate_every, total_offset=args.total_offset,
                   initialized_from=str(args.init_from) if args.init_from else None)
     args.output.mkdir(parents=True, exist_ok=True)
@@ -216,7 +234,8 @@ def main(argv=None):
         save_policy(checkpoint, policy_params, dict(stage=args.stage,
             stage_steps=offset + int(step), invocation_steps=int(step),
             total_steps=args.total_offset + offset + int(step),
-            protocol="adaptive-v2", updated_utc=utc(), contract=env_contract))
+            protocol="recovery-v3", recovery_seed_sha256=recovery_seed,
+            policy_source_steps=source_steps, updated_utc=utc(), contract=env_contract))
         if args.adaptive_gates and int(step) == 0:
             assess(step)
 
@@ -255,8 +274,8 @@ def main(argv=None):
     try:
         ppo.train(environment=env, num_timesteps=actual,
             num_envs=args.worlds, episode_length=500,
-            wrap_env_fn=wrapper.wrap_for_brax_training,
-            learning_rate=3e-4, entropy_cost=0.005, discounting=0.97,
+            wrap_env_fn=functools.partial(wrapper.wrap_for_brax_training, full_reset=True),
+            learning_rate=args.learning_rate, entropy_cost=0.005, discounting=0.97,
             unroll_length=20, batch_size=batch_size, num_minibatches=4,
             num_updates_per_batch=4, normalize_observations=True,
             normalize_observations_std_eps=0.01,

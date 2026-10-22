@@ -1,4 +1,4 @@
-param([switch]$Publish, [switch]$WarmStart, [int]$MaxTotalSteps = 200000000, [int]$GateEvery = 5000000, [int]$Worlds = 1024)
+param([switch]$Publish, [switch]$WarmStart, [int]$MaxTotalSteps = 200000000, [int]$GateEvery = 5000000, [int]$Worlds = 1024, [string]$RestartFrom)
 # A hidden persistent Windows host keeps foreground WSL training alive.
 $ErrorActionPreference = 'Stop'
 $boxingProject = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
@@ -17,6 +17,7 @@ if (Test-Path -LiteralPath $boxingHostRecord) {
 $boxingArguments = @('-e', 'bash', 'tools/run_curriculum.sh', '--max-total-steps', $MaxTotalSteps, '--gate-every', $GateEvery, '--worlds', $Worlds)
 if ($Publish) { $boxingArguments += '--publish' }
 if ($WarmStart) { $boxingArguments += '--warm-start' }
+if ($RestartFrom) { $boxingArguments += @('--restart-from', $RestartFrom) }
 $boxingHost = Start-Process -FilePath 'wsl.exe' -ArgumentList $boxingArguments `
     -WorkingDirectory $boxingProject -WindowStyle Hidden -PassThru `
     -RedirectStandardOutput (Join-Path $boxingRuns 'curriculum_supervisor.log') `

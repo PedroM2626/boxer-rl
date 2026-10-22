@@ -1,5 +1,13 @@
 # Adaptive unassisted G1 curriculum
 
+**Current continuation (2026-10-22):** the original shared allocation stopped at
+197.30M without repeated gate passes. The [recovery investigation](curriculum-recovery.md)
+selects the preserved 181.58M actor, retains all 197.30M consumed transitions,
+enables full randomized resets and training disturbances, and reduces PPO's
+learning rate. The launched job extends the shared ceiling to **400M total**.
+The promotion protocol below remains unchanged; the 200M references describe
+the initial/default allocation, not an additional per-level requirement.
+
 ## Current protocol
 
 The user approved replacing fixed per-stage budgets with performance-based
@@ -81,8 +89,9 @@ that the foundation will succeed within that initial total.
 The preceding fixed-budget balance run stopped at a durable checkpoint of
 **66,232,320** transitions. An immutable pre-migration snapshot and original
 config are in `checkpoints/curriculum/archive-fixed-budget-66232320/`. Its last
-small preview is not a promotion certificate. The current run warm-starts that
-policy and keeps the cumulative counter, with gentle mixed commands enabled.
+small preview is not a promotion certificate. Adaptive-v2 initially warm-started
+that policy with gentle mixed commands. Recovery-v3 now restores the preserved
+181.58M candidate at the 197.30M consumed offset, as described in the recovery report.
 
 **Brax 0.14.2's policy callback does not expose Adam or simulator/RNG state.**
 Snapshots include the actor, critic, normalizer and exact contract, but are
@@ -115,7 +124,7 @@ rendering. Existing assisted-training environments are not modified.
 From PowerShell in the repository, start a persistent hidden WSL host:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File tools/start_curriculum.ps1 -Publish -WarmStart
+powershell -ExecutionPolicy Bypass -File tools/start_curriculum.ps1 -Publish -WarmStart -MaxTotalSteps 400000000 -RestartFrom checkpoints/curriculum/recovery-seed-181575680
 # A fresh output without prior state does not need -WarmStart.
 ```
 

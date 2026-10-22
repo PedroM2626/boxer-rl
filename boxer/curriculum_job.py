@@ -117,6 +117,7 @@ def main(argv=None):
     parser.add_argument("--worlds", type=int, default=1024)
     parser.add_argument("--publish", action="store_true")
     parser.add_argument("--warm-start", action="store_true")
+    parser.add_argument("--restart-from", type=Path)
     parser.add_argument("--git-executable", default="git")
     parser.add_argument("--git-worktree")
     args = parser.parse_args(argv)
@@ -139,7 +140,7 @@ def main(argv=None):
         if previous and not args.warm_start:
             raise ValueError("existing job requires --warm-start (fresh Adam and RNG)")
         state = dict(status="running", phase="starting", pid=os.getpid(),
-                     started_utc=utc(), protocol="adaptive-v2",
+                     started_utc=utc(), protocol="recovery-v3",
                      max_total_steps=args.max_total_steps, gate_every=args.gate_every,
                      completed=[stage for stage in STAGES
                                 if certified(args.output / stage, stage)], assistance=False,
@@ -181,6 +182,10 @@ def main(argv=None):
                     "--gate-every", str(args.gate_every), "--total-offset", str(used - saved)]
                 if saved:
                     command += ["--warm-start"]
+                    if args.restart_from:
+                        source = json.loads((args.restart_from / "latest.json").read_text())
+                        if source["stage"] == stage:
+                            command += ["--restart-from", str(args.restart_from.resolve())]
                 elif index:
                     command += ["--init-from", str(args.output / STAGES[index - 1] / "checkpoint")]
                 if args.publish:

@@ -13,8 +13,12 @@ no pelvis springs, welds, gravity compensation or root movement controller.
 Standing with gentle movement practice, slow walking, full walking and navigation
 toward a marker starting 1.8–2.2 m away have periodic physical promotion gates.
 Two consecutive complete passes advance the same policy immediately. Standing
-practice is retained during walking. **200M is an initial shared total ceiling**,
-including the 66.23M already trained; it is not a mandatory budget per stage.
+practice is retained during walking. The **initial shared total ceiling was 200M**,
+not a mandatory budget per stage. That first allocation stopped at
+197.30M without two consecutive balance passes. The current
+[recovery continuation](docs/curriculum-recovery.md) retains that consumed counter,
+restores the stronger 181.58M candidate, trains with fresh episode resets and
+disturbances, and extends the shared ceiling to **400M total**.
 Oscillating rewards do not stop it.
 Navigation stops at boxing range; the marker is not yet a physical opponent.
 The later transfer to two interacting boxers remains a separate experiment
@@ -23,8 +27,8 @@ has already been learned.
 
 ```powershell
 # First install the separate WSL runtime: bash tools/setup_curriculum.sh
-powershell -ExecutionPolicy Bypass -File tools/start_curriculum.ps1 -Publish -WarmStart
-# After an interruption, add -WarmStart. This restores weights and observation
+powershell -ExecutionPolicy Bypass -File tools/start_curriculum.ps1 -Publish -WarmStart -MaxTotalSteps 400000000 -RestartFrom checkpoints/curriculum/recovery-seed-181575680
+# -WarmStart restores weights and observation
 # statistics with fresh Adam and RNG; it is not a full-state continuation.
 ```
 

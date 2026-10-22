@@ -1,0 +1,48 @@
+{
+  "protocol": "recovery-v3",
+  "date": "2026-10-22",
+  "tests_passed": 23,
+  "diagnostic": [
+    {
+      "policy_steps": 181575680,
+      "all_survivors": 246,
+      "holdout_survivors": 121,
+      "failure_flags": {
+        "tilt": 2,
+        "low_pelvis": 8,
+        "leg_collision": 0,
+        "nonfinite": 0
+      }
+    },
+    {
+      "policy_steps": 197304320,
+      "all_survivors": 216,
+      "holdout_survivors": 108,
+      "failure_flags": {
+        "tilt": 0,
+        "low_pelvis": 40,
+        "leg_collision": 0,
+        "nonfinite": 0
+      }
+    }
+  ],
+  "diagnostic_batch_worlds": 256,
+  "promotion_eligible": false,
+  "selected_policy_steps": 181575680,
+  "preserved_consumed_steps": 197304320,
+  "shared_total_ceiling": 400000000,
+  "full_reset": true,
+  "learning_rate": 0.0001,
+  "training_impulse_speed_range": [
+    0.1,
+    0.3
+  ],
+  "training_impulse_interval_seconds": [
+    3,
+    5
+  ],
+  "frozen_gate_changed": false,
+  "recovery_smoke_steps": 61440,
+  "smoke_is_main_training": false,
+  "causal_limit": "Coverage and episode-state issues were verified; their individual causal contributions were not isolated. Future unchanged gates decide recovery."
+}

@@ -44,7 +44,8 @@ def test_real_physics_has_free_root_and_leg_action_authority():
     assert model.nq == 36 and model.nu == 29 and model.neq == 0
     assert not np.any(model.body_gravcomp)
     assert len(env.leg_action_indices) == 12
-    assert not config.push_config.enable
+    assert config.push_config.enable
+    assert list(config.push_config.magnitude_range) == [.1, .3]
     state = jax.jit(env.reset)(jax.random.PRNGKey(7))
     step = jax.jit(env.step)
     zero = step(state, jp.zeros(29))
@@ -59,6 +60,23 @@ def test_real_physics_has_free_root_and_leg_action_authority():
     # A robot placed too low is a fall, even if its linear speed is zero.
     fallen = state.data.replace(qpos=state.data.qpos.at[2].set(.4))
     assert bool(env._get_termination(fallen))
+
+
+def test_full_reset_replaces_episode_history_and_randomizes_new_spawns():
+    from mujoco_playground import wrapper
+    env = UnassistedG1()
+    wrapped = wrapper.wrap_for_brax_training(env, episode_length=500, full_reset=True)
+    state = jax.jit(wrapped.reset)(jax.random.split(jax.random.PRNGKey(41), 2))
+    before = np.asarray(state.data.qpos[0]).copy()
+    state.info["steps"] = state.info["steps"].at[0].set(499)
+    state.info["last_act"] = state.info["last_act"].at[0].set(2.)
+    state.info["phase"] = state.info["phase"].at[0].set(123.)
+    state = jax.jit(wrapped.step)(state, jp.zeros((2, 29)))
+    jax.block_until_ready(state)
+    assert bool(state.done[0])
+    np.testing.assert_array_equal(state.info["last_last_act"][0], 0.)
+    np.testing.assert_allclose(state.info["phase"][0], [0., np.pi], atol=1e-6)
+    assert np.max(np.abs(np.asarray(state.data.qpos[0]) - before)) > .01
 
 
 @pytest.mark.parametrize("stage,probability", [("balance", .70), ("walk_easy", .40), ("walk", .40)])

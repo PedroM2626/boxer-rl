@@ -35,6 +35,8 @@ def test_gates_control_early_exit_without_restarting_live_ppo(tmp_path, monkeypa
     assert trainer.main(["--output", str(tmp_path), "--steps", "50000", "--worlds", "1",
                          "--adaptive-gates", "--gate-every", "10240"]) == 0
     assert len(calls) == 1  # One PPO invocation, Adam resident between evaluations.
+    assert calls[0]["wrap_env_fn"].keywords["full_reset"]
+    assert calls[0]["learning_rate"] == 1e-4
     result = json.loads((tmp_path / "training_result.json").read_text())
     expected = 10240 if passes else 40960
     assert result["status"] == ("promoted" if passes else "budget_reached")

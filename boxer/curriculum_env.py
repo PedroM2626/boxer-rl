@@ -46,7 +46,11 @@ def stage_config(stage, impl="warp"):
     # One global contact allocation for a modest laptop batch, rather than the
     # upstream 8192-world default. Each robot has very few feet-only contacts.
     cfg.naconmax = 8192
-    cfg.push_config.enable = False
+    # Train recovery over the same impulse scale used by the frozen gate.
+    # These are bounded disturbances, never stabilizing root forces.
+    cfg.push_config.enable = True
+    cfg.push_config.interval_range = [3.0, 5.0]
+    cfg.push_config.magnitude_range = [0.10, 0.30]
     cfg.noise_config.level = 0.25
     cfg.reward_config.scales.action_rate = -0.01
     if stage == "balance":
