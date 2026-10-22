@@ -1,0 +1,15 @@
+wsl: Failed to translate 'D:\IBM Bob\bin'
+To github-boxer-rl:PedroM2626/boxer-rl.git
+   af194cf..4865fee  HEAD -> master
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/mnt/e/boxer-agent/boxer/curriculum_job.py", line 271, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/mnt/e/boxer-agent/boxer/curriculum_job.py", line 244, in main
+    run_child(command, stage_dir / "train.log")
+  File "/mnt/e/boxer-agent/boxer/curriculum_job.py", line 85, in run_child
+    chunk = reader.read()
+            ^^^^^^^^^^^^^
+OSError: [Errno 61] No data available

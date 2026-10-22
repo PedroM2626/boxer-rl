@@ -8,6 +8,11 @@ stage-specific configuration. The [reviewed 450M shared ceiling](curriculum-450m
 remains active. Physical gates are unchanged; every remaining stage must still
 earn two distinct complete passes. Paired boxing remains downstream.
 
+Full walking resumed at 422.89152M main transitions after a
+[supervisor log-read fault](curriculum-log-read-recovery.md). The targeted bounded
+retry preserves warning inspection and the latest policy; no training or gate
+setting changed during that recovery.
+
 **Earlier recovery:** the original shared allocation stopped at
 197.30M without repeated gate passes. The [recovery investigation](curriculum-recovery.md)
 selects the preserved 181.58M actor, retains all 197.30M consumed transitions,

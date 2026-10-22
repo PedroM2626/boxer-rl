@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 from contextlib import ExitStack
 import datetime as dt
+import errno
 import hashlib
 import json
 import math
@@ -16,6 +17,7 @@ from pathlib import Path
 import signal
 import subprocess
 import sys
+import time
 
 from boxer.checkpoint_io import atomic_bytes, atomic_json
 from boxer.curriculum_control import STAGES, promotion_ready
@@ -68,6 +70,24 @@ def publish(run, stage, git_executable="git", git_worktree=None):
     subprocess.run(git + ["push", "origin", "HEAD"], check=True)
 
 
+def read_log_chunk(log, offset):
+    """Retry ENODATA at the same offset without dropping uninspected output.
+
+    A WSL-mounted log has returned ENODATA while its child was appending.
+    Persistent failures and every other error still stop supervision safely.
+    """
+    for attempt in range(3):
+        try:
+            with log.open("rb") as reader:
+                reader.seek(offset)
+                chunk = reader.read()
+                return chunk, reader.tell()
+        except OSError as error:
+            if error.errno != getattr(errno, "ENODATA", 61) or attempt == 2:
+                raise
+            time.sleep(.1 * (attempt + 1))
+
+
 def run_child(command, log):
     with log.open("a") as stream:
         offset = log.stat().st_size
@@ -80,10 +100,7 @@ def run_child(command, log):
                     code = child.wait(timeout=2)
                 except subprocess.TimeoutExpired:
                     code = None
-                with log.open("rb") as reader:
-                    reader.seek(offset)
-                    chunk = reader.read()
-                    offset = reader.tell()
+                chunk, offset = read_log_chunk(log, offset)
                 scan = overlap + chunk
                 overlap = scan[-64:]
                 if b"overflow -" in scan.lower():
