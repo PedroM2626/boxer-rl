@@ -1,6 +1,10 @@
-param([switch]$Publish, [switch]$WarmStart, [int]$MaxTotalSteps = 200000000, [int]$GateEvery = 5000000, [int]$Worlds = 1024, [string]$RestartFrom, [switch]$ForceRestart)
+param([switch]$Publish, [switch]$WarmStart, [int]$MaxTotalSteps = 200000000, [int]$GateEvery = 5000000, [int]$Worlds = 1024, [string]$RestartFrom, [switch]$ForceRestart, [double]$WalkEasyTrackingSigma)
 # A hidden persistent Windows host keeps foreground WSL training alive.
 $ErrorActionPreference = 'Stop'
+if ($PSBoundParameters.ContainsKey('WalkEasyTrackingSigma') -and
+    ($WalkEasyTrackingSigma -le 0 -or [double]::IsNaN($WalkEasyTrackingSigma) -or [double]::IsInfinity($WalkEasyTrackingSigma))) {
+    throw 'Easy-walking tracking sigma must be finite and positive.'
+}
 $boxingProject = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
 $boxingRuns = Join-Path $boxingProject 'runs'
 New-Item -ItemType Directory -Path $boxingRuns -Force | Out-Null
@@ -19,6 +23,9 @@ if ($Publish) { $boxingArguments += '--publish' }
 if ($WarmStart) { $boxingArguments += '--warm-start' }
 if ($RestartFrom) { $boxingArguments += @('--restart-from', $RestartFrom) }
 if ($ForceRestart) { $boxingArguments += '--force-restart' }
+if ($PSBoundParameters.ContainsKey('WalkEasyTrackingSigma')) {
+    $boxingArguments += @('--walk-easy-tracking-sigma', $WalkEasyTrackingSigma.ToString([System.Globalization.CultureInfo]::InvariantCulture))
+}
 $boxingHost = Start-Process -FilePath 'wsl.exe' -ArgumentList $boxingArguments `
     -WorkingDirectory $boxingProject -WindowStyle Hidden -PassThru `
     -RedirectStandardOutput (Join-Path $boxingRuns 'curriculum_supervisor.log') `

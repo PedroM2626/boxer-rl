@@ -103,3 +103,19 @@ contracts. They include identical source/seed across arms, preserved original
 policy bytes, separate diagnostic accounting including partial failures,
 preview rejection, and refusal to overlap an active main lock. Bash syntax
 validation passed. These checks do not substitute for physical outcomes.
+
+## Completed and reviewed, 2026-10-22 14:08 UTC review
+
+The comparison completed and the original main policy resumed automatically.
+The [outcome and continuation decision](results/curriculum/tracking-comparison-112066560/analysis.md)
+record improved backward tracking and standing retention for width 0.01, but
+continued failure of the lateral displacement gates. Both arms and the main
+policy are preserved. The reviewed change applies width 0.01 only to easy-walking
+training, continuing the main actor at its newer 319.8976M consumed counter.
+No diagnostic candidate is imported and no stage is promoted.
+
+Use the normal launcher with `-WalkEasyTrackingSigma 0.01` to select this profile
+explicitly. Ordinary supervisor resumes also inherit `training_tracking_sigma`
+from the easy-walking checkpoint when the option is omitted; standalone learner
+experiments still require their explicit flag as described above. Full walking
+and approach keep their original defaults. The frozen evaluator remains unchanged.

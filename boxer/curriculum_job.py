@@ -10,6 +10,7 @@ from contextlib import ExitStack
 import datetime as dt
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import signal
@@ -135,11 +136,16 @@ def main(argv=None):
     parser.add_argument("--warm-start", action="store_true")
     parser.add_argument("--restart-from", type=Path)
     parser.add_argument("--force-restart", action="store_true")
+    parser.add_argument("--walk-easy-tracking-sigma", type=float,
+                        help="easy-walking training reward width; other stages and gates are unchanged")
     parser.add_argument("--git-executable", default="git")
     parser.add_argument("--git-worktree")
     args = parser.parse_args(argv)
     if args.max_total_steps <= 0 or args.gate_every <= 0:
         raise ValueError("total ceiling and gate interval must be positive")
+    if args.walk_easy_tracking_sigma is not None and (
+            not math.isfinite(args.walk_easy_tracking_sigma) or args.walk_easy_tracking_sigma <= 0):
+        raise ValueError("easy-walking tracking sigma must be finite and positive")
     if args.force_restart and not (args.warm_start and args.restart_from):
         raise ValueError("forced rollback requires a warm start and a recovery source")
     args.output = args.output.resolve()
@@ -199,6 +205,15 @@ def main(argv=None):
                     "--steps", str(saved + remaining), "--worlds", str(args.worlds),
                     "--seed", str(41 + index), "--adaptive-gates",
                     "--gate-every", str(args.gate_every), "--total-offset", str(used - saved)]
+                if stage == "walk_easy":
+                    sigma = args.walk_easy_tracking_sigma
+                    if sigma is None and saved:
+                        sigma = json.loads((stage_dir / "checkpoint/latest.json").read_text()).get(
+                            "training_tracking_sigma")
+                    if sigma is not None:
+                        if not math.isfinite(sigma) or sigma <= 0:
+                            raise ValueError("checkpoint tracking sigma must be finite and positive")
+                        command += ["--tracking-sigma", str(sigma)]
                 if saved:
                     command += ["--warm-start"]
                     if args.restart_from:

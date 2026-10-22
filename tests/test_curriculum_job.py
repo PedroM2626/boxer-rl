@@ -11,7 +11,8 @@ from test_curriculum_control import gate
 
 @pytest.mark.skipif(sys.platform == "win32", reason="Linux supervisor uses flock")
 @pytest.mark.parametrize("pass_first", [False, True])
-def test_only_successful_gate_promotes(tmp_path, monkeypatch, pass_first):
+@pytest.mark.parametrize("sigma", [None, ".01"])
+def test_only_successful_gate_promotes(tmp_path, monkeypatch, pass_first, sigma):
     commands = []
     def child(command, log):
         commands.append(command)
@@ -27,16 +28,46 @@ def test_only_successful_gate_promotes(tmp_path, monkeypatch, pass_first):
         (destination / "gate_history.json").write_text(json.dumps(history))
     monkeypatch.setattr(job, "run_child", child)
     output = tmp_path / "run"
-    assert job.main(["--output", str(output), "--max-total-steps", "100000", "--worlds", "1"]) == 0
+    flags = ["--output", str(output), "--max-total-steps", "100000", "--worlds", "1"]
+    if sigma is not None:
+        flags += ["--walk-easy-tracking-sigma", sigma]
+    assert job.main(flags) == 0
     state = json.loads((output / "state.json").read_text())
     assert state["status"] == "budget_reached"
     assert state["completed"] == (["balance"] if pass_first else [])
     assert len(commands) == (2 if pass_first else 1)
+    assert "--tracking-sigma" not in commands[0]  # Balance remains unchanged.
     if pass_first:
         assert "--init-from" in commands[1]
         assert commands[1][commands[1].index("--steps") + 1] == "79520"
+        assert ("--tracking-sigma" in commands[1]) == (sigma is not None)
     assert state["total_steps"] == (40960 if pass_first else 20480)
     assert not (output / "approach").exists()
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="Linux supervisor uses flock")
+@pytest.mark.parametrize("active_stage", ["walk_easy", "walk"])
+def test_easy_walking_resume_inherits_recorded_reward_profile(tmp_path, monkeypatch, active_stage):
+    output = tmp_path / "run"
+    checkpoint = output / active_stage / "checkpoint"
+    checkpoint.mkdir(parents=True)
+    (output / "state.json").write_text("{}")
+    (checkpoint / "latest.json").write_text(json.dumps(dict(stage_steps=1000,
+                                                          training_tracking_sigma=.01)))
+    previous = job.STAGES[:job.STAGES.index(active_stage)]
+    monkeypatch.setattr(job, "certified", lambda path, stage: stage in previous)
+    class Captured(Exception):
+        pass
+    def child(command, log):
+        if active_stage == "walk_easy":
+            assert command[command.index("--tracking-sigma") + 1] == "0.01"
+        else:
+            assert "--tracking-sigma" not in command
+        assert "--warm-start" in command and "--restart-from" not in command
+        raise Captured
+    monkeypatch.setattr(job, "run_child", child)
+    with pytest.raises(Captured):
+        job.main(["--output", str(output), "--warm-start", "--worlds", "1"])
 
 
 @pytest.mark.skipif(sys.platform == "win32", reason="Linux supervisor uses flock")

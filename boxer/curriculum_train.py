@@ -254,7 +254,8 @@ def main(argv=None):
             stage_steps=offset + int(step), invocation_steps=int(step),
             total_steps=args.total_offset + offset + int(step),
             protocol="recovery-v3", recovery_seed_sha256=recovery_seed,
-            policy_source_steps=source_steps, updated_utc=utc(), contract=env_contract))
+            policy_source_steps=source_steps, updated_utc=utc(), contract=env_contract,
+            training_tracking_sigma=float(env._config.reward_config.tracking_sigma)))
         if args.adaptive_gates and int(step) == 0:
             assess(step)
 
