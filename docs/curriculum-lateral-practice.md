@@ -93,3 +93,8 @@ The measured command audit and continuation manifest are in
 `docs/results/curriculum/lateral-practice/`. The existing persistent launcher
 and overflow guard supervise the relaunched main job. Continued full physical
 gates determine whether this practice improves actual footwork.
+
+The [first physical follow-up](results/curriculum/lateral-practice/followup-2026-10-22-1539.md)
+records a transient improvement to 12/14 passing trials, then 10/14. Lateral
+displacement increased, but neither full gate passed; the original bounded
+continuation remains active without another training change.
