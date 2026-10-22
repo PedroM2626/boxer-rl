@@ -107,6 +107,9 @@ def main(argv=None):
     parser.add_argument("--force-restart", action="store_true",
                         help="explicitly discard updates after the same recovery seed")
     parser.add_argument("--learning-rate", type=float, default=1e-4)
+    parser.add_argument("--tracking-sigma", type=float,
+                        help="training-only velocity reward width for isolated comparisons; "
+                             "omission preserves the task default, evaluation is unchanged")
     parser.add_argument("--publish-run", type=Path)
     parser.add_argument("--preview-snapshots", action="store_true")
     parser.add_argument("--adaptive-gates", action="store_true")
@@ -120,10 +123,15 @@ def main(argv=None):
         raise ValueError("gate interval must be positive and total offset non-negative")
     if args.force_restart and not (args.restart_from and args.warm_start):
         raise ValueError("--force-restart requires --warm-start and --restart-from")
+    if args.tracking_sigma is not None and (
+            not np.isfinite(args.tracking_sigma) or args.tracking_sigma <= 0):
+        raise ValueError("tracking sigma must be finite and positive")
     jax_compat()
     if args.worlds < 1 or args.worlds & (args.worlds - 1):
         raise ValueError("worlds must be a positive power of two")
     config = stage_config(args.stage)
+    if args.tracking_sigma is not None:
+        config.reward_config.tracking_sigma = args.tracking_sigma
     config.naconmax = max(8192, args.worlds * 16)
     env = UnassistedG1(args.stage, config=config)
     env_contract = contract(env)

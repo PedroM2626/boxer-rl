@@ -8,6 +8,10 @@ learning rate. The launched job extends the shared ceiling to **400M total**.
 The promotion protocol below remains unchanged; the 200M references describe
 the initial/default allocation, not an additional per-level requirement.
 
+The [walking tracking comparison](curriculum-tracking-experiment.md) documents
+the subsequent directional plateau and a bounded training-only reward experiment.
+The active job and physical benchmark remain unchanged while it is prepared.
+
 ## Current protocol
 
 The user approved replacing fixed per-stage budgets with performance-based
