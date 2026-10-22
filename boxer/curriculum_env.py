@@ -46,6 +46,9 @@ def stage_config(stage, impl="warp"):
     # One global contact allocation for a modest laptop batch, rather than the
     # upstream 8192-world default. Each robot has very few feet-only contacts.
     cfg.naconmax = 8192
+    # Fresh random poses can activate more constraint rows than the upstream
+    # 90-row feet-only default, even when the sampled reset is not selected.
+    cfg.njmax = 256
     # Train recovery over the same impulse scale used by the frozen gate.
     # These are bounded disturbances, never stabilizing root forces.
     cfg.push_config.enable = True

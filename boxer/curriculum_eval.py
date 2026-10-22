@@ -26,6 +26,7 @@ def evaluate(checkpoint, stage=None, worlds=32, seeds=(7, 23), video=None, previ
     config.noise_config.level = 0.0
     # Training disturbances must never leak into the fixed evaluation protocol.
     config.push_config.enable = False
+    config.njmax = 90  # Preserve the original benchmark allocation.
     env = UnassistedG1(stage, config=config)
     if contract(env) != metadata["contract"]:
         raise ValueError("evaluation model differs from the checkpoint contract")

@@ -1,5 +1,7 @@
 """Recovery keeps compute accounting, avoids repeated rollback, and freezes gates."""
 import json
+import sys
+import time
 from types import SimpleNamespace
 
 import numpy as np
@@ -7,6 +9,7 @@ import pytest
 
 from boxer import curriculum_eval as evaluator
 from boxer import curriculum_train as trainer
+from boxer import curriculum_job as job
 
 
 def test_rollback_is_one_time_and_keeps_consumed_counter(tmp_path, monkeypatch):
@@ -34,6 +37,10 @@ def test_rollback_is_one_time_and_keeps_consumed_counter(tmp_path, monkeypatch):
     assert trainer.main(flags + ["--steps", "130000"]) == 0
     assert restored == [10000, 50960]  # Keep subsequent learning, do not reapply the seed.
     assert json.loads((own / "checkpoint/latest.json").read_text())["stage_steps"] > 70960
+    consumed = json.loads((own / "checkpoint/latest.json").read_text())["stage_steps"]
+    assert trainer.main(flags + ["--force-restart", "--steps", "180000"]) == 0
+    assert restored[-1] == 10000
+    assert json.loads((own / "checkpoint/latest.json").read_text())["stage_steps"] > consumed
 
 
 def test_evaluation_disables_training_pushes(tmp_path, monkeypatch):
@@ -43,7 +50,19 @@ def test_evaluation_disables_training_pushes(tmp_path, monkeypatch):
     def inspect(stage, config):
         assert not config.push_config.enable
         assert config.noise_config.level == 0
+        assert config.njmax == 90
         raise StopProbe
     monkeypatch.setattr(evaluator, "UnassistedG1", inspect)
     with pytest.raises(StopProbe):
         evaluator.evaluate(tmp_path)
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="Linux process-group supervisor")
+def test_physics_overflow_stops_child_instead_of_continuing(tmp_path, monkeypatch):
+    monkeypatch.setattr(job, "ROOT", tmp_path)
+    started = time.monotonic()
+    with pytest.raises(RuntimeError, match="Physics allocation overflow"):
+        job.run_child([sys.executable, "-u", "-c",
+                       "import time;print('nefc overflow - increase njmax',flush=True);time.sleep(20)"],
+                      tmp_path / "child.log")
+    assert time.monotonic() - started < 10

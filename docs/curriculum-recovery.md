@@ -69,7 +69,9 @@ they are not a claim that the instability has already been solved.
   only its original fixed impulse, keeping the benchmark unchanged.
 - PPO learning rate is 0.0001, down from 0.0003. The actor, critic and normalizer
   warm-start from 181.58M; Adam and RNG are fresh, as before.
-- Consumed steps remain **197,304,320**, including the discarded updates. A
+- The first rollback retained **197,304,320** consumed transitions, including
+  discarded updates. The capacity incident below adds another 1,003,520; the
+  safe restart retains **198,307,840** consumed transitions. A
   rollback never rewinds compute accounting or pretends that the old actor
   received the discarded training.
 - The one-time recovery seed SHA is recorded in every new policy. Reusing the
@@ -90,9 +92,32 @@ powershell -ExecutionPolicy Bypass -File tools/start_curriculum.ps1 `
 The current supervisor still advances by performance, never by time spent or
 reward alone. Paired boxing integration remains downstream of the foundation.
 
+## Constraint capacity discovered during continuation
+
+The first full-scale continuation emitted six `nefc overflow` messages after
+the short smoke test. Full random resets exercise many more sampled states
+than cached spawns; the inherited 90-row training constraint allocation was
+insufficient for rare samples. The prior adaptive run and frozen evaluation
+logs did not contain this warning, so it is not presented as an explanation
+for every earlier regression.
+
+The learner was stopped at 198,307,840 consumed transitions. Its 1,003,520 new
+updates are rejected and archived under
+`checkpoints/curriculum/rejected-overflow-198307840/`. They are not used as the
+recovery source. A one-time explicit forced rollback restores the original
+181.58M policy while retaining the higher consumed counter. Ordinary later
+resumes do not force another rollback.
+
+Training now allocates **256 constraint rows per world**. The frozen evaluator
+retains its original 90-row allocation, which showed no overflow in the recorded
+gates; its new log check invalidates any gate that ever reports one. The
+supervisor also monitors new child output and terminates the entire process
+group on physics-allocation overflow instead of silently training on dropped
+constraints. Old log warnings are excluded from the new-process scan.
+
 ## Validation and limits
 
-Twenty-three focused tests passed, including a real forced episode timeout
+Twenty-four focused tests passed, including a real forced episode timeout
 that verifies fresh qpos and cleared action/gait history, a frozen evaluator
 configuration, and one-time rollback without rewinding consumed steps.
 
@@ -102,6 +127,14 @@ parameters/losses. Its last short epoch measured about 36,393 transitions/s;
 this is not a sustained throughput guarantee. It is not included in the main
 policy counter and is not evidence of improved recovery. The continuing main
 job's unchanged full gates will determine whether robustness improves.
+
+After the capacity fix, an additional isolated **1,003,520-transition** GPU
+smoke run completed with finite parameters and **zero overflow messages** at
+256 rows. Its offsets are diagnostic accounting, not new main-policy progress.
+The supervisor test also confirms that a child emitting an overflow warning is
+terminated instead of continuing for its requested runtime. Ordinary recovery
+resumes preserve subsequent learning; the tested explicit forced option is used
+only to discard the update interval affected by the capacity incident.
 
 Published measurements and the validation record are under
 `docs/results/curriculum/recovery/`. Code, documentation, checksums and recovery

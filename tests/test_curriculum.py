@@ -45,6 +45,7 @@ def test_real_physics_has_free_root_and_leg_action_authority():
     assert not np.any(model.body_gravcomp)
     assert len(env.leg_action_indices) == 12
     assert config.push_config.enable
+    assert config.njmax == 256
     assert list(config.push_config.magnitude_range) == [.1, .3]
     state = jax.jit(env.reset)(jax.random.PRNGKey(7))
     step = jax.jit(env.step)

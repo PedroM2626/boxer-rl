@@ -21,6 +21,7 @@ def diagnose(checkpoints, seeds=(7, 23, 31, 47), worlds=32):
     cfg = stage_config("balance")
     cfg.noise_config.level = 0.0
     cfg.push_config.enable = False
+    cfg.njmax = 90
     env = UnassistedG1(config=cfg)
     cases = [(seed, disturbed) for seed in seeds for disturbed in (False, True)]
     count = len(cases) * worlds

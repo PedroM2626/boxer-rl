@@ -1,7 +1,7 @@
 {
   "protocol": "recovery-v3",
   "date": "2026-10-22",
-  "tests_passed": 23,
+  "tests_passed": 24,
   "diagnostic": [
     {
       "policy_steps": 181575680,
@@ -44,5 +44,12 @@
   "frozen_gate_changed": false,
   "recovery_smoke_steps": 61440,
   "smoke_is_main_training": false,
-  "causal_limit": "Coverage and episode-state issues were verified; their individual causal contributions were not isolated. Future unchanged gates decide recovery."
+  "causal_limit": "Coverage and episode-state issues were verified; their individual causal contributions were not isolated. Future unchanged gates decide recovery.",
+  "safe_restart_consumed_steps": 198307840,
+  "rejected_overflow_training_steps": 1003520,
+  "training_constraint_rows": 256,
+  "frozen_gate_constraint_rows": 90,
+  "capacity_smoke_steps": 1003520,
+  "capacity_smoke_overflow_messages": 0,
+  "allocation_overflow_is_fatal": true
 }

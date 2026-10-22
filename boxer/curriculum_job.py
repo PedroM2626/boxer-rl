@@ -69,10 +69,26 @@ def publish(run, stage, git_executable="git", git_worktree=None):
 
 def run_child(command, log):
     with log.open("a") as stream:
+        offset = log.stat().st_size
+        overlap = b""
         child = subprocess.Popen(command, cwd=ROOT, stdout=stream, stderr=subprocess.STDOUT,
                                  start_new_session=True)
         try:
-            code = child.wait()
+            while True:
+                try:
+                    code = child.wait(timeout=2)
+                except subprocess.TimeoutExpired:
+                    code = None
+                with log.open("rb") as reader:
+                    reader.seek(offset)
+                    chunk = reader.read()
+                    offset = reader.tell()
+                scan = overlap + chunk
+                overlap = scan[-64:]
+                if b"overflow -" in scan.lower():
+                    raise RuntimeError(f"Physics allocation overflow; child stopped. Inspect {log}")
+                if code is not None:
+                    break
         except BaseException:
             try:
                 os.killpg(child.pid, signal.SIGTERM)
@@ -118,11 +134,14 @@ def main(argv=None):
     parser.add_argument("--publish", action="store_true")
     parser.add_argument("--warm-start", action="store_true")
     parser.add_argument("--restart-from", type=Path)
+    parser.add_argument("--force-restart", action="store_true")
     parser.add_argument("--git-executable", default="git")
     parser.add_argument("--git-worktree")
     args = parser.parse_args(argv)
     if args.max_total_steps <= 0 or args.gate_every <= 0:
         raise ValueError("total ceiling and gate interval must be positive")
+    if args.force_restart and not (args.warm_start and args.restart_from):
+        raise ValueError("forced rollback requires a warm start and a recovery source")
     args.output = args.output.resolve()
     args.output.mkdir(parents=True, exist_ok=True)
     with ExitStack() as stack:
@@ -186,6 +205,8 @@ def main(argv=None):
                         source = json.loads((args.restart_from / "latest.json").read_text())
                         if source["stage"] == stage:
                             command += ["--restart-from", str(args.restart_from.resolve())]
+                            if args.force_restart:
+                                command += ["--force-restart"]
                 elif index:
                     command += ["--init-from", str(args.output / STAGES[index - 1] / "checkpoint")]
                 if args.publish:

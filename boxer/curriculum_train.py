@@ -104,6 +104,8 @@ def main(argv=None):
     parser.add_argument("--warm-start", action="store_true")
     parser.add_argument("--restart-from", type=Path,
                         help="one-time policy rollback; retain own consumed-step counter")
+    parser.add_argument("--force-restart", action="store_true",
+                        help="explicitly discard updates after the same recovery seed")
     parser.add_argument("--learning-rate", type=float, default=1e-4)
     parser.add_argument("--publish-run", type=Path)
     parser.add_argument("--preview-snapshots", action="store_true")
@@ -116,6 +118,8 @@ def main(argv=None):
     args = parser.parse_args(argv)
     if args.gate_every <= 0 or args.total_offset < 0 or args.learning_rate <= 0:
         raise ValueError("gate interval must be positive and total offset non-negative")
+    if args.force_restart and not (args.restart_from and args.warm_start):
+        raise ValueError("--force-restart requires --warm-start and --restart-from")
     jax_compat()
     if args.worlds < 1 or args.worlds & (args.worlds - 1):
         raise ValueError("worlds must be a positive power of two")
@@ -146,7 +150,7 @@ def main(argv=None):
         selected_params, selected = load_policy_params(args.restart_from)
         if selected["contract"] != env_contract or selected["stage"] != args.stage:
             raise ValueError("recovery seed stage/model contract differs")
-        if recovery_seed != selected["sha256"]:
+        if args.force_restart or recovery_seed != selected["sha256"]:
             params, source_steps = selected_params, selected["stage_steps"]
             recovery_seed = selected["sha256"]
             print(f"Recovery seed {source_steps}; consumed counter retained at {offset}.", flush=True)
@@ -168,6 +172,7 @@ def main(argv=None):
                   protocol="recovery-v3", adaptive_gates=args.adaptive_gates,
                   learning_rate=args.learning_rate, full_reset=True,
                   policy_source_steps=source_steps, recovery_seed_sha256=recovery_seed,
+                  forced_restart=args.force_restart,
                   gate_every=args.gate_every, total_offset=args.total_offset,
                   initialized_from=str(args.init_from) if args.init_from else None)
     args.output.mkdir(parents=True, exist_ok=True)
@@ -197,11 +202,17 @@ def main(argv=None):
             return
         gate_path = args.output / "gates" / f"step-{current}.json"
         job_phase("evaluating", step)
-        with (args.output / "eval.log").open("a") as stream:
+        gate_log = args.output / "eval.log"
+        log_offset = gate_log.stat().st_size if gate_log.exists() else 0
+        with gate_log.open("a") as stream:
             subprocess.run([sys.executable, "-u", "-m", "boxer.curriculum_eval",
                 str(checkpoint), "--output", str(gate_path),
                 "--video", str(args.output / "evaluation.mp4")],
                 stdout=stream, stderr=subprocess.STDOUT, check=True)
+        with gate_log.open("rb") as stream:
+            stream.seek(log_offset)
+            if b"overflow -" in stream.read().lower():
+                raise RuntimeError("Evaluation physics allocation overflow; gate is invalid")
         result = json.loads(gate_path.read_text())
         if (result["stage_steps"] != current
                 or result["checkpoint_sha256"] != manifest["sha256"]):
