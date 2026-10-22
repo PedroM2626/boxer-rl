@@ -1,6 +1,6 @@
 # Assisted boxing: 200M continuation
 
-Status: **running**. Updated: 2026-10-21T23:17:05.334641+00:00.
+Status: **failed**. Updated: 2026-10-22T00:16:59.648091+00:00.
 
 Requested budget: 200,000,000 learner transitions total, including the 2,109,440-transition seed. A world step counts twice.
 
@@ -25,3 +25,5 @@ Raw progress, subprocess logs and the live job state remain under `runs/skills_2
 A resume preserves actor, critic, optimizer, normalization and the saved PPO sampling key. Each milestone starts fresh physical rounds; simulator state is not restored. Legacy seeds without a saved key fold the seed step into the new key. This is not a bit-identical uninterrupted rollout.
 
 The computer and WSL must remain running. The job uses an exclusive run lock, atomic checkpoint writes and explicit output-path ownership for automatic Git commits. Unrelated staged changes block publishing.
+
+Failure: `training interrupted`.
