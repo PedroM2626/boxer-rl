@@ -1,10 +1,17 @@
 # Adaptive unassisted G1 curriculum
 
-**Current continuation (2026-10-22):** the original shared allocation stopped at
+**Current continuation (2026-10-22):** the 400M-era job stopped at **397,230,080**
+consumed transitions without certifying easy walking. The
+[reviewed extension](curriculum-450m.md) preserves that final checkpoint and
+continues the same actor under a **450M shared main ceiling**, with tracking
+width 0.01 and lateral-practice probability 0.5 inherited on warm start.
+Physical gates remain unchanged; two distinct complete passes are still required.
+
+**Earlier recovery:** the original shared allocation stopped at
 197.30M without repeated gate passes. The [recovery investigation](curriculum-recovery.md)
 selects the preserved 181.58M actor, retains all 197.30M consumed transitions,
 enables full randomized resets and training disturbances, and reduces PPO's
-learning rate. The launched job extends the shared ceiling to **400M total**.
+learning rate. That recovery launched the earlier **400M total** allocation.
 The promotion protocol below remains unchanged; the 200M references describe
 the initial/default allocation, not an additional per-level requirement.
 
@@ -12,13 +19,14 @@ The [walking tracking comparison](curriculum-tracking-experiment.md) documents
 the subsequent directional plateau and a bounded training-only reward experiment.
 The [reviewed result](results/curriculum/tracking-comparison-112066560/analysis.md)
 supports easy-walking training with tracking width 0.01. The original main policy
-resumes at 319.8976M consumed transitions; no diagnostic actor is substituted.
-The physical benchmark and 400M shared ceiling remain unchanged.
+resumed at 319.8976M consumed transitions without a diagnostic actor substitution.
+At that point the physical benchmark and then-current 400M ceiling were unchanged.
 
 After the lateral displacement plateau persisted, the
 [lateral-practice investigation](curriculum-lateral-practice.md) added targeted
-sideways commands. The current main continuation starts at 360.36608M consumed
-transitions with the same actor and unchanged total ceiling.
+sideways commands. That continuation started at 360.36608M consumed transitions
+with the same actor and then-current 400M ceiling. The reviewed 450M extension
+above is now active.
 
 ## Current protocol
 
@@ -136,7 +144,7 @@ rendering. Existing assisted-training environments are not modified.
 From PowerShell in the repository, start a persistent hidden WSL host:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File tools/start_curriculum.ps1 -Publish -WarmStart -MaxTotalSteps 400000000 -RestartFrom checkpoints/curriculum/recovery-seed-181575680
+powershell -ExecutionPolicy Bypass -File tools/start_curriculum.ps1 -Publish -WarmStart -MaxTotalSteps 450000000
 # A fresh output without prior state does not need -WarmStart.
 ```
 
