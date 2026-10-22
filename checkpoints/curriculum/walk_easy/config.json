@@ -1,8 +1,8 @@
 {
   "stage": "walk_easy",
   "requested_steps": 196674560,
-  "offset_steps": 116572160,
-  "invocation_steps": 77824000,
+  "offset_steps": 157040640,
+  "invocation_steps": 36864000,
   "worlds": 1024,
   "seed": 42,
   "batch_size": 256,
@@ -150,6 +150,7 @@
     "episode_length": 500,
     "history_len": 1,
     "impl": "warp",
+    "lateral_practice_probability": 0.5,
     "lin_vel_x": [
       -0.0875,
       0.1375
@@ -222,7 +223,7 @@
   "adaptive_gates": true,
   "learning_rate": 0.0001,
   "full_reset": true,
-  "policy_source_steps": 116572160,
+  "policy_source_steps": 157040640,
   "recovery_seed_sha256": "5ef6bab214257fdccd967f2533452b2ef00ab3b8874515ff245e6e72772db636",
   "forced_restart": false,
   "gate_every": 5000000,
