@@ -1,0 +1,222 @@
+"""Native MuJoCo transfer harness for two unassisted foundation actors.
+
+The learned feet, dynamics and 103-input interface come from the foundation.
+Opponent collision geometry is additional physics, never a stabilizing force.
+This harness is deliberately separate from legacy assisted boxing controllers.
+"""
+from __future__ import annotations
+
+import mujoco
+import numpy as np
+
+from boxer import scene
+
+
+def build_pair(foundation, separation=2.0):
+    if not np.isfinite(separation) or separation < 1.8:
+        raise ValueError("transfer spawns must be separated by at least 1.8 m")
+    source = foundation.mj_model
+    spec = mujoco.MjSpec()
+    for name in ("timestep", "integrator", "iterations", "ls_iterations", "cone",
+                 "disableflags", "solver", "impratio", "gravity"):
+        setattr(spec.option, name, getattr(source.opt, name))
+    spec.compiler.degree = False
+    spec.visual.global_.offwidth = 1280
+    spec.visual.global_.offheight = 720
+    floor = spec.worldbody.add_geom(name="floor", type=mujoco.mjtGeom.mjGEOM_PLANE,
+                                    size=[0, 0, .01], contype=1, conaffinity=0)
+    floor.rgba = [.2, .25, .3, 1]
+    spec.worldbody.add_light(pos=[0, 0, 4])
+    # Read measured target geometry from the existing scene; retain the learned
+    # robot rather than replacing its foot shapes or joint dynamics with it.
+    targets = scene.build_model(separation, visual=False)
+    for index, side in enumerate(scene.SIDES):
+        robot = mujoco.MjSpec.from_file(foundation.xml_path, assets=foundation._model_assets)
+        for sensor in list(robot.sensors):
+            if sensor.type == mujoco.mjtSensor.mjSENS_CONTACT:
+                robot.delete(sensor)
+        floor_pairs = []
+        for pair in list(robot.pairs):
+            if "floor" in (pair.geomname1, pair.geomname2):
+                floor_pairs.append((pair.geomname1, pair.geomname2, pair.condim,
+                                    np.array(pair.friction), np.array(pair.solref),
+                                    np.array(pair.solimp)))
+                robot.delete(pair)
+        robot.delete(robot.geom("floor"))
+        for key in list(robot.keys):
+            robot.delete(key)
+        existing = {g.name for g in robot.geoms}
+        # Head, torso and blocking surfaces are absent from feet-only contacts.
+        # Copy massless collision surfaces only: body inertials remain explicit.
+        for name in set(scene.UPPER_TARGET_GEOMS + scene.BODY_TARGET_GEOMS):
+            if name in existing:
+                continue
+            reference = targets.geom(scene.RED + name)
+            body_name = targets.body(reference.bodyid[0]).name[len(scene.RED):]
+            geom = robot.body(body_name).add_geom(name=name, type=reference.type[0],
+                size=reference.size.copy(), pos=reference.pos.copy(), quat=reference.quat.copy(),
+                contype=0, conaffinity=0, mass=0, group=3)
+            geom.rgba = [.7, .2, .2, .25] if index == 0 else [.2, .3, .8, .25]
+        frame = spec.worldbody.add_frame(pos=[(-.5 if index == 0 else .5) * separation, 0, 0],
+                                         quat=[1, 0, 0, 0] if index == 0 else [0, 0, 0, 1])
+        spec.attach(robot, prefix=side, frame=frame)
+        for first, second, dim, friction, solref, solimp in floor_pairs:
+            pair = spec.add_pair(geomname1="floor" if first == "floor" else side + first,
+                                 geomname2="floor" if second == "floor" else side + second)
+            pair.condim, pair.friction, pair.solref, pair.solimp = dim, friction, solref, solimp
+    wanted = set()
+    for side in scene.SIDES:
+        other = scene.OPPONENT[side]
+        for strikers, surfaces in scene.STRIKE_TARGETS:
+            for fist in strikers:
+                for target in surfaces:
+                    wanted.add(tuple(sorted((side + fist, other + target))))
+        for limb in ("left_foot", "right_foot", "left_shin", "right_shin",
+                     "left_thigh", "right_thigh", "torso_collision", "pelvis_collision"):
+            for target in ("left_foot", "right_foot", "left_shin", "right_shin",
+                           "left_thigh", "right_thigh", "torso_collision", "pelvis_collision"):
+                wanted.add(tuple(sorted((side + limb, other + target))))
+    for first, second in sorted(wanted):
+        spec.add_pair(geomname1=first, geomname2=second, condim=3, friction=[.6, .6, .005, .0001, .0001])
+    model = spec.compile()
+    if model.neq or np.any(model.body_gravcomp):
+        raise ValueError("paired transfer forbids constraints and gravity compensation")
+    # Contract checks fail before any action if composition changes learned DOFs.
+    for side in scene.SIDES:
+        ids = [model.actuator(side + source.actuator(i).name).id for i in range(source.nu)]
+        np.testing.assert_allclose(model.actuator_gainprm[ids], source.actuator_gainprm)
+        np.testing.assert_allclose(model.actuator_biasprm[ids], source.actuator_biasprm)
+    return model
+
+
+class PairedFoundation:
+    """Both policies act on shared physics; the first fall ends the round."""
+
+    dt = .02
+
+    def __init__(self, foundation, separation=2.0):
+        self.foundation = foundation
+        self.model = build_pair(foundation, separation)
+        self.data = mujoco.MjData(self.model)
+        self.pose = np.asarray(foundation._default_pose)
+        self.action_scale = float(foundation._config.action_scale)
+        self.substeps = round(self.dt / self.model.opt.timestep)
+        if not np.isclose(self.substeps * self.model.opt.timestep, self.dt):
+            raise ValueError("physics/control interval mismatch")
+        self.maps = []
+        for side in scene.SIDES:
+            actuators = np.array([self.model.actuator(side + foundation.mj_model.actuator(i).name).id
+                                  for i in range(29)])
+            joints = self.model.actuator_trnid[actuators, 0]
+            root = next(j for j in range(self.model.njnt)
+                        if self.model.jnt_type[j] == mujoco.mjtJoint.mjJNT_FREE
+                        and self.model.joint(j).name.startswith(side))
+            self.maps.append(dict(act=actuators, q=self.model.jnt_qposadr[joints],
+                                  v=self.model.jnt_dofadr[joints], root=int(self.model.jnt_qposadr[root]),
+                                  rootv=int(self.model.jnt_dofadr[root]), side=side))
+        self.reset()
+
+    def reset(self, seed=0, swap=False, randomized=True):
+        mujoco.mj_resetData(self.model, self.data)
+        rng = np.random.default_rng(seed)
+        self.phase = np.tile([0., np.pi], (2, 1))
+        self.frequency = rng.uniform(1.25, 1.5, (2, 1))
+        self.last_action = np.zeros((2, 29))
+        self.done = False
+        self.elapsed = 0.
+        for index, mapping in enumerate(self.maps):
+            q, rv, side = mapping['root'], mapping['rootv'], mapping['side']
+            self.data.qpos[mapping['q']] = self.pose * (rng.uniform(.5, 1.5, 29) if randomized else 1.)
+            self.data.qpos[q + 2] = float(self.foundation._init_q[2])
+            if swap:
+                self.data.qpos[q:q+2] *= -1
+                self.data.qpos[q+3:q+7] = [0, 0, 0, 1] if index == 0 else [1, 0, 0, 0]
+            if randomized:
+                self.data.qpos[q:q+2] += rng.uniform(-.05, .05, 2)
+                self.data.qvel[rv:rv+6] = rng.uniform(-.5, .5, 6)
+            self.data.ctrl[mapping['act']] = self.data.qpos[mapping['q']]
+        mujoco.mj_forward(self.model, self.data)
+        return self.observation(np.zeros((2, 3)))
+
+    def observation(self, commands):
+        commands = np.asarray(commands)
+        if commands.shape != (2, 3) or not np.isfinite(commands).all():
+            raise ValueError("commands must be finite with shape (2, 3)")
+        rows = []
+        for i, mapping in enumerate(self.maps):
+            side = mapping['side']
+            gravity = self.data.site(side + 'imu_in_pelvis').xmat.reshape(3, 3).T @ [0, 0, -1]
+            rows.append(np.concatenate([
+                self.data.sensor(side + 'local_linvel_pelvis').data,
+                self.data.sensor(side + 'gyro_pelvis').data, gravity, commands[i],
+                self.data.qpos[mapping['q']] - self.pose, self.data.qvel[mapping['v']],
+                self.last_action[i], np.cos(self.phase[i]), np.sin(self.phase[i])]))
+        return np.asarray(rows, dtype=np.float32)
+
+    def approach_commands(self, stop_distance=.75):
+        roots = [self.data.qpos[m['root']:m['root']+2] for m in self.maps]
+        delta = roots[1] - roots[0]
+        distance = np.linalg.norm(delta)
+        speed = np.clip((distance - stop_distance) * .8, 0., .45)
+        commands = []
+        for i, mapping in enumerate(self.maps):
+            rotation = self.data.site(mapping['side'] + 'imu_in_pelvis').xmat.reshape(3, 3)
+            local = rotation[:2, :2].T @ (delta if i == 0 else -delta)
+            commands.append([*(speed * local / max(distance, 1e-6)),
+                             np.clip(np.arctan2(local[1], local[0]), -.5, .5)])
+        return np.asarray(commands)
+
+    def fallen(self):
+        finite = np.isfinite(self.data.qpos).all() and np.isfinite(self.data.qvel).all()
+        flags = []
+        for m in self.maps:
+            flags.append(not finite or self.data.qpos[m['root'] + 2] < .55
+                         or self.data.sensor(m['side'] + 'upvector_torso').data[2] < .6)
+        # Keep the foundation's self-foot/leg contact termination rule.
+        for contact in self.data.contact:
+            names = [self.model.geom(int(g)).name for g in contact.geom]
+            for i, side in enumerate(scene.SIDES):
+                if all(n.startswith(side) for n in names):
+                    names_local = {n[len(side):] for n in names}
+                    if names_local in ({'left_foot', 'right_foot'},
+                                       {'left_foot', 'right_shin'}, {'right_foot', 'left_shin'}):
+                        flags[i] = True
+        return np.array(flags)
+
+    def step(self, actions):
+        if self.done:
+            raise RuntimeError("first-fall termination requires an explicit reset")
+        actions = np.asarray(actions)
+        if actions.shape != (2, 29) or not np.isfinite(actions).all():
+            raise ValueError("actions must be finite with shape (2, 29)")
+        impulses = np.zeros(2)
+        self.data.xfrc_applied[:] = 0
+        self.data.qfrc_applied[:] = 0
+        for i, m in enumerate(self.maps):
+            self.data.ctrl[m['act']] = self.pose + self.action_scale * actions[i]
+        for _ in range(self.substeps):
+            mujoco.mj_step(self.model, self.data)
+            for name in ('mjWARN_BADQPOS', 'mjWARN_BADQVEL', 'mjWARN_BADQACC',
+                         'mjWARN_CNSTRFULL', 'mjWARN_CONTACTFULL'):
+                warning = getattr(mujoco.mjtWarning, name, None)
+                if warning is not None and self.data.warning[warning].number:
+                    # Native MuJoCo can reset an invalid state internally.
+                    # Such a reset must never become apparent trial survival.
+                    raise FloatingPointError(f'Invalid paired physics: {name}')
+            for k, contact in enumerate(self.data.contact):
+                names = [self.model.geom(int(g)).name for g in contact.geom]
+                for i, side in enumerate(scene.SIDES):
+                    legal = any(side + hand in names and
+                                any(scene.OPPONENT[side] + target in names for target in
+                                    ('head_collision', 'torso_collision')) for hand in scene.HAND_GEOMS)
+                    if legal:
+                        force = np.zeros(6)
+                        mujoco.mj_contactForce(self.model, self.data, k, force)
+                        impulses[i] += max(0., force[0]) * self.model.opt.timestep
+            if self.fallen().any():
+                self.done = True
+                break
+        self.last_action = actions.copy()
+        self.phase = (self.phase + 2 * np.pi * self.dt * self.frequency + np.pi) % (2*np.pi) - np.pi
+        self.elapsed = float(self.data.time)
+        return dict(done=self.done, fallen=self.fallen(), legal_contact_impulse=impulses)

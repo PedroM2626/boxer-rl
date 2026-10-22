@@ -1,20 +1,16 @@
 # Adaptive unassisted G1 curriculum
 
-**Current stage (2026-10-22):** balance and easy walking are certified. Easy
-walking earned [two complete consecutive passes](results/curriculum/walk-easy-certification/README.md)
-and promoted automatically at **417,873,920 main consumed transitions**.
-Full-range walking is adopting training tracking width **0.04** after a
-[controlled comparison](curriculum-full-walk-comparison.md) passed 14/14 physical
-trials versus 8/14 for the original width. The reviewed shared ceiling is now
-**475M main transitions**, a bounded 25M extension. The original main actor and
-all consumed steps are retained; diagnostic policies do not supply certification.
-Two distinct complete consecutive main passes remain mandatory. Paired boxing
-remains downstream.
+**Current stage (2026-10-22):** all four foundation levels are certified by
+[two distinct consecutive complete physical passes](results/curriculum/foundation-certification/README.md).
+The foundation finished normally at **474,992,640 consumed main transitions**
+under the **475M** ceiling. Full walking passed at 474,562,560; approach then
+added 430,080 transitions. The exact actor payload was retained at transition.
 
-**Current operation:** the original main policy resumed at **449,986,560**
-consumed transitions with full-walking tracking width 0.04 under a hidden
-persistent WSL host. The final old-width gate passed 6/14 trials. Diagnostic
-training is separately accounted and neither arm is imported into main history.
+**Current operation:** validate [paired free-body transfer](paired-foundation-transfer.md)
+before training strikes. The foundation job is stopped and certified. Two
+actors now share one physical scene with real opponent contacts and separated
+spawns; this transfer diagnostic is independently accounted, with zero training
+updates. No boxing mastery is claimed, and no further main allocation is implied.
 
 Full walking resumed at 422.89152M main transitions after a
 [supervisor log-read fault](curriculum-log-read-recovery.md). The targeted bounded
