@@ -1,8 +1,8 @@
 {
   "stage": "balance",
   "requested_steps": 200000000,
-  "offset_steps": 0,
-  "invocation_steps": 200704000,
+  "offset_steps": 66232320,
+  "invocation_steps": 131072000,
   "worlds": 1024,
   "seed": 41,
   "batch_size": 256,
@@ -131,8 +131,8 @@
     "action_repeat": 1,
     "action_scale": 0.5,
     "ang_vel_yaw": [
-      0.0,
-      0.0
+      -0.05,
+      0.05
     ],
     "command_config": {
       "a": [
@@ -151,12 +151,12 @@
     "history_len": 1,
     "impl": "warp",
     "lin_vel_x": [
-      0.0,
-      0.0
+      -0.03,
+      0.05
     ],
     "lin_vel_y": [
-      0.0,
-      0.0
+      -0.02,
+      0.02
     ],
     "naconmax": 16384,
     "njmax": 90,
@@ -218,5 +218,9 @@
     "soft_joint_pos_limit_factor": 0.95
   },
   "optimizer_resume": false,
+  "protocol": "adaptive-v2",
+  "adaptive_gates": true,
+  "gate_every": 5000000,
+  "total_offset": 0,
   "initialized_from": null
 }
