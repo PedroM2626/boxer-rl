@@ -1,9 +1,10 @@
 # Mixed continuation regression and policy-update investigation
 
-**Current decision:** the completed single-block probe confirms substantial actual
-policy movement despite PPO clipping. Allocate one bounded matched actor-rate
-comparison below, retaining the latest fully evaluated final and all consumed
-work. No actor adoption, promotion, reward/physics change or gate weakening.
+**Current decision:** the actor-rate comparison is completed and independently
+reviewed. Reject the reduced-rate branch. Permit one bounded **16,384-credit**
+ordinary continuation from the latest unchanged-rate final, retaining its exact
+version-6 profile and all optimizer state. Full gates and early stops below
+remain mandatory. No main adoption or phase promotion.
 
 ## Complete physical outcome
 
@@ -188,3 +189,57 @@ They consumed **10,395** evaluation controls, bringing formal diagnostic compute
 to **999,750** before arm screens. These source results cannot predict either
 final. Live progress can advance beyond the archived launch snapshot; account
 all attempted work from both child progress files before deciding continuation.
+
+## Completed actor-rate comparison and confirmation decision
+
+All three full screen generations and three fresh sets are verified: **144
+complete episodes / 62,822 evaluation controls**, 24 finite PPO blocks, exact
+checkpoint hashes and optimizer/consumed/mode prefixes. Native error logs are
+empty. Complete foundation histories remain 29/41/13/2 with two distinct final
+passes each and finite correct payloads; the stopped main boxing hash is intact.
+The control's first-block measurements exactly reproduce the prior rate probe.
+
+| Policy / same fresh 15M sample | Neutral 0 survivors | Neutral 1 survivors | Active survivors | Surviving active red / blue events | Active two-way episodes |
+| --- | --- | --- | --- | --- | --- |
+| Source | 5/8 | 4/8 | 7/8 | 2 / 2 | 2 |
+| Reduced rate / +8,192 | 5/8 | 3/8 | 5/8 | 2 / 3 | 2 |
+| Original rate / +16,384 | 6/8 | 7/8 | 6/8 | 8 / 9 | 4 |
+
+The reduced-rate branch correctly stopped at its first screen (neutral 0 only
+3/8 survivors). Lower initial KL is not a physical recovery. The original-rate
+control ends with 19/24 fresh survivors versus 16/24 source and 17 surviving
+active events across all four seeds versus four source events across two seeds.
+However, active survival regresses 7/8 to 6/8 and neutral-0 scoring breadth
+regresses; no complete generation or fresh set passes. This is mixed evidence,
+not reliable boxing or a reason for an unrestricted extension.
+
+Archive and independent recheck: `tools/review_striking_actor_rate.py` and
+`docs/results/striking-pilot/actor-rate-1835008/analysis.json`. Global diagnostic
+PPO is **1,836,288**, formal evaluation **1,052,177**. Added collection 24,576
+and integrated replay 98,304 presentations remain separate; BC 8,000 updates,
+main boxing 1,048,576 and combined main 476,041,216 are unchanged. Unused prior
+allocation is not consumed compute and does not silently fund later jobs.
+
+The broader surviving active scoring and paired overall survival justify one
+**16,384-credit confirmation** from the latest complete control final SHA
+`c6f7fbf4c5ef941c43b8a71be7f6f6680dd657d38e96a7ed112a0f2f8f79c04b`.
+This is an ordinary version-6 resume with actor/critic rate 0.0001, gamma 0.999,
+retention 1, balanced mixed worlds, inherited engagement profile and every
+normalizer/Adam/RNG/sampler prefix retained. No reduced-rate state, rollback,
+teacher or change of body authority is applied.
+
+Full unchanged screens at **+8,192 / +16,384**; stop if any profile has at most
+3/8 survivors, or at the first screen if no measured survival/scoring-breadth/
+two-way component improves over the source original screen. These measurements
+control early stopping only; all complete criteria remain necessary. Source
+and final receive identical fresh **16,000,003 through 16,000,006**, both swaps.
+Maximum **96 episodes / 48,000 evaluation controls**; no automatic subsequent
+allocation. Review all complete trials, including falls, before deciding again.
+
+New global diagnostic ceilings: **1,852,672 PPO / 1,100,177 evaluation controls**.
+New collection is at most 16,384 and replay 65,536 presentations. At full use
+lineage becomes **1,867,776 learner / 1,245,184 world**, Adam **11,656 / 35,328**,
+mixed-mode totals **65,536 / 65,536**, historical neutral prefix unchanged.
+Launcher: `tools/start_striking_mixed_confirm_continue.ps1`; live state:
+`/home/pedro/boxing-runs/striking-mixed-confirm-1851392/continuation.json`.
+Preserve the existing monitoring schedule and inspect this job before any launch.

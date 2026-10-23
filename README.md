@@ -3,10 +3,12 @@
 ## Current experiment: unassisted paired boxing diagnostics
 
 The latest [policy-update investigation](docs/striking-policy-update-investigation.md)
-found physical regression after the mixed continuation and substantial actual
-rollout policy movement. A bounded actor-rate comparison tests a tenfold smaller
-actor step against the unchanged profile, with all moments, critic rate and
-physical gates retained. No current policy is certified as reliable boxing.
+rejects the reduced actor rate after full physical evaluation. The unchanged-rate
+final improves matched fresh surviving active events from 4 to 17, including four
+two-way episodes, but still fails complete gates. One bounded 16,384-credit
+confirmation continues its exact profile with full evaluation and early stops.
+No current policy is certified as reliable boxing. See the
+[completion roadmap](docs/boxing-roadmap.md).
 
 All four [foundation stages](docs/curriculum.md) passed their unchanged complete
 physical gates twice on distinct checkpoints. Foundation learning finished at
@@ -98,17 +100,14 @@ is completed and independently reviewed: mixed fresh survival is 24/24 versus
 18/24 neutral control and 22/24 source. Neither arm passes complete criteria;
 valid strikes remain sparse. The neutral control severely regresses. The
 further 65,536-credit mixed continuation is now completed: neither generation
-passes, and matched fresh survival regresses 21/24 to 15/24. A [policy-update investigation](docs/striking-policy-update-investigation.md)
-finds parameter drift larger than normalizer drift, despite improving offline
-imitation error. Its completed 1,024-control actual-rollout probe measures
-52.34% sampled ratios outside clipping after 16 updates. A matched bounded
-comparison now tests actor rate 0.00001 versus 0.0001, retaining all moments,
-critic rate, physics and full criteria. Inspect
-`/home/pedro/boxing-runs/striking-actor-rate-1835008/comparison.json`
-and its process before another launch. Pre-comparison diagnostic PPO is
-**1,811,712**, formal simulation **989,355 world controls**; the maximum new
-allocation is 32,768 learner/world controls and 84,000 evaluation controls.
-Main counters and independent gates remain unchanged. No adoption or promotion.
+passes, and matched fresh survival regresses 21/24 to 15/24. The [completed actor-rate review](docs/striking-policy-update-investigation.md)
+rejects the lower-rate branch. The original-rate final has 19/24 fresh survivors
+and 17 surviving active events, with incomplete stability. One 16,384-credit
+confirmation runs from that latest final; inspect
+`/home/pedro/boxing-runs/striking-mixed-confirm-1851392/continuation.json`
+and its process before another launch. Diagnostic totals are 1,836,288 PPO and
+1,052,177 evaluation controls; ceilings are 1,852,672 and 1,100,177. Main counters,
+physics and complete criteria remain unchanged. No adoption or promotion.
 
 The [closed-fist replay repair](docs/closed-fist-rendering.md) restores the
 original visual feature without changing learning or physics. Historical videos

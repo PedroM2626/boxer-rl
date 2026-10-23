@@ -1,14 +1,15 @@
 # Adaptive unassisted G1 curriculum
 
-**Latest striking operation (2026-10-23):** the completed mixed continuation
-regressed on matched fresh physical tests (21/24 source versus 15/24 final
-survivors). The subsequent actual-rollout probe measured 52.34% clipped action
-ratios after 16 updates. A bounded **16,384-credit-per-arm** actor-rate comparison
-now tests 0.00001 against unchanged 0.0001, retaining critic rate, all moments,
-physics and full gates. Read the [evidence and exact contract](striking-policy-update-investigation.md).
-Before this comparison diagnostic PPO is **1,811,712**, formal simulation
-**989,355**; ceilings are **1,844,480 / 1,073,355** respectively. Main training
-stays stopped. No rollback to a favorable actor, adoption or promotion.
+**Latest striking operation (2026-10-23):** the actor-rate comparison completed
+without a full pass. Lower rate reduced KL but failed physical stability; reject
+that branch. The unchanged-rate final improves matched fresh overall survival
+16/24 to 19/24 and surviving active impacts 4 to 17, with active survival still
+6/8. One **16,384-credit confirmation continuation** is allocated from its latest
+final, ordinary version-6 warm state and unchanged physics/gates. Full screens
+at +8,192/+16,384, severe-regression/stagnation stops and matched fresh 16M tests
+are required. Read the [evidence and exact contract](striking-policy-update-investigation.md).
+Current diagnostic totals **1,836,288 PPO / 1,052,177 formal world controls**;
+new ceilings **1,852,672 / 1,100,177**. Main stays stopped; no adoption/promotion.
 
 **Current stage (2026-10-22):** all four foundation levels are certified by
 [two distinct consecutive complete physical passes](results/curriculum/foundation-certification/README.md).

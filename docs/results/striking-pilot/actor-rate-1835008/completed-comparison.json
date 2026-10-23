@@ -1,0 +1,298 @@
+{
+  "status": "completed",
+  "pid": 436,
+  "started_utc": "2026-10-23T21:47:30.911679+00:00",
+  "phase": "awaiting_review",
+  "diagnostic_output": "/home/pedro/boxing-runs/striking-actor-rate-1835008",
+  "source_sha256": "8c99c2dfe21cd6c94a90ed31c487620118df5b0d0fdfe430eabe2471745a31c2",
+  "source_consumed_offset": 1835008,
+  "source_world_offset": 1212416,
+  "maximum_new_ppo_steps": 32768,
+  "new_ppo_steps_per_arm": 16384,
+  "maximum_evaluation_world_controls": 84000,
+  "diagnostic_consumed_steps": 24576,
+  "diagnostic_collection_world_controls": 24576,
+  "diagnostic_evaluation_world_controls": 62822,
+  "diagnostic_ppo_before_job": 1811712,
+  "formal_evaluation_world_controls_before_job": 989355,
+  "main_consumed_retained": 1048576,
+  "main_project_consumed_retained": 476041216,
+  "cumulative_supervised_updates_retained": 8000,
+  "new_separate_supervised_updates": 0,
+  "assistance": false,
+  "unchanged_rewards": true,
+  "policy_adoption": "none",
+  "promotion": false,
+  "fresh_seeds": [
+    15000003,
+    15000004,
+    15000005,
+    15000006
+  ],
+  "arms": [
+    {
+      "arm": "conservative_actor",
+      "initial_sha256": "6ddb863d9e6f83eaac00aaf331a6e52ffc2bd78ed28dbc510dec714c844a16e1",
+      "gates": [
+        {
+          "new_ppo_steps": 8192,
+          "sha256": "8c55b1260ace7b71170b68ce5da72255b00c6243d294c5d91041ffde5e3d236b",
+          "screen": {
+            "neutral-0": {
+              "pair_survivors": 3,
+              "own_surviving_events": 2.0,
+              "own_surviving_scoring_seeds": [
+                31
+              ]
+            },
+            "neutral-1": {
+              "pair_survivors": 6,
+              "own_surviving_events": 6.0,
+              "own_surviving_scoring_seeds": [
+                31,
+                47
+              ]
+            },
+            "selfplay": {
+              "pair_survivors": 4,
+              "own_surviving_events": 5.0,
+              "own_surviving_scoring_seeds": [
+                7,
+                23
+              ]
+            }
+          },
+          "passes_complete": false
+        }
+      ],
+      "initial_update_geometry": {
+        "epoch": 4,
+        "minibatch": -1,
+        "phase": "after_normalizer",
+        "loss": null,
+        "profiles": {
+          "all": {
+            "rows": 1024,
+            "exact_gaussian_kl_mean": 0.0029149151104249857,
+            "exact_gaussian_kl_p95": 0.004810905398682357,
+            "command_kl_mean": 0.0005094493627958768,
+            "arm_kl_mean": 0.0024054657476291087,
+            "sampled_approx_kl": 0.004290737620387512,
+            "ratio_clip_fraction": 0.03125
+          },
+          "neutral": {
+            "rows": 512,
+            "exact_gaussian_kl_mean": 0.0028479499284242704,
+            "exact_gaussian_kl_p95": 0.00439281348917512,
+            "command_kl_mean": 0.0005163018822035883,
+            "arm_kl_mean": 0.0023316480462206818,
+            "sampled_approx_kl": 0.0032674465361568665,
+            "ratio_clip_fraction": 0.013671875
+          },
+          "active": {
+            "rows": 512,
+            "exact_gaussian_kl_mean": 0.002981880292425701,
+            "exact_gaussian_kl_p95": 0.005254377336674478,
+            "command_kl_mean": 0.0005025968433881652,
+            "arm_kl_mean": 0.002479283449037536,
+            "sampled_approx_kl": 0.005314028704618158,
+            "ratio_clip_fraction": 0.048828125
+          }
+        }
+      },
+      "early_stop_reason": "Severe survival regression: at most three pairs survive a complete screen profile",
+      "final_checkpoint_sha256": "8c55b1260ace7b71170b68ce5da72255b00c6243d294c5d91041ffde5e3d236b",
+      "fresh": {
+        "neutral-0": {
+          "pair_survivors": 5,
+          "own_surviving_events": 1.0,
+          "own_surviving_scoring_seeds": [
+            15000004
+          ]
+        },
+        "neutral-1": {
+          "pair_survivors": 3,
+          "own_surviving_events": 2.0,
+          "own_surviving_scoring_seeds": [
+            15000004,
+            15000005
+          ]
+        },
+        "selfplay": {
+          "pair_survivors": 5,
+          "own_surviving_events": 5.0,
+          "own_surviving_scoring_seeds": [
+            15000003,
+            15000005,
+            15000006
+          ]
+        }
+      }
+    },
+    {
+      "arm": "control",
+      "initial_sha256": "8c99c2dfe21cd6c94a90ed31c487620118df5b0d0fdfe430eabe2471745a31c2",
+      "gates": [
+        {
+          "new_ppo_steps": 8192,
+          "sha256": "32bc0bd517e989f16a867143d086a39fe76d5d09d6e6c93662e0107948ac0c29",
+          "screen": {
+            "neutral-0": {
+              "pair_survivors": 5,
+              "own_surviving_events": 1.0,
+              "own_surviving_scoring_seeds": [
+                7
+              ]
+            },
+            "neutral-1": {
+              "pair_survivors": 7,
+              "own_surviving_events": 3.0,
+              "own_surviving_scoring_seeds": [
+                23,
+                47
+              ]
+            },
+            "selfplay": {
+              "pair_survivors": 6,
+              "own_surviving_events": 6.0,
+              "own_surviving_scoring_seeds": [
+                7,
+                23,
+                31,
+                47
+              ]
+            }
+          },
+          "passes_complete": false
+        },
+        {
+          "new_ppo_steps": 16384,
+          "sha256": "c6f7fbf4c5ef941c43b8a71be7f6f6680dd657d38e96a7ed112a0f2f8f79c04b",
+          "screen": {
+            "neutral-0": {
+              "pair_survivors": 7,
+              "own_surviving_events": 3.0,
+              "own_surviving_scoring_seeds": [
+                7,
+                23,
+                47
+              ]
+            },
+            "neutral-1": {
+              "pair_survivors": 7,
+              "own_surviving_events": 1.0,
+              "own_surviving_scoring_seeds": [
+                47
+              ]
+            },
+            "selfplay": {
+              "pair_survivors": 6,
+              "own_surviving_events": 8.0,
+              "own_surviving_scoring_seeds": [
+                7,
+                23,
+                47
+              ]
+            }
+          },
+          "passes_complete": false
+        }
+      ],
+      "initial_update_geometry": {
+        "epoch": 4,
+        "minibatch": -1,
+        "phase": "after_normalizer",
+        "loss": null,
+        "profiles": {
+          "all": {
+            "rows": 1024,
+            "exact_gaussian_kl_mean": 0.037905320027134676,
+            "exact_gaussian_kl_p95": 0.07007191378410023,
+            "command_kl_mean": 0.0072186892999933985,
+            "arm_kl_mean": 0.03068663072714128,
+            "sampled_approx_kl": 0.06252290378129592,
+            "ratio_clip_fraction": 0.5234375
+          },
+          "neutral": {
+            "rows": 512,
+            "exact_gaussian_kl_mean": 0.03682689954879412,
+            "exact_gaussian_kl_p95": 0.06336386865953503,
+            "command_kl_mean": 0.006877597417333561,
+            "arm_kl_mean": 0.029949302131460555,
+            "sampled_approx_kl": 0.04030961103331442,
+            "ratio_clip_fraction": 0.501953125
+          },
+          "active": {
+            "rows": 512,
+            "exact_gaussian_kl_mean": 0.03898374050547525,
+            "exact_gaussian_kl_p95": 0.07922944550492342,
+            "command_kl_mean": 0.007559781182653238,
+            "arm_kl_mean": 0.03142395932282201,
+            "sampled_approx_kl": 0.08473619652927741,
+            "ratio_clip_fraction": 0.544921875
+          }
+        }
+      },
+      "final_checkpoint_sha256": "c6f7fbf4c5ef941c43b8a71be7f6f6680dd657d38e96a7ed112a0f2f8f79c04b",
+      "fresh": {
+        "neutral-0": {
+          "pair_survivors": 6,
+          "own_surviving_events": 1.0,
+          "own_surviving_scoring_seeds": [
+            15000003
+          ]
+        },
+        "neutral-1": {
+          "pair_survivors": 7,
+          "own_surviving_events": 5.0,
+          "own_surviving_scoring_seeds": [
+            15000003,
+            15000004,
+            15000005,
+            15000006
+          ]
+        },
+        "selfplay": {
+          "pair_survivors": 6,
+          "own_surviving_events": 17.0,
+          "own_surviving_scoring_seeds": [
+            15000003,
+            15000004,
+            15000005,
+            15000006
+          ]
+        }
+      }
+    }
+  ],
+  "active_evaluation": "/home/pedro/boxing-runs/striking-actor-rate-1835008/control/fresh/selfplay",
+  "updated_utc": "2026-10-23T22:03:34.805276+00:00",
+  "source_fresh": {
+    "neutral-0": {
+      "pair_survivors": 5,
+      "own_surviving_events": 2.0,
+      "own_surviving_scoring_seeds": [
+        15000003,
+        15000004
+      ]
+    },
+    "neutral-1": {
+      "pair_survivors": 4,
+      "own_surviving_events": 2.0,
+      "own_surviving_scoring_seeds": [
+        15000003,
+        15000004
+      ]
+    },
+    "selfplay": {
+      "pair_survivors": 7,
+      "own_surviving_events": 4.0,
+      "own_surviving_scoring_seeds": [
+        15000003,
+        15000006
+      ]
+    }
+  },
+  "active_arm": "control",
+  "active_training_output": "/home/pedro/boxing-runs/striking-actor-rate-1835008/control"
+}
