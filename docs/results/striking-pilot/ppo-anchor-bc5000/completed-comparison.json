@@ -1,0 +1,147 @@
+{
+  "status": "completed",
+  "phase": "awaiting_review",
+  "pid": 441,
+  "started_utc": "2026-10-23T11:32:10.360733+00:00",
+  "diagnostic_output": "/home/pedro/boxing-runs/striking-ppo-anchor-bc5000",
+  "source_sha256": "c7d6f1d5458f4767e6d7bedd98350ed8f79231de1030783fe9feb4b779d81e19",
+  "critic_optimizer_source_sha256": "87eb01ff6392b592395b64fc6f6a29f78e35fd1c1ad2941fafbcc8001146f5d8",
+  "migrated_sha256": "d9a18d9cbdca7a31dd5c5efcd2e21cc5c17e917a57e9ec26b56dafe018fd6187",
+  "source_consumed_offset": 1441792,
+  "source_world_offset": 917504,
+  "new_ppo_steps_per_arm": 131072,
+  "maximum_new_ppo_steps": 262144,
+  "diagnostic_consumed_steps": 262144,
+  "diagnostic_collection_world_controls": 131072,
+  "diagnostic_evaluation_world_controls": 53652,
+  "maximum_evaluation_world_controls": 60000,
+  "formal_evaluation_world_controls_before_job": 458469,
+  "diagnostic_ppo_before_job": 1188096,
+  "cumulative_supervised_updates_retained": 8000,
+  "main_consumed_retained": 1048576,
+  "main_project_consumed_retained": 476041216,
+  "policy_adoption": "none",
+  "promotion": false,
+  "assistance": false,
+  "fresh_seeds": [
+    5000003,
+    5000004,
+    5000005,
+    5000006
+  ],
+  "arms": [
+    {
+      "arm": "ppo_only",
+      "anchor_loss_weight": 0.0,
+      "initial_sha256": "98a8015312eb9fbba596de90cbb4595f65b3d634b61be06fecd91d3ec964fc07",
+      "final_checkpoint_sha256": "e3e01b71de64e3d26a431ba87d484a45d349621df5461c274fb7e394b935ef4e",
+      "new_ppo_steps": 131072,
+      "screen": {
+        "neutral-0": {
+          "pair_survivors": 8,
+          "own_surviving_events": 0.0,
+          "own_surviving_scoring_seeds": []
+        },
+        "neutral-1": {
+          "pair_survivors": 8,
+          "own_surviving_events": 0.0,
+          "own_surviving_scoring_seeds": []
+        },
+        "selfplay": {
+          "pair_survivors": 8,
+          "own_surviving_events": 1.0,
+          "own_surviving_scoring_seeds": [
+            47
+          ]
+        }
+      },
+      "fresh": {
+        "neutral-0": {
+          "pair_survivors": 7,
+          "own_surviving_events": 0.0,
+          "own_surviving_scoring_seeds": []
+        },
+        "neutral-1": {
+          "pair_survivors": 7,
+          "own_surviving_events": 0.0,
+          "own_surviving_scoring_seeds": []
+        },
+        "selfplay": {
+          "pair_survivors": 6,
+          "own_surviving_events": 0.0,
+          "own_surviving_scoring_seeds": []
+        }
+      }
+    },
+    {
+      "arm": "ppo_anchor",
+      "anchor_loss_weight": 0.02,
+      "initial_sha256": "6dd8688e9e6d0e4b94dae6e0ebd2981794eb5492c03c7879518db8783d64d9cd",
+      "final_checkpoint_sha256": "3a5bae07922ad435ead3ee027263d505b13967119468e3ef13750b2ddcab90fe",
+      "new_ppo_steps": 131072,
+      "screen": {
+        "neutral-0": {
+          "pair_survivors": 5,
+          "own_surviving_events": 0.0,
+          "own_surviving_scoring_seeds": []
+        },
+        "neutral-1": {
+          "pair_survivors": 6,
+          "own_surviving_events": 0.0,
+          "own_surviving_scoring_seeds": []
+        },
+        "selfplay": {
+          "pair_survivors": 5,
+          "own_surviving_events": 0.0,
+          "own_surviving_scoring_seeds": []
+        }
+      },
+      "fresh": {
+        "neutral-0": {
+          "pair_survivors": 5,
+          "own_surviving_events": 0.0,
+          "own_surviving_scoring_seeds": []
+        },
+        "neutral-1": {
+          "pair_survivors": 5,
+          "own_surviving_events": 0.0,
+          "own_surviving_scoring_seeds": []
+        },
+        "selfplay": {
+          "pair_survivors": 6,
+          "own_surviving_events": 0.0,
+          "own_surviving_scoring_seeds": []
+        }
+      }
+    }
+  ],
+  "active_evaluation": "/home/pedro/boxing-runs/striking-ppo-anchor-bc5000/ppo_anchor/fresh/selfplay",
+  "updated_utc": "2026-10-23T12:00:29.663963+00:00",
+  "source_fresh": {
+    "neutral-0": {
+      "pair_survivors": 7,
+      "own_surviving_events": 1.0,
+      "own_surviving_scoring_seeds": [
+        5000004
+      ]
+    },
+    "neutral-1": {
+      "pair_survivors": 8,
+      "own_surviving_events": 1.0,
+      "own_surviving_scoring_seeds": [
+        5000006
+      ]
+    },
+    "selfplay": {
+      "pair_survivors": 6,
+      "own_surviving_events": 4.0,
+      "own_surviving_scoring_seeds": [
+        5000003,
+        5000005,
+        5000006
+      ]
+    }
+  },
+  "active_arm": "ppo_anchor",
+  "active_training_output": "/home/pedro/boxing-runs/striking-ppo-anchor-bc5000/ppo_anchor"
+}

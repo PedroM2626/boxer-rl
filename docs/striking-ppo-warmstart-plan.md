@@ -1,5 +1,9 @@
 # Explicit supervised-to-PPO continuation contract
 
+**Completed:** both fixed arms and all physical trials finished. Neither passes;
+no PPO extension is granted. See the [final review and next bounded audit](striking-ppo-anchor-review.md).
+The launch/integration details below describe the completed job.
+
 ## Evidence and decision
 
 The [completed anchoring comparison](striking-motor-anchoring.md) improved approach

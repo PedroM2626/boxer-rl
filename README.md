@@ -50,12 +50,13 @@ validated 32 unique approach prefixes and completed 1,000 supervised updates
 per matched arm plus all 120 full physical episodes. The corrected actor has
 7/8 active survival on fresh seeds but only one surviving impact; neither arm
 passes the complete criteria. No actor or stage is adopted. Further identical
-imitation is stopped. The [validated PPO continuation](docs/striking-ppo-warmstart-plan.md)
-preserves the latest BC5000 actor and independently counted actor/critic Adam
-states. A hidden matched comparison is running, beginning with fresh full source
-evaluation: 131,072 diagnostic learner credits per arm, with auxiliary approach
-anchoring at weight 0 or 0.02. Main ceilings and physical gates are unchanged.
-Inspect `/home/pedro/boxing-runs/striking-ppo-anchor-bc5000/comparison.json`,
+imitation is stopped. The [completed matched PPO comparison](docs/striking-ppo-anchor-review.md)
+preserved the latest BC5000 actor and independent actor/critic Adam histories,
+but both 131,072-credit arms failed: stable neutral strikes disappeared and
+auxiliary anchoring regressed survival. Neither actor is adopted; no additional
+PPO is allocated. A bounded saved-Gaussian diagnostic of source and both final
+policies is running, with unchanged physical criteria and no optimizer updates.
+Inspect `/home/pedro/boxing-runs/striking-postppo-sampling-bc5000/sampling.json`,
 its active child, progress and logs before any new launch.
 
 The [closed-fist replay repair](docs/closed-fist-rendering.md) restores the

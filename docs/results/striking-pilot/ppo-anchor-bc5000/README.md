@@ -1,6 +1,10 @@
 # Matched PPO continuation from the latest BC5000 actor
 
-This directory records launch and integration evidence, not final physical results.
+**Completed:** final physical reports, actor snapshots, training metrics and
+`analysis.json` are now archived. Both arms fail; no actor is adopted or PPO
+extension granted. See the [final review](../../../striking-ppo-anchor-review.md).
+
+The sections below retain the original launch and integration evidence.
 The comparison started on 2026-10-23 at 11:32 UTC under the
 [reviewed continuation contract](../../../striking-ppo-warmstart-plan.md).
 

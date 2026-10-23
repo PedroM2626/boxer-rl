@@ -46,16 +46,19 @@ comparison](striking-motor-anchoring.md) verified 32 unique candidate prefixes
 and completed a bounded matched BC correction: 1,000 updates per arm and all
 120 complete physical episodes. The correction improves some survival but
 reduces scoring; neither actor passes the complete criteria. Further identical
-imitation is stopped. The [validated PPO continuation](striking-ppo-warmstart-plan.md)
-now preserves the latest zero-anchor BC5000 actor and both independent Adam
-histories. Its hidden matched comparison started at 2026-10-23 11:32 UTC with
-fresh source evaluation before two bounded 131,072-credit diagnostic PPO arms
-(auxiliary approach anchoring weights 0 and 0.02). Inspect
-`/home/pedro/boxing-runs/striking-ppo-anchor-bc5000/comparison.json`, its active
-child, progress, hashes and logs before new work. Pre-job diagnostic PPO is
-1,188,096, formal evaluation controls 458,469 and cumulative supervised compute
-8,000 updates. The job records new PPO collection and evaluation controls
-separately; no policy adoption or stage promotion occurs automatically.
+imitation is stopped. The [completed PPO comparison and regression review](striking-ppo-anchor-review.md)
+verified both fixed 131,072-credit arms and all 120 full physical episodes. Neither
+actor passes: both lose surviving neutral strikes and auxiliary anchoring also
+regresses survival. No PPO extension or actor adoption is granted. Diagnostic PPO
+is now **1,450,240**, formal evaluation controls **512,121** before the next audit,
+with **131,072** new PPO collection world controls recorded separately. Cumulative
+supervised compute remains 8,000 updates. An offline crossed-normalizer check
+localizes most demonstrated-action drift to actor parameters. A bounded saved-
+Gaussian evaluation of source and both final policies is active (72 episodes,
+at most 36,000 world controls, no optimizer updates, unchanged physical criteria).
+Inspect `/home/pedro/boxing-runs/striking-postppo-sampling-bc5000/sampling.json`,
+its active child, progress and logs before new work; the previous PPO job is
+completed. No stage promotion can result from this diagnostic alone.
 Main counters and all physical gates remain unchanged. No actor is adopted.
 No gate is relaxed, stage promoted or candidate composite controller certified.
 
