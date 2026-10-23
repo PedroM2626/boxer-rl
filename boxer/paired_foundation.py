@@ -13,7 +13,7 @@ from boxer import scene
 from boxer.impact_scorecard import ImpactScorecard
 
 
-def build_pair(foundation, separation=2.0):
+def build_pair(foundation, separation=2.0, *, visual_fists=False):
     if not np.isfinite(separation) or separation < 1.8:
         raise ValueError("transfer spawns must be separated by at least 1.8 m")
     source = foundation.mj_model
@@ -33,6 +33,10 @@ def build_pair(foundation, separation=2.0):
     targets = scene.build_model(separation, visual=False)
     for index, side in enumerate(scene.SIDES):
         robot = mujoco.MjSpec.from_file(foundation.xml_path, assets=foundation._model_assets)
+        if visual_fists:
+            # Reuse the original closed-hand visual graft only in replay models.
+            # The live learner keeps its exact compiled model and geom ordering.
+            scene._graft_fists(robot)
         for sensor in list(robot.sensors):
             if sensor.type == mujoco.mjtSensor.mjSENS_CONTACT:
                 robot.delete(sensor)

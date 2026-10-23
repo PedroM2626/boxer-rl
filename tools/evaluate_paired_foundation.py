@@ -15,7 +15,7 @@ import numpy as np
 from boxer.checkpoint_io import atomic_json
 from boxer.curriculum_env import UnassistedG1
 from boxer.curriculum_train import contract, inference, load_policy_params, utc
-from boxer.paired_foundation import PairedFoundation
+from boxer.paired_foundation import PairedFoundation, build_pair
 
 
 def evaluate(checkpoint, trials=2, seeds=(7, 23, 31, 47), seconds=10., video=None):
@@ -80,13 +80,18 @@ def render(env, frames, path, caption='Paired transfer diagnostic | Free bodies 
     import imageio.v2 as imageio
     from PIL import Image, ImageDraw
     path=Path(path);path.parent.mkdir(parents=True,exist_ok=True)
-    data=mujoco.MjData(env.model)
+    # Render the recorded coordinates with the original closed-fist meshes.
+    # This model never steps physics or supplies observations/rewards.
+    model=build_pair(env.foundation, visual_fists=True)
+    if (model.nq,model.nv,model.nu)!=(env.model.nq,env.model.nv,env.model.nu):
+        raise ValueError('visual replay model changed the coordinate contract')
+    data=mujoco.MjData(model)
     camera=mujoco.MjvCamera();camera.distance=4.;camera.azimuth=100;camera.elevation=-18
     camera.lookat[:]=[0,0,.75]
-    with mujoco.Renderer(env.model,height=480,width=640) as renderer:
+    with mujoco.Renderer(model,height=480,width=640) as renderer:
         with imageio.get_writer(path,fps=25) as writer:
             for qpos in frames:
-                data.qpos[:]=qpos;mujoco.mj_forward(env.model,data)
+                data.qpos[:]=qpos;mujoco.mj_forward(model,data)
                 renderer.update_scene(data,camera=camera)
                 image=Image.fromarray(renderer.render());draw=ImageDraw.Draw(image)
                 draw.rectangle((0,0,640,40),fill='black')

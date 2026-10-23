@@ -99,3 +99,8 @@ the stopped host logs before replacing their live names. No core training,
 physics, scoring or promotion implementation changed in this review; validation
 therefore focused on actual physical diagnostics, provenance and runtime checks.
 See the [launch record](results/striking-pilot/review-524288/launched.json).
+
+Subsequent [closed-fist replay restoration](closed-fist-rendering.md) changes only
+the model used to render recorded coordinates. It adds 1,000 replay world controls
+to the diagnostic ledger (43,656 total), without changing this training decision,
+the active simulation, physical criteria or checkpoint lineage.

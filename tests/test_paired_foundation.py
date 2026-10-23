@@ -7,7 +7,38 @@ import numpy as np
 import pytest
 
 from boxer.curriculum_env import UnassistedG1, stage_config
-from boxer.paired_foundation import PairedFoundation
+from boxer.paired_foundation import PairedFoundation, build_pair
+
+
+def test_closed_fist_replay_preserves_physics_and_coordinate_contract(foundation, pair):
+    visual = build_pair(foundation, visual_fists=True)
+    plain = pair.model
+    assert (visual.nq, visual.nv, visual.nu, visual.npair, visual.neq) == (
+        plain.nq, plain.nv, plain.nu, plain.npair, plain.neq)
+    for field in ('body_mass', 'body_inertia', 'dof_damping', 'dof_armature',
+                  'actuator_gainprm', 'actuator_biasprm', 'jnt_qposadr', 'qpos0'):
+        np.testing.assert_array_equal(getattr(visual, field), getattr(plain, field))
+    def contacts(model):
+        return [(model.geom(a).name, model.geom(b).name)
+                for a, b in zip(model.pair_geom1, model.pair_geom2)]
+    assert contacts(visual) == contacts(plain)
+    data = mujoco.MjData(visual)
+    mujoco.mj_forward(visual, data)
+    for side in ('red/', 'blue/'):
+        for hand in ('left', 'right'):
+            wrist = visual.body(f'{side}{hand}_wrist_yaw_link').id
+            meshes = {}
+            for g in range(visual.ngeom):
+                if visual.geom_bodyid[g] != wrist or visual.geom_type[g] != mujoco.mjtGeom.mjGEOM_MESH:
+                    continue
+                name = visual.mesh(visual.geom_dataid[g]).name
+                assert 'rubber_hand' not in name
+                if '_hand_' in name:
+                    assert visual.geom_contype[g] == visual.geom_conaffinity[g] == 0
+                    meshes[name.split('_hand_')[-1]] = data.geom_xpos[g]
+            assert len(meshes) == 8
+            for tip in ('index_1_link', 'middle_1_link', 'thumb_2_link'):
+                assert np.linalg.norm(meshes[tip] - meshes['palm_link']) < .08
 
 
 @pytest.fixture(scope='module')
