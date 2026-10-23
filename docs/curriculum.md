@@ -15,15 +15,17 @@ survival and zero deterministic impacts. The separate eight-episode saved-Gaussi
 checks also found zero impacts. The subsequent
 [completed 256-episode holdout and causal contact audit](striking-body-holdout-review.md)
 found one reproducible stable two-way exchange, but no robust benefit from body
-authority. The [next bounded boxing curriculum pilot](striking-partner-curriculum.md)
-uses one learner against a neutral reactive motor partner, retaining both free
-bodies and all physical contacts. Its separate allocation is 131,072 new diagnostic
-learner transitions, with source/final partner trials and unchanged full self-play
-evaluation. The original main actor is copied with all learning state retained;
-no failed candidate is adopted. Inspect
-`/home/pedro/boxing-runs/striking-partner-1048576/partner.json` and the active child
-before any launch. Keep main and foundation stopped; do not repeat completed
-reward/body comparisons or holdouts. Diagnostics do not count as main advancement.
+authority. The first [neutral-partner boxing pilot](striking-partner-curriculum.md)
+completed 131,072 diagnostic transitions, with unchanged 6/8 and 8/8 role survival
+and no final learner impacts. The [reviewed duration continuation](striking-partner-duration-review.md)
+retains its exact learning state and unchanged task for at most **524,288 new
+diagnostic transitions**, checking all sixteen partner and eight self-play trials
+every 131,072. It stops on survival regression, two stagnant checks, two complete
+consecutive phase passes, or its finite budget. Main does not adopt the actor.
+Inspect `/home/pedro/boxing-runs/striking-partner-duration-1179648/duration.json`
+and its active child before any launch. Keep main and foundation stopped; do not
+repeat completed comparisons, holdouts or the original partner pilot. Diagnostics
+do not count as main advancement, and the navigation probe changes were rejected.
 No gate is relaxed, stage promoted or candidate composite controller certified.
 
 Full walking resumed at 422.89152M main transitions after a

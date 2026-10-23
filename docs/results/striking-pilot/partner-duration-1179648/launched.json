@@ -1,0 +1,130 @@
+{
+  "updated_utc": "2026-10-23T08:01:43.526681+00:00",
+  "parent": {
+    "status": "running",
+    "phase": "training",
+    "pid": 352,
+    "started_utc": "2026-10-23T08:01:09.918691+00:00",
+    "diagnostic_output": "/home/pedro/boxing-runs/striking-partner-duration-1179648",
+    "source_sha256": "38cdfbee805babc6a40f164c9064ca99e1f3cb70e19d436fd3fd37f79e954a48",
+    "source_offset": 1179648,
+    "source_world_offset": 655360,
+    "main_consumed_retained": 1048576,
+    "diagnostic_ppo_before_job": 925952,
+    "formal_evaluation_world_controls_before_job": 261701,
+    "maximum_new_learner_steps": 524288,
+    "block_steps": 131072,
+    "maximum_evaluation_world_controls": 48000,
+    "diagnostic_consumed_steps": 0,
+    "diagnostic_evaluation_world_controls": 0,
+    "source_roles": [
+      {
+        "survivors": 6,
+        "own_surviving_scoring_seeds": [],
+        "own_surviving_events": 0.0,
+        "median_minimum_hand_distance": 0.2775807643348087
+      },
+      {
+        "survivors": 8,
+        "own_surviving_scoring_seeds": [],
+        "own_surviving_events": 0.0,
+        "median_minimum_hand_distance": 0.2735765787428336
+      }
+    ],
+    "checks": [],
+    "policy_adoption": "none",
+    "assistance": false,
+    "consecutive_passes": 0,
+    "stagnant_checks": 0,
+    "best_distance": 0.27557867153882115,
+    "best_scoring_role_seeds": [],
+    "active_block": 1,
+    "active_ceiling": 1310720,
+    "updated_utc": "2026-10-23T08:01:09.919661+00:00"
+  },
+  "child_state": {
+    "status": "running",
+    "pid": 460,
+    "started_utc": "2026-10-23T08:01:26.530166+00:00",
+    "ceiling": 1310720,
+    "foundation_steps": 474992640,
+    "foundation_sha256": "b39b1990945e8a374802c3a190e5ac5e026ae39e7fd5ef61c5c2b01ad291c6fc",
+    "assistance": false,
+    "optimizer_saved": true,
+    "physics_state_saved": false,
+    "discarded_collected_steps": 0,
+    "actor_inputs": 146,
+    "actions": 17,
+    "learners_per_world": 1,
+    "opponent_mode": "neutral_motor",
+    "engagement_distance": 0.45,
+    "engagement_reward_distance": 0.45,
+    "consumed_steps": 1181475,
+    "optimized_steps": 1181184,
+    "world_control_steps": 657187,
+    "combined_project_consumed_steps": 476174115,
+    "updated_utc": "2026-10-23T08:01:43.519050+00:00",
+    "rounds": 0,
+    "fall_rounds": 0,
+    "scored_by_corner": [
+      1.0,
+      0.0
+    ],
+    "actor_steps_per_second": 107.5409272069295,
+    "phase": "collecting"
+  },
+  "live_progress": {
+    "consumed_steps": 1181475,
+    "optimized_steps": 1181184,
+    "world_control_steps": 657187,
+    "combined_project_consumed_steps": 476174115,
+    "updated_utc": "2026-10-23T08:01:43.519050+00:00",
+    "rounds": 0,
+    "fall_rounds": 0,
+    "scored_by_corner": [
+      1.0,
+      0.0
+    ],
+    "actor_steps_per_second": 107.5409272069295,
+    "phase": "collecting"
+  },
+  "checkpoint_snapshot": {
+    "file": "step-1181184.pkl",
+    "sha256": "8e773c2b30fd5d5c388b4b41f333df74a450cc68196b1f2071befc1755db0559",
+    "consumed_steps": 1181184,
+    "optimized_steps": 1181184,
+    "world_control_steps": 656896,
+    "foundation_sha256": "b39b1990945e8a374802c3a190e5ac5e026ae39e7fd5ef61c5c2b01ad291c6fc",
+    "actor_inputs": 146,
+    "actions": 17,
+    "learners_per_world": 1,
+    "opponent_mode": "neutral_motor",
+    "engagement_distance": 0.45,
+    "engagement_reward_distance": 0.45
+  },
+  "finite_learning_state": true,
+  "physics_error_logs": {
+    "block-1-errors.log": ""
+  },
+  "main_consumed_retained": 1048576,
+  "foundation_consumed_retained": 474992640,
+  "combined_main_consumed_retained": 476041216,
+  "diagnostic_ppo_at_observation": 927779,
+  "hidden_host": {
+    "main_consumed_steps": 1048576,
+    "diagnostic_output": "/home/pedro/boxing-runs/striking-partner-duration-1179648",
+    "pid": 30832,
+    "started_utc": "2026-10-23T08:01:02.2051922Z",
+    "diagnostic_ceiling": 524288
+  },
+  "processes": [
+    "    352     351 /home/pedro/venvs/boxing_curriculum/bin/python -u tools/striking_partner_duration_job.py --output /home/pedro/boxing-runs/striking-partner-duration-1179648",
+    "    460     352 /home/pedro/venvs/boxing_curriculum/bin/python -u tools/striking_partner_job.py --train-child --output /home/pedro/boxing-runs/striking-partner-duration-1179648/learner --ceiling 1310720"
+  ],
+  "code_sha256": {
+    "tools/striking_partner_duration_job.py": "de12fc3cc3a70fa63bbe81f5e46e11e3f6048e63436967291367223f0a85a9d8",
+    "tools/evaluate_striking.py": "6c111396c6c215ed7b4966a1e50defa6afaa80818173ce9406bd5824ec611dc2",
+    "boxer/striking_partner.py": "e0a7ddd2385832f100045bc97596acc0fb9dddfb99545f5ca4e706d5f5a255de",
+    "boxer/striking_train.py": "9103ad40d628e4fd01e0442fb07c862f158b1ea18737e8bc4d1c56ac5b8eb3ca"
+  }
+}

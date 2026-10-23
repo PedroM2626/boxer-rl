@@ -1,0 +1,14 @@
+{
+  "reason": "Windows text writing introduced CRLF in the new Bash launcher; set -euo pipefail failed before Python started.",
+  "recovery": "Normalized Bash file to LF bytes; verified no previous learner process or duration state; relaunched the hidden host.",
+  "failed_hidden_host": {
+    "main_consumed_steps": 1048576,
+    "diagnostic_output": "/home/pedro/boxing-runs/striking-partner-duration-1179648",
+    "pid": 36548,
+    "started_utc": "2026-10-23T07:59:33.1747850Z",
+    "diagnostic_ceiling": 524288
+  },
+  "stderr": "wsl: Failed to translate 'D:\\IBM Bob\\bin'\ntools/run_striking_partner_duration.sh: line 2: set: pipefail\n: invalid option name\n",
+  "diagnostic_consumed_steps": 0,
+  "physical_world_controls": 0
+}

@@ -27,6 +27,10 @@ def main():
                         help='diagnostic saved-Gaussian policy; does not replace deterministic screening')
     parser.add_argument('--neutral-partner',type=int,choices=(0,1),metavar='LEARNER_CORNER',
                         help='diagnostic only: zero the other corner high-level commands; keep all physics')
+    parser.add_argument('--zero-command-offsets',action='store_true',
+                        help='diagnostic ablation: keep learned motor navigation, remove high-level command offsets')
+    parser.add_argument('--approach-gain',type=float,
+                        help='diagnostic navigation proportional gain; original default is 0.8')
     parser.add_argument('--engagement-distance',type=float,
                         help='explicit diagnostic profile override; impact criteria remain fixed')
     args=parser.parse_args()
@@ -68,6 +72,19 @@ def main():
             engagement_reward_distance=reward_distance,body_residual_radians=body_bound)
     else:
         raise ValueError('unsupported striking interface dimensions')
+    if args.approach_gain is not None:
+        if not np.isfinite(args.approach_gain) or args.approach_gain <= 0:
+            raise ValueError('positive finite approach gain required')
+        original_commands=env.pair.approach_commands
+        def diagnostic_commands(stop_distance=.75):
+            result=original_commands(stop_distance)
+            roots=[env.pair.data.qpos[m['root']:m['root']+2] for m in env.pair.maps]
+            distance=float(np.linalg.norm(roots[1]-roots[0]))
+            original_speed=np.clip((distance-stop_distance)*.8,0.,.45)
+            speed=np.clip((distance-stop_distance)*args.approach_gain,0.,.45)
+            if original_speed>0:result[:,:2]*=speed/original_speed
+            return result
+        env.pair.approach_commands=diagnostic_commands
     residual_hash=None
     if args.checkpoint:
         payload=(args.checkpoint/manifest['file']).read_bytes()
@@ -105,6 +122,9 @@ def main():
                     if args.neutral_partner is not None:
                         action=action.copy()
                         action[1-args.neutral_partner]=0.
+                    if args.zero_command_offsets:
+                        action=action.copy()
+                        action[:,:3]=0.
                     previous_scores=env.pair.scorecard.last_score.copy()
                     obs,reward,done,outcome=env.step(action);transitions+=1
                     hits+=outcome['scored'];impulses+=outcome['legal_contact_impulse']
@@ -147,6 +167,8 @@ def main():
         actor_inputs=inputs,actions=actions,body_residual_radians=body_bound,
         sampled_policy=args.sampled,
         neutral_partner_learner_corner=args.neutral_partner,
+        diagnostic_zero_command_offsets=args.zero_command_offsets,
+        diagnostic_approach_gain=args.approach_gain,
         diagnostic_profile_override=args.engagement_distance is not None,
         certification=False))
 

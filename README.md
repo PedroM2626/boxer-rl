@@ -22,14 +22,16 @@ and adaptive body authority regressed survival against control. Neither actor is
 adopted. The [actual replay](fights/striking-pilot/stable-two-way-exchange-1179648.mp4)
 is evidence of that episode, not reliable boxing.
 
-The next [bounded boxing curriculum experiment](docs/striking-partner-curriculum.md)
-trains one corner against a neutral learned motor partner, with both bodies and
-legs free and all contacts active. Its separate ceiling is **131,072 new diagnostic
-learner transitions**; it warm-starts the original main actor without migration.
-Source/final partner trials and the original full self-play evaluation are required.
-No foundation or main gate is weakened. Inspect durable state at
-`/home/pedro/boxing-runs/striking-partner-1048576/partner.json` and its child before
-another launch; `runs/striking_partner_host.json` identifies the hidden WSL host.
+The [neutral-partner curriculum pilot](docs/striking-partner-curriculum.md) completed
+131,072 diagnostic transitions without passing: survival stayed 6/8 and 8/8 by
+learner role, with no final learner impacts. The [reviewed duration experiment](docs/striking-partner-duration-review.md)
+preserves that learning state and unchanged task for at most **524,288 additional
+diagnostic transitions**, with complete physical checks every 131,072 and automatic
+stops for regression or stagnation. Both bodies/legs remain free and all contacts
+active. No actor is adopted into main and no physical gate is weakened. Inspect
+`/home/pedro/boxing-runs/striking-partner-duration-1179648/duration.json` and its
+child before another launch; `runs/striking_partner_duration_host.json` identifies
+the hidden WSL host.
 
 The [closed-fist replay repair](docs/closed-fist-rendering.md) restores the
 original visual feature without changing learning or physics. Historical videos

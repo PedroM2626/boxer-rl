@@ -1,5 +1,11 @@
 # Single-learner striking practice with a neutral learned partner
 
+**Current status:** this initial pilot completed its 131,072-step allocation and
+failed the physical phase screen. The [completed review and bounded duration
+continuation](striking-partner-duration-review.md) supersede its launch status.
+Inspect the new `striking-partner-duration-1179648/duration.json` before any launch.
+The protocol below remains the original pilot specification.
+
 ## Decision and bounded allocation
 
 The [completed 256-episode comparison and contact audit](striking-body-holdout-review.md)
