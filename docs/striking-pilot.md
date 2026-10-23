@@ -197,3 +197,20 @@ state and a verified checkpoint hash under the new 262,144 ceiling. The source
 foundation payload and inherited profile remained unchanged; the existing
 30-minute monitor schedule was preserved. Runtime identities are recorded in
 `results/striking-pilot/continuation-launched.json`, not reusable restart targets.
+
+## First physical impacts reproduced during continuation
+
+The [97,280-step snapshot review](results/striking-pilot/first-observed-impacts/README.md)
+confirmed the first independent events: all eight deterministic paired episodes
+survived, and blue landed one qualifying left-hand event in each of the two
+holdout-seed-31 side arrangements. The remaining six episodes scored zero.
+Training had recorded events from both corners, but deterministic evaluation
+has so far validated blue only. Events were replayed at 4.046/4.104 s with
+unchanged thresholds; actual video and exact timing are archived. The evaluator
+now logs the scoring hand, timestamp, contact-window impulse and first-fall flags
+for each event, without changing simulation/actions or score classification.
+
+Continue the unchanged learner under the existing **262,144** ceiling. This is
+progress from zero contacts, not boxing completion or a promotion. The snapshot
+was isolated while training kept its resident optimizer; no restart, rollback,
+new budget or duplicate learner was introduced. No new policy source was adopted.

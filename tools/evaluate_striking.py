@@ -53,6 +53,7 @@ def main():
                 obs=env.reset(seed,swap)
                 rng=np.random.default_rng(seed+int(swap)*1009)
                 hits=np.zeros(2);impulses=np.zeros(2)
+                impact_events=[]
                 minimum_hand_distance=env.hand_distances().copy()
                 residual_activity=np.zeros(2)
                 max_residual=np.zeros(2)
@@ -60,8 +61,18 @@ def main():
                     if mode=='trained':action=np.asarray(policy(jp.array(normalize(obs,saved['norm']))))
                     elif mode=='exploration':action=np.tanh(rng.normal(0.,np.exp(-1.9),(2,17)))
                     else:action=np.zeros((2,17))
+                    previous_scores=env.pair.scorecard.last_score.copy()
                     obs,reward,done,outcome=env.step(action);transitions+=1
                     hits+=outcome['scored'];impulses+=outcome['legal_contact_impulse']
+                    if np.any(outcome['scored']):
+                        recent=env.pair.scorecard.last_score > previous_scores
+                        hands=[dict(corner=i,hand=h,
+                                    score_time=float(env.pair.scorecard.last_score[i,h]),
+                                    contact_window_impulse=float(env.pair.scorecard.impulse[i,h]))
+                               for i in range(2) for h in range(2) if recent[i,h]]
+                        impact_events.append(dict(control_step=step,elapsed=env.pair.elapsed,
+                            scored_by_corner=outcome['scored'].tolist(),hands=hands,
+                            fallen=outcome['fallen'].tolist()))
                     minimum_hand_distance=np.minimum(minimum_hand_distance,env.hand_distances())
                     residual_activity+=np.mean(np.abs(outcome['arm_residual']),axis=1)
                     max_residual=np.maximum(max_residual,np.max(np.abs(outcome['arm_residual']),axis=1))
@@ -75,6 +86,7 @@ def main():
                     minimum_hand_target_distance=minimum_hand_distance.tolist(),
                     mean_abs_arm_residual=(residual_activity/(step+1)).tolist(),
                     max_abs_arm_residual=max_residual.tolist())
+                result['impact_events']=impact_events
                 results.append(result);print(json.dumps(result),flush=True)
     if frames:
         from tools.evaluate_paired_foundation import render
