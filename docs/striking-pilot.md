@@ -225,3 +225,14 @@ boxing learner-step ceiling**. Initial spawns remain nominally 2 m and physical
 impact criteria remain unchanged. Ordinary resumes inherit this saved profile.
 Read that report and its decision record before a new intervention; historical
 32,768/262,144 allocations above are not the current ceiling.
+
+## Subsequent 524,288-step review
+
+The [duration review](striking-duration-review.md) supersedes the preceding budget.
+Independent evaluation regressed to 7/8 pair survival and zero impacts. Read-only
+exploration/navigation/arm interventions and finite-state checks are archived.
+One bounded unchanged duration experiment now has a **1,048,576 total boxing
+learner-transition ceiling**, retaining the latest actor and all learning state.
+If physical contacts or survival do not recover, another unchanged extension
+requires a controlled reward/exploration investigation instead. No physical
+criterion, source foundation policy or initial separation changed.

@@ -1,0 +1,57 @@
+{
+  "previous_ceiling": 524288,
+  "new_ceiling": 1048576,
+  "additional_steps": 524288,
+  "source_sha256": "c9e6ceeb5164e158daf5d92bd35004bbb9cc6a6b70772395e5f1f8bae00b7205",
+  "foundation_main_retained": 474992640,
+  "boxing_main_retained": 524288,
+  "combined_main_at_new_ceiling": 476041216,
+  "profile_unchanged": true,
+  "engagement_distance": 0.45,
+  "physical_scorecard_unchanged": true,
+  "assistance": false,
+  "evaluation": {
+    "deterministic": {
+      "episodes": 8,
+      "pair_survivors": 7,
+      "scored_by_corner": [
+        0.0,
+        0.0
+      ],
+      "all_finite": true
+    },
+    "sampled": {
+      "episodes": 8,
+      "pair_survivors": 7,
+      "scored_by_corner": [
+        0.0,
+        0.0
+      ],
+      "all_finite": true
+    },
+    "zero_navigation": {
+      "episodes": 8,
+      "pair_survivors": 7,
+      "scored_by_corner": [
+        0.0,
+        0.0
+      ],
+      "all_finite": true
+    },
+    "zero_arms": {
+      "episodes": 8,
+      "pair_survivors": 8,
+      "scored_by_corner": [
+        0.0,
+        0.0
+      ],
+      "all_finite": true
+    }
+  },
+  "diagnostic_world_controls_this_review": 15056,
+  "formal_striking_world_controls_to_date": 42656,
+  "diagnostic_ppo_learner_steps_total": 768,
+  "decision": "One bounded unchanged learning-duration experiment; retain latest actor, critic, Adam, normalizer and RNG. No rollback or diagnostic policy import.",
+  "rationale": "Integrity and foundation certification checks passed. Training produced 33 events over 279 completed rounds versus 15 over 238 in the preceding invocation, but falls increased from 13/238 to 30/279 and deterministic evaluation regressed to 7/8 survival and zero contacts. Sampled replay and zero-navigation interventions did not restore contacts. Zero-arm intervention restored 8/8 survival but no contacts, implicating arm/body coordination rather than frozen legs or numerical failure. Sparse-contact PPO has received only 262144 transitions under the corrected range; allow a finite additional 524288 to test learning duration without introducing another unisolated reward or range change. This is an experiment, not evidence that more steps solve it.",
+  "review_next": "Evaluate latest checkpoint at 1048576 using unchanged complete eight-episode physical evaluation and inspect intermediate events/falls. If independent contacts or survival do not recover, do not grant another unchanged duration extension: run a bounded controlled reward/exploration comparison with separately recorded diagnostic compute. No boxing certification or foundation promotion is implied."
+}

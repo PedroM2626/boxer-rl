@@ -8,14 +8,16 @@ added 430,080 transitions. The exact actor payload was retained at transition.
 
 **Current operation:** the [opponent-aware striking pilot](striking-pilot.md)
 adds trainable arm residuals and independent fist-impact events over the unchanged
-certified motor actor. The reviewed boxing ceiling is **524,288 learner
-transitions**, with a [measured engagement-range correction](striking-range-recovery.md)
-to 0.45 m. The latest main policy and all 262,144 consumed boxing transitions
-are retained. Boxing steps remain separately accounted from foundation and
-diagnostic compute. Initial spawns and physical impact criteria are unchanged.
-Inspect `runs/striking-pilot` and the durable Linux output referenced in that
-report. The completed foundation must not be restarted. No boxing mastery is
-claimed; physical impact/fall evaluation must follow the bounded pilot.
+certified motor actor. The reviewed boxing ceiling is now **1,048,576 learner
+transitions**, following the [524,288-step physical review](striking-duration-review.md).
+The inherited engagement/reward range remains 0.45 m; all main learning state
+and consumed transitions are retained. Boxing steps remain separate from
+foundation and diagnostic compute. Initial spawns and physical impact criteria
+are unchanged. Inspect `runs/striking-pilot` and the durable Linux output.
+The completed foundation must not be restarted. Latest independent evaluation
+found 7/8 pair survival and no impacts; no boxing mastery is claimed. The review
+sets a stop condition on further unchanged duration extensions if physical
+contacts or survival fail to recover at the next budget review.
 
 Full walking resumed at 422.89152M main transitions after a
 [supervisor log-read fault](curriculum-log-read-recovery.md). The targeted bounded
