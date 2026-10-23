@@ -1,15 +1,16 @@
 # Adaptive unassisted G1 curriculum
 
-**Latest striking operation (2026-10-23):** the matched gamma 0.99 / 0.999
-comparison is completed and independently reviewed. Neither arm passes. Gamma
-0.999 produces surviving active strikes on four fresh seeds, including one
-ten-second two-way episode, but neutral scoring and stability remain incomplete.
-A single **32,768-credit diagnostic ordinary continuation** of its latest final
-is allocated, with full checks halfway and at completion; inspect its live state
-before launching anything. Read the [result and bounded contract](striking-reward-credit-review.md#completed-horizon-comparison-and-bounded-continuation-2026-10-23).
-Pre-continuation diagnostic counters are **1,646,848 learner credits / 770,086
-formal world controls**. Main counters and foundation certifications are unchanged.
-Historical allocations below are completed evidence, not permission to restart them.
+**Latest striking operation (2026-10-23):** the longer-horizon continuation is
+completed and reviewed. Both complete generations fail. Final neutral-role-1
+striking improves, but active survival and strikes regress on the same fresh
+seeds. **No further optimization is allocated.** A bounded passive source/final
+trace of all active and neutral-role-1 holdout episodes investigates that mixed
+transfer. Read the [current result and trace contract](striking-reward-credit-review.md#completed-longer-horizon-continuation-and-transfer-review-2026-10-23)
+and live diagnostic process before launching anything. Diagnostic PPO is
+**1,679,616 learner credits**, formal simulation **813,050 world controls** before
+the trace audit (at most 16,000 additional controls). Main counters and complete
+foundation certifications are unchanged. Historical allocations below are
+completed evidence, not permission to restart them.
 
 **Current stage (2026-10-22):** all four foundation levels are certified by
 [two distinct consecutive complete physical passes](results/curriculum/foundation-certification/README.md).

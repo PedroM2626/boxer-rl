@@ -1,4 +1,6 @@
-# Bounded continuation of the reviewed gamma-0.999 final
+# Completed continuation of the reviewed gamma-0.999 final
+
+**Current status: completed, reviewed; both complete generations fail.**
 
 The [completed comparison and continuation contract](../../../striking-reward-credit-review.md#completed-horizon-comparison-and-bounded-continuation-2026-10-23)
 record the measured advantage, failed criteria and remaining limitations.
@@ -29,3 +31,14 @@ remain unchanged. Keep the existing monitoring schedule.
 Fourteen focused tests, Python compilation, shell syntax, PowerShell parsing,
 source hash/state validation and live persistent-process verification passed.
 Startup evaluates the new source holdout before any additional optimization.
+
+
+`completed-continuation.json` and `analysis.json` retain the final decision,
+all 96 original trials are archived in source/final and distinct screen folders,
+and `training-metrics.jsonl` contains all 32 finite blocks. Exact gate payloads
+are archived under `checkpoints/striking-validation/credit-horizon-continue-1703936/`.
+Final neutral-role-1 scoring improves but active survival/striking regress.
+The [current result and passive investigation](../../../striking-reward-credit-review.md#completed-longer-horizon-continuation-and-transfer-review-2026-10-23)
+stop further optimization pending a matched source/final trace; the original
+startup snapshots and allocation above are historical, not a live job or
+permission to relaunch.

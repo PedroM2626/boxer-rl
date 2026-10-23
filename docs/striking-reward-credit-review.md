@@ -1,8 +1,10 @@
 # Reward-credit review and completed horizon comparison
 
-**Current status:** both horizon arms are completed and reviewed. Neither passes.
-The latest gamma-0.999 actor receives one bounded 32,768-credit continuation;
-see the [current result and contract](#completed-horizon-comparison-and-bounded-continuation-2026-10-23).
+**Current status:** the single longer-horizon continuation is completed and
+reviewed; both complete generations fail. No more optimization is allocated.
+The latest final improves neutral-role-1 striking but regresses active play.
+A bounded passive matched trace is the next diagnostic; see the
+[current result and investigation](#completed-longer-horizon-continuation-and-transfer-review-2026-10-23).
 
 ## Completed neutral curriculum review
 
@@ -277,3 +279,86 @@ The existing horizon/state-preservation, optimizer-prefix and neutral-routing
 checks also pass. Python compilation, LF shell syntax, PowerShell launcher
 parsing and `git diff --check` succeed. The actual hidden process was verified
 running its preregistered fresh source evaluation before any new optimization.
+
+
+## Completed longer-horizon continuation and transfer review (2026-10-23)
+
+The single ordinary gamma-0.999 continuation completed normally at **17:29:17
+UTC**, consuming its entire **32,768-credit** allocation. Neither of the two
+distinct complete screen generations passes. The complete source/final holdout
+and both screens comprise **96 episodes / 42,964 evaluation world controls**.
+Checkpoint hashes, finite learned/optimizer leaves, preserved counters, 32 finite
+update records and all four complete foundation histories were reverified by
+`tools/review_striking_horizon_continuation.py`. Native error logs are empty.
+
+| Policy / sample | Neutral 0 survival / own events | Neutral 1 survival / own events | Active survival | Surviving active red / blue events | Surviving two-way episodes |
+| --- | --- | --- | --- | --- | --- |
+| Source / fresh 11M | 7/8 / 3 | 7/8 / 0 | 7/8 | 0 / 5 | 0 |
+| +16,384 / screen | 5/8 / 1 | 7/8 / 0 | 6/8 | 6 / 7 | 3 |
+| +32,768 / screen | 6/8 / 1 | 8/8 / 2 | 5/8 | 1 / 5 | 1 |
+| +32,768 / fresh 11M | 7/8 / 1 | 7/8 / 5 | 6/8 | 0 / 1 | 0 |
+
+The screen's three intermediate two-way episodes do not override its failed
+survival/neutral criteria. The final neutral-role-1 screen alone meets its
+profile threshold: 8/8 pair survival and own surviving strikes on two seeds.
+Its fresh own strikes also span two seeds, but fresh survival is 7/8 rather
+than the required 8/8. Neutral role 0 still scores on only one seed. On exactly
+the same fresh active seeds (11,000,003..11,000,006, both swaps), pair survival
+decreases 7/8 to 6/8 and surviving events decrease five to one. This is mixed
+transfer with a measured active regression, not a complete phase pass or a
+reason to keep extending unchanged neutral-only optimization. Neither selected
+intermediate episodes nor older four-seed results replace the current final.
+
+Both exact models/configurations and all reports/metrics are archived under
+`credit-horizon-continue-1703936` in the result and checkpoint-validation trees.
+Intermediate hash:
+`f4d8daf3260280b6046dc5dddedc44b1edb153a0cc7c44c8058223801c9320cc`.
+Final hash:
+`55976fc15b74b9997b4cb56cf13683f1f87315ac6d67c5cc966ab3c644dd2d73`.
+The final lineage is **1,736,704 learner credits / 1,114,112 world controls**,
+Adam **9,608 / 33,280**, role credits **50,229 / 48,075**, including the inherited
+neutral prefix. Nothing is rolled back or promoted. Current diagnostic PPO is
+**1,679,616**, formal diagnostic simulation **813,050 world controls**; this job
+also adds 32,768 collection controls and 131,072 integrated replay presentations.
+Standalone BC stays 8,000 updates; main boxing and combined main remain
+**1,048,576 / 476,041,216**. Foundation certifications and ceilings are unchanged.
+
+### Bounded passive investigation, no training extension
+
+Before choosing a training change, replay **all eight fresh active episodes and
+all eight neutral-role-1 episodes for both source and final**. This fixed
+32-episode / at most **16,000 world-control** audit preserves every failed case,
+same seeds/swaps, original deterministic mean policies and inherited physical
+profiles. It uses no optimizer updates, teacher, action intervention, assistance
+or gate change. Check all original physical fields for exact equality, hashes,
+finite trace arrays and native numerical/capacity logs. Trace actual qpos/qvel,
+actions, commands, root/hand distances, pelvis/upright state, legal impacts,
+first positive-force interbody contacts and terminal flags. Compare neutral
+improvement with active failure onset; contact-before-fall is a temporal
+association and does not establish causality. This can inform a subsequent
+coverage or control hypothesis, but does not authorize a new training budget.
+
+Persistent launcher: `tools/start_striking_horizon_regression_trace.ps1`.
+Live state:
+`/home/pedro/boxing-runs/striking-horizon-regression-trace-1736704/trace-review.json`.
+Inspect it, its child, progress and all complete replay checks before any further
+launch. Record all attempted simulation, including on failure. At the maximum
+allocation formal diagnostic simulation would reach **829,050**, while diagnostic
+PPO stays **1,679,616**. Preserve the latest final, all consumed work, unassisted
+free legs and existing monitoring schedule. The eventual full trace review,
+not an isolated frame or reward number, determines the next concrete decision.
+
+
+Validation for this review/audit: **12 focused tests passed** (existing passive
+trace/reward invariants, complete gate evidence guards and five new contact-timing
+summary checks). Python compilation, LF shell syntax, PowerShell launcher parsing
+and `git diff --check` pass. The hidden audit supervisor and its native child were
+verified live; the main checkpoint hash remains unchanged. Startup evidence is
+under `docs/results/striking-pilot/horizon-regression-trace-1736704/`.
+The two source profiles (16 episodes) have already reproduced every original
+physical field exactly, with finite hashed trace arrays and empty native error
+logs. Final-policy replay checks remain pending at this snapshot. Both source
+falls follow interbody contact: early red low-pelvis termination in active play,
+and late blue self-leg contact against a neutral partner. This chronology alone
+is not evidence that contact caused either fall; compare the complete final
+traces before proposing a correction.

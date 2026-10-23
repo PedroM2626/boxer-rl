@@ -72,15 +72,18 @@ unchanged extension. The [completed reward-credit audit and matched horizon comp
 verified all raw physical gates and checkpoints. Gamma 0.999 produces six
 surviving active impacts across four fresh seeds, including one deterministic
 ten-second two-way episode, versus no fresh impacts at gamma 0.99. Neither
-passes: neutral strikes remain absent and some pairs fall. One further
-**32,768-credit diagnostic ordinary continuation** of the latest gamma-0.999
-checkpoint is allocated, with complete checks at 16,384/32,768 and fresh seeds
-at the end. Inspect
-`/home/pedro/boxing-runs/striking-credit-horizon-continue-1703936/continuation.json`
-and its process before any launch. Before this continuation, cumulative
-diagnostic PPO is **1,646,848**, formal diagnostic simulation **770,086 world
-controls**; main counters remain unchanged. No blind extension or adoption;
-higher discounted return nor an isolated replay certifies boxing.
+passes: neutral strikes remain absent and some pairs fall. The further
+32,768-credit ordinary continuation has now completed: both complete generations
+fail. Final neutral-role-1 striking improves, but active survival regresses from
+7/8 to 6/8 and surviving active events from five to one on the same fresh seeds.
+No more optimizer steps are allocated. A bounded passive matched source/final
+trace investigates this mixed transfer. Inspect
+`/home/pedro/boxing-runs/striking-horizon-regression-trace-1736704/trace-review.json`
+and its process before any launch. Diagnostic PPO is **1,679,616** and formal
+diagnostic simulation **813,050 world controls** before that audit (at most
+16,000 additional controls); main counters remain unchanged. Full
+[results and the investigation contract](docs/striking-reward-credit-review.md#completed-longer-horizon-continuation-and-transfer-review-2026-10-23)
+retain all failures and checkpoint provenance. No phase is promoted.
 
 The [closed-fist replay repair](docs/closed-fist-rendering.md) restores the
 original visual feature without changing learning or physics. Historical videos
