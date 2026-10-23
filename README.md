@@ -54,10 +54,16 @@ imitation is stopped. The [completed matched PPO comparison](docs/striking-ppo-a
 preserved the latest BC5000 actor and independent actor/critic Adam histories,
 but both 131,072-credit arms failed: stable neutral strikes disappeared and
 auxiliary anchoring regressed survival. Neither actor is adopted; no additional
-PPO is allocated. A bounded saved-Gaussian diagnostic of source and both final
-policies is running, with unchanged physical criteria and no optimizer updates.
-Inspect `/home/pedro/boxing-runs/striking-postppo-sampling-bc5000/sampling.json`,
-its active child, progress and logs before any new launch.
+PPO is allocated to that failed objective. The completed saved-Gaussian audit
+also found no stable-strike recovery. A short gradient assay showed that the small
+approach-only loss does not preserve demonstrated strikes. The
+[bounded demonstration-retention continuation](docs/striking-retention-continuation.md)
+now tests 32,768 new diagnostic credits per arm, retaining the latest PPO-only
+actor/critic and independently counted Adam states. It compares weight 0 versus 1
+on verified strike/approach replay, with unchanged full physical criteria and no
+rollback or main adoption. Inspect
+`/home/pedro/boxing-runs/striking-retention-1572864/comparison.json`, its active
+child, progress and native logs before another launch.
 
 The [closed-fist replay repair](docs/closed-fist-rendering.md) restores the
 original visual feature without changing learning or physics. Historical videos

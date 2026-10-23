@@ -113,9 +113,11 @@ def require_ppo_checkpoint(saved):
             raise ValueError('joint PPO optimizer required; explicit optimizer migration required')
 
 
-def make_ppo_update(actor,critic,tx,anchor_weight=None):
+def make_ppo_update(actor,critic,tx,anchor_weight=None,retention_weight=None):
     if anchor_weight is not None:
         from boxer.striking_ppo_warmstart import anchor_loss
+    if retention_weight is not None:
+        from boxer.striking_retention import retention_loss
     @jax.jit
     def update(ap,vp,optimizer,batch):
         def loss(ap,vp):
@@ -127,6 +129,8 @@ def make_ppo_update(actor,critic,tx,anchor_weight=None):
             result=policy+.25*value_loss-.001*entropy
             if anchor_weight is not None:
                 result+=anchor_weight*anchor_loss(actor,ap,batch['anchor_obs'],batch['anchor_labels'])
+            if retention_weight is not None:
+                result+=retention_weight*retention_loss(actor,ap,batch['retention_obs'],batch['retention_labels'],batch['retention_weights'])
             return result
         loss_value,grads=jax.value_and_grad(loss,argnums=(0,1))(ap,vp)
         updates,optimizer=tx.update(grads,optimizer,(ap,vp))
@@ -147,6 +151,8 @@ def main(argv=None):
     parser.add_argument('--resume',action='store_true')
     parser.add_argument('--contact-ppo',action='store_true',help='explicit migrated 148-input split-Adam training')
     parser.add_argument('--anchor-loss-weight',type=float,choices=(0.,.02),default=0.)
+    parser.add_argument('--demonstration-ppo',action='store_true')
+    parser.add_argument('--retention-loss-weight',type=float,choices=(0.,1.),default=0.)
     parser.add_argument('--engagement-distance',type=float,
                         help='explicit reviewed change of approach stop and engagement reward peak')
     parser.add_argument('--publish-dir',type=Path,
@@ -156,6 +162,10 @@ def main(argv=None):
         raise ValueError('contact PPO requires explicit migrated resume and inherited engagement profile')
     if not args.contact_ppo and args.anchor_loss_weight!=0.:
         raise ValueError('auxiliary loss requires explicit contact PPO')
+    if args.demonstration_ppo and (not args.contact_ppo or args.anchor_loss_weight!=0.):
+        raise ValueError('demonstration PPO requires contact resume without the rejected anchor-only profile')
+    if not args.demonstration_ppo and args.retention_loss_weight!=0.:
+        raise ValueError('retention loss requires explicit demonstration PPO')
     if args.ceiling <= 0 or args.worlds <= 0 or args.unroll < 2:
         raise ValueError('positive ceiling/worlds and unroll >=2 required')
     if jax.devices()[0].platform!='cpu':
@@ -193,6 +203,7 @@ def train(args):
     if contract(foundation)!=metadata['contract']:
         raise ValueError('frozen motor contract mismatch')
     contact_ppo=getattr(args,'contact_ppo',False)
+    demonstration_ppo=getattr(args,'demonstration_ppo',False)
     env_class=StrikingEnv
     if contact_ppo:
         from boxer.striking_contact import ContactAwareStrikingEnv
@@ -218,6 +229,9 @@ def train(args):
         interface_metadata.update(contact_history=True,learners_per_world=2,opponent_mode='active_selfplay',
             optimizer_kind=OPTIMIZER_KIND,anchor_loss_weight=args.anchor_loss_weight)
         config.update(interface_metadata,version=2)
+        if demonstration_ppo:
+            interface_metadata.update(demonstration_ppo=True,retention_loss_weight=args.retention_loss_weight)
+            config.update(interface_metadata,version=3)
     checkpoint_path=args.output/'checkpoint/latest.json'
     if previous:
         if not args.resume:
@@ -240,6 +254,10 @@ def train(args):
             raise ValueError('boxing checkpoint checksum mismatch')
         saved=pickle.loads(payload)
         require_ppo_checkpoint(saved)
+        if demonstration_ppo != saved.get('demonstration_ppo',False):
+            raise ValueError('explicit demonstration checkpoint and training path must agree')
+        if demonstration_ppo and saved['retention_loss_weight']!=args.retention_loss_weight:
+            raise ValueError('retention checkpoint and requested coefficient disagree')
         if contact_ppo != (saved.get('optimizer_kind')=='split_adam_v1'):
             raise ValueError('optimizer format requires the matching explicit training path')
         for key in ('actor_inputs','actions','contact_history','learners_per_world','opponent_mode','anchor_loss_weight'):
@@ -279,6 +297,11 @@ def train(args):
         if anchor_manifest['sha256']!=continuation['anchor_dataset_sha256']:
             raise ValueError('auxiliary anchor provenance mismatch')
         aux_rng=np.random.default_rng();aux_rng.bit_generator.state=continuation['aux_sampler_state']
+        if demonstration_ppo:
+            from boxer.striking_retention import load_retention_data,validate_retention_state,retention_batch
+            retention_data,retention_provenance=load_retention_data()
+            validate_retention_state(continuation,retention_provenance)
+            retention_rng=np.random.default_rng();retention_rng.bit_generator.state=continuation['retention_sampler_state']
 
     @jax.jit
     def act(parameters, obs, rng):
@@ -290,7 +313,8 @@ def train(args):
     def value(parameters,obs):
         return critic.apply(parameters,obs)
 
-    update=make_ppo_update(actor,critic,tx,args.anchor_loss_weight if contact_ppo else None)
+    update=make_ppo_update(actor,critic,tx,args.anchor_loss_weight if contact_ppo else None,
+        args.retention_loss_weight if demonstration_ppo else None)
 
     envs=[env_class(foundation,motor_params,**profile) for _ in range(args.worlds)]
     # Share the already compiled frozen network across worlds.
@@ -374,6 +398,7 @@ def train(args):
                     ai=aux_rng.integers(0,len(anchor_data['observation']),64)
                     minibatch.update(anchor_obs=jp.array(normalize(anchor_data['observation'][ai],norm)),
                         anchor_labels=jp.array(anchor_data['action'][ai]))
+                    if demonstration_ppo:minibatch.update(retention_batch(retention_data,retention_rng,norm))
                 ap,vp,optimizer,loss=update(ap,vp,optimizer,minibatch)
                 losses.append(float(loss))
         if contact_ppo and not np.isfinite(losses).all():raise FloatingPointError('nonfinite contact PPO loss')
@@ -386,6 +411,9 @@ def train(args):
             foundation_sha256=metadata['sha256'],**interface_metadata,**profile)
         if contact_ppo:
             saved['aux_sampler_state']=aux_rng.bit_generator.state
+            if demonstration_ppo:
+                saved['retention_sampler_state']=retention_rng.bit_generator.state
+                validate_retention_state(saved,retention_provenance)
             require_ppo_checkpoint(saved)
         payload=pickle.dumps(jax.device_get(saved),protocol=pickle.HIGHEST_PROTOCOL)
         name=f'step-{consumed}.pkl'

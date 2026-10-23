@@ -1,5 +1,10 @@
 # Completed BC5000-to-PPO comparison and regression investigation
 
+**Follow-up completed:** saved-Gaussian evaluation and the short gradient assay
+confirm no recovered stable striking. See the [result review and distinct bounded
+demonstration-retention continuation](striking-retention-continuation.md). The
+launch plan below is historical; the PPO/anchor-only objective is not extended.
+
 Both matched arms finished their fixed 131,072 new learner credits and all 120
 source/final full physical episodes. Neither final actor passes the unchanged
 complete criteria. **No further PPO is allocated**, no actor is adopted and no

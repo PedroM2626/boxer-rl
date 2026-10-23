@@ -52,13 +52,19 @@ actor passes: both lose surviving neutral strikes and auxiliary anchoring also
 regresses survival. No PPO extension or actor adoption is granted. Diagnostic PPO
 is now **1,450,240**, formal evaluation controls **512,121** before the next audit,
 with **131,072** new PPO collection world controls recorded separately. Cumulative
-supervised compute remains 8,000 updates. An offline crossed-normalizer check
-localizes most demonstrated-action drift to actor parameters. A bounded saved-
-Gaussian evaluation of source and both final policies is active (72 episodes,
-at most 36,000 world controls, no optimizer updates, unchanged physical criteria).
-Inspect `/home/pedro/boxing-runs/striking-postppo-sampling-bc5000/sampling.json`,
-its active child, progress and logs before new work; the previous PPO job is
-completed. No stage promotion can result from this diagnostic alone.
+supervised compute remains 8,000 updates. The completed saved-Gaussian audit
+(72 trials) also found no recovery of stable strikes. The subsequent read-only
+gradient assay used 1,536 world controls and zero updates. Formal diagnostic
+simulation now totals **547,894 world controls**, including that assay.
+The [review and bounded demonstration-retention continuation](striking-retention-continuation.md)
+allocates **32,768 new diagnostic PPO credits per arm**, 65,536 maximum, from the
+latest completed PPO-only actor with Adam counts 7,048 / 30,720 and all counters
+retained. It tests weight 0 versus 1 on verified demonstration/approach replay,
+without a rollback or gate change. New source seeds are 7,000,003–7,000,006; all
+final complete screen/fresh evaluations are retained. Inspect
+`/home/pedro/boxing-runs/striking-retention-1572864/comparison.json`, its active
+child, progress and native logs before another launch. The two preceding audits
+are completed. No automatic extension, actor adoption or stage promotion occurs.
 Main counters and all physical gates remain unchanged. No actor is adopted.
 No gate is relaxed, stage promoted or candidate composite controller certified.
 

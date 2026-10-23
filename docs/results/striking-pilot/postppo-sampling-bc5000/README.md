@@ -1,4 +1,11 @@
-# Post-PPO saved-Gaussian diagnostic launch
+# Post-PPO saved-Gaussian diagnostic
+
+**Completed:** all 72 episodes consumed 34,237 world controls. Raw profiles,
+`completed-sampling.json` and `analysis.json` are archived here. Neither final PPO
+actor recovers stable strikes; no surviving two-way episode occurs. All results
+are finite and native error logs empty. See the [completed review and next
+continuation](../../../striking-retention-continuation.md). The launch snapshot
+and notes below are retained as historical evidence.
 
 This is a launch snapshot, not final physical evidence. See
 [the completed PPO review](../../../striking-ppo-anchor-review.md) for the bounded
