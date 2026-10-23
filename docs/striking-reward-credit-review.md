@@ -1,10 +1,10 @@
 # Reward-credit review and completed horizon comparison
 
-**Current status:** the full 72-episode zero-command holdout is completed and
-reviewed. No complete set passes, so the masked controller is not adopted.
-The next bounded training comparison tests 50/50 neutral/current-mean-active
-opponent coverage against ordinary neutral-only control, from the unchanged
-latest final. Read the [current matched contract](striking-mixed-partner-comparison.md).
+**Current status:** the subsequent mixed/control training comparison is
+completed and reviewed. Neither passes; mixed improves measured stability.
+A single ordinary bounded mixed continuation is allocated with early stops.
+Read the [current result and contract](striking-mixed-partner-comparison.md#completed-comparison-and-one-bounded-continuation-2026-10-23).
+Historical reward/command investigations below are completed, not active jobs.
 
 ## Completed neutral curriculum review
 

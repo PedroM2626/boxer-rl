@@ -86,16 +86,18 @@ Removing command offsets retains two legal strikes; removing arm residuals
 produces none. The broader 72-episode holdout is now completed:
 zero commands improves original-screen survival, but fresh neutral strikes vanish
 and active fresh survival changes 8/8 to 7/8. Neither controller passes a complete
-set, so the masked controller is not adopted. A
-[bounded matched coverage experiment](docs/striking-mixed-partner-comparison.md)
-now compares 50/50 neutral/current-mean-active opponent training with ordinary
-neutral-only control from the unchanged latest final. Full learned actions,
-physics, independent gates and optimizer prefixes are retained; allocation is
-32,768 diagnostic credits per arm with intermediate full checks and early stops.
-Inspect `/home/pedro/boxing-runs/striking-mixed-partner-1736704/comparison.json`
-and its process before any launch. Pre-job diagnostic PPO is **1,679,616**, formal
-simulation **870,055 world controls**; main counters remain unchanged. No actor
-is adopted or phase promoted, and no blind extension is authorized.
+set, so the masked controller is not adopted. The
+[matched mixed-opponent comparison](docs/striking-mixed-partner-comparison.md)
+is completed and independently reviewed: mixed fresh survival is 24/24 versus
+18/24 neutral control and 22/24 source. Neither arm passes complete criteria;
+valid strikes remain sparse. The neutral control severely regresses. One ordinary
+**65,536-credit bounded mixed-profile continuation** from the latest mixed final
+is allocated with complete checks and regression/stagnation stops, preserving
+full learned actions, unassisted physics and optimizer/consumed prefixes. Inspect
+`/home/pedro/boxing-runs/striking-mixed-partner-continue-1769472/continuation.json`
+and its process before any launch. Pre-continuation diagnostic PPO is **1,745,152**,
+formal simulation **946,747 world controls**; main counters remain unchanged.
+No actor is adopted, phase promoted or automatic further extension granted.
 
 The [closed-fist replay repair](docs/closed-fist-rendering.md) restores the
 original visual feature without changing learning or physics. Historical videos

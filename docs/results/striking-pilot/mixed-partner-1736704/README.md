@@ -1,4 +1,4 @@
-# Bounded matched mixed-opponent coverage comparison
+# Completed matched mixed-opponent coverage comparison
 
 The [full contract](../../../striking-mixed-partner-comparison.md) records the
 failed holdout evidence, source provenance, explicit version-6 task transition,
@@ -51,3 +51,19 @@ PPO is 1,680,640, formal simulation 881,310, new collection 1,024 controls,
 main accounting unchanged. `integration-state.json` is historical; the mixed
 remaining invocation is active and later control/full gates remain pending.
 Do not interpret the finite guard as learned boxing or a promotion pass.
+
+
+**Completed and independently reviewed:** all 168 full physical trials and four
+distinct original-screen gate models are archived with finite PPO metrics,
+correct checksums/optimizer/mode prefixes, matched sampler/RNG streams and empty
+native error logs. Neither arm passes a complete generation. Mixed fresh survival
+is 24/24 versus 18/24 control and 22/24 source; control also has a 3/8 original
+neutral-role-0 survival flag at the final boundary. More control strikes do not
+compensate for those falls. `completed-comparison.json` and `analysis.json`
+retain every full result and the continuation decision.
+
+Actual diagnostic PPO is 1,745,152, formal simulation 946,747 world controls.
+No main actor is adopted. The [single bounded ordinary mixed continuation](../../../striking-mixed-partner-comparison.md#completed-comparison-and-one-bounded-continuation-2026-10-23)
+starts from the latest mixed final, never an earlier favorable generation.
+Startup/native-integration snapshots above are historical; this completed
+comparison must not be relaunched.

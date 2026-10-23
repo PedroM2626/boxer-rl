@@ -1,16 +1,16 @@
 # Adaptive unassisted G1 curriculum
 
-**Latest striking operation (2026-10-23):** the 72-episode command-offset
-holdout is completed and reviewed. No complete set passes; the masked controller
-is not adopted. A [bounded matched mixed-opponent comparison](striking-mixed-partner-comparison.md)
-now tests 50/50 neutral/current-mean-active training coverage against neutral-only
-control from the unchanged latest final. Each arm has at most 32,768 new credits,
-retained 1,024-credit integration, full checks at 16,384/32,768, and final fresh
-13M-seed evaluation. No main ceiling or physical gate changes. Pre-job diagnostic
-PPO is **1,679,616**, formal simulation **870,055 world controls**. Inspect live
-state/process, full results and native guards before another launch. Main
-counters and all complete foundation certifications are unchanged. Historical
-allocations below are completed evidence, not permission to restart them.
+**Latest striking operation (2026-10-23):** the matched mixed/control comparison
+is completed and independently reviewed. Neither arm passes. Mixed fresh survival
+is 24/24 versus 18/24 control and 22/24 source, but strikes remain insufficient.
+The severely regressed neutral control is stopped. One ordinary **65,536-credit
+bounded mixed-profile continuation** is allocated from its latest final, with
+full checks at 32,768/65,536, severe-regression and no-improvement early stops.
+Read the [current results and contract](striking-mixed-partner-comparison.md#completed-comparison-and-one-bounded-continuation-2026-10-23)
+and live job/process before any launch. Pre-continuation diagnostic PPO is
+**1,745,152**, formal simulation **946,747 world controls**. Main counters, physical
+gates and complete foundation certifications remain unchanged. No actor is
+adopted or phase promoted; historical allocations below must not be restarted.
 
 **Current stage (2026-10-22):** all four foundation levels are certified by
 [two distinct consecutive complete physical passes](results/curriculum/foundation-certification/README.md).

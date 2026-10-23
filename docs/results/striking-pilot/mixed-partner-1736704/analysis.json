@@ -1,0 +1,365 @@
+{
+  "status": "reviewed",
+  "main_adoption": false,
+  "promotion": false,
+  "diagnostic_ppo_total": 1745152,
+  "formal_world_controls_total": 946747,
+  "actual_new_evaluation_world_controls": 76692,
+  "new_collection_world_controls": 65536,
+  "new_integrated_replay_presentations": 262144,
+  "cumulative_supervised_updates": 8000,
+  "native_error_logs_empty": true,
+  "arms": [
+    {
+      "arm": "mixed",
+      "final_sha256": "c3fe6cacf39024c50239ddd9da9e31c5085518db05245d4fdd48eb04255f648b",
+      "gates": [
+        {
+          "new_ppo_steps": 16384,
+          "sha256": "650ce05e6e6910507c8fdb7a8a62ad01cedb4bb85cd60efcd8daef5046d7995f",
+          "screen": {
+            "profiles": {
+              "neutral-0": {
+                "pair_survivors": 6,
+                "own_surviving_scoring_seeds": [],
+                "surviving_events_by_corner": [
+                  0.0,
+                  0.0
+                ],
+                "surviving_two_way_episodes": 0,
+                "passes_profile": false
+              },
+              "neutral-1": {
+                "pair_survivors": 8,
+                "own_surviving_scoring_seeds": [
+                  23
+                ],
+                "surviving_events_by_corner": [
+                  0.0,
+                  1.0
+                ],
+                "surviving_two_way_episodes": 0,
+                "passes_profile": false
+              },
+              "selfplay": {
+                "pair_survivors": 8,
+                "own_surviving_scoring_seeds": [
+                  7,
+                  23,
+                  47
+                ],
+                "surviving_events_by_corner": [
+                  4.0,
+                  3.0
+                ],
+                "surviving_two_way_episodes": 1,
+                "passes_profile": true
+              }
+            },
+            "passes_complete": false
+          }
+        },
+        {
+          "new_ppo_steps": 32768,
+          "sha256": "c3fe6cacf39024c50239ddd9da9e31c5085518db05245d4fdd48eb04255f648b",
+          "screen": {
+            "profiles": {
+              "neutral-0": {
+                "pair_survivors": 7,
+                "own_surviving_scoring_seeds": [
+                  47
+                ],
+                "surviving_events_by_corner": [
+                  1.0,
+                  0.0
+                ],
+                "surviving_two_way_episodes": 0,
+                "passes_profile": false
+              },
+              "neutral-1": {
+                "pair_survivors": 8,
+                "own_surviving_scoring_seeds": [],
+                "surviving_events_by_corner": [
+                  0.0,
+                  0.0
+                ],
+                "surviving_two_way_episodes": 0,
+                "passes_profile": false
+              },
+              "selfplay": {
+                "pair_survivors": 6,
+                "own_surviving_scoring_seeds": [
+                  7,
+                  23
+                ],
+                "surviving_events_by_corner": [
+                  2.0,
+                  2.0
+                ],
+                "surviving_two_way_episodes": 2,
+                "passes_profile": false
+              }
+            },
+            "passes_complete": false
+          }
+        }
+      ],
+      "fresh": {
+        "profiles": {
+          "neutral-0": {
+            "pair_survivors": 8,
+            "own_surviving_scoring_seeds": [],
+            "surviving_events_by_corner": [
+              0.0,
+              0.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": false
+          },
+          "neutral-1": {
+            "pair_survivors": 8,
+            "own_surviving_scoring_seeds": [
+              13000003
+            ],
+            "surviving_events_by_corner": [
+              0.0,
+              1.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": false
+          },
+          "selfplay": {
+            "pair_survivors": 8,
+            "own_surviving_scoring_seeds": [
+              13000004,
+              13000006
+            ],
+            "surviving_events_by_corner": [
+              2.0,
+              1.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": true
+          }
+        },
+        "passes_complete": false
+      },
+      "actor_adam_count": 10120,
+      "critic_adam_count": 33792,
+      "neutral_credits_by_corner": [
+        50229,
+        48075
+      ],
+      "mixed_credits_by_mode_and_corner": [
+        [
+          7914,
+          8470
+        ],
+        [
+          8637,
+          7747
+        ]
+      ],
+      "severe_survival_flag": null
+    },
+    {
+      "arm": "neutral",
+      "final_sha256": "b576583c12e7527e08cc9f40016c61725a5b8b586f270e62180e4c7322bf2827",
+      "gates": [
+        {
+          "new_ppo_steps": 16384,
+          "sha256": "cbaf9d665822186dbfcc54dd9b29e72a3f008edcf672a36d7f2982c918247e3c",
+          "screen": {
+            "profiles": {
+              "neutral-0": {
+                "pair_survivors": 6,
+                "own_surviving_scoring_seeds": [
+                  31
+                ],
+                "surviving_events_by_corner": [
+                  1.0,
+                  0.0
+                ],
+                "surviving_two_way_episodes": 0,
+                "passes_profile": false
+              },
+              "neutral-1": {
+                "pair_survivors": 8,
+                "own_surviving_scoring_seeds": [],
+                "surviving_events_by_corner": [
+                  0.0,
+                  0.0
+                ],
+                "surviving_two_way_episodes": 0,
+                "passes_profile": false
+              },
+              "selfplay": {
+                "pair_survivors": 6,
+                "own_surviving_scoring_seeds": [
+                  7,
+                  23
+                ],
+                "surviving_events_by_corner": [
+                  1.0,
+                  1.0
+                ],
+                "surviving_two_way_episodes": 0,
+                "passes_profile": false
+              }
+            },
+            "passes_complete": false
+          }
+        },
+        {
+          "new_ppo_steps": 32768,
+          "sha256": "b576583c12e7527e08cc9f40016c61725a5b8b586f270e62180e4c7322bf2827",
+          "screen": {
+            "profiles": {
+              "neutral-0": {
+                "pair_survivors": 3,
+                "own_surviving_scoring_seeds": [],
+                "surviving_events_by_corner": [
+                  0.0,
+                  0.0
+                ],
+                "surviving_two_way_episodes": 0,
+                "passes_profile": false
+              },
+              "neutral-1": {
+                "pair_survivors": 7,
+                "own_surviving_scoring_seeds": [
+                  7,
+                  31,
+                  47
+                ],
+                "surviving_events_by_corner": [
+                  1.0,
+                  8.0
+                ],
+                "surviving_two_way_episodes": 1,
+                "passes_profile": false
+              },
+              "selfplay": {
+                "pair_survivors": 6,
+                "own_surviving_scoring_seeds": [
+                  7,
+                  23,
+                  31
+                ],
+                "surviving_events_by_corner": [
+                  1.0,
+                  6.0
+                ],
+                "surviving_two_way_episodes": 1,
+                "passes_profile": false
+              }
+            },
+            "passes_complete": false
+          }
+        }
+      ],
+      "fresh": {
+        "profiles": {
+          "neutral-0": {
+            "pair_survivors": 6,
+            "own_surviving_scoring_seeds": [
+              13000004
+            ],
+            "surviving_events_by_corner": [
+              1.0,
+              0.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": false
+          },
+          "neutral-1": {
+            "pair_survivors": 7,
+            "own_surviving_scoring_seeds": [
+              13000003
+            ],
+            "surviving_events_by_corner": [
+              0.0,
+              1.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": false
+          },
+          "selfplay": {
+            "pair_survivors": 5,
+            "own_surviving_scoring_seeds": [
+              13000003,
+              13000004,
+              13000005
+            ],
+            "surviving_events_by_corner": [
+              5.0,
+              5.0
+            ],
+            "surviving_two_way_episodes": 2,
+            "passes_profile": false
+          }
+        },
+        "passes_complete": false
+      },
+      "actor_adam_count": 10120,
+      "critic_adam_count": 33792,
+      "neutral_credits_by_corner": [
+        66566,
+        64506
+      ],
+      "mixed_credits_by_mode_and_corner": null,
+      "severe_survival_flag": "Severe survival regression: at most three pairs survive a complete screen profile"
+    }
+  ],
+  "foundation_history_records": {
+    "balance": 29,
+    "walk_easy": 41,
+    "walk": 13,
+    "approach": 2
+  },
+  "source_fresh": {
+    "profiles": {
+      "neutral-0": {
+        "pair_survivors": 8,
+        "own_surviving_scoring_seeds": [
+          13000006
+        ],
+        "surviving_events_by_corner": [
+          2.0,
+          0.0
+        ],
+        "surviving_two_way_episodes": 0,
+        "passes_profile": false
+      },
+      "neutral-1": {
+        "pair_survivors": 7,
+        "own_surviving_scoring_seeds": [
+          13000003
+        ],
+        "surviving_events_by_corner": [
+          0.0,
+          1.0
+        ],
+        "surviving_two_way_episodes": 0,
+        "passes_profile": false
+      },
+      "selfplay": {
+        "pair_survivors": 7,
+        "own_surviving_scoring_seeds": [
+          13000004,
+          13000006
+        ],
+        "surviving_events_by_corner": [
+          1.0,
+          1.0
+        ],
+        "surviving_two_way_episodes": 0,
+        "passes_profile": true
+      }
+    },
+    "passes_complete": false
+  },
+  "matched_sampler_and_training_rng_streams": true,
+  "actor_parameter_l2_between_arms": 0.5557616949081421,
+  "decision": "Neither arm passes either complete generation. Stop the severely regressed neutral control. Mixed fresh survival improves to 24/24 versus 18/24 control and 22/24 source, with sparse valid active strikes. Permit one ordinary 65536-credit bounded mixed-profile diagnostic continuation from its latest final only, full screens at 32768/65536, severe-regression and no-measured-improvement early stops. Keep all source/optimizer/mode/consumed prefixes, unchanged gates and main ceilings. No promotion or adoption."
+}

@@ -1,4 +1,8 @@
-# Matched mixed-opponent coverage experiment
+# Mixed-opponent coverage: completed comparison and bounded continuation
+
+**Current status:** both matched arms completed and were independently reviewed.
+Neither passes. One bounded ordinary mixed-profile continuation is allocated;
+see the [current result and contract](#completed-comparison-and-one-bounded-continuation-2026-10-23).
 
 The full [command-offset intervention review](striking-reward-credit-review.md#completed-full-holdout-and-next-coverage-decision-2026-10-23)
 does not justify adopting a masked controller. Original-screen survival improves,
@@ -129,3 +133,125 @@ are archived under `docs/results/striking-pilot/mixed-partner-1736704/`; exact
 transition and first native model under
 `checkpoints/striking-validation/mixed-partner-1736704/`. Main counters and all
 four certified foundation histories remain unchanged.
+
+
+## Completed comparison and one bounded continuation (2026-10-23)
+
+Both arms completed their entire **32,768-credit** allocations normally. The
+comparison finished at **19:39:53 UTC**. All **168 complete physical episodes**
+consume **76,692 evaluation world controls**. Both original-screen generations
+fail for each arm. No policy is adopted or phase promoted.
+
+| Policy / set | Neutral 0 survival / own events | Neutral 1 survival / own events | Active survival | Surviving active red / blue events | Surviving two-way episodes |
+| --- | --- | --- | --- | --- | --- |
+| Common source / fresh 13M | 8/8 / 2 | 7/8 / 1 | 7/8 | 1 / 1 | 0 |
+| Mixed / +16,384 screen | 6/8 / 0 | 8/8 / 1 | 8/8 | 4 / 3 | 1 |
+| Mixed / +32,768 screen | 7/8 / 1 | 8/8 / 0 | 6/8 | 2 / 2 | 2 |
+| Mixed / final fresh 13M | 8/8 / 0 | 8/8 / 1 | 8/8 | 2 / 1 | 0 |
+| Neutral / +16,384 screen | 6/8 / 1 | 8/8 / 0 | 6/8 | 1 / 1 | 0 |
+| Neutral / +32,768 screen | 3/8 / 0 | 7/8 / 8 | 6/8 | 1 / 6 | 1 |
+| Neutral / final fresh 13M | 6/8 / 1 | 7/8 / 1 | 5/8 | 5 / 5 | 2 |
+
+Fresh seeds are 13,000,003..13,000,006, both swaps. Mixed survival is **24/24**
+across all fresh profiles, versus **18/24** neutral control and **22/24** source.
+Original-screen final totals are 21/24 mixed versus 16/24 control and 19/24
+source. This supports mixed coverage for stability on these sets, not superiority
+in all boxing measures. The control has more surviving active impacts and two
+fresh two-way episodes, while losing three active pairs. Mixed retains sparse
+valid active strikes on two fresh seeds, but none are fresh two-way exchanges.
+Its neutral role 0 scores zero fresh events and role 1 scores on only one seed.
+Neither satisfies the unchanged multiseed criteria. Stop the severely regressed
+neutral-only control; its 3/8 survival flag was reached at its final budget
+boundary, so all 32,768 credits remain consumed rather than being discarded.
+
+`tools/review_striking_mixed_partner.py` independently verified all four distinct
+gate models, full original/fresh sets, 32 finite PPO blocks per arm, optimizer and
+mode/role ledgers, complete foundation histories (29/41/13/2), main checkpoint
+hash and empty native logs. Final BC/auxiliary/replay sampler and training RNG
+streams match across arms; actor parameters differ (L2 distance 0.555762).
+No nonfinite state or constraint/contact capacity warning explains the regression.
+
+Final mixed hash:
+`c3fe6cacf39024c50239ddd9da9e31c5085518db05245d4fdd48eb04255f648b`.
+Final neutral hash:
+`b576583c12e7527e08cc9f40016c61725a5b8b586f270e62180e4c7322bf2827`.
+Each lineage is **1,769,472 learner credits / 1,146,880 world controls**, Adam
+**10,120 / 33,792**. Mixed mode/corner credits are
+**[[7,914, 8,470], [8,637, 7,747]]**, historical neutral prefix 50,229/48,075
+unchanged. Control neutral credits are 66,566/64,506. All exact gate payloads,
+configurations, reports, metrics and completed analysis are archived under the
+existing `mixed-partner-1736704` result and checkpoint-validation trees.
+
+Actual new diagnostic compute is **65,536 PPO credits / collection controls**,
+**76,692 evaluation controls** and **262,144 integrated replay presentations**.
+Cumulative diagnostic PPO is **1,745,152**, formal diagnostic simulation
+**946,747 world controls**. Standalone BC remains 8,000 updates. Main boxing
+**1,048,576**, combined main **476,041,216** and all foundation ceilings and
+certifications remain unchanged. Do not add diagnostic lineage to main training.
+
+### Single ordinary mixed continuation
+
+The mixed arm improves both fresh and original-screen stability over source and
+control while retaining real active strikes. Its first trial supplies only
+16,384 controls per opponent mode, and scoring remains incomplete. These results
+justify **one further bounded 65,536-credit diagnostic continuation** of the
+latest final mixed policy, not the neutral control, an earlier favorable gate,
+or the masked controller. No new task, physics, reward, authority, sampler,
+normalizer, optimizer or source transition is introduced. Use ordinary version-6
+warm resumes with inherited four-neutral/four-current-mean-active worlds.
+
+The new lineage ceiling is **1,835,008 learner credits / 1,212,416 world controls**.
+At full use Adam counts reach **11,144 / 34,816** and mixed mode-row totals
+49,152/49,152, retaining every historical and new mode/corner attempt. Diagnostic
+PPO would reach **1,810,688**, with 65,536 additional collection controls and
+262,144 integrated replay presentations; standalone BC/main counters do not move.
+
+Preserve distinct complete gates at **32,768 and 65,536** new credits. If any
+profile has at most **3/8 surviving pairs**, stop early. At the first gate also
+stop if it fails complete criteria and **no measured screen component improves
+over the source's original screen**. Components are each profile's paired
+survivors and own surviving scoring-seed breadth, plus active surviving two-way
+episode count; source vector is **(7,1,8,0,6,2,2)**. Improvement in one component
+only permits the remainder of this fixed allocation; it is not a phase pass,
+proof of overall dominance or permission for another extension. The complete
+physical criteria stay unchanged. Retain every failed/stagnant generation and
+all attempted/discarded compute, then run final fresh checks even after a stop.
+
+Source and final fresh seeds are **14,000,003..14,000,006**, both swaps, all three
+full profiles. With both screens this is at most **96 episodes / 48,000 evaluation
+world controls**. At the cap formal diagnostic simulation would reach **994,747**.
+Two distinct consecutive complete passes remain necessary; the parent never
+adopts or promotes automatically. Review actual final/fresh outcomes before
+another allocation, even when some return or contact count increases.
+
+Hidden persistent launcher: `tools/start_striking_mixed_partner_continue.ps1`;
+live state:
+`/home/pedro/boxing-runs/striking-mixed-partner-continue-1769472/continuation.json`.
+Inspect that job/process, attempted progress, checkpoint hashes and full gates
+before any other launch. Preserve the existing monitoring schedule. Ordinary
+warm starts retain all learned/optimizer/RNG/mode prefixes; no forced rollback.
+
+
+### Continuation validation and retained warm update
+
+**15 focused tests passed**, covering the ordinary mixed-source provenance,
+free native routing, mode/role accounting, retained discarded attempts and the
+new stagnation-stop semantics. The complete comparison reviewer independently
+validated all physical reports and four gate payloads. Python compilation,
+LF shell syntax, PowerShell parsing and `git diff --check` pass.
+
+The hidden continuation is running. Its first additional **1,024 learner/world
+controls** are retained within the allocation, with finite checkpoint hash
+`29dee2efd6d4c6b269ca0a2707bfa074976ef74ccad7d6e739d9e5ec5fc7b70b`,
+Adam **10,136 / 33,808**, unchanged historical neutral prefix, and mixed ledger
+**[[8,170, 8,726], [8,893, 8,003]]**. No transition was repeated or optimizer
+reset. Native logs are empty. The source's complete 14M fresh check consumed
+**10,815 evaluation controls**, bringing formal diagnostic simulation to
+**957,562**. At the first-update boundary diagnostic PPO is **1,746,176**;
+later live progress advances beyond this snapshot. Main counters are unchanged.
+
+Exact first-update model/configuration and source-evaluation/proof snapshots
+are archived under the `mixed-partner-continue-1769472` checkpoint-validation
+and result folders. These are integration evidence, not a completed gate.
+Inspect live progress and eventual complete screens/fresh outcomes before any
+further action or extension; preserve the monitoring schedule.

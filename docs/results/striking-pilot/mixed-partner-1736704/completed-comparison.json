@@ -1,0 +1,236 @@
+{
+  "status": "completed",
+  "pid": 357,
+  "started_utc": "2026-10-23T19:15:14.955445+00:00",
+  "phase": "awaiting_review",
+  "diagnostic_output": "/home/pedro/boxing-runs/striking-mixed-partner-1736704",
+  "source_sha256": "55976fc15b74b9997b4cb56cf13683f1f87315ac6d67c5cc966ab3c644dd2d73",
+  "source_consumed_offset": 1736704,
+  "source_world_offset": 1114112,
+  "maximum_new_ppo_steps": 65536,
+  "new_ppo_steps_per_arm": 32768,
+  "maximum_evaluation_world_controls": 84000,
+  "diagnostic_consumed_steps": 65536,
+  "diagnostic_collection_world_controls": 65536,
+  "diagnostic_evaluation_world_controls": 76692,
+  "diagnostic_ppo_before_job": 1679616,
+  "formal_evaluation_world_controls_before_job": 870055,
+  "main_consumed_retained": 1048576,
+  "main_project_consumed_retained": 476041216,
+  "cumulative_supervised_updates_retained": 8000,
+  "new_separate_supervised_updates": 0,
+  "assistance": false,
+  "unchanged_rewards": true,
+  "policy_adoption": "none",
+  "promotion": false,
+  "fresh_seeds": [
+    13000003,
+    13000004,
+    13000005,
+    13000006
+  ],
+  "arms": [
+    {
+      "arm": "mixed",
+      "initial_sha256": "dff21ecbaa3035d6880a3f8d6575d7260d63fa37b3d8dde19f18642101cbd8e1",
+      "gates": [
+        {
+          "new_ppo_steps": 16384,
+          "sha256": "650ce05e6e6910507c8fdb7a8a62ad01cedb4bb85cd60efcd8daef5046d7995f",
+          "screen": {
+            "neutral-0": {
+              "pair_survivors": 6,
+              "own_surviving_events": 0.0,
+              "own_surviving_scoring_seeds": []
+            },
+            "neutral-1": {
+              "pair_survivors": 8,
+              "own_surviving_events": 1.0,
+              "own_surviving_scoring_seeds": [
+                23
+              ]
+            },
+            "selfplay": {
+              "pair_survivors": 8,
+              "own_surviving_events": 7.0,
+              "own_surviving_scoring_seeds": [
+                7,
+                23,
+                47
+              ]
+            }
+          },
+          "passes_complete": false
+        },
+        {
+          "new_ppo_steps": 32768,
+          "sha256": "c3fe6cacf39024c50239ddd9da9e31c5085518db05245d4fdd48eb04255f648b",
+          "screen": {
+            "neutral-0": {
+              "pair_survivors": 7,
+              "own_surviving_events": 1.0,
+              "own_surviving_scoring_seeds": [
+                47
+              ]
+            },
+            "neutral-1": {
+              "pair_survivors": 8,
+              "own_surviving_events": 0.0,
+              "own_surviving_scoring_seeds": []
+            },
+            "selfplay": {
+              "pair_survivors": 6,
+              "own_surviving_events": 4.0,
+              "own_surviving_scoring_seeds": [
+                7,
+                23
+              ]
+            }
+          },
+          "passes_complete": false
+        }
+      ],
+      "final_checkpoint_sha256": "c3fe6cacf39024c50239ddd9da9e31c5085518db05245d4fdd48eb04255f648b",
+      "fresh": {
+        "neutral-0": {
+          "pair_survivors": 8,
+          "own_surviving_events": 0.0,
+          "own_surviving_scoring_seeds": []
+        },
+        "neutral-1": {
+          "pair_survivors": 8,
+          "own_surviving_events": 1.0,
+          "own_surviving_scoring_seeds": [
+            13000003
+          ]
+        },
+        "selfplay": {
+          "pair_survivors": 8,
+          "own_surviving_events": 3.0,
+          "own_surviving_scoring_seeds": [
+            13000004,
+            13000006
+          ]
+        }
+      }
+    },
+    {
+      "arm": "neutral",
+      "initial_sha256": "55976fc15b74b9997b4cb56cf13683f1f87315ac6d67c5cc966ab3c644dd2d73",
+      "gates": [
+        {
+          "new_ppo_steps": 16384,
+          "sha256": "cbaf9d665822186dbfcc54dd9b29e72a3f008edcf672a36d7f2982c918247e3c",
+          "screen": {
+            "neutral-0": {
+              "pair_survivors": 6,
+              "own_surviving_events": 1.0,
+              "own_surviving_scoring_seeds": [
+                31
+              ]
+            },
+            "neutral-1": {
+              "pair_survivors": 8,
+              "own_surviving_events": 0.0,
+              "own_surviving_scoring_seeds": []
+            },
+            "selfplay": {
+              "pair_survivors": 6,
+              "own_surviving_events": 2.0,
+              "own_surviving_scoring_seeds": [
+                7,
+                23
+              ]
+            }
+          },
+          "passes_complete": false
+        },
+        {
+          "new_ppo_steps": 32768,
+          "sha256": "b576583c12e7527e08cc9f40016c61725a5b8b586f270e62180e4c7322bf2827",
+          "screen": {
+            "neutral-0": {
+              "pair_survivors": 3,
+              "own_surviving_events": 0.0,
+              "own_surviving_scoring_seeds": []
+            },
+            "neutral-1": {
+              "pair_survivors": 7,
+              "own_surviving_events": 8.0,
+              "own_surviving_scoring_seeds": [
+                7,
+                31,
+                47
+              ]
+            },
+            "selfplay": {
+              "pair_survivors": 6,
+              "own_surviving_events": 7.0,
+              "own_surviving_scoring_seeds": [
+                7,
+                23,
+                31
+              ]
+            }
+          },
+          "passes_complete": false
+        }
+      ],
+      "early_stop_reason": "Severe survival regression: at most three pairs survive a complete screen profile",
+      "final_checkpoint_sha256": "b576583c12e7527e08cc9f40016c61725a5b8b586f270e62180e4c7322bf2827",
+      "fresh": {
+        "neutral-0": {
+          "pair_survivors": 6,
+          "own_surviving_events": 1.0,
+          "own_surviving_scoring_seeds": [
+            13000004
+          ]
+        },
+        "neutral-1": {
+          "pair_survivors": 7,
+          "own_surviving_events": 1.0,
+          "own_surviving_scoring_seeds": [
+            13000003
+          ]
+        },
+        "selfplay": {
+          "pair_survivors": 5,
+          "own_surviving_events": 10.0,
+          "own_surviving_scoring_seeds": [
+            13000003,
+            13000004,
+            13000005
+          ]
+        }
+      }
+    }
+  ],
+  "active_evaluation": "/home/pedro/boxing-runs/striking-mixed-partner-1736704/neutral/fresh/selfplay",
+  "updated_utc": "2026-10-23T19:39:53.336678+00:00",
+  "source_fresh": {
+    "neutral-0": {
+      "pair_survivors": 8,
+      "own_surviving_events": 2.0,
+      "own_surviving_scoring_seeds": [
+        13000006
+      ]
+    },
+    "neutral-1": {
+      "pair_survivors": 7,
+      "own_surviving_events": 1.0,
+      "own_surviving_scoring_seeds": [
+        13000003
+      ]
+    },
+    "selfplay": {
+      "pair_survivors": 7,
+      "own_surviving_events": 2.0,
+      "own_surviving_scoring_seeds": [
+        13000004,
+        13000006
+      ]
+    }
+  },
+  "active_arm": "neutral",
+  "active_training_output": "/home/pedro/boxing-runs/striking-mixed-partner-1736704/neutral"
+}
