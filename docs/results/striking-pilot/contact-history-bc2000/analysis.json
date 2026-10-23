@@ -1,0 +1,152 @@
+{
+  "source_sha256": "fc48cecf46647ba70fb372a657e9b8a889d37ff7b4dfbdddeb2453872a42540f",
+  "arms": {
+    "zero_history": {
+      "sha256": "f5cf016f2e2e53d59b7167cfc0e0d24b26afb80027b63bc6712dcebad3dacded",
+      "finite_learning_state": true,
+      "retained_critic_normalizer_key_logstd_and_lineage": true,
+      "ppo_resume_rejected": true,
+      "complete_screen_thresholds_met": false,
+      "evaluations": {
+        "neutral-0": {
+          "pair_survivors": 6,
+          "own_surviving_events": 1.0,
+          "own_surviving_scoring_seeds": [
+            7
+          ],
+          "surviving_two_way_episodes": 0
+        },
+        "neutral-1": {
+          "pair_survivors": 7,
+          "own_surviving_events": 0.0,
+          "own_surviving_scoring_seeds": [],
+          "surviving_two_way_episodes": 0
+        },
+        "selfplay": {
+          "pair_survivors": 3,
+          "own_surviving_events": 2.0,
+          "own_surviving_scoring_seeds": [
+            23
+          ],
+          "surviving_two_way_episodes": 1
+        }
+      },
+      "offline_demonstration_fit": {
+        "role_0_before_hit": {
+          "rows": 919,
+          "mean_absolute_commands": 0.03577328845858574,
+          "mean_absolute_left_arm": 0.04964006319642067,
+          "mean_absolute_right_arm": 0.026966771110892296,
+          "max_absolute_action_error": 0.8282416462898254,
+          "mean_action_change_from_history": 0.0
+        },
+        "role_0_after_hit": {
+          "rows": 3581,
+          "mean_absolute_commands": 0.016966642811894417,
+          "mean_absolute_left_arm": 0.01734628900885582,
+          "mean_absolute_right_arm": 0.013605192303657532,
+          "max_absolute_action_error": 0.7440111637115479,
+          "mean_action_change_from_history": 0.0
+        },
+        "role_1_before_hit": {
+          "rows": 607,
+          "mean_absolute_commands": 0.03662339970469475,
+          "mean_absolute_left_arm": 0.05177977681159973,
+          "mean_absolute_right_arm": 0.027768440544605255,
+          "max_absolute_action_error": 0.98817378282547,
+          "mean_action_change_from_history": 0.0
+        },
+        "role_1_after_hit": {
+          "rows": 2393,
+          "mean_absolute_commands": 0.017233429476618767,
+          "mean_absolute_left_arm": 0.017144769430160522,
+          "mean_absolute_right_arm": 0.013782480731606483,
+          "max_absolute_action_error": 1.1124968528747559,
+          "mean_action_change_from_history": 0.0
+        }
+      }
+    },
+    "contact_history": {
+      "sha256": "2da4302cb992d5067a86c8886f72bac2cf54f2def1c41f7f87201d5f76c0bf9a",
+      "finite_learning_state": true,
+      "retained_critic_normalizer_key_logstd_and_lineage": true,
+      "ppo_resume_rejected": true,
+      "complete_screen_thresholds_met": false,
+      "evaluations": {
+        "neutral-0": {
+          "pair_survivors": 6,
+          "own_surviving_events": 1.0,
+          "own_surviving_scoring_seeds": [
+            47
+          ],
+          "surviving_two_way_episodes": 0
+        },
+        "neutral-1": {
+          "pair_survivors": 6,
+          "own_surviving_events": 0.0,
+          "own_surviving_scoring_seeds": [],
+          "surviving_two_way_episodes": 0
+        },
+        "selfplay": {
+          "pair_survivors": 5,
+          "own_surviving_events": 1.0,
+          "own_surviving_scoring_seeds": [
+            7
+          ],
+          "surviving_two_way_episodes": 0
+        }
+      },
+      "offline_demonstration_fit": {
+        "role_0_before_hit": {
+          "rows": 919,
+          "mean_absolute_commands": 0.035577140748500824,
+          "mean_absolute_left_arm": 0.049425553530454636,
+          "mean_absolute_right_arm": 0.026942884549498558,
+          "max_absolute_action_error": 0.8265129923820496,
+          "mean_action_change_from_history": 0.0
+        },
+        "role_0_after_hit": {
+          "rows": 3581,
+          "mean_absolute_commands": 0.016947241500020027,
+          "mean_absolute_left_arm": 0.01714959740638733,
+          "mean_absolute_right_arm": 0.013609875924885273,
+          "max_absolute_action_error": 0.6501407027244568,
+          "mean_action_change_from_history": 0.021946419030427933
+        },
+        "role_1_before_hit": {
+          "rows": 607,
+          "mean_absolute_commands": 0.03647657483816147,
+          "mean_absolute_left_arm": 0.051589854061603546,
+          "mean_absolute_right_arm": 0.02778465300798416,
+          "max_absolute_action_error": 0.9864514470100403,
+          "mean_action_change_from_history": 0.0
+        },
+        "role_1_after_hit": {
+          "rows": 2393,
+          "mean_absolute_commands": 0.017191477119922638,
+          "mean_absolute_left_arm": 0.016957299783825874,
+          "mean_absolute_right_arm": 0.013788255862891674,
+          "max_absolute_action_error": 1.0469486713409424,
+          "mean_action_change_from_history": 0.021805455908179283
+        }
+      }
+    }
+  },
+  "policy_adoption": "none",
+  "promotion": false,
+  "new_ppo_transitions": 0,
+  "new_supervised_updates": 4000,
+  "cumulative_supervised_updates": 6000,
+  "cumulative_example_presentations": 1536000,
+  "formal_world_controls_before_job": 366084,
+  "diagnostic_ppo_retained": 1188096,
+  "main_project_consumed": 476041216,
+  "foundation_consumed": 474992640,
+  "main_boxing_consumed": 1048576,
+  "diagnostic_world_controls": 19259,
+  "formal_world_controls_total": 385343,
+  "matched_sampler_final": true,
+  "native_numerical_or_capacity_warnings": false,
+  "decision": "Reject both arms for adoption and stop further blind imitation. Neither complete screen passes; contact feedback does not establish stable own strikes in both roles. Retain all branch checkpoints without substituting an earlier source. Recorded-state fit remains worse before impact. Next investigate policy-state coverage and first-fall traces in a documented bounded read-only diagnostic; allocate no more supervised or PPO learning without that review.",
+  "offline_fit_limitation": "Recorded successful demonstration states only; not independent physical evidence or proof of a failure cause."
+}

@@ -178,3 +178,18 @@ Any favorable candidate also needs fresh physical seeds and motor regression
 checks. No main adoption or further allocation is preapproved. This comparison
 is the next authorized work, not an already running job or proof that contact
 feedback solves boxing. Inspect completed state and processes first.
+
+## Contact-history implementation launched
+
+The reviewed [matched comparison](striking-contact-history-comparison.md) has
+passed migration, feedback timing, unchanged physics and sampler tests and is
+running. Inspect its own durable state and active evaluator before another job.
+The earlier initialization remains completed; neither old checkpoint is adopted.
+
+## Contact-history comparison completed
+
+The [matched comparison](striking-contact-history-comparison.md) completed both
+2,000-update continuations and all 48 physical trials. Neither passed or was
+adopted; no further learning is allocated. The review archives all results and
+defines the next bounded read-only coverage/first-fall investigation. Formal
+world controls now total 385,343; diagnostic PPO and main counters are unchanged.

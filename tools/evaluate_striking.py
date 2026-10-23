@@ -30,6 +30,7 @@ def main():
     parser.add_argument('--seeds',type=int,nargs='+',default=[7,23,31,47])
     parser.add_argument('--seconds',type=float,default=10.)
     parser.add_argument('--video',type=Path)
+    parser.add_argument('--progress',type=Path,help='durable attempted controls for diagnostic recovery')
     parser.add_argument('--sampled',action='store_true',
                         help='diagnostic saved-Gaussian policy; does not replace deterministic screening')
     parser.add_argument('--arm-noise-scale',type=float,default=1.,
@@ -45,6 +46,7 @@ def main():
     parser.add_argument('--engagement-distance',type=float,
                         help='explicit diagnostic profile override; impact criteria remain fixed')
     args=parser.parse_args()
+    if args.progress and args.progress.exists():raise ValueError('evaluation progress exists; inspect before rerun')
     if args.sampled and not args.checkpoint:
         raise ValueError('sampled diagnostic requires a saved policy')
     if not np.isfinite(args.arm_noise_scale) or args.arm_noise_scale<=0 or args.arm_noise_hold<1:
@@ -67,7 +69,7 @@ def main():
         if not config_path.exists():config_path=args.checkpoint.parent/'config.json'
         if config_path.exists():
             config=json.loads(config_path.read_text())
-            for key in ('engagement_distance','engagement_reward_distance','actor_inputs','actions','body_residual_radians'):
+            for key in ('engagement_distance','engagement_reward_distance','actor_inputs','actions','body_residual_radians','contact_history'):
                 if key in manifest and key in config and manifest[key]!=config[key]:
                     raise ValueError('checkpoint and configuration engagement profiles disagree')
             distance=config.get('engagement_distance',.58)
@@ -77,10 +79,18 @@ def main():
     inputs=config.get('actor_inputs',(manifest or {}).get('actor_inputs',146))
     actions=config.get('actions',(manifest or {}).get('actions',17))
     body_bound=config.get('body_residual_radians',(manifest or {}).get('body_residual_radians',0.))
+    contact_history=config.get('contact_history',(manifest or {}).get('contact_history',False))
+    if contact_history != ((inputs,actions)==(148,17)):
+        raise ValueError('contact history and interface dimensions disagree')
     if (inputs,actions)==(146,17):
         if body_bound!=0.:raise ValueError('legacy interface cannot carry body residual authority')
         env=StrikingEnv(foundation,params,engagement_distance=distance,
                        engagement_reward_distance=reward_distance)
+    elif (inputs,actions)==(148,17):
+        if body_bound!=0.:raise ValueError('contact interface cannot carry body residual authority')
+        from boxer.striking_contact import ContactAwareStrikingEnv
+        env=ContactAwareStrikingEnv(foundation,params,engagement_distance=distance,
+            engagement_reward_distance=reward_distance)
     elif (inputs,actions)==(161,32):
         from boxer.striking_body import WholeBodyStrikingEnv
         env=WholeBodyStrikingEnv(foundation,params,engagement_distance=distance,
@@ -106,6 +116,8 @@ def main():
         residual_hash=hashlib.sha256(payload).hexdigest()
         if residual_hash!=manifest['sha256']:raise ValueError('striking checksum mismatch')
         saved=pickle.loads(payload)
+        for key,expected in (('actor_inputs',inputs),('actions',actions),('contact_history',contact_history)):
+            if key in saved and saved[key]!=expected:raise ValueError('payload and declared interface disagree')
         if saved['foundation_sha256']!=source['sha256']:raise ValueError('striking motor mismatch')
         if not all(np.isfinite(x).all() for x in jax.tree_util.tree_leaves(
                 tuple(saved[k] for k in ('actor','critic','optimizer','norm','key')))):
@@ -147,7 +159,11 @@ def main():
                         action=action.copy()
                         action[:,:3]=0.
                     previous_scores=env.pair.scorecard.last_score.copy()
-                    obs,reward,done,outcome=env.step(action);transitions+=1
+                    transitions+=1
+                    if args.progress:
+                        atomic_json(args.progress,dict(status='running',simulated_world_transitions=transitions,
+                            seed=seed,swap=swap,control_step=step,striking_sha256=residual_hash,updated_utc=utc()))
+                    obs,reward,done,outcome=env.step(action)
                     hits+=outcome['scored'];impulses+=outcome['legal_contact_impulse']
                     if np.any(outcome['scored']):
                         recent=env.pair.scorecard.last_score > previous_scores
@@ -185,7 +201,7 @@ def main():
         simulated_world_transitions=transitions,optimization_transitions=0,
         scorecard_version=1,episode_seconds=args.seconds,trials=results,
         engagement_distance=distance,engagement_reward_distance=reward_distance,
-        actor_inputs=inputs,actions=actions,body_residual_radians=body_bound,
+        actor_inputs=inputs,actions=actions,body_residual_radians=body_bound,contact_history=contact_history,
         sampled_policy=args.sampled,
         diagnostic_arm_noise_scale=args.arm_noise_scale,
         diagnostic_arm_noise_hold=args.arm_noise_hold,
@@ -194,6 +210,9 @@ def main():
         diagnostic_approach_gain=args.approach_gain,
         diagnostic_profile_override=args.engagement_distance is not None,
         certification=False))
+    if args.progress:
+        atomic_json(args.progress,dict(status='completed',simulated_world_transitions=transitions,
+            striking_sha256=residual_hash,updated_utc=utc()))
 
 
 if __name__=='__main__':

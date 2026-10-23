@@ -31,13 +31,17 @@ ten-second strike trajectories and 49 failures. The completed
 used fifteen demonstrations and 2,000 actor updates. The network learned isolated
 stable strikes against a neutral partner, but neither checkpoint passed and
 active self-play regressed to 4/8 at 2,000 updates.
-Inspect `/home/pedro/boxing-runs/striking-demonstration-init-1441792/initialization.json`
-and processes before any launch. All jobs are currently completed. Keep PPO
-stopped; do not repeat completed comparisons or resume blind imitation. The next
-bounded work is a matched contact-history input comparison after tested migration
-of the latest supervised actor, optimizer and sampling state; its complete
-protocol is in that review. Diagnostic PPO totals 1,188,096; formal world controls
-are 366,084. Supervised updates are separate compute, incompatible with PPO resume.
+The [matched contact-history comparison](striking-contact-history-comparison.md)
+completed all 4,000 additional supervised updates and 48 full physical trials.
+Neither arm passes: contact history has 5/8 active pair survival, versus 3/8 for
+control, and no surviving blue-role own events. No actor is adopted and blind
+imitation remains stopped. Inspect
+`/home/pedro/boxing-runs/striking-contact-compare-bc2000/comparison.json` and
+processes before another launch. The next bounded work is a read-only policy-state
+coverage/first-fall audit, at most 12,000 world controls after instrumentation
+checks. No additional supervised or PPO learning is allocated. Diagnostic PPO
+remains 1,188,096; formal world controls are now 385,343. Cumulative supervised
+compute is 6,000 updates, counted separately and incompatible with PPO resume.
 Main counters and all physical gates remain unchanged. No actor is adopted.
 No gate is relaxed, stage promoted or candidate composite controller certified.
 

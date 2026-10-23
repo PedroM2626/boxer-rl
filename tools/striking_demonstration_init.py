@@ -90,7 +90,8 @@ def main():
                 folder=args.output/f'update-{step}';folder.mkdir(exist_ok=False)
                 snapshot=dict(saved,actor=jax.device_get(params),optimizer=jax.device_get(optimizer),
                     training_kind='supervised_demonstration',supervised_updates=step,
-                    ppo_optimizer_compatible=False,source_ppo_sha256=manifest['sha256'])
+                    ppo_optimizer_compatible=False,source_ppo_sha256=manifest['sha256'],
+                    sampler_state=rng.bit_generator.state)
                 b=pickle.dumps(snapshot,protocol=pickle.HIGHEST_PROTOCOL);name=f'bc-update-{step}.pkl'
                 atomic_bytes(folder/name,b)
                 atomic_json(folder/'latest.json',dict(manifest,file=name,sha256=hashlib.sha256(b).hexdigest(),

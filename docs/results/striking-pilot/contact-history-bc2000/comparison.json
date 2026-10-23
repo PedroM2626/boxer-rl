@@ -1,0 +1,129 @@
+{
+  "status": "completed",
+  "phase": "awaiting_review",
+  "pid": 725,
+  "started_utc": "2026-10-23T09:51:36.517770+00:00",
+  "diagnostic_output": "/home/pedro/boxing-runs/striking-contact-compare-bc2000",
+  "source_sha256": "fc48cecf46647ba70fb372a657e9b8a889d37ff7b4dfbdddeb2453872a42540f",
+  "original_weight_source_sha256": "87eb01ff6392b592395b64fc6f6a29f78e35fd1c1ad2941fafbcc8001146f5d8",
+  "expanded_source_sha256": "e53cf10d690752d8e9e7544ae4d6f901901950fe60c905005190904479c2d660",
+  "demonstration_files": {
+    "head-advance-1-role-0-seed-2000003-swap-0.npz": "0981b54ec9611488a1e51a1dde9a4ce12e6291f2a642b36db6c7947bb9a3af1f",
+    "head-advance-1-role-0-seed-2000004-swap-1.npz": "afaa07df857888fd545ed6f2d534fe26b1c864cba21640d1498187009108f758",
+    "head-advance-1-role-0-seed-2000005-swap-0.npz": "fe2afd12e2c03053330c6bf4330b338154a003e4826be479bedeb380cf274c21",
+    "head-advance-1-role-0-seed-2000007-swap-0.npz": "92d6a796fa456796ac285421259bec05016e655986e89e94ad39aa68bdb1fde9",
+    "head-advance-1-role-0-seed-2000008-swap-0.npz": "3b41ed347d0a7231fbebb81061785e0b8a3d55d4e838758c53edb8fc7aabbcfb",
+    "head-advance-1-role-0-seed-2000009-swap-0.npz": "77ce811997b4a0884cad068e47db6e160ec013f4faa58eca03fb8bbdf44cc8c3",
+    "head-advance-1-role-0-seed-2000010-swap-1.npz": "19a70b3311624fd0e5c45369bcdf155849fcf469524cd60d3713a2df264ec8bb",
+    "head-advance-1-role-0-seed-2000012-swap-0.npz": "ebfbf28e01e1eba7e24e482bb86f991968d7fa139f2e5b58440540399bbbf95e",
+    "head-advance-1-role-0-seed-2000014-swap-1.npz": "6677302796fac7d094fdfe91294848ca17dfd312b4975be2d9ba73c5b28954d4",
+    "head-advance-1-role-1-seed-2000006-swap-0.npz": "95fbb4d67dfee5d789ae5cb003d315d3d70416ad4cd21766e95c3eb739a6d9ab",
+    "head-advance-1-role-1-seed-2000008-swap-0.npz": "0a0a9b7c5d1b4f09f8a2d45d816ea8e00e3b64e9d709a70a4e41ce050abd6373",
+    "head-advance-1-role-1-seed-2000014-swap-0.npz": "37fbdf27772950e8b9703cf353198d3a6173bb684cff427c9e103c602ca6dfc6",
+    "head-advance-1-role-1-seed-2000016-swap-1.npz": "8867d61493d2eea9bb79439d62ff6b48da001f847eaf81bd5658f38a28a77004",
+    "head-advance-1-role-1-seed-2000017-swap-0.npz": "7f0290fafe27790221529464237a25d02d5edf44acb734939f362d1840bf56f4",
+    "head-advance-1-role-1-seed-2000017-swap-1.npz": "96943753094f1e5c114a60f707c38d6ab621a658d76cc9360d516a061f82d273"
+  },
+  "demonstration_rows": 7500,
+  "sampler_recovery": {
+    "seed": 313,
+    "prefix_batches": 2000,
+    "batch_size": 256,
+    "rows": 7500,
+    "state": {
+      "bit_generator": "PCG64",
+      "state": {
+        "state": 101463421562678700854225826621060267551,
+        "inc": 89835311349304356548015180603057384587
+      },
+      "has_uint32": 0,
+      "uinteger": 593382789
+    }
+  },
+  "maximum_new_supervised_updates": 4000,
+  "supervised_updates_before_job": 2000,
+  "new_supervised_updates": 4000,
+  "new_data_presentations": 1024000,
+  "new_ppo_transitions": 0,
+  "diagnostic_ppo_retained": 1188096,
+  "formal_world_controls_before_job": 366084,
+  "diagnostic_evaluation_world_controls": 19259,
+  "maximum_evaluation_world_controls": 24000,
+  "policy_adoption": "none",
+  "teacher_used_at_evaluation": false,
+  "arms": [
+    {
+      "arm": "zero_history",
+      "checkpoint_sha256": "f5cf016f2e2e53d59b7167cfc0e0d24b26afb80027b63bc6712dcebad3dacded",
+      "evaluations": {
+        "neutral-0": {
+          "pair_survivors": 6,
+          "own_surviving_scoring_seeds": [
+            7
+          ],
+          "own_surviving_events": 1.0
+        },
+        "neutral-1": {
+          "pair_survivors": 7,
+          "own_surviving_scoring_seeds": [],
+          "own_surviving_events": 0.0
+        },
+        "selfplay": {
+          "pair_survivors": 3,
+          "own_surviving_scoring_seeds": [
+            23
+          ],
+          "own_surviving_events": 2.0
+        }
+      },
+      "sampler_final": {
+        "bit_generator": "PCG64",
+        "state": {
+          "state": 273013975125901572257885298787690314982,
+          "inc": 89835311349304356548015180603057384587
+        },
+        "has_uint32": 1,
+        "uinteger": 4143835738
+      }
+    },
+    {
+      "arm": "contact_history",
+      "checkpoint_sha256": "2da4302cb992d5067a86c8886f72bac2cf54f2def1c41f7f87201d5f76c0bf9a",
+      "evaluations": {
+        "neutral-0": {
+          "pair_survivors": 6,
+          "own_surviving_scoring_seeds": [
+            47
+          ],
+          "own_surviving_events": 1.0
+        },
+        "neutral-1": {
+          "pair_survivors": 6,
+          "own_surviving_scoring_seeds": [],
+          "own_surviving_events": 0.0
+        },
+        "selfplay": {
+          "pair_survivors": 5,
+          "own_surviving_scoring_seeds": [
+            7
+          ],
+          "own_surviving_events": 1.0
+        }
+      },
+      "sampler_final": {
+        "bit_generator": "PCG64",
+        "state": {
+          "state": 273013975125901572257885298787690314982,
+          "inc": 89835311349304356548015180603057384587
+        },
+        "has_uint32": 1,
+        "uinteger": 4143835738
+      }
+    }
+  ],
+  "active_arm": "contact_history",
+  "active_arm_updates": 2000,
+  "loss": 0.019051117822527885,
+  "updated_utc": "2026-10-23T09:55:04.727124+00:00",
+  "active_checkpoint": "/home/pedro/boxing-runs/striking-contact-compare-bc2000/contact_history"
+}

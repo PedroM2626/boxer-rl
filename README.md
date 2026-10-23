@@ -34,13 +34,16 @@ controller survival. It is not a trained boxer or a phase pass. A sixteen-seed
 holdout produced fifteen further trajectories, all exactly replayed. The
 [completed supervised initialization](docs/striking-demonstration-initialization.md)
 learned isolated stable strikes against a neutral partner, but neither checkpoint
-passed and active self-play regressed. The next reviewed work compares physical
-contact-history inputs with a matched control after validated state migration.
+passed and active self-play regressed. The [contact-history comparison](docs/striking-contact-history-comparison.md)
+completed 2,000 further supervised updates per arm and all 48 physical episodes.
+Both variants failed; contact feedback reached 5/8 self-play survival versus 3/8
+for control, without sufficient own scoring in both roles.
 **No additional PPO** is allocated. Both bodies/legs remain free and all contacts
 active. No actor is adopted and no physical gate is weakened. Inspect
-`/home/pedro/boxing-runs/striking-demonstration-init-1441792/initialization.json`
+`/home/pedro/boxing-runs/striking-contact-compare-bc2000/comparison.json`
 and processes before another launch; that job is completed. Main and PPO remain
-stopped. The next comparison's finite protocol is in the completed review.
+stopped. The next bounded work is a read-only policy-state coverage/first-fall
+audit, documented in the comparison review; no more learning is allocated.
 
 The [closed-fist replay repair](docs/closed-fist-rendering.md) restores the
 original visual feature without changing learning or physics. Historical videos
