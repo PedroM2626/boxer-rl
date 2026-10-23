@@ -33,12 +33,17 @@ def anchor_loss(actor,params,obs,labels):
 
 def validate_split_checkpoint(saved):
     neutral=saved.get('neutral_contact_ppo') is True
-    expected=(1,'neutral_motor') if neutral else (2,'active_selfplay')
+    mixed=saved.get('mixed_partner_ppo') is True
+    expected=(1,'mixed_current_mean') if mixed else (1,'neutral_motor') if neutral else (2,'active_selfplay')
     if (saved.get('training_kind')!='ppo' or saved.get('ppo_optimizer_compatible') is not True or
             saved.get('optimizer_kind')!=OPTIMIZER_KIND or saved.get('migration_version')!=1 or
             (saved.get('actor_inputs'),saved.get('actions'))!=(148,17) or not saved.get('contact_history') or
             (saved.get('learners_per_world'),saved.get('opponent_mode'))!=expected):
         raise ValueError('invalid explicit split-Adam PPO interface')
+    if mixed:
+        from boxer.striking_mixed_partner import validate_mixed_metadata
+        if not neutral:raise ValueError('mixed task requires preserved neutral lineage')
+        validate_mixed_metadata(saved)
     if neutral:
         transition=saved.get('neutral_partner_transition',{})
         sha=transition.get('source_sha256','')
@@ -48,7 +53,7 @@ def validate_split_checkpoint(saved):
                 transition.get('optimizer_reset') is not False or len(sha)!=64 or
                 any(c not in '0123456789abcdef' for c in sha) or
                 credits.shape!=(2,) or credits.dtype.kind not in 'iu' or np.any(credits<0) or
-                credits.sum()!=saved['consumed_steps']-1638400):
+                credits.sum()!=(1736704 if mixed else saved['consumed_steps'])-1638400):
             raise ValueError('explicit neutral task transition and exact learner-credit accounting required')
     migration=saved.get('optimizer_migration',{})
     if migration.get('actor_count_at_migration')!=5000 or migration.get('critic_count_at_migration',-1)<0:

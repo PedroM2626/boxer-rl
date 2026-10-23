@@ -1,0 +1,161 @@
+{
+  "status": "reviewed",
+  "all_72_trials_complete": true,
+  "source_checkpoint_valid": true,
+  "native_error_logs_empty": true,
+  "diagnostic_ppo_total": 1679616,
+  "actual_new_world_controls": 35955,
+  "formal_world_controls_total": 870055,
+  "main_adoption": false,
+  "promotion": false,
+  "foundation_history_records": {
+    "balance": 29,
+    "walk_easy": 41,
+    "walk": 13,
+    "approach": 2
+  },
+  "checks": [
+    {
+      "name": "unmodified-fresh",
+      "zero_command_offsets": false,
+      "complete_criteria": {
+        "profiles": {
+          "neutral-0": {
+            "pair_survivors": 8,
+            "own_surviving_scoring_seeds": [
+              12000003
+            ],
+            "surviving_events_by_corner": [
+              1.0,
+              0.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": false
+          },
+          "neutral-1": {
+            "pair_survivors": 8,
+            "own_surviving_scoring_seeds": [
+              12000006
+            ],
+            "surviving_events_by_corner": [
+              0.0,
+              1.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": false
+          },
+          "selfplay": {
+            "pair_survivors": 8,
+            "own_surviving_scoring_seeds": [
+              12000003,
+              12000004,
+              12000005,
+              12000006
+            ],
+            "surviving_events_by_corner": [
+              2.0,
+              3.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": true
+          }
+        },
+        "passes_complete": false
+      },
+      "world_controls": 12000
+    },
+    {
+      "name": "zero-commands-screen",
+      "zero_command_offsets": true,
+      "complete_criteria": {
+        "profiles": {
+          "neutral-0": {
+            "pair_survivors": 8,
+            "own_surviving_scoring_seeds": [
+              23
+            ],
+            "surviving_events_by_corner": [
+              1.0,
+              0.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": false
+          },
+          "neutral-1": {
+            "pair_survivors": 8,
+            "own_surviving_scoring_seeds": [
+              7,
+              23
+            ],
+            "surviving_events_by_corner": [
+              0.0,
+              2.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": true
+          },
+          "selfplay": {
+            "pair_survivors": 8,
+            "own_surviving_scoring_seeds": [
+              7
+            ],
+            "surviving_events_by_corner": [
+              1.0,
+              0.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": true
+          }
+        },
+        "passes_complete": false
+      },
+      "world_controls": 12000
+    },
+    {
+      "name": "zero-commands-fresh",
+      "zero_command_offsets": true,
+      "complete_criteria": {
+        "profiles": {
+          "neutral-0": {
+            "pair_survivors": 8,
+            "own_surviving_scoring_seeds": [],
+            "surviving_events_by_corner": [
+              0.0,
+              0.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": false
+          },
+          "neutral-1": {
+            "pair_survivors": 8,
+            "own_surviving_scoring_seeds": [],
+            "surviving_events_by_corner": [
+              0.0,
+              0.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": false
+          },
+          "selfplay": {
+            "pair_survivors": 7,
+            "own_surviving_scoring_seeds": [
+              12000003,
+              12000004,
+              12000005,
+              12000006
+            ],
+            "surviving_events_by_corner": [
+              4.0,
+              3.0
+            ],
+            "surviving_two_way_episodes": 2,
+            "passes_profile": true
+          }
+        },
+        "passes_complete": false
+      },
+      "world_controls": 11955
+    }
+  ],
+  "decision": "Reject blanket zero-command adoption: full screen survival improves but fresh neutral strikes vanish, and active fresh survival regresses 8/8 to 7/8 despite two surviving two-way episodes. No complete set passes. Test a matched bounded 50/50 neutral/current-mean-active opponent training mixture from the unchanged latest final against ordinary neutral-only control, with unchanged actions, rewards, gates and retained optimizer/counters. This is a diagnostic allocation, not a main extension or promotion."
+}

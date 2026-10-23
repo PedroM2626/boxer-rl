@@ -1,4 +1,4 @@
-# Full diagnostic holdout of the command-offset intervention
+# Completed full holdout of the command-offset intervention
 
 The [completed ablation and full contract](../../../striking-reward-credit-review.md#completed-controller-ablations-and-full-holdout-2026-10-23)
 record the selected-case improvement and its limits. Neither prior training
@@ -30,3 +30,14 @@ and combined main remain 1,048,576/476,041,216. No supervised/replay work, rollb
 assistance, geometry/physics/reward or gate change. Free legs and learned motor
 feedback remain active. Archive the completed full result and decide from both
 fresh controllers and the full screen, not selected successful episodes.
+
+
+**Completed and reviewed:** all 72 new trials, 35,955 actual world controls,
+correct hashes/complete seed sets and empty native error logs are archived in
+`completed-holdout.json`, `analysis.json` and the three complete profile folders.
+No complete set passes. The command intervention improves original-screen
+survival but loses fresh neutral own strikes and regresses active survival.
+It is not adopted. Formal simulation is 870,055, diagnostic PPO 1,679,616.
+The [next bounded coverage comparison](../../../striking-mixed-partner-comparison.md)
+preserves full actions and the latest final. Startup snapshots above are
+historical; this completed job must not be relaunched.

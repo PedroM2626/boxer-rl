@@ -83,16 +83,19 @@ terminations after interbody contact; the neutral failure is blue self-leg
 contact. The fixed controller ablations have now completed: each
 rescues all selected falls (6/6 surviving pairs versus 3/6 unchanged baseline).
 Removing command offsets retains two legal strikes; removing arm residuals
-produces none. A full-screen/new-seed diagnostic now tests the command intervention
-against the unmodified latest final (72 complete episodes / at most 36,000 world
-controls, zero learning). This selected-case effect is not a promotion or actor
-adoption. Inspect
-`/home/pedro/boxing-runs/striking-zero-command-holdout-1736704/holdout.json`
-and its process before any launch. Diagnostic PPO is **1,679,616**, formal
-diagnostic simulation **834,100 world controls** before the assay; main counters
-remain unchanged. Read the
-[full results and bounded contract](docs/striking-reward-credit-review.md#completed-controller-ablations-and-full-holdout-2026-10-23)
-before another intervention. No phase is promoted or actor adopted.
+produces none. The broader 72-episode holdout is now completed:
+zero commands improves original-screen survival, but fresh neutral strikes vanish
+and active fresh survival changes 8/8 to 7/8. Neither controller passes a complete
+set, so the masked controller is not adopted. A
+[bounded matched coverage experiment](docs/striking-mixed-partner-comparison.md)
+now compares 50/50 neutral/current-mean-active opponent training with ordinary
+neutral-only control from the unchanged latest final. Full learned actions,
+physics, independent gates and optimizer prefixes are retained; allocation is
+32,768 diagnostic credits per arm with intermediate full checks and early stops.
+Inspect `/home/pedro/boxing-runs/striking-mixed-partner-1736704/comparison.json`
+and its process before any launch. Pre-job diagnostic PPO is **1,679,616**, formal
+simulation **870,055 world controls**; main counters remain unchanged. No actor
+is adopted or phase promoted, and no blind extension is authorized.
 
 The [closed-fist replay repair](docs/closed-fist-rendering.md) restores the
 original visual feature without changing learning or physics. Historical videos

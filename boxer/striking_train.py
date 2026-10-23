@@ -158,6 +158,7 @@ def main(argv=None):
     parser.add_argument('--retention-loss-weight',type=float,choices=(0.,1.),default=0.)
     parser.add_argument('--neutral-contact-ppo',action='store_true')
     parser.add_argument('--credit-horizon-ppo',action='store_true')
+    parser.add_argument('--mixed-partner-ppo',action='store_true')
     parser.add_argument('--training-gamma',type=float,choices=(.99,.999),default=.99)
     parser.add_argument('--engagement-distance',type=float,
                         help='explicit reviewed change of approach stop and engagement reward peak')
@@ -178,6 +179,9 @@ def main(argv=None):
         raise ValueError('credit-horizon comparison requires the reviewed neutral task')
     if not args.credit_horizon_ppo and args.training_gamma!=.99:
         raise ValueError('discount change requires explicit credit-horizon provenance')
+    if args.mixed_partner_ppo and (not args.credit_horizon_ppo or args.training_gamma!=.999
+            or args.worlds!=8 or args.unroll!=128):
+        raise ValueError('mixed partner requires explicit gamma-0.999 lineage and eight 128-step worlds')
     if args.ceiling <= 0 or args.worlds <= 0 or args.unroll < 2:
         raise ValueError('positive ceiling/worlds and unroll >=2 required')
     if jax.devices()[0].platform!='cpu':
@@ -218,6 +222,7 @@ def train(args):
     demonstration_ppo=getattr(args,'demonstration_ppo',False)
     neutral_contact_ppo=getattr(args,'neutral_contact_ppo',False)
     credit_horizon_ppo=getattr(args,'credit_horizon_ppo',False)
+    mixed_partner_ppo=getattr(args,'mixed_partner_ppo',False)
     env_class=StrikingEnv
     if contact_ppo:
         from boxer.striking_contact import ContactAwareStrikingEnv
@@ -225,6 +230,9 @@ def train(args):
         if neutral_contact_ppo:
             from boxer.striking_partner import ContactPartnerStrikingEnv
             env_class=ContactPartnerStrikingEnv
+        if mixed_partner_ppo:
+            from boxer.striking_mixed_partner import ContactMixedStrikingEnv,MIXED_ACTIVE_WORLDS
+            env_class=ContactMixedStrikingEnv
     observation_size, action_size = env_class.observation_size, env_class.action_size
     learners_per_world = getattr(env_class, 'learners_per_world', 2)
     if learners_per_world not in (1, 2):
@@ -256,6 +264,9 @@ def train(args):
                 if credit_horizon_ppo:
                     interface_metadata.update(credit_horizon_ppo=True,training_gamma=args.training_gamma)
                     config.update(interface_metadata,version=5,gamma=args.training_gamma)
+                    if mixed_partner_ppo:
+                        interface_metadata.update(mixed_partner_ppo=True,active_world_indices=list(MIXED_ACTIVE_WORLDS))
+                        config.update(interface_metadata,version=6)
     checkpoint_path=args.output/'checkpoint/latest.json'
     if previous:
         if not args.resume:
@@ -284,6 +295,8 @@ def train(args):
             raise ValueError('explicit neutral checkpoint and task must agree')
         if credit_horizon_ppo != saved.get('credit_horizon_ppo',False):
             raise ValueError('explicit credit-horizon checkpoint and training path must agree')
+        if mixed_partner_ppo != saved.get('mixed_partner_ppo',False):
+            raise ValueError('explicit mixed checkpoint and training task must agree')
         if credit_horizon_ppo and saved['training_gamma']!=args.training_gamma:
             raise ValueError('checkpoint and requested discount disagree')
         if demonstration_ppo and saved['retention_loss_weight']!=args.retention_loss_weight:
@@ -343,10 +356,15 @@ def train(args):
     def value(parameters,obs):
         return critic.apply(parameters,obs)
 
+    @jax.jit
+    def mean_action(parameters,obs):
+        return jp.tanh(actor.apply(parameters,obs)[0])
+
     update=make_ppo_update(actor,critic,tx,args.anchor_loss_weight if contact_ppo else None,
         args.retention_loss_weight if demonstration_ppo else None)
 
-    envs=[env_class(foundation,motor_params,**profile) for _ in range(args.worlds)]
+    envs=[env_class(foundation,motor_params,**profile,
+        **({'active_opponent':i in MIXED_ACTIVE_WORLDS} if mixed_partner_ppo else {})) for i in range(args.worlds)]
     # Share the already compiled frozen network across worlds.
     for env in envs[1:]:env.motor=envs[0].motor
     episode=np.full(args.worlds,consumed//rows,dtype=np.int64)
@@ -359,9 +377,13 @@ def train(args):
     session_start=consumed
     completed_rounds=falls=0
     neutral_credits=np.zeros(2,dtype=np.int64)
+    mixed_credits=np.zeros((2,2),dtype=np.int64)
     if neutral_contact_ppo:
         neutral_credits=np.maximum(np.asarray(continuation['neutral_credits_by_corner'],dtype=np.int64),
             np.asarray(progress.get('neutral_credits_by_corner',[0,0]),dtype=np.int64))
+    if mixed_partner_ppo:
+        mixed_credits=np.maximum(np.asarray(continuation['mixed_credits_by_mode_and_corner'],dtype=np.int64),
+            np.asarray(progress.get('mixed_credits_by_mode_and_corner',[[0,0],[0,0]]),dtype=np.int64))
     scored=np.zeros(2)
     def record(status='running',**extra):
         progress=dict(consumed_steps=consumed,optimized_steps=optimized,
@@ -373,6 +395,7 @@ def train(args):
             progress.update(actor_adam_count=int(optimizer['actor_adam'][0].count),
                 critic_adam_count=int(optimizer['critic_adam'][0].count))
         if neutral_contact_ppo:progress['neutral_credits_by_corner']=neutral_credits.tolist()
+        if mixed_partner_ppo:progress['mixed_credits_by_mode_and_corner']=mixed_credits.tolist()
         atomic_json(args.output/'progress.json',progress)
         atomic_json(args.output/'state.json',dict(state,status=status,**progress))
     def publish():
@@ -398,14 +421,21 @@ def train(args):
             action,raw,logp=act(ap,jp.array(normalized),sub)
             predicted=np.asarray(value(vp,jp.array(normalized)))
             actions=np.asarray(action).reshape(args.worlds,learners_per_world,action_size)
+            if mixed_partner_ppo:
+                other_obs=np.stack([env.opponent_observation for env in envs])
+                opponent_actions=np.asarray(mean_action(ap,jp.array(normalize(other_obs,norm))))
             rewards=[];dones=[];following=[]
             for i,env in enumerate(envs):
                 consumed+=learners_per_world
                 world_controls+=1
-                if neutral_contact_ppo:neutral_credits[env.learner_corner]+=1
+                if mixed_partner_ppo:mixed_credits[int(env.active_opponent),env.learner_corner]+=1
+                elif neutral_contact_ppo:neutral_credits[env.learner_corner]+=1
                 # Count attempted physics even if a later world/update fails.
                 record(phase='collecting')
-                next_obs,reward,done,outcome=env.step(actions[i])
+                if mixed_partner_ppo:
+                    next_obs,reward,done,outcome=env.step(actions[i],
+                        opponent_actions[i] if env.active_opponent else None)
+                else:next_obs,reward,done,outcome=env.step(actions[i])
                 rewards.extend(reward);dones.extend([done]*learners_per_world)
                 scored+=outcome['scored']
                 if done:
@@ -449,6 +479,7 @@ def train(args):
         if contact_ppo:
             saved['aux_sampler_state']=aux_rng.bit_generator.state
             if neutral_contact_ppo:saved['neutral_credits_by_corner']=neutral_credits.tolist()
+            if mixed_partner_ppo:saved['mixed_credits_by_mode_and_corner']=mixed_credits.tolist()
             if demonstration_ppo:
                 saved['retention_sampler_state']=retention_rng.bit_generator.state
                 validate_retention_state(saved,retention_provenance)

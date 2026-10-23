@@ -1,11 +1,10 @@
 # Reward-credit review and completed horizon comparison
 
-**Current status:** the continuation, 32 passive matched replays and 12 selected
-controller ablations are completed and reviewed. No further optimization is
-allocated. Both ablations rescue the selected falls, but only zero command
-offsets retains legal strikes. A fixed full-screen/fresh holdout diagnostic
-checks whether that selected-case effect generalizes; see the
-[current result and contract](#completed-controller-ablations-and-full-holdout-2026-10-23).
+**Current status:** the full 72-episode zero-command holdout is completed and
+reviewed. No complete set passes, so the masked controller is not adopted.
+The next bounded training comparison tests 50/50 neutral/current-mean-active
+opponent coverage against ordinary neutral-only control, from the unchanged
+latest final. Read the [current matched contract](striking-mixed-partner-comparison.md).
 
 ## Completed neutral curriculum review
 
@@ -480,3 +479,48 @@ PPO remains **1,679,616**, main boxing **1,048,576**, combined main **476,041,21
 Preserve the existing monitor, latest final and all consumed work. The runner
 reuses the tested complete-evidence guards; Python/shell/PowerShell syntax checks
 pass. The 12 focused checks cover channel isolation and unchanged native physics.
+
+
+## Completed full holdout and next coverage decision (2026-10-23)
+
+The full assay completed normally at **18:26:01 UTC**, using **35,955 evaluation
+world controls** for all 72 new episodes. Complete original-screen baseline
+reports already exist for the same latest-final hash. All seed/swap sets, hashes,
+finite states, parent full-criteria summaries and native logs were checked;
+there are no numerical/capacity errors. Current final learned state/optimizer
+prefixes and complete foundation histories (29/41/13/2 records) remain valid.
+
+| Same final policy / set | Neutral 0 survival / own events | Neutral 1 survival / own events | Active survival | Surviving active red / blue events | Surviving two-way episodes |
+| --- | --- | --- | --- | --- | --- |
+| Unmodified / original screen | 6/8 / 1 | 8/8 / 2 | 5/8 | 1 / 5 | 1 |
+| Zero command offsets / original screen | 8/8 / 1 | 8/8 / 2 | 8/8 | 1 / 0 | 0 |
+| Unmodified / fresh 12M | 8/8 / 1 | 8/8 / 1 | 8/8 | 2 / 3 | 0 |
+| Zero command offsets / fresh 12M | 8/8 / 0 | 8/8 / 0 | 7/8 | 4 / 3 | 2 |
+
+Fresh seeds 12,000,003..12,000,006 include both swaps and the complete ten-second
+profiles. Zero commands improves original-screen survival, but its fresh neutral
+roles lose all own events and fresh active survival regresses versus the matched
+unmodified policy. Two surviving fresh two-way episodes do not override those
+failures. **Neither controller passes a complete set. Reject blanket adoption of
+the zero-command intervention**; it remains a descriptive diagnostic. No trained
+actor, physical authority, score, gate or main ceiling changes.
+
+All new raw reports, progress, completed state and analysis are archived under
+`docs/results/striking-pilot/zero-command-holdout-1736704/`. Actual formal diagnostic
+simulation is **870,055 world controls**, PPO still **1,679,616**. No optimizer,
+standalone supervised or integrated replay updates occurred. Main boxing
+1,048,576 and combined main 476,041,216 retain their prior limits.
+
+The earlier active-only and neutral-only runs each lost task performance. The
+longer-horizon final improves neutral blue striking but regresses active play;
+removing commands alone is not sufficient. This motivates one **matched bounded
+coverage experiment**, preserving full learned authority: 50/50 neutral/current-
+mean-active opponent worlds against neutral-only control. The explicit version-6
+transition retains all learned/optimizer/sampler/consumed state from the latest
+final. See the [complete comparison contract](striking-mixed-partner-comparison.md)
+for 32,768 credits per arm, retained native integration blocks, independent full
+checks, early-stop rules, exact accounting and no automatic adoption/extension.
+**32 focused tests pass**, including new task routing, mode/role balance and
+provenance guards plus unchanged horizon/neutral/legacy PPO behavior. Python,
+LF shell and PowerShell syntax checks pass. Real mixed-path integration is
+required before further new-profile optimization and is included in its budget.
