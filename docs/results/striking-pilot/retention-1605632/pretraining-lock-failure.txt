@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/mnt/e/boxer-agent/boxer/striking_train.py", line 435, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/mnt/e/boxer-agent/boxer/striking_train.py", line 177, in main
+    fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
+BlockingIOError: [Errno 11] Resource temporarily unavailable

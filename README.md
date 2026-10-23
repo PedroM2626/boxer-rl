@@ -57,13 +57,18 @@ auxiliary anchoring regressed survival. Neither actor is adopted; no additional
 PPO is allocated to that failed objective. The completed saved-Gaussian audit
 also found no stable-strike recovery. A short gradient assay showed that the small
 approach-only loss does not preserve demonstrated strikes. The
-[bounded demonstration-retention continuation](docs/striking-retention-continuation.md)
-now tests 32,768 new diagnostic credits per arm, retaining the latest PPO-only
-actor/critic and independently counted Adam states. It compares weight 0 versus 1
-on verified strike/approach replay, with unchanged full physical criteria and no
-rollback or main adoption. Inspect
-`/home/pedro/boxing-runs/striking-retention-1572864/comparison.json`, its active
-child, progress and native logs before another launch.
+[completed demonstration-retention comparison](docs/striking-retention-review.md)
+restores learned mean-policy impacts: one fresh ten-second episode has three red
+and two blue valid strikes with both robots standing. It is one selected episode,
+and neutral-role-1 survival regresses to 4/8; neither actor passes full criteria.
+No phase advances or actor is adopted. The selected exchange and matched failure
+traces reproduce exactly; the video uses actual recorded coordinates and closed
+fists. One bounded ordinary continuation is active from the latest retention
+actor, at most 32,768 new diagnostic credits with two complete physical checks
+and a severe-regression stop. All criteria, physics and main ceilings remain
+unchanged. Inspect
+`/home/pedro/boxing-runs/striking-retention-1605632/continuation.json`, its active
+child, full reports, progress and native logs before another launch.
 
 The [closed-fist replay repair](docs/closed-fist-rendering.md) restores the
 original visual feature without changing learning or physics. Historical videos

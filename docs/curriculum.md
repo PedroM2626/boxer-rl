@@ -56,15 +56,24 @@ supervised compute remains 8,000 updates. The completed saved-Gaussian audit
 (72 trials) also found no recovery of stable strikes. The subsequent read-only
 gradient assay used 1,536 world controls and zero updates. Formal diagnostic
 simulation now totals **547,894 world controls**, including that assay.
-The [review and bounded demonstration-retention continuation](striking-retention-continuation.md)
-allocates **32,768 new diagnostic PPO credits per arm**, 65,536 maximum, from the
-latest completed PPO-only actor with Adam counts 7,048 / 30,720 and all counters
-retained. It tests weight 0 versus 1 on verified demonstration/approach replay,
-without a rollback or gate change. New source seeds are 7,000,003–7,000,006; all
-final complete screen/fresh evaluations are retained. Inspect
-`/home/pedro/boxing-runs/striking-retention-1572864/comparison.json`, its active
-child, progress and native logs before another launch. The two preceding audits
-are completed. No automatic extension, actor adoption or stage promotion occurs.
+The [completed demonstration-retention comparison](striking-retention-review.md)
+finished both 32,768-credit arms and all 120 full physical trials. Retention
+restores legal learned mean-policy strikes, including one fresh ten-second
+three-red/two-blue exchange with both robots standing. Neutral-role-1 fresh
+survival regresses to 4/8, so neither actor passes the unchanged complete criteria.
+No phase is promoted or actor adopted. The selected learned three/two exchange
+and all matched stability traces reproduced exactly; four role-1 failures occur
+after contact (two low-pelvis, two self-leg). Cumulative diagnostic PPO remains
+**1,515,776**, formal diagnostic simulation **611,668 world controls** after the
+8,091-control trace audit. A [single justified bounded ordinary continuation](striking-retention-review.md)
+is active from the latest retention actor: at most **32,768** new learner credits,
+full original screens every 16,384 credits, preregistered 8,000,003-series source/
+final evaluation, and stop on a screen profile with at most 3/8 surviving pairs.
+This training stop does not change complete promotion criteria. Inspect
+`/home/pedro/boxing-runs/striking-retention-1605632/continuation.json`, its active
+child, progress, hashes and all full reports before new work. No rollback or
+further automatic extension is authorized; all body/leg physics and main ceilings
+are retained. The comparison and replay/trace audit are completed.
 Main counters and all physical gates remain unchanged. No actor is adopted.
 No gate is relaxed, stage promoted or candidate composite controller certified.
 

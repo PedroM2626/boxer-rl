@@ -1,0 +1,436 @@
+{
+  "status": "reviewed",
+  "main_adoption": false,
+  "promotion": false,
+  "diagnostic_ppo_total": 1515776,
+  "formal_world_controls_total": 603577,
+  "new_ppo_collection_world_controls": 32768,
+  "cumulative_supervised_updates": 8000,
+  "source_offline": {
+    "approach_anchors": {
+      "rows": 1600,
+      "mse": 0.016522033140063286,
+      "command_mse": 0.026275327429175377,
+      "left_arm_mse": 0.01669907756149769,
+      "mean_abs_action": 0.10109832137823105
+    },
+    "strike_demonstrations": {
+      "rows": 7500,
+      "mse": 0.016180483624339104,
+      "command_mse": 0.01646982505917549,
+      "left_arm_mse": 0.02183147333562374,
+      "mean_abs_action": 0.30175307393074036
+    }
+  },
+  "arms": [
+    {
+      "arm": "ppo_only",
+      "sha256": "7c17c4500ef0873b8a7c575e24ead949c8742d31abca566075c92328616d8c6a",
+      "checks": {
+        "screen": {
+          "profiles": {
+            "neutral-0": {
+              "survivors": 7,
+              "own_scoring_seeds": [],
+              "surviving_events_by_corner": [
+                0.0,
+                0.0
+              ],
+              "surviving_two_way_episodes": 0,
+              "all_episode_events_by_corner": [
+                0.0,
+                0.0
+              ],
+              "mean_final_root_distance": 0.5890545229897814,
+              "passes_profile": false
+            },
+            "neutral-1": {
+              "survivors": 8,
+              "own_scoring_seeds": [],
+              "surviving_events_by_corner": [
+                0.0,
+                0.0
+              ],
+              "surviving_two_way_episodes": 0,
+              "all_episode_events_by_corner": [
+                0.0,
+                0.0
+              ],
+              "mean_final_root_distance": 0.530806794444467,
+              "passes_profile": false
+            },
+            "selfplay": {
+              "survivors": 8,
+              "own_scoring_seeds": [],
+              "surviving_events_by_corner": [
+                0.0,
+                0.0
+              ],
+              "surviving_two_way_episodes": 0,
+              "all_episode_events_by_corner": [
+                0.0,
+                0.0
+              ],
+              "mean_final_root_distance": 0.6373303995889845,
+              "passes_profile": true
+            }
+          },
+          "passes_complete": false
+        },
+        "fresh": {
+          "profiles": {
+            "neutral-0": {
+              "survivors": 7,
+              "own_scoring_seeds": [],
+              "surviving_events_by_corner": [
+                0.0,
+                0.0
+              ],
+              "surviving_two_way_episodes": 0,
+              "all_episode_events_by_corner": [
+                0.0,
+                0.0
+              ],
+              "mean_final_root_distance": 0.5374880252894678,
+              "passes_profile": false
+            },
+            "neutral-1": {
+              "survivors": 8,
+              "own_scoring_seeds": [],
+              "surviving_events_by_corner": [
+                0.0,
+                0.0
+              ],
+              "surviving_two_way_episodes": 0,
+              "all_episode_events_by_corner": [
+                0.0,
+                0.0
+              ],
+              "mean_final_root_distance": 0.5357196390430521,
+              "passes_profile": false
+            },
+            "selfplay": {
+              "survivors": 7,
+              "own_scoring_seeds": [],
+              "surviving_events_by_corner": [
+                0.0,
+                0.0
+              ],
+              "surviving_two_way_episodes": 0,
+              "all_episode_events_by_corner": [
+                0.0,
+                0.0
+              ],
+              "mean_final_root_distance": 0.6076099299771973,
+              "passes_profile": true
+            }
+          },
+          "passes_complete": false
+        }
+      },
+      "actor_adam_count": 7560,
+      "critic_adam_count": 31232,
+      "final_actor_final_norm": {
+        "approach_anchors": {
+          "rows": 1600,
+          "mse": 0.020768191665410995,
+          "command_mse": 0.024902069941163063,
+          "left_arm_mse": 0.022353479638695717,
+          "mean_abs_action": 0.11671645194292068
+        },
+        "strike_demonstrations": {
+          "rows": 7500,
+          "mse": 0.020311370491981506,
+          "command_mse": 0.016340352594852448,
+          "left_arm_mse": 0.027733126655220985,
+          "mean_abs_action": 0.30659356713294983
+        }
+      },
+      "final_actor_source_norm": {
+        "approach_anchors": {
+          "rows": 1600,
+          "mse": 0.02075946517288685,
+          "command_mse": 0.02486465685069561,
+          "left_arm_mse": 0.022345324978232384,
+          "mean_abs_action": 0.11669725924730301
+        },
+        "strike_demonstrations": {
+          "rows": 7500,
+          "mse": 0.02038217894732952,
+          "command_mse": 0.016304222866892815,
+          "left_arm_mse": 0.027808427810668945,
+          "mean_abs_action": 0.3074325919151306
+        }
+      },
+      "source_actor_final_norm": {
+        "approach_anchors": {
+          "rows": 1600,
+          "mse": 0.01652466505765915,
+          "command_mse": 0.026289228349924088,
+          "left_arm_mse": 0.016688138246536255,
+          "mean_abs_action": 0.10109365731477737
+        },
+        "strike_demonstrations": {
+          "rows": 7500,
+          "mse": 0.016111019998788834,
+          "command_mse": 0.016524234786629677,
+          "left_arm_mse": 0.021721577271819115,
+          "mean_abs_action": 0.3007933795452118
+        }
+      },
+      "log_std_source": [
+        -1.9977895021438599,
+        -1.9267486333847046,
+        -1.9579594135284424,
+        -2.050445795059204,
+        -1.9594345092773438,
+        -1.9688494205474854,
+        -1.9830914735794067,
+        -1.9173303842544556,
+        -1.995171070098877,
+        -1.9017654657363892,
+        -1.99242103099823,
+        -1.9656975269317627,
+        -1.9424278736114502,
+        -1.964021921157837,
+        -1.9217249155044556,
+        -1.939098596572876,
+        -1.9498533010482788
+      ],
+      "log_std_final": [
+        -2.0002222061157227,
+        -1.9268773794174194,
+        -1.9553778171539307,
+        -2.0507731437683105,
+        -1.9572852849960327,
+        -1.9723446369171143,
+        -1.9879666566848755,
+        -1.9175326824188232,
+        -1.994413137435913,
+        -1.9004641771316528,
+        -1.9885756969451904,
+        -1.963335394859314,
+        -1.9435209035873413,
+        -1.9676940441131592,
+        -1.9204803705215454,
+        -1.9440665245056152,
+        -1.9539464712142944
+      ]
+    },
+    {
+      "arm": "ppo_retention",
+      "sha256": "f10d817527e521b0f95253c1d8cfdf2db4b3a03195958e15a7638222743fd38c",
+      "checks": {
+        "screen": {
+          "profiles": {
+            "neutral-0": {
+              "survivors": 7,
+              "own_scoring_seeds": [
+                31
+              ],
+              "surviving_events_by_corner": [
+                1.0,
+                0.0
+              ],
+              "surviving_two_way_episodes": 0,
+              "all_episode_events_by_corner": [
+                1.0,
+                0.0
+              ],
+              "mean_final_root_distance": 0.5818958524715695,
+              "passes_profile": false
+            },
+            "neutral-1": {
+              "survivors": 8,
+              "own_scoring_seeds": [
+                31
+              ],
+              "surviving_events_by_corner": [
+                0.0,
+                1.0
+              ],
+              "surviving_two_way_episodes": 0,
+              "all_episode_events_by_corner": [
+                0.0,
+                1.0
+              ],
+              "mean_final_root_distance": 0.5778491552481659,
+              "passes_profile": false
+            },
+            "selfplay": {
+              "survivors": 7,
+              "own_scoring_seeds": [
+                7,
+                31
+              ],
+              "surviving_events_by_corner": [
+                2.0,
+                0.0
+              ],
+              "surviving_two_way_episodes": 0,
+              "all_episode_events_by_corner": [
+                2.0,
+                0.0
+              ],
+              "mean_final_root_distance": 0.5893317929342257,
+              "passes_profile": true
+            }
+          },
+          "passes_complete": false
+        },
+        "fresh": {
+          "profiles": {
+            "neutral-0": {
+              "survivors": 8,
+              "own_scoring_seeds": [
+                7000006
+              ],
+              "surviving_events_by_corner": [
+                1.0,
+                0.0
+              ],
+              "surviving_two_way_episodes": 0,
+              "all_episode_events_by_corner": [
+                1.0,
+                0.0
+              ],
+              "mean_final_root_distance": 0.555618399589842,
+              "passes_profile": false
+            },
+            "neutral-1": {
+              "survivors": 4,
+              "own_scoring_seeds": [],
+              "surviving_events_by_corner": [
+                0.0,
+                0.0
+              ],
+              "surviving_two_way_episodes": 0,
+              "all_episode_events_by_corner": [
+                1.0,
+                1.0
+              ],
+              "mean_final_root_distance": 0.5580035573512641,
+              "passes_profile": false
+            },
+            "selfplay": {
+              "survivors": 6,
+              "own_scoring_seeds": [
+                7000003,
+                7000005
+              ],
+              "surviving_events_by_corner": [
+                3.0,
+                3.0
+              ],
+              "surviving_two_way_episodes": 1,
+              "all_episode_events_by_corner": [
+                5.0,
+                5.0
+              ],
+              "mean_final_root_distance": 0.5497263214321222,
+              "passes_profile": false
+            }
+          },
+          "passes_complete": false
+        }
+      },
+      "actor_adam_count": 7560,
+      "critic_adam_count": 31232,
+      "final_actor_final_norm": {
+        "approach_anchors": {
+          "rows": 1600,
+          "mse": 0.012571673840284348,
+          "command_mse": 0.014093626290559769,
+          "left_arm_mse": 0.009203660301864147,
+          "mean_abs_action": 0.08554301410913467
+        },
+        "strike_demonstrations": {
+          "rows": 7500,
+          "mse": 0.0059907082468271255,
+          "command_mse": 0.006621514447033405,
+          "left_arm_mse": 0.005326504819095135,
+          "mean_abs_action": 0.2938573956489563
+        }
+      },
+      "final_actor_source_norm": {
+        "approach_anchors": {
+          "rows": 1600,
+          "mse": 0.012582752853631973,
+          "command_mse": 0.014117943122982979,
+          "left_arm_mse": 0.00920694787055254,
+          "mean_abs_action": 0.08561352640390396
+        },
+        "strike_demonstrations": {
+          "rows": 7500,
+          "mse": 0.0060082413256168365,
+          "command_mse": 0.006569060496985912,
+          "left_arm_mse": 0.005312441848218441,
+          "mean_abs_action": 0.29478776454925537
+        }
+      },
+      "source_actor_final_norm": {
+        "approach_anchors": {
+          "rows": 1600,
+          "mse": 0.016522977501153946,
+          "command_mse": 0.02631797082722187,
+          "left_arm_mse": 0.01667657122015953,
+          "mean_abs_action": 0.1010986939072609
+        },
+        "strike_demonstrations": {
+          "rows": 7500,
+          "mse": 0.016092482954263687,
+          "command_mse": 0.016515027731657028,
+          "left_arm_mse": 0.02168562076985836,
+          "mean_abs_action": 0.3008217513561249
+        }
+      },
+      "log_std_source": [
+        -1.9977895021438599,
+        -1.9267486333847046,
+        -1.9579594135284424,
+        -2.050445795059204,
+        -1.9594345092773438,
+        -1.9688494205474854,
+        -1.9830914735794067,
+        -1.9173303842544556,
+        -1.995171070098877,
+        -1.9017654657363892,
+        -1.99242103099823,
+        -1.9656975269317627,
+        -1.9424278736114502,
+        -1.964021921157837,
+        -1.9217249155044556,
+        -1.939098596572876,
+        -1.9498533010482788
+      ],
+      "log_std_final": [
+        -1.9993975162506104,
+        -1.9248102903366089,
+        -1.9617842435836792,
+        -2.0545921325683594,
+        -1.956890344619751,
+        -1.9634003639221191,
+        -1.9810841083526611,
+        -1.9225119352340698,
+        -2.0000433921813965,
+        -1.9001513719558716,
+        -1.9938931465148926,
+        -1.9650987386703491,
+        -1.9457099437713623,
+        -1.9634296894073486,
+        -1.9239466190338135,
+        -1.9418740272521973,
+        -1.955739974975586
+      ]
+    }
+  ],
+  "foundation_history_records": {
+    "balance": 29,
+    "walk_easy": 41,
+    "walk": 13,
+    "approach": 2
+  },
+  "native_error_logs_empty": true,
+  "auxiliary_sampler_streams_match": true,
+  "decision": "Neither final actor passes complete gates. Retention restores legal striking including one fresh deterministic two-way surviving episode, but regresses neutral-role-1 survival. No PPO extension yet. Reproduce the exchange and trace matched neutral-role-1 control/treatment episodes before a bounded continuation decision."
+}

@@ -1,4 +1,10 @@
-# Demonstration-retention PPO continuation: launch evidence
+# Demonstration-retention PPO continuation
+
+**Completed:** both fixed arms, all 120 physical episodes, final checkpoints,
+training metrics and `analysis.json` are archived. Retention restores some legal
+striking and one fresh stable two-way episode, but regresses role-1 survival;
+neither actor passes. See the [final review](../../../striking-retention-review.md).
+The launch and integration notes below retain their original historical scope.
 
 This directory records the [bounded continuation](../../../striking-retention-continuation.md)
 from the latest completed PPO-only actor, retaining all optimizer and lineage

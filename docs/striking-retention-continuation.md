@@ -1,5 +1,11 @@
 # Saved-policy regression review and bounded demonstration-retention PPO
 
+**Completed:** both fixed arms and all full physical trials finished. Retention
+restores strikes, including one fresh deterministic two-way surviving episode,
+but regresses role-1 survival. Neither actor passes. See the [final review and
+bounded replay/trace audit](striking-retention-review.md). Launch details below
+are historical; no training extension is granted yet.
+
 ## Completed investigations and decision
 
 The [saved-Gaussian audit](results/striking-pilot/postppo-sampling-bc5000/analysis.json)
