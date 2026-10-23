@@ -1,5 +1,11 @@
 # Bounded ordinary continuation of the latest retention actor
 
+**Completed:** both distinct complete generations fail. Final models, full
+source/final fresh reports, per-block metrics, `completed-continuation.json` and
+`analysis.json` are archived. Native states/losses are finite and error logs empty.
+See the [completed review and next bounded task](../../../striking-neutral-retention-curriculum.md).
+The launch/recovery notes below retain their original scope.
+
 Live state is `/home/pedro/boxing-runs/striking-retention-1605632/continuation.json`.
 `launch-state.json` is a snapshot, not live accounting. The exact source policy and
 configuration are archived in

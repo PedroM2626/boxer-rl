@@ -65,15 +65,22 @@ No phase is promoted or actor adopted. The selected learned three/two exchange
 and all matched stability traces reproduced exactly; four role-1 failures occur
 after contact (two low-pelvis, two self-leg). Cumulative diagnostic PPO remains
 **1,515,776**, formal diagnostic simulation **611,668 world controls** after the
-8,091-control trace audit. A [single justified bounded ordinary continuation](striking-retention-review.md)
-is active from the latest retention actor: at most **32,768** new learner credits,
-full original screens every 16,384 credits, preregistered 8,000,003-series source/
-final evaluation, and stop on a screen profile with at most 3/8 surviving pairs.
-This training stop does not change complete promotion criteria. Inspect
-`/home/pedro/boxing-runs/striking-retention-1605632/continuation.json`, its active
-child, progress, hashes and all full reports before new work. No rollback or
-further automatic extension is authorized; all body/leg physics and main ceilings
-are retained. The comparison and replay/trace audit are completed.
+8,091-control trace audit. The [completed active continuation and next curriculum task](striking-neutral-retention-curriculum.md)
+reviewed both further distinct complete generations: neither passes, and no
+screen neutral learner scores. Active fresh survival rises to 7/8 with another
+surviving two-way episode, but neutral-role-1 fresh survival is 6/8. Stop the
+active-only extension. Cumulative diagnostic PPO is now **1,548,544**, formal
+diagnostic simulation **656,030 world controls**. A bounded **32,768-credit**
+neutral-partner task is active from the latest final actor, preserving replay,
+Adam counts 8,072 / 31,744 and every historical counter. Eight one-learner worlds
+retain the 1,024-row PPO batch; each learner credit now consumes one physical
+world control, with both role ledgers recorded. The full evaluator still tests
+both active learned agents and both neutral profiles with unchanged criteria.
+Inspect `/home/pedro/boxing-runs/striking-neutral-retention-1638400/curriculum.json`,
+its active child, role counters, full gate history, checkpoint hashes and native
+logs before new work. The preceding continuation is completed; no actor adoption,
+phase pass, rollback or further automatic extension is authorized. Free legs,
+unassisted physics and all main counters/ceilings are preserved.
 Main counters and all physical gates remain unchanged. No actor is adopted.
 No gate is relaxed, stage promoted or candidate composite controller certified.
 

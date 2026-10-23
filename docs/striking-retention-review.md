@@ -1,5 +1,10 @@
 # Demonstration retention restores strikes, with incomplete stability
 
+**Follow-up completed:** the further active-only allocation finished with two
+failed complete screens. See the [final continuation review and bounded neutral-
+partner curriculum](striking-neutral-retention-curriculum.md). The ordinary
+continuation launch/recovery notes below retain their historical scope.
+
 Both matched arms completed their fixed 32,768 new learner credits, real
 first-block guards and all 120 source/final ten-second physical episodes. The
 retention arm restores real learned mean-policy strikes, including one fresh

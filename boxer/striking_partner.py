@@ -41,3 +41,13 @@ class PartnerStrikingEnv:
         outcome['learner_corner'] = self.learner_corner
         i = self.learner_corner
         return obs[i:i+1], reward[i:i+1], done, outcome
+
+
+class ContactPartnerStrikingEnv(PartnerStrikingEnv):
+    """The same one-learner routing with the existing two real impact flags."""
+    observation_size = 148
+
+    def __init__(self,*args,**kwargs):
+        from boxer.striking_contact import ContactAwareStrikingEnv
+        self.env=ContactAwareStrikingEnv(*args,**kwargs)
+        self.learner_corner=0

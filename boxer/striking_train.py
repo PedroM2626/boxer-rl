@@ -153,6 +153,7 @@ def main(argv=None):
     parser.add_argument('--anchor-loss-weight',type=float,choices=(0.,.02),default=0.)
     parser.add_argument('--demonstration-ppo',action='store_true')
     parser.add_argument('--retention-loss-weight',type=float,choices=(0.,1.),default=0.)
+    parser.add_argument('--neutral-contact-ppo',action='store_true')
     parser.add_argument('--engagement-distance',type=float,
                         help='explicit reviewed change of approach stop and engagement reward peak')
     parser.add_argument('--publish-dir',type=Path,
@@ -166,6 +167,8 @@ def main(argv=None):
         raise ValueError('demonstration PPO requires contact resume without the rejected anchor-only profile')
     if not args.demonstration_ppo and args.retention_loss_weight!=0.:
         raise ValueError('retention loss requires explicit demonstration PPO')
+    if args.neutral_contact_ppo and (not args.demonstration_ppo or args.retention_loss_weight!=1.):
+        raise ValueError('neutral contact task requires the reviewed demonstration-retention path')
     if args.ceiling <= 0 or args.worlds <= 0 or args.unroll < 2:
         raise ValueError('positive ceiling/worlds and unroll >=2 required')
     if jax.devices()[0].platform!='cpu':
@@ -204,10 +207,14 @@ def train(args):
         raise ValueError('frozen motor contract mismatch')
     contact_ppo=getattr(args,'contact_ppo',False)
     demonstration_ppo=getattr(args,'demonstration_ppo',False)
+    neutral_contact_ppo=getattr(args,'neutral_contact_ppo',False)
     env_class=StrikingEnv
     if contact_ppo:
         from boxer.striking_contact import ContactAwareStrikingEnv
         env_class=ContactAwareStrikingEnv
+        if neutral_contact_ppo:
+            from boxer.striking_partner import ContactPartnerStrikingEnv
+            env_class=ContactPartnerStrikingEnv
     observation_size, action_size = env_class.observation_size, env_class.action_size
     learners_per_world = getattr(env_class, 'learners_per_world', 2)
     if learners_per_world not in (1, 2):
@@ -226,12 +233,16 @@ def train(args):
     if contact_ppo:
         from boxer.striking_ppo_warmstart import OPTIMIZER_KIND,SplitAdam
         if previous is None:raise ValueError('migrated contact configuration required')
-        interface_metadata.update(contact_history=True,learners_per_world=2,opponent_mode='active_selfplay',
+        interface_metadata.update(contact_history=True,learners_per_world=learners_per_world,
+            opponent_mode=getattr(env_class,'opponent_mode','active_selfplay'),
             optimizer_kind=OPTIMIZER_KIND,anchor_loss_weight=args.anchor_loss_weight)
         config.update(interface_metadata,version=2)
         if demonstration_ppo:
             interface_metadata.update(demonstration_ppo=True,retention_loss_weight=args.retention_loss_weight)
             config.update(interface_metadata,version=3)
+            if neutral_contact_ppo:
+                interface_metadata['neutral_contact_ppo']=True
+                config.update(interface_metadata,version=4)
     checkpoint_path=args.output/'checkpoint/latest.json'
     if previous:
         if not args.resume:
@@ -256,6 +267,8 @@ def train(args):
         require_ppo_checkpoint(saved)
         if demonstration_ppo != saved.get('demonstration_ppo',False):
             raise ValueError('explicit demonstration checkpoint and training path must agree')
+        if neutral_contact_ppo != saved.get('neutral_contact_ppo',False):
+            raise ValueError('explicit neutral checkpoint and task must agree')
         if demonstration_ppo and saved['retention_loss_weight']!=args.retention_loss_weight:
             raise ValueError('retention checkpoint and requested coefficient disagree')
         if contact_ppo != (saved.get('optimizer_kind')=='split_adam_v1'):
@@ -328,6 +341,10 @@ def train(args):
     started=time.monotonic()
     session_start=consumed
     completed_rounds=falls=0
+    neutral_credits=np.zeros(2,dtype=np.int64)
+    if neutral_contact_ppo:
+        neutral_credits=np.maximum(np.asarray(continuation['neutral_credits_by_corner'],dtype=np.int64),
+            np.asarray(progress.get('neutral_credits_by_corner',[0,0]),dtype=np.int64))
     scored=np.zeros(2)
     def record(status='running',**extra):
         progress=dict(consumed_steps=consumed,optimized_steps=optimized,
@@ -338,6 +355,7 @@ def train(args):
             progress['combined_foundation_and_lineage_steps']=progress.pop('combined_project_consumed_steps')
             progress.update(actor_adam_count=int(optimizer['actor_adam'][0].count),
                 critic_adam_count=int(optimizer['critic_adam'][0].count))
+        if neutral_contact_ppo:progress['neutral_credits_by_corner']=neutral_credits.tolist()
         atomic_json(args.output/'progress.json',progress)
         atomic_json(args.output/'state.json',dict(state,status=status,**progress))
     def publish():
@@ -367,6 +385,7 @@ def train(args):
             for i,env in enumerate(envs):
                 consumed+=learners_per_world
                 world_controls+=1
+                if neutral_contact_ppo:neutral_credits[env.learner_corner]+=1
                 # Count attempted physics even if a later world/update fails.
                 record(phase='collecting')
                 next_obs,reward,done,outcome=env.step(actions[i])
@@ -411,6 +430,7 @@ def train(args):
             foundation_sha256=metadata['sha256'],**interface_metadata,**profile)
         if contact_ppo:
             saved['aux_sampler_state']=aux_rng.bit_generator.state
+            if neutral_contact_ppo:saved['neutral_credits_by_corner']=neutral_credits.tolist()
             if demonstration_ppo:
                 saved['retention_sampler_state']=retention_rng.bit_generator.state
                 validate_retention_state(saved,retention_provenance)

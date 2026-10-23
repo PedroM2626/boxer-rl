@@ -63,12 +63,15 @@ and two blue valid strikes with both robots standing. It is one selected episode
 and neutral-role-1 survival regresses to 4/8; neither actor passes full criteria.
 No phase advances or actor is adopted. The selected exchange and matched failure
 traces reproduce exactly; the video uses actual recorded coordinates and closed
-fists. One bounded ordinary continuation is active from the latest retention
-actor, at most 32,768 new diagnostic credits with two complete physical checks
-and a severe-regression stop. All criteria, physics and main ceilings remain
-unchanged. Inspect
-`/home/pedro/boxing-runs/striking-retention-1605632/continuation.json`, its active
-child, full reports, progress and native logs before another launch.
+fists. The [completed follow-up active continuation](docs/striking-neutral-retention-curriculum.md)
+also fails both complete screens: stable active contacts persist, while neutral
+practice remains unsuccessful. A short neutral-partner curriculum task is active
+from the latest actor with replay and optimizer state retained, at most 32,768
+new learner credits. Both bodies/legs remain free; the independent evaluator
+still tests both active learned corners and all unchanged full criteria. No
+actor is adopted or phase promoted. Inspect
+`/home/pedro/boxing-runs/striking-neutral-retention-1638400/curriculum.json`, its
+active child, role credits, full reports and native logs before another launch.
 
 The [closed-fist replay repair](docs/closed-fist-rendering.md) restores the
 original visual feature without changing learning or physics. Historical videos

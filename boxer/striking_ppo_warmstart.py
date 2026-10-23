@@ -32,11 +32,24 @@ def anchor_loss(actor,params,obs,labels):
 
 
 def validate_split_checkpoint(saved):
+    neutral=saved.get('neutral_contact_ppo') is True
+    expected=(1,'neutral_motor') if neutral else (2,'active_selfplay')
     if (saved.get('training_kind')!='ppo' or saved.get('ppo_optimizer_compatible') is not True or
             saved.get('optimizer_kind')!=OPTIMIZER_KIND or saved.get('migration_version')!=1 or
             (saved.get('actor_inputs'),saved.get('actions'))!=(148,17) or not saved.get('contact_history') or
-            saved.get('learners_per_world')!=2 or saved.get('opponent_mode')!='active_selfplay'):
+            (saved.get('learners_per_world'),saved.get('opponent_mode'))!=expected):
         raise ValueError('invalid explicit split-Adam PPO interface')
+    if neutral:
+        transition=saved.get('neutral_partner_transition',{})
+        sha=transition.get('source_sha256','')
+        credits=np.asarray(saved.get('neutral_credits_by_corner',[]))
+        if (transition.get('consumed_steps')!=1638400 or transition.get('world_control_steps')!=1015808 or
+                transition.get('actor_count')!=8072 or transition.get('critic_count')!=31744 or
+                transition.get('optimizer_reset') is not False or len(sha)!=64 or
+                any(c not in '0123456789abcdef' for c in sha) or
+                credits.shape!=(2,) or credits.dtype.kind not in 'iu' or np.any(credits<0) or
+                credits.sum()!=saved['consumed_steps']-1638400):
+            raise ValueError('explicit neutral task transition and exact learner-credit accounting required')
     migration=saved.get('optimizer_migration',{})
     if migration.get('actor_count_at_migration')!=5000 or migration.get('critic_count_at_migration',-1)<0:
         raise ValueError('reviewed optimizer prefixes required')
@@ -51,6 +64,7 @@ def validate_split_checkpoint(saved):
         if len(state)!=2 or not hasattr(state[0],'count'):raise ValueError('Adam state format mismatch')
         count=np.asarray(state[0].count)
         prefix=migration.get(name+'_count_at_migration')
+        if neutral:prefix=max(prefix or 0,8072 if name=='actor' else 31744)
         if count.shape or count.dtype.kind not in 'iu' or prefix is None or int(count)<prefix:
             raise ValueError('optimizer count lost or invalid')
         for moments in (state[0].mu,state[0].nu):

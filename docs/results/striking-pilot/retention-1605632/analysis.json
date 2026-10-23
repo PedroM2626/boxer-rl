@@ -1,0 +1,190 @@
+{
+  "status": "reviewed",
+  "diagnostic_ppo_total": 1548544,
+  "formal_world_controls_total": 656030,
+  "new_evaluation_world_controls": 44362,
+  "new_collection_world_controls": 16384,
+  "main_adoption": false,
+  "promotion": false,
+  "gates": [
+    {
+      "sha256": "8730a9eeafbb65f302c36d00f952aced6ccb9b6cddf2a5b58d7c4aebf0eb63c4",
+      "consumed_steps": 1622016,
+      "actor_count": 7816,
+      "critic_count": 31488
+    },
+    {
+      "sha256": "76b83b4c1bd0a66b439c24296366b557fda02a0fecf7d801b67e670472587c45",
+      "consumed_steps": 1638400,
+      "actor_count": 8072,
+      "critic_count": 31744
+    }
+  ],
+  "checks": {
+    "source-fresh": {
+      "profiles": {
+        "neutral-0": {
+          "survivors": 7,
+          "own_scoring_seeds": [],
+          "surviving_events_by_corner": [
+            0.0,
+            0.0
+          ],
+          "surviving_two_way_episodes": 0,
+          "passes_profile": false
+        },
+        "neutral-1": {
+          "survivors": 7,
+          "own_scoring_seeds": [
+            8000005,
+            8000006
+          ],
+          "surviving_events_by_corner": [
+            0.0,
+            2.0
+          ],
+          "surviving_two_way_episodes": 0,
+          "passes_profile": false
+        },
+        "selfplay": {
+          "survivors": 6,
+          "own_scoring_seeds": [
+            8000003,
+            8000005,
+            8000006
+          ],
+          "surviving_events_by_corner": [
+            2.0,
+            2.0
+          ],
+          "surviving_two_way_episodes": 0,
+          "passes_profile": false
+        }
+      },
+      "passes_complete": false
+    },
+    "gate-16384": {
+      "profiles": {
+        "neutral-0": {
+          "survivors": 6,
+          "own_scoring_seeds": [],
+          "surviving_events_by_corner": [
+            0.0,
+            0.0
+          ],
+          "surviving_two_way_episodes": 0,
+          "passes_profile": false
+        },
+        "neutral-1": {
+          "survivors": 7,
+          "own_scoring_seeds": [],
+          "surviving_events_by_corner": [
+            0.0,
+            0.0
+          ],
+          "surviving_two_way_episodes": 0,
+          "passes_profile": false
+        },
+        "selfplay": {
+          "survivors": 8,
+          "own_scoring_seeds": [
+            23
+          ],
+          "surviving_events_by_corner": [
+            1.0,
+            0.0
+          ],
+          "surviving_two_way_episodes": 0,
+          "passes_profile": true
+        }
+      },
+      "passes_complete": false
+    },
+    "gate-32768": {
+      "profiles": {
+        "neutral-0": {
+          "survivors": 7,
+          "own_scoring_seeds": [],
+          "surviving_events_by_corner": [
+            0.0,
+            0.0
+          ],
+          "surviving_two_way_episodes": 0,
+          "passes_profile": false
+        },
+        "neutral-1": {
+          "survivors": 8,
+          "own_scoring_seeds": [],
+          "surviving_events_by_corner": [
+            0.0,
+            0.0
+          ],
+          "surviving_two_way_episodes": 0,
+          "passes_profile": false
+        },
+        "selfplay": {
+          "survivors": 7,
+          "own_scoring_seeds": [
+            7,
+            31
+          ],
+          "surviving_events_by_corner": [
+            0.0,
+            2.0
+          ],
+          "surviving_two_way_episodes": 0,
+          "passes_profile": true
+        }
+      },
+      "passes_complete": false
+    },
+    "final-fresh": {
+      "profiles": {
+        "neutral-0": {
+          "survivors": 8,
+          "own_scoring_seeds": [],
+          "surviving_events_by_corner": [
+            0.0,
+            0.0
+          ],
+          "surviving_two_way_episodes": 0,
+          "passes_profile": false
+        },
+        "neutral-1": {
+          "survivors": 6,
+          "own_scoring_seeds": [],
+          "surviving_events_by_corner": [
+            0.0,
+            0.0
+          ],
+          "surviving_two_way_episodes": 0,
+          "passes_profile": false
+        },
+        "selfplay": {
+          "survivors": 7,
+          "own_scoring_seeds": [
+            8000003,
+            8000005,
+            8000006
+          ],
+          "surviving_events_by_corner": [
+            1.0,
+            4.0
+          ],
+          "surviving_two_way_episodes": 1,
+          "passes_profile": true
+        }
+      },
+      "passes_complete": false
+    }
+  },
+  "foundation_history_records": {
+    "balance": 29,
+    "walk_easy": 41,
+    "walk": 13,
+    "approach": 2
+  },
+  "native_error_logs_empty": true,
+  "main_hash_unchanged": true,
+  "decision": "Stop active-only extension after two failed complete checks. Prepare one explicitly validated neutral-partner curriculum transition from the latest final actor, preserving retention loss and all state. No rollback or main adoption."
+}
