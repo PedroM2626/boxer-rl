@@ -8,17 +8,18 @@ added 430,080 transitions. The exact actor payload was retained at transition.
 
 **Current operation:** the [opponent-aware striking pilot](striking-pilot.md)
 adds trainable arm residuals and independent fist-impact events over the unchanged
-certified motor actor. Main boxing PPO stopped at **1,048,576 learner
-transitions**. The [final review and active reward comparison](striking-reward-comparison.md)
-records 6/8 pair survival and three impacts in one episode that ended in a fall.
-No additional main budget is granted. Two sequential diagnostic arms each receive
-131,072 new transitions, cloning the exact latest learning state; their compute
-is separate from main. Inspect the report's durable `diagnostic_output` and
-`comparison.json` before any launch. Keep the foundation stopped and do not
-silently import a diagnostic actor. Both arms must complete unchanged full
-physical evaluation and be reviewed before a new main continuation decision.
-The inherited main range remains 0.45 m; initial spawns and impact criteria
-are unchanged. No boxing mastery is claimed.
+certified motor actor. Main boxing PPO remains stopped at **1,048,576 learner
+transitions**, without a budget extension. Both arms of the proximity-reward
+comparison failed the predefined physical screening; neither policy was adopted.
+The [results, interface probe and current motion-reference comparison](striking-motion-reference-comparison.md)
+record the decision. A fresh common-source baseline and a CMU-reference reward
+arm each receive 131,072 new diagnostic transitions, separate from all main work.
+Inspect `/home/pedro/boxing-runs/striking-imitation-compare-1048576/comparison.json`
+and its active child/process before launching anything. The completed reach
+comparison must not be relaunched. Keep the foundation stopped; no stage promotion
+or boxing mastery is claimed. Main source, 0.45 m profile, 2 m initial spawns,
+free physics and independent impact criteria remain unchanged. Review both full
+evaluations before any subsequent training or adoption decision.
 
 Full walking resumed at 422.89152M main transitions after a
 [supervisor log-read fault](curriculum-log-read-recovery.md). The targeted bounded

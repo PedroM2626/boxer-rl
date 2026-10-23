@@ -130,3 +130,13 @@ unchanged. Parent state and active counters are recorded in the
 [launch snapshot](results/striking-pilot/review-1048576/comparison-launched.json).
 Process identities are observations, not reusable restart targets. No main or
 foundation learner was active, and the monitoring schedule remains unchanged.
+
+## Completed proximity comparison and next investigation
+
+Both proximity-comparison arms finished; neither met the predeclared physical
+screening criteria, and neither actor was adopted. Main steps remain stopped
+at 1,048,576. The [result and current CMU-reference comparison](striking-motion-reference-comparison.md)
+record the full evaluations, finite-state checks, factorial amplitude/range
+probe, audit of older unassisted configs and separately bounded next diagnostic.
+Inspect the current imitation comparison's durable state before any launch;
+do not rerun the completed reach comparison.

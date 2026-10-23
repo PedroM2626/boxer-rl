@@ -32,6 +32,20 @@ def reach_bonus(distances, dt, both_up):
     return .25 * dt * np.exp(-(distances / .2)**2) if both_up else np.zeros(2)
 
 
+def motion_bonus(angles, reference, relative_extension_speed, dt, both_up):
+    """Untimed pose similarity, paid only for active relative fist extension.
+
+    This is reward shaping, not pose playback or a controller. Maximum 1/s.
+    """
+    angles, reference, speed = map(np.asarray, (angles, reference, relative_extension_speed))
+    if (angles.shape != (2, 4) or reference.ndim != 2 or reference.shape[1] != 4
+            or not len(reference) or speed.shape != (2,) or not np.isfinite(dt) or dt <= 0
+            or not all(np.isfinite(x).all() for x in (angles, reference, speed))):
+        raise ValueError('finite two-corner poses/speeds and nonempty four-joint reference required')
+    similarity = np.exp(-np.sum((angles[:, None, :] - reference[None, :, :])**2, axis=-1) / .6**2).max(axis=1)
+    return dt * similarity * np.clip(speed, 0., 1.) if both_up else np.zeros(2)
+
+
 def run_arm(args):
     import boxer.striking_train as training
     if args.arm == 'reach':
@@ -42,6 +56,39 @@ def run_arm(args):
                 reward += reach_bonus(self.hand_distances(), self.pair.dt, not outcome['done'])
                 return obs, reward, done, outcome
         training.StrikingEnv = ReachShaping
+    elif args.arm == 'imitation':
+        import mujoco
+        base = training.StrikingEnv
+        class MotionShaping(base):
+            def __init__(self, *positional, **kwargs):
+                super().__init__(*positional, **kwargs)
+                reference = json.loads(Path('data/reference/cmu-13-17-jab.json').read_text())
+                start, stop = reference['strike_window']
+                self.reference = np.asarray(reference['targets_radians'][start:stop+1])
+                self.arm_qpos = [[self.pair.model.joint(m['side'] + name.split('/')[-1]).qposadr[0]
+                                  for name in reference['joints']] for m in self.pair.maps]
+            def step(self, action):
+                obs, reward, done, outcome = super().step(action)
+                speeds = []
+                for i, mapping in enumerate(self.pair.maps):
+                    fist = self.pair.fists[i, 0]  # reference records the left jab
+                    torso = self.pair.model.geom(mapping['side'] + 'torso_collision').id
+                    fv, tv = np.zeros(6), np.zeros(6)
+                    for geom, velocity in ((fist, fv), (torso, tv)):
+                        mujoco.mj_objectVelocity(self.pair.model, self.pair.data,
+                            mujoco.mjtObj.mjOBJ_GEOM, int(geom), velocity, 0)
+                    position = self.pair.data.geom_xpos[fist]
+                    target = min(self.pair.targets[1-i], key=lambda g:
+                        np.linalg.norm(self.pair.data.geom_xpos[g] - position))
+                    direction = self.pair.data.geom_xpos[target] - position
+                    direction /= max(np.linalg.norm(direction), 1e-8)
+                    relative = fv[3:] - tv[3:] - np.cross(tv[:3],
+                        position - self.pair.data.geom_xpos[torso])
+                    speeds.append(relative @ direction)
+                reward += motion_bonus(self.pair.data.qpos[np.asarray(self.arm_qpos)],
+                    self.reference, speeds, self.pair.dt, not outcome['done'])
+                return obs, reward, done, outcome
+        training.StrikingEnv = MotionShaping
     training.main(['--output', str(args.output), '--resume', '--ceiling', str(args.ceiling),
                    '--worlds', '4', '--unroll', '128'])
 
@@ -68,11 +115,12 @@ def compare(args):
             source=str(args.source), source_sha256=manifest['sha256'],
             main_consumed_steps_retained=initial, foundation_consumed_steps_retained=474992640,
             diagnostic_steps_per_arm=args.steps, diagnostic_steps_ceiling=2*args.steps,
+            candidate=args.candidate,
             diagnostic_consumed_steps=0, diagnostic_output=str(args.output),
             physics_scorecard_unchanged=True, policy_adoption='none', arms={})
         atomic_json(state_path, state)
         try:
-            for arm in ('baseline', 'reach'):
+            for arm in ('baseline', args.candidate):
                 folder = args.output / arm
                 checkpoint = folder / 'checkpoint'
                 checkpoint.mkdir(parents=True, exist_ok=False)
@@ -82,8 +130,11 @@ def compare(args):
                 atomic_json(folder / 'progress.json', dict(consumed_steps=initial))
                 atomic_json(folder / 'diagnostic-profile.json', dict(arm=arm,
                     source_sha256=manifest['sha256'], lineage_counter_offset=initial,
-                    training_reward='unchanged' if arm == 'baseline' else
+                    training_reward={'baseline': 'unchanged', 'reach':
                     'base + both_up * dt * 0.25 * exp(-(minimum_hand_target_center_distance/0.2)^2)',
+                    'imitation': 'base + both_up * dt * nearest_CMU_pose_similarity * clipped_relative_fist_extension_speed'}[arm],
+                    reference_sha256=hashlib.sha256(Path('data/reference/cmu-13-17-jab.json').read_bytes()).hexdigest()
+                    if arm == 'imitation' else None,
                     evaluation_reward='unchanged', main_training=False,
                     tool_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest()))
                 state.update(active_arm=arm, phase='training', updated_utc=utc())
@@ -128,7 +179,8 @@ def main():
     parser.add_argument('--source', type=Path, default=Path('checkpoints/striking-pilot/step-1048576'))
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--steps', type=int, default=131072)
-    parser.add_argument('--arm', choices=('baseline', 'reach'))
+    parser.add_argument('--candidate', choices=('reach', 'imitation'), default='reach')
+    parser.add_argument('--arm', choices=('baseline', 'reach', 'imitation'))
     parser.add_argument('--ceiling', type=int)
     args = parser.parse_args()
     run_arm(args) if args.arm else compare(args)

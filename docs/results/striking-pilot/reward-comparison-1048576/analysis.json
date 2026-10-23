@@ -1,0 +1,75 @@
+{
+  "arms": {
+    "baseline": {
+      "pair_survivors": 7,
+      "scored_by_corner": [
+        2.0,
+        1.0
+      ],
+      "complete_episode_impacts": 0.0,
+      "scoring_seeds": [
+        47
+      ],
+      "training_final": {
+        "consumed_steps": 1179648,
+        "optimized_steps": 1179648,
+        "world_control_steps": 589824,
+        "combined_project_consumed_steps": 476172288,
+        "updated_utc": "2026-10-23T04:53:37.054103+00:00",
+        "rounds": 139,
+        "fall_rounds": 11,
+        "scored_by_corner": [
+          2.0,
+          3.0
+        ],
+        "actor_steps_per_second": 240.44216041219303,
+        "phase": "updated",
+        "mean_loss": 0.0235882731503807
+      },
+      "all_finite": true,
+      "sha256": "765c87b8f53f628dd322b64609378b08df981c93ea1402b1e7b16766d8c01dbb",
+      "eligible": false
+    },
+    "reach": {
+      "pair_survivors": 6,
+      "scored_by_corner": [
+        3.0,
+        1.0
+      ],
+      "complete_episode_impacts": 0.0,
+      "scoring_seeds": [
+        7
+      ],
+      "training_final": {
+        "consumed_steps": 1179648,
+        "optimized_steps": 1179648,
+        "world_control_steps": 589824,
+        "combined_project_consumed_steps": 476172288,
+        "updated_utc": "2026-10-23T05:03:23.304439+00:00",
+        "rounds": 143,
+        "fall_rounds": 23,
+        "scored_by_corner": [
+          13.0,
+          9.0
+        ],
+        "actor_steps_per_second": 242.69352268541328,
+        "phase": "updated",
+        "mean_loss": -0.027421307750046253
+      },
+      "all_finite": true,
+      "sha256": "9055033cce3acee6b2d6cbc171f37c8c78fdb3b8d6baf9eef5af5e56cbfcaa48",
+      "eligible": false
+    }
+  },
+  "foundation_certifications": {
+    "balance": true,
+    "walk_easy": true,
+    "walk": true,
+    "approach": true
+  },
+  "main_consumed_retained": 1048576,
+  "combined_main_consumed_retained": 476041216,
+  "diagnostic_ppo_consumed_total": 264960,
+  "formal_striking_world_controls_total": 60969,
+  "decision": "Reject reach shaping and adopt neither diagnostic policy; no main budget extension. Investigate the motor/action coordination interface and old unassisted system before further training."
+}

@@ -15,13 +15,15 @@ policies. At **1,048,576 boxing learner transitions**, final evaluation found
 6/8 surviving pairs and three impacts concentrated in an episode ending in a
 fall. Main PPO stopped at its reviewed ceiling; no further main steps are granted.
 
-A [bounded sequential reward comparison](docs/striking-reward-comparison.md)
-clones that complete learning state into an unchanged baseline and a training-only
-hand-proximity shaping arm, **131,072 diagnostic transitions each**. Both receive
-the original full physical evaluation. Diagnostic consumption is separate from
-main work, and neither actor is automatically adopted. Read the report before
-restarting anything. Persistent state is under
-`/home/pedro/boxing-runs/striking-reward-compare-1048576/comparison.json`;
+The [completed proximity comparison and current motion-reference test](docs/striking-motion-reference-comparison.md)
+keep diagnostic compute separate from main. Proximity shaping failed to improve
+stable contacts, and neither diagnostic actor was adopted. The current sequential
+comparison clones the same main source into an unchanged baseline and an untimed
+CMU-jab reward arm, **131,072 new diagnostic transitions each**, with full original
+physical evaluation and no automatic adoption. It adds learning guidance without
+scripted actuator trajectories or root assistance. Read the report before any
+restart. Durable state is
+`/home/pedro/boxing-runs/striking-imitation-compare-1048576/comparison.json`;
 `runs/striking_comparison_host.json` identifies its hidden WSL host.
 
 The [closed-fist replay repair](docs/closed-fist-rendering.md) restores the

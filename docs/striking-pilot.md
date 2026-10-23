@@ -246,3 +246,13 @@ not extended. The active bounded diagnostic comparison has two sequential
 131,072-transition arms, separate counters, complete unchanged physical evaluation
 and no automatic policy adoption. Inspect its durable output before launching
 anything else.
+
+## Completed proximity comparison and next investigation
+
+Both proximity-comparison arms finished; neither met the predeclared physical
+screening criteria, and neither actor was adopted. Main steps remain stopped
+at 1,048,576. The [result and current CMU-reference comparison](striking-motion-reference-comparison.md)
+record the full evaluations, finite-state checks, factorial amplitude/range
+probe, audit of older unassisted configs and separately bounded next diagnostic.
+Inspect the current imitation comparison's durable state before any launch;
+do not rerun the completed reach comparison.

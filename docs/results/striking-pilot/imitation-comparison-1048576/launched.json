@@ -1,0 +1,63 @@
+{
+  "comparison": {
+    "status": "running",
+    "started_utc": "2026-10-23T05:18:40.332821+00:00",
+    "pid": 443,
+    "source": "checkpoints/striking-pilot/step-1048576",
+    "source_sha256": "efad0ccd1051ee5305d4ccf8ebbd7d0e402211f12ecd0cdf175b473b24a7b5b0",
+    "main_consumed_steps_retained": 1048576,
+    "foundation_consumed_steps_retained": 474992640,
+    "diagnostic_steps_per_arm": 131072,
+    "diagnostic_steps_ceiling": 262144,
+    "candidate": "imitation",
+    "diagnostic_consumed_steps": 0,
+    "diagnostic_output": "/home/pedro/boxing-runs/striking-imitation-compare-1048576",
+    "physics_scorecard_unchanged": true,
+    "policy_adoption": "none",
+    "arms": {},
+    "active_arm": "baseline",
+    "phase": "training",
+    "updated_utc": "2026-10-23T05:18:40.341453+00:00"
+  },
+  "active_progress": {
+    "consumed_steps": 1059748,
+    "optimized_steps": 1058816,
+    "world_control_steps": 529874,
+    "combined_project_consumed_steps": 476052388,
+    "updated_utc": "2026-10-23T05:19:45.722324+00:00",
+    "rounds": 10,
+    "fall_rounds": 2,
+    "scored_by_corner": [
+      1.0,
+      0.0
+    ],
+    "actor_steps_per_second": 225.19668971411585,
+    "phase": "collecting"
+  },
+  "checkpoint": {
+    "file": "step-1058816.pkl",
+    "sha256": "d333423ff039ac47afb2ba6b1928b8e1a7303eb4f33f189df903c0784a7d85fd",
+    "consumed_steps": 1058816,
+    "optimized_steps": 1058816,
+    "foundation_sha256": "b39b1990945e8a374802c3a190e5ac5e026ae39e7fd5ef61c5c2b01ad291c6fc",
+    "engagement_distance": 0.45,
+    "engagement_reward_distance": 0.45
+  },
+  "active_new_diagnostic_consumed": 11172,
+  "all_learning_leaves_finite": true,
+  "main_source_unchanged": true,
+  "host": {
+    "diagnostic_output": "/home/pedro/boxing-runs/striking-imitation-compare-1048576",
+    "pid": 13636,
+    "main_consumed_steps": 1048576,
+    "started_utc": "2026-10-23T05:18:35.6803764Z",
+    "candidate": "imitation",
+    "steps_per_arm": 131072
+  },
+  "single_diagnostic_learner_no_main_or_foundation": true,
+  "code_sha256": {
+    "tools/striking_reward_compare.py": "213c258034aae7060dff5d50b6042d57911ebde0e5e3d504853c1b1da3e8bb98",
+    "tools/striking_interface_probe.py": "0fa0b18b96cabc22ce7ebab95aaaca776e74998b5877ee00e3d5af84c65a954b",
+    "data/reference/cmu-13-17-jab.json": "75d8c64bd1a5eae42312e465dd95c384d2c8b52d95208567141e1aed4fb0ef1c"
+  }
+}
