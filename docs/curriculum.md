@@ -1,16 +1,17 @@
 # Adaptive unassisted G1 curriculum
 
-**Latest striking operation (2026-10-23):** the longer-horizon continuation is
-completed and reviewed. Both complete generations fail. Final neutral-role-1
-striking improves, but active survival and strikes regress on the same fresh
-seeds. **No further optimization is allocated.** A bounded passive source/final
-trace of all active and neutral-role-1 holdout episodes investigates that mixed
-transfer. Read the [current result and trace contract](striking-reward-credit-review.md#completed-longer-horizon-continuation-and-transfer-review-2026-10-23)
-and live diagnostic process before launching anything. Diagnostic PPO is
-**1,679,616 learner credits**, formal simulation **813,050 world controls** before
-the trace audit (at most 16,000 additional controls). Main counters and complete
-foundation certifications are unchanged. Historical allocations below are
-completed evidence, not permission to restart them.
+**Latest striking operation (2026-10-23):** the longer-horizon continuation
+failed both complete generations. The subsequent 32 matched passive replays
+reproduced every original physical result exactly. Latest-final active failures
+are post-contact red low-pelvis terminations; the neutral failure is blue
+self-leg contact. **No further optimization is allocated.** A fixed diagnostic
+removes high-level command offsets or arm residuals separately on the selected
+failed-seed sets (12 episodes / at most 6,000 controls). Read the
+[current result and contract](striking-reward-credit-review.md#completed-transfer-traces-and-controller-ablation-2026-10-23)
+and live process before any launch. Diagnostic PPO is **1,679,616 learner credits**,
+formal simulation **828,100 controls** before that assay. Main counters and
+complete foundation certifications remain unchanged. Historical allocations
+below are completed evidence, not permission to restart them.
 
 **Current stage (2026-10-22):** all four foundation levels are certified by
 [two distinct consecutive complete physical passes](results/curriculum/foundation-certification/README.md).

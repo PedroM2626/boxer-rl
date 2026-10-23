@@ -1,4 +1,4 @@
-# Passive matched investigation of neutral-to-active transfer
+# Completed matched investigation of neutral-to-active transfer
 
 The [completed continuation and trace contract](../../../striking-reward-credit-review.md#completed-longer-horizon-continuation-and-transfer-review-2026-10-23)
 stop further optimization after two failed complete generations. Neutral-role-1
@@ -33,3 +33,15 @@ world controls. Record actual audit simulation separately. Main boxing remains
 1,048,576, combined main 476,041,216, standalone BC 8,000 updates. All four
 foundation certifications remain valid (29/41/13/2 complete history records).
 The finished trace must be reviewed before a new training decision.
+
+
+**Completed and reviewed:** all 32 original physical trials match exactly,
+with finite hashed trace arrays and empty native error logs. `completed-traces.json`
+retains all original comparisons; `analysis.json` summarizes the five failures.
+Raw evaluations/traces are archived in all four profile directories. Actual
+simulation is 15,050 controls, formal total 828,100, zero new optimization.
+All five failures follow interbody contact; active red low pelvis and neutral
+blue self-leg terminations are temporal observations, not proof of cause.
+The [fixed controller-channel diagnostic](../../../striking-reward-credit-review.md#completed-transfer-traces-and-controller-ablation-2026-10-23)
+is the next read-only investigation. No further training budget is granted.
+The startup and source integration snapshots above are historical.

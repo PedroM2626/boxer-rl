@@ -76,14 +76,19 @@ passes: neutral strikes remain absent and some pairs fall. The further
 32,768-credit ordinary continuation has now completed: both complete generations
 fail. Final neutral-role-1 striking improves, but active survival regresses from
 7/8 to 6/8 and surviving active events from five to one on the same fresh seeds.
-No more optimizer steps are allocated. A bounded passive matched source/final
-trace investigates this mixed transfer. Inspect
-`/home/pedro/boxing-runs/striking-horizon-regression-trace-1736704/trace-review.json`
+No more optimizer steps are allocated. All 32 subsequent passive source/final replays
+reproduce the original physical results exactly, with finite states and no
+numerical/capacity errors. Latest-final active failures are red low-pelvis
+terminations after interbody contact; the neutral failure is blue self-leg
+contact. A fixed diagnostic now removes command offsets or arm residuals
+separately on those selected failed-seed sets (12 episodes / at most 6,000
+world controls, zero learning). Inspect
+`/home/pedro/boxing-runs/striking-horizon-control-ablation-1736704/ablation.json`
 and its process before any launch. Diagnostic PPO is **1,679,616** and formal
-diagnostic simulation **813,050 world controls** before that audit (at most
-16,000 additional controls); main counters remain unchanged. Full
-[results and the investigation contract](docs/striking-reward-credit-review.md#completed-longer-horizon-continuation-and-transfer-review-2026-10-23)
-retain all failures and checkpoint provenance. No phase is promoted.
+diagnostic simulation **828,100 world controls** before this assay; main counters
+remain unchanged. Full
+[results and the investigation contract](docs/striking-reward-credit-review.md#completed-transfer-traces-and-controller-ablation-2026-10-23)
+retain failures and provenance. No phase is promoted or actor adopted.
 
 The [closed-fist replay repair](docs/closed-fist-rendering.md) restores the
 original visual feature without changing learning or physics. Historical videos

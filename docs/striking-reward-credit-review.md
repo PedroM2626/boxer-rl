@@ -1,10 +1,11 @@
 # Reward-credit review and completed horizon comparison
 
-**Current status:** the single longer-horizon continuation is completed and
-reviewed; both complete generations fail. No more optimization is allocated.
-The latest final improves neutral-role-1 striking but regresses active play.
-A bounded passive matched trace is the next diagnostic; see the
-[current result and investigation](#completed-longer-horizon-continuation-and-transfer-review-2026-10-23).
+**Current status:** the longer-horizon continuation and all 32 passive matched
+replays are completed and reviewed. No further optimization is allocated.
+The latest final has post-contact red low-pelvis failures in active play and a
+blue self-leg termination against a neutral partner. A fixed controller-channel
+ablation diagnostic tests those selected cases; see the
+[current result and contract](#completed-transfer-traces-and-controller-ablation-2026-10-23).
 
 ## Completed neutral curriculum review
 
@@ -362,3 +363,62 @@ falls follow interbody contact: early red low-pelvis termination in active play,
 and late blue self-leg contact against a neutral partner. This chronology alone
 is not evidence that contact caused either fall; compare the complete final
 traces before proposing a correction.
+
+
+## Completed transfer traces and controller ablation (2026-10-23)
+
+All **32 passive matched episodes reproduced every original physical field
+exactly**. Trace hashes and all stored arrays were checked, with no native
+numerical/capacity errors. Actual audit simulation is **15,050 world controls**,
+zero optimization. Formal diagnostic simulation is now **828,100 controls**;
+diagnostic PPO stays **1,679,616**. Main counters, latest final checkpoint,
+foundation histories and consumed prefixes remain unchanged. Complete evaluations,
+raw traces, exact replay state and `analysis.json` are archived under
+`docs/results/striking-pilot/horizon-regression-trace-1736704/`.
+
+All five observed failures occur after interbody contact. In active play, the
+source's one and final's two red failures terminate at pelvis height below
+0.55 m, without tilt/self-leg flags. The shared early case (seed 11,000,003,
+swap true) falls at 1.580 s (source) / 1.810 s (final), after first contacts at
+1.460 / 1.498 s. The additional final active failure (11,000,006, swap false)
+falls at 8.406 s, first contact 1.568 s. Against the neutral partner, both
+source and final blue fail through self-leg contact on seed 11,000,006, swap
+true (9.338 / 9.826 s), without low-pelvis/tilt flags at the terminal instant.
+The latest final still has more neutral blue strikes and worse active play.
+These temporal observations do not identify whether high-level movement,
+arm loading, incoming contact or coupled feedback caused the failures.
+
+### One fixed closed-loop channel experiment
+
+Use only the latest final hash
+`55976fc15b74b9997b4cb56cf13683f1f87315ac6d67c5cc966ab3c644dd2d73`,
+without optimizer updates or policy rollback. Run two separate evaluator
+interventions already supported and tested: zero the three high-level command
+offsets, or zero the fourteen high-level arm residuals. All other action
+channels retain learned authority; the frozen motor still controls free legs,
+roots and arms through native contacts. No root forces, constraints, teacher,
+reward, scorecard or gate changes. The unchanged baseline is the exact archived
+latest-final physical evaluation, not a newly selected favorable policy.
+
+For each intervention run active seeds **11,000,003 and 11,000,006**, both swaps,
+and neutral-role-1 seed **11,000,006**, both swaps: **12 episodes / at most 6,000
+world controls total**, zero learning. Preserve every selected success/failure,
+trace actual state/actions and terminal flags, verify hashes/finite state and
+native logs, and compare each seed/swap to its original final-policy baseline.
+These seeds were chosen to include every latest-final failure in the traced
+profiles, with their opposite swaps retained; this is a targeted mechanism
+assay, not an unbiased estimate of general boxing performance. Interventions
+alter later feedback/state trajectories and are not gate-eligible policies.
+Even a standing zero-arm controller cannot be adopted as a trained boxer.
+Review both interventions before selecting a training change; no additional
+optimizer allocation follows automatically.
+
+Hidden persistent launcher: `tools/start_striking_horizon_control_ablation.ps1`.
+Live state:
+`/home/pedro/boxing-runs/striking-horizon-control-ablation-1736704/ablation.json`.
+Check that job/process and attempted progress before any other launch. At the
+full cap formal diagnostic simulation would be **834,100**, diagnostic PPO
+remains **1,679,616**, main boxing **1,048,576**, combined main **476,041,216**;
+all standalone and integrated supervised compute is unchanged. Preserve the
+existing monitor. Existing channel-isolation and read-only physics tests are
+included in the 12 passing checks; Python/shell/PowerShell syntax checks pass.
