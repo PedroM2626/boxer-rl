@@ -41,12 +41,19 @@ processes before another launch. The [coverage and channel audits](striking-poli
 are now also completed. Passive traces exactly reproduce all 24 original trials;
 selected early falls disappear when high-level arm residuals are removed, with
 all learned motor actions and free-body physics retained. These short interventions
-are not adopted policies or gates. The next bounded work is a fresh pre-contact
-sample comparison, at most 4,800 world controls, zero learning. Inspect the latest
-`/home/pedro/boxing-runs/striking-channel-contact-bc4000/channels.json` and processes
-before launching anything. Diagnostic PPO remains 1,188,096; formal world controls
-are now 398,434. Cumulative supervised compute is 6,000 updates, counted separately
-and incompatible with PPO resume. No optimizer extension or promotion is granted.
+are not adopted policies or gates. The [fresh pre-contact review and anchoring
+comparison](striking-motor-anchoring.md) verified 32 unique candidate prefixes
+and completed a bounded matched BC correction: 1,000 updates per arm and all
+120 complete physical episodes. The correction improves some survival but
+reduces scoring; neither actor passes the complete criteria. Further identical
+imitation is stopped. The [next PPO contract](striking-ppo-warmstart-plan.md)
+requires validated explicit actor/critic optimizer migration from the latest
+zero-anchor BC5000 actor before its conditional bounded diagnostic comparison.
+No PPO job is implemented or running yet. Inspect
+`/home/pedro/boxing-runs/striking-anchor-learning-bc4000/learning.json` and processes
+before new work. Diagnostic PPO remains 1,188,096; formal evaluation controls
+are 458,469 and cumulative supervised compute 8,000 updates. No actor adoption
+or stage promotion occurs from this comparison.
 Main counters and all physical gates remain unchanged. No actor is adopted.
 No gate is relaxed, stage promoted or candidate composite controller certified.
 

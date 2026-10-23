@@ -185,3 +185,20 @@ striking demonstrations and their event history. Do not train directly on seeds
 replace the optimizer, or allocate another long PPO run. Fresh independent full
 physical checks remain necessary after any learning; the current protocol grants
 only the 4,800-control data comparison, not optimizer compute or promotion.
+
+## Fresh comparison completed; targeted learning launched
+
+The fresh comparison completed 4,716 controls with matched initial observations
+and 32 deduplicated role candidates. The reviewed
+[motor-anchoring protocol](striking-motor-anchoring.md) records both profiles,
+exclusions and the new evidence-based allocation. It permits 1,000 supervised
+updates per matched arm and at most 60,000 independent physical evaluation
+controls, zero PPO, preserving the latest actor/Adam/sampler lineage. That bounded
+job is now running; inspect its own `learning.json`, active evaluator and process
+before any launch. The former collection and channel audits remain completed.
+
+The anchoring comparison subsequently completed all 120 full episodes. Its
+[final review](striking-motor-anchoring.md) rejects further identical imitation,
+retains the latest corrected actor without promotion, and defines a migration-first
+PPO continuation contract. It is not still running. Inspect the latest review and
+completed state before implementing or launching anything else.

@@ -1,0 +1,179 @@
+{
+  "source_sha256": "2da4302cb992d5067a86c8886f72bac2cf54f2def1c41f7f87201d5f76c0bf9a",
+  "anchor_dataset_sha256": "ef0e2416ca0af53c65aa3a13dc411e55b38922ab73a862ff2a0051b4070e07da",
+  "arms": {
+    "preserve_anchor": {
+      "sha256": "a793994b636fd7315b05bc6aced2caf425381aff68e14d5c27d2ff4c115260a7",
+      "screen": {
+        "neutral-0": {
+          "pair_survivors": 6,
+          "own_surviving_events": 0.0,
+          "own_surviving_scoring_seeds": []
+        },
+        "neutral-1": {
+          "pair_survivors": 8,
+          "own_surviving_events": 2.0,
+          "own_surviving_scoring_seeds": [
+            7,
+            47
+          ]
+        },
+        "selfplay": {
+          "pair_survivors": 6,
+          "own_surviving_events": 0.0,
+          "own_surviving_scoring_seeds": [],
+          "surviving_two_way_episodes": 0,
+          "surviving_scoring_seeds_by_corner": {
+            "0": [],
+            "1": []
+          }
+        }
+      },
+      "fresh": {
+        "neutral-0": {
+          "pair_survivors": 6,
+          "own_surviving_events": 2.0,
+          "own_surviving_scoring_seeds": [
+            4000004
+          ]
+        },
+        "neutral-1": {
+          "pair_survivors": 8,
+          "own_surviving_events": 0.0,
+          "own_surviving_scoring_seeds": []
+        },
+        "selfplay": {
+          "pair_survivors": 6,
+          "own_surviving_events": 0.0,
+          "own_surviving_scoring_seeds": [],
+          "surviving_two_way_episodes": 0,
+          "surviving_scoring_seeds_by_corner": {
+            "0": [],
+            "1": []
+          }
+        }
+      },
+      "screen_thresholds_met": false,
+      "fresh_thresholds_met": false,
+      "optimizer_count": 5000,
+      "sampler_final_matches_parent": true,
+      "retained_critic_norm_key_logstd_and_lineage": true,
+      "finite": true,
+      "ppo_resume_rejected": true,
+      "anchor_mean_abs_commands": 0.5821787714958191,
+      "anchor_mean_abs_arms": 0.29785171151161194,
+      "source_preservation_mse": 6.15298340562731e-05
+    },
+    "zero_anchor": {
+      "sha256": "c7d6f1d5458f4767e6d7bedd98350ed8f79231de1030783fe9feb4b779d81e19",
+      "screen": {
+        "neutral-0": {
+          "pair_survivors": 7,
+          "own_surviving_events": 0.0,
+          "own_surviving_scoring_seeds": []
+        },
+        "neutral-1": {
+          "pair_survivors": 8,
+          "own_surviving_events": 1.0,
+          "own_surviving_scoring_seeds": [
+            47
+          ]
+        },
+        "selfplay": {
+          "pair_survivors": 5,
+          "own_surviving_events": 0.0,
+          "own_surviving_scoring_seeds": [],
+          "surviving_two_way_episodes": 0,
+          "surviving_scoring_seeds_by_corner": {
+            "0": [],
+            "1": []
+          }
+        }
+      },
+      "fresh": {
+        "neutral-0": {
+          "pair_survivors": 8,
+          "own_surviving_events": 0.0,
+          "own_surviving_scoring_seeds": []
+        },
+        "neutral-1": {
+          "pair_survivors": 8,
+          "own_surviving_events": 1.0,
+          "own_surviving_scoring_seeds": [
+            4000005
+          ]
+        },
+        "selfplay": {
+          "pair_survivors": 7,
+          "own_surviving_events": 1.0,
+          "own_surviving_scoring_seeds": [
+            4000005
+          ],
+          "surviving_two_way_episodes": 0,
+          "surviving_scoring_seeds_by_corner": {
+            "0": [],
+            "1": [
+              4000005
+            ]
+          }
+        }
+      },
+      "screen_thresholds_met": false,
+      "fresh_thresholds_met": false,
+      "optimizer_count": 5000,
+      "sampler_final_matches_parent": true,
+      "retained_critic_norm_key_logstd_and_lineage": true,
+      "finite": true,
+      "ppo_resume_rejected": true,
+      "anchor_mean_abs_commands": 0.07030077278614044,
+      "anchor_mean_abs_arms": 0.05178564786911011,
+      "source_preservation_mse": 0.1588687300682068
+    }
+  },
+  "source_anchor_mean_abs_commands": 0.5810887813568115,
+  "source_anchor_mean_abs_arms": 0.2967453896999359,
+  "source_fresh": {
+    "neutral-0": {
+      "pair_survivors": 8,
+      "own_surviving_events": 3.0,
+      "own_surviving_scoring_seeds": [
+        4000003,
+        4000004
+      ]
+    },
+    "neutral-1": {
+      "pair_survivors": 8,
+      "own_surviving_events": 2.0,
+      "own_surviving_scoring_seeds": [
+        4000003,
+        4000005
+      ]
+    },
+    "selfplay": {
+      "pair_survivors": 6,
+      "own_surviving_events": 0.0,
+      "own_surviving_scoring_seeds": [],
+      "surviving_two_way_episodes": 0,
+      "surviving_scoring_seeds_by_corner": {
+        "0": [],
+        "1": []
+      }
+    }
+  },
+  "diagnostic_world_controls": 55319,
+  "formal_world_controls_total": 458469,
+  "new_supervised_updates": 2000,
+  "cumulative_supervised_updates": 8000,
+  "cumulative_example_presentations": 2048000,
+  "new_ppo_transitions": 0,
+  "diagnostic_ppo_retained": 1188096,
+  "foundation_consumed": 474992640,
+  "main_boxing_consumed": 1048576,
+  "main_project_consumed": 476041216,
+  "native_numerical_or_capacity_warnings": false,
+  "matched_sampler_final": true,
+  "policy_adoption": "none",
+  "promotion": false,
+  "limitation": "Two matched arms are not consecutive checkpoint passes. Physical outcomes, not anchor fit, determine continuation.",
+  "decision": "Neither arm passes complete screen/fresh scoring criteria. Stop further identical imitation and preserve both branches. Use the latest zero-anchor BC5000 branch as a diagnostic continuation source, not an adopted actor. Implement and validate explicit actor/critic optimizer migration before the separately documented bounded physical PPO comparison; direct BC resume remains rejected."
+}

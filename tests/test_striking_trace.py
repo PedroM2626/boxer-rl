@@ -3,7 +3,7 @@ import jax.numpy as jp
 import numpy as np
 
 from boxer.striking_contact import ContactAwareStrikingEnv
-from boxer.striking_trace import StrikingTrace,terminal_details
+from boxer.striking_trace import StrikingTrace,terminal_details,root_distance
 from boxer.striking_coverage import block_distances,leave_trajectory_out_baselines
 from test_paired_foundation import foundation
 from tools.evaluate_striking import ablate_action
@@ -14,6 +14,7 @@ def test_trace_is_read_only_with_identical_native_trajectory(foundation,tmp_path
     plain=ContactAwareStrikingEnv(foundation,None,motor=motor)
     traced=ContactAwareStrikingEnv(foundation,None,motor=motor)
     a=plain.reset(23);b=traced.reset(23);trace=StrikingTrace(traced)
+    initial_distance=root_distance(traced.pair)
     action=np.random.default_rng(2).uniform(-.1,.1,(2,17)).astype(np.float32)
     for _ in range(5):
         trace.before(traced,b,action)
@@ -31,6 +32,9 @@ def test_trace_is_read_only_with_identical_native_trajectory(foundation,tmp_path
         np.testing.assert_array_equal(stored['next_observation'][-1],b)
         np.testing.assert_array_equal(stored['observation'][1:],stored['next_observation'][:-1])
         np.testing.assert_array_equal(stored['qpos'][-1],traced.pair.data.qpos)
+        assert stored['root_distance_before'][0]==initial_distance
+        assert stored['root_distance_after'][-1]==root_distance(traced.pair)
+        np.testing.assert_array_equal(stored['root_distance_after'][:-1],stored['root_distance_before'][1:])
     assert contacts and all(0<c['elapsed']<=.1+1e-9 for c in contacts)
     assert traced.pair.model.neq==0 and not np.any(traced.pair.model.body_gravcomp)
     assert not np.any(traced.pair.data.qfrc_applied) and not np.any(traced.pair.data.xfrc_applied)

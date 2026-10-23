@@ -6,6 +6,11 @@ import numpy as np
 from boxer.checkpoint_io import atomic_bytes
 
 
+def root_distance(pair):
+    roots=[pair.data.qpos[m['root']:m['root']+2] for m in pair.maps]
+    return float(np.linalg.norm(roots[1]-roots[0]))
+
+
 class StrikingTrace:
     def __init__(self, env):
         self.rows=[]
@@ -13,12 +18,13 @@ class StrikingTrace:
 
     def before(self, env, observation, action):
         self.pending=dict(observation=observation.copy(),action=action.copy(),
-            time_before=env.pair.elapsed,commands=env.commands(action).copy())
+            time_before=env.pair.elapsed,commands=env.commands(action).copy(),
+            root_distance_before=root_distance(env.pair))
 
     def after(self, env, observation, outcome):
         pair=env.pair
         self.pending.update(next_observation=observation.copy(),qpos=pair.data.qpos.copy(),
-            qvel=pair.data.qvel.copy(),time_after=pair.elapsed,
+            qvel=pair.data.qvel.copy(),time_after=pair.elapsed,root_distance_after=root_distance(pair),
             applied_actions=outcome['applied_actions'].copy(),arm_residual=outcome['arm_residual'].copy(),
             scored=outcome['scored'].copy(),fallen=outcome['fallen'].copy(),
             hand_distance=env.hand_distances().copy(),

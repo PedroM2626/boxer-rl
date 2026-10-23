@@ -45,8 +45,15 @@ and processes before another launch; that job is completed. Main and PPO remain
 stopped. The [completed coverage/channel audits](docs/striking-policy-coverage-audit.md)
 reproduced every physical result and localized selected early falls to the arm
 residual channel. Their short interventions are diagnostic, not adopted policies.
-The next bounded work validates motor-preserving pre-contact examples on fresh
-seeds; no additional learning is allocated.
+The [fresh sample review and motor-anchoring comparison](docs/striking-motor-anchoring.md)
+validated 32 unique approach prefixes and completed 1,000 supervised updates
+per matched arm plus all 120 full physical episodes. The corrected actor has
+7/8 active survival on fresh seeds but only one surviving impact; neither arm
+passes the complete criteria. No actor or stage is adopted. Further identical
+imitation is stopped. The next [PPO continuation contract](docs/striking-ppo-warmstart-plan.md)
+requires explicit validated optimizer migration from the latest BC5000 actor.
+Inspect `/home/pedro/boxing-runs/striking-anchor-learning-bc4000/learning.json`
+and processes before new work; that job is completed. No PPO comparison is running.
 
 The [closed-fist replay repair](docs/closed-fist-rendering.md) restores the
 original visual feature without changing learning or physics. Historical videos
