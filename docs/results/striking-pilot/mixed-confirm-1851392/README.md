@@ -21,3 +21,17 @@ The hidden persistent launcher is `tools/start_striking_mixed_confirm_continue.p
 The launch files here are historical snapshots. Inspect actual process, child
 progress, logs and complete reports before any intervention. All physical gates,
 free legs, unassisted roots, scoring, main counters and monitoring remain intact.
+
+## Completed independent review
+
+The predeclared stagnation stop triggered at 8,192, not 16,384. All 72 complete
+episodes / 32,798 evaluation controls, eight finite PPO metrics, complete source
+and final profiles and exact gate model are archived. Main/foundation histories
+and hashes were reverified; native error logs are empty. Original-screen early
+stop vector (7,3,7,1,6,3,2) becomes (7,2,7,1,6,3,1). No component improves.
+Fresh survivors total 19/24 source versus 18/24 final; both fail full criteria.
+The final has 17 surviving active impacts (red 9 / blue 8), two two-way episodes,
+and unstable neutral roles. No more unchanged PPO is allocated. Global diagnostic
+PPO is 1,844,480 and formal evaluation 1,084,975; collection/replay are separately
+8,192 / 32,768. `analysis.json` records the passive matched trace decision.
+Launch snapshots above are historical. No policy is adopted or promoted.

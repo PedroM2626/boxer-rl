@@ -1,10 +1,10 @@
 # Mixed continuation regression and policy-update investigation
 
-**Current decision:** the actor-rate comparison is completed and independently
-reviewed. Reject the reduced-rate branch. Permit one bounded **16,384-credit**
-ordinary continuation from the latest unchanged-rate final, retaining its exact
-version-6 profile and all optimizer state. Full gates and early stops below
-remain mandatory. No main adoption or phase promotion.
+**Current decision:** the confirmation stopped at +8,192 for complete-screen
+stagnation. No unchanged PPO extension is allocated. Retain its latest final and
+all consumed work. A bounded passive source/final failure trace below investigates
+timing, contacts and reward components without optimization or control changes.
+No main adoption, rollback or phase promotion.
 
 ## Complete physical outcome
 
@@ -243,3 +243,58 @@ mixed-mode totals **65,536 / 65,536**, historical neutral prefix unchanged.
 Launcher: `tools/start_striking_mixed_confirm_continue.ps1`; live state:
 `/home/pedro/boxing-runs/striking-mixed-confirm-1851392/continuation.json`.
 Preserve the existing monitoring schedule and inspect this job before any launch.
+
+## Confirmation stopped and passive failure investigation
+
+The 16,384-credit confirmation stopped correctly at **8,192 consumed/optimized
+learner/world controls**. Its first complete screen vector changed from
+(7,3,7,1,6,3,2) to (7,2,7,1,6,3,1): no early-stop component improves. The failed
+complete set is retained, not replaced by fresh results. All **72 complete
+episodes / 32,798 evaluation controls**, eight finite PPO blocks, gate/final
+payload, empty native error logs and complete foundation/main prefixes are
+independently verified by `tools/review_striking_mixed_confirmation.py`.
+
+| Same fresh 16M sample | Neutral 0 survivors / own events | Neutral 1 survivors / own events | Active survivors / red-blue events | Active two-way episodes |
+| --- | --- | --- | --- | --- |
+| Source | 8/8 / 9 | 6/8 / 2 | 5/8 / 7-11 | 3 |
+| +8,192 final | 7/8 / 5 | 5/8 / 1 | 6/8 / 9-8 | 2 |
+
+Survival totals change 19/24 to 18/24; neutral scoring breadth also regresses.
+The latest final SHA is
+`6bf3273ab5cd83e42b588403a7361140e4ee42afe0fbec20732e0a010bb34e7a`,
+lineage **1,859,584 learner / 1,236,992 world**, Adam **11,528 / 35,200**,
+mixed-mode totals **61,440 / 61,440**, historical neutral 50,229/48,075 intact.
+Global diagnostic PPO is **1,844,480**, formal evaluation **1,084,975**;
+new collection 8,192 and replay 32,768 presentations are separate. Unused
+allocation is not consumed. Main counters and all foundation certifications
+stay unchanged. No result establishes that another unchanged extension helps.
+
+Allocate a passive matched replay of the **source and final, all three profiles,
+four existing 16M seeds, both swaps**: **48 complete episodes / at most 24,000
+world controls**, no training, new optimization, supervised work or adoption.
+Every pre-existing trial field must match the original untraced physical result
+exactly, and every trace must be finite with a checked SHA. Stop and investigate
+if instrumentation changes outcomes. Record qpos/qvel, actions, commands,
+residuals, first contact, first fall, corner terminal conditions, actual scoring
+times and reward components. Compare contact-before-fall, precontact posture,
+and late commands; these are temporal associations, not causal proof. Do not
+repeat the previously rejected command mask or body-authority change based only
+on correlations. The data will determine the next bounded intervention.
+
+PPO remains **1,844,480**. Formal diagnostic ceiling becomes **1,108,975**
+(1,084,975 + 24,000), all attempted simulation retained on failure. There is no
+PPO allocation while this diagnostic is active. Hidden launcher:
+`tools/start_striking_mixed_failure_trace.ps1`; live output:
+`/home/pedro/boxing-runs/striking-mixed-failure-trace-1859584/trace-review.json`.
+Inspect this process and its diagnostic output before launching anything else;
+preserve the monitoring schedule and all unassisted physical/gate settings.
+
+The passive audit's first full eight-episode profile is verified identical to
+its original physical results with finite hash-checked traces (4,000 controls).
+Eleven focused checks pass, including a native passive-equivalence test. A
+missing source-reference archive initially stopped analysis after that completed
+replay; the reviewer now copies source reports. Explicit diagnostic recovery
+retains the failed state and all 4,000 consumed controls, reuses the completed
+report without rerunning physics and rejects partially attempted reports.
+The resumed job continues remaining profiles under the original total cap.
+See the trace result README and `failure-before-resume.json` for the evidence.

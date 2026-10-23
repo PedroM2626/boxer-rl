@@ -1,0 +1,162 @@
+{
+  "status": "completed",
+  "pid": 433,
+  "started_utc": "2026-10-23T22:19:31.834649+00:00",
+  "phase": "awaiting_review",
+  "diagnostic_output": "/home/pedro/boxing-runs/striking-mixed-confirm-1851392",
+  "source_sha256": "c6f7fbf4c5ef941c43b8a71be7f6f6680dd657d38e96a7ed112a0f2f8f79c04b",
+  "source_consumed_offset": 1851392,
+  "source_world_offset": 1228800,
+  "maximum_new_ppo_steps": 16384,
+  "maximum_evaluation_world_controls": 48000,
+  "diagnostic_consumed_steps": 8192,
+  "diagnostic_collection_world_controls": 8192,
+  "diagnostic_evaluation_world_controls": 32798,
+  "diagnostic_ppo_before_job": 1836288,
+  "formal_evaluation_world_controls_before_job": 1052177,
+  "main_consumed_retained": 1048576,
+  "main_project_consumed_retained": 476041216,
+  "cumulative_supervised_updates_retained": 8000,
+  "new_separate_supervised_updates": 0,
+  "assistance": false,
+  "unchanged_rewards": true,
+  "policy_adoption": "none",
+  "promotion": false,
+  "fresh_seeds": [
+    16000003,
+    16000004,
+    16000005,
+    16000006
+  ],
+  "source_screen_vector": [
+    7,
+    3,
+    7,
+    1,
+    6,
+    3,
+    2
+  ],
+  "gates": [
+    {
+      "new_ppo_steps": 8192,
+      "sha256": "6bf3273ab5cd83e42b588403a7361140e4ee42afe0fbec20732e0a010bb34e7a",
+      "screen": {
+        "profiles": {
+          "neutral-0": {
+            "pair_survivors": 7,
+            "own_surviving_scoring_seeds": [
+              23,
+              31
+            ],
+            "surviving_events_by_corner": [
+              2.0,
+              0.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": true
+          },
+          "neutral-1": {
+            "pair_survivors": 7,
+            "own_surviving_scoring_seeds": [
+              31
+            ],
+            "surviving_events_by_corner": [
+              0.0,
+              3.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": false
+          },
+          "selfplay": {
+            "pair_survivors": 6,
+            "own_surviving_scoring_seeds": [
+              7,
+              23,
+              47
+            ],
+            "surviving_events_by_corner": [
+              3.0,
+              2.0
+            ],
+            "surviving_two_way_episodes": 1,
+            "passes_profile": false
+          }
+        },
+        "passes_complete": false
+      },
+      "passes_complete": false,
+      "progress_vector": [
+        7,
+        2,
+        7,
+        1,
+        6,
+        3,
+        1
+      ]
+    }
+  ],
+  "active_evaluation": "/home/pedro/boxing-runs/striking-mixed-confirm-1851392/final-fresh/selfplay",
+  "updated_utc": "2026-10-23T22:26:38.359843+00:00",
+  "source_fresh": {
+    "neutral-0": {
+      "pair_survivors": 8,
+      "own_surviving_events": 9.0,
+      "own_surviving_scoring_seeds": [
+        16000003,
+        16000004,
+        16000005,
+        16000006
+      ]
+    },
+    "neutral-1": {
+      "pair_survivors": 6,
+      "own_surviving_events": 2.0,
+      "own_surviving_scoring_seeds": [
+        16000005,
+        16000006
+      ]
+    },
+    "selfplay": {
+      "pair_survivors": 5,
+      "own_surviving_events": 18.0,
+      "own_surviving_scoring_seeds": [
+        16000003,
+        16000004,
+        16000005,
+        16000006
+      ]
+    }
+  },
+  "active_training_output": "/home/pedro/boxing-runs/striking-mixed-confirm-1851392",
+  "early_stop_reason": "No full-screen measurement improves over source at 8192; stop and review",
+  "final_fresh": {
+    "neutral-0": {
+      "pair_survivors": 7,
+      "own_surviving_events": 5.0,
+      "own_surviving_scoring_seeds": [
+        16000003,
+        16000004,
+        16000006
+      ]
+    },
+    "neutral-1": {
+      "pair_survivors": 5,
+      "own_surviving_events": 1.0,
+      "own_surviving_scoring_seeds": [
+        16000006
+      ]
+    },
+    "selfplay": {
+      "pair_survivors": 6,
+      "own_surviving_events": 17.0,
+      "own_surviving_scoring_seeds": [
+        16000003,
+        16000004,
+        16000005,
+        16000006
+      ]
+    }
+  }
+}

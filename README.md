@@ -3,11 +3,10 @@
 ## Current experiment: unassisted paired boxing diagnostics
 
 The latest [policy-update investigation](docs/striking-policy-update-investigation.md)
-rejects the reduced actor rate after full physical evaluation. The unchanged-rate
-final improves matched fresh surviving active events from 4 to 17, including four
-two-way episodes, but still fails complete gates. One bounded 16,384-credit
-confirmation continues its exact profile with full evaluation and early stops.
-No current policy is certified as reliable boxing. See the
+finds the confirmation stagnant at +8,192; no full gate passes. No further
+unchanged PPO allocation is granted. A bounded passive source/final trace now
+investigates falls, contacts and reward components without changing physics or
+actions. No current policy is certified as reliable boxing. See the
 [completion roadmap](docs/boxing-roadmap.md).
 
 All four [foundation stages](docs/curriculum.md) passed their unchanged complete
@@ -100,14 +99,14 @@ is completed and independently reviewed: mixed fresh survival is 24/24 versus
 18/24 neutral control and 22/24 source. Neither arm passes complete criteria;
 valid strikes remain sparse. The neutral control severely regresses. The
 further 65,536-credit mixed continuation is now completed: neither generation
-passes, and matched fresh survival regresses 21/24 to 15/24. The [completed actor-rate review](docs/striking-policy-update-investigation.md)
-rejects the lower-rate branch. The original-rate final has 19/24 fresh survivors
-and 17 surviving active events, with incomplete stability. One 16,384-credit
-confirmation runs from that latest final; inspect
-`/home/pedro/boxing-runs/striking-mixed-confirm-1851392/continuation.json`
-and its process before another launch. Diagnostic totals are 1,836,288 PPO and
-1,052,177 evaluation controls; ceilings are 1,852,672 and 1,100,177. Main counters,
-physics and complete criteria remain unchanged. No adoption or promotion.
+passes, and matched fresh survival regresses 21/24 to 15/24. The [completed reviews](docs/striking-policy-update-investigation.md) reject the
+lower-rate branch and stop the subsequent confirmation at +8,192 for stagnation.
+A passive failure trace now compares source/final on all three profiles and
+identical 16M seeds. Inspect
+`/home/pedro/boxing-runs/striking-mixed-failure-trace-1859584/trace-review.json`
+and its process before another launch. Diagnostic totals are 1,844,480 PPO and
+1,084,975 evaluation controls; tracing adds at most 24,000 controls and no
+optimization. Main counters, physics and full gates are unchanged. No promotion.
 
 The [closed-fist replay repair](docs/closed-fist-rendering.md) restores the
 original visual feature without changing learning or physics. Historical videos
