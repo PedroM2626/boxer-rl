@@ -15,7 +15,13 @@ class StrikingEnv:
     observation_size = 146
     residual_scale = .8  # radians; filtered at the 20 ms control interval
 
-    def __init__(self, foundation, params, motor=None, pair=None):
+    def __init__(self, foundation, params, motor=None, pair=None,
+                 engagement_distance=.58, engagement_reward_distance=.6):
+        if not all(np.isfinite(x) and x>0 for x in
+                   (engagement_distance,engagement_reward_distance)):
+            raise ValueError('engagement distances must be finite and positive')
+        self.engagement_distance=float(engagement_distance)
+        self.engagement_reward_distance=float(engagement_reward_distance)
         self.pair = pair or PairedFoundation(foundation)
         self.motor = motor or jax.jit(inference(foundation, params))
         self.arm_indices = np.array([i for i in range(29)
@@ -34,7 +40,7 @@ class StrikingEnv:
         return self.observation()
 
     def commands(self, actions=None):
-        command = self.pair.approach_commands(stop_distance=.58)
+        command = self.pair.approach_commands(stop_distance=self.engagement_distance)
         if actions is not None:
             command += actions[:, :3] * [.15, .15, .25]
         return np.clip(command, [-.35, -.25, -.5], [.55, .25, .5])
@@ -101,7 +107,7 @@ class StrikingEnv:
                   - 5.*outcome['fallen'].astype(float))
         if both_up:
             reward += .5*progress + self.pair.dt*(
-                .1*np.asarray(facing) + .15*np.exp(-((distance-.6)/.2)**2)
+                .1*np.asarray(facing) + .15*np.exp(-((distance-self.engagement_reward_distance)/.2)**2)
                 - .03*np.mean(self.residual**2,axis=1))
         timed_out = self.age >= 500
         outcome.update(distance=distance, timed_out=timed_out,

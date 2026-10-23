@@ -7,7 +7,7 @@ from pathlib import Path
 import sys
 
 from boxer.striking_env import StrikingEnv
-from boxer.striking_train import Actor, advantages, main
+from boxer.striking_train import Actor, advantages, main, engagement_profile, validate_resume_config
 from test_paired_foundation import foundation, pair
 
 
@@ -44,6 +44,30 @@ def test_first_fall_and_clock_cut_gae_between_rounds():
     assert returns[0,0]==1.
     assert returns[1,0]==100.
     assert np.isfinite(adv).all()
+
+
+def test_engagement_profile_preserves_legacy_and_inherits_reviewed_distance():
+    assert engagement_profile()==dict(engagement_distance=.58,engagement_reward_distance=.6)
+    changed=engagement_profile({},.45)
+    assert changed==dict(engagement_distance=.45,engagement_reward_distance=.45)
+    assert engagement_profile(changed)==changed
+
+
+@pytest.mark.parametrize('value',[0.,-1.,np.nan,np.inf])
+def test_invalid_engagement_profile_is_rejected(value):
+    with pytest.raises(ValueError,match='finite and positive'):
+        engagement_profile({},value)
+
+
+def test_profile_adoption_cannot_change_unrelated_resume_settings():
+    old=dict(worlds=4,unroll=128)
+    legacy=dict(old,**engagement_profile())
+    validate_resume_config(old,legacy)
+    changed=dict(old,**engagement_profile({},.45))
+    with pytest.raises(ValueError):validate_resume_config(old,changed)
+    validate_resume_config(old,changed,explicit_profile_change=True)
+    with pytest.raises(ValueError):
+        validate_resume_config(old,dict(changed,worlds=8),explicit_profile_change=True)
 
 
 @pytest.mark.skipif(sys.platform=='win32',reason='Linux supervisor uses flock')

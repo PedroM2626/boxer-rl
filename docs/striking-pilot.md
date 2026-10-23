@@ -214,3 +214,14 @@ Continue the unchanged learner under the existing **262,144** ceiling. This is
 progress from zero contacts, not boxing completion or a promotion. The snapshot
 was isolated while training kept its resident optimizer; no restart, rollback,
 new budget or duplicate learner was introduced. No new policy source was adopted.
+
+## Range correction after the 262,144 stop
+
+The [engagement-range investigation](striking-range-recovery.md) records the
+final regression, measured workspace and unchanged-policy physical comparison.
+The reviewed continuation retains the latest 262,144 actor/Adam/counters and
+changes the training approach/reward range to **0.45 m** under a **524,288 total
+boxing learner-step ceiling**. Initial spawns remain nominally 2 m and physical
+impact criteria remain unchanged. Ordinary resumes inherit this saved profile.
+Read that report and its decision record before a new intervention; historical
+32,768/262,144 allocations above are not the current ceiling.

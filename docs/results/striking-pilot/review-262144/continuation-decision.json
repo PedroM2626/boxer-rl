@@ -1,0 +1,33 @@
+{
+  "previous_ceiling": 262144,
+  "new_ceiling": 524288,
+  "additional_steps": 262144,
+  "main_consumed_retained": 262144,
+  "foundation_main_retained": 474992640,
+  "source_sha256": "191dc2b107cd84210bc5bb0a95c6b916713718a32b08893c42b4d81ae28d71bc",
+  "previous_engagement_distance": 0.58,
+  "previous_reward_peak": 0.6,
+  "new_engagement_distance": 0.45,
+  "new_reward_peak": 0.45,
+  "old_evaluation": {
+    "pair_survivors": 8,
+    "episodes": 8,
+    "impacts": 0
+  },
+  "new_profile_evaluation": {
+    "pair_survivors": 8,
+    "episodes": 8,
+    "impacts": 2
+  },
+  "source_policy_adopted": "Latest main 262144 policy, critic, normalizer, Adam and RNG; no rollback or diagnostic actor substitution.",
+  "physical_scorecard_unchanged": true,
+  "initial_spawns_unchanged": "nominal 2 m",
+  "assistance": false,
+  "diagnostic_world_control_steps_this_review": 10500,
+  "forward_kinematic_samples_this_review": 15000,
+  "diagnostic_ppo_learner_steps_total": 768,
+  "rationale": "Training paid engagement at 0.60m outside sampled legal fist workspace. Common-sample static sweep found 0/1000 overlaps at 0.60 versus 68/1000 at 0.45. Same-weight free-body evaluation at 0.45 retained 8/8 survival and recovered two valid events; motor opposition was partial, so keep the motor/action interface unchanged.",
+  "review_next": "Run unchanged physical impact/fall evaluation at the new stop; compare both corners and retained 97280/262144 actors. Investigate persistent no-contact behavior or regression before any further extension.",
+  "profile_reader_smoke_world_controls": 4,
+  "formal_striking_world_controls_to_date": 27600
+}

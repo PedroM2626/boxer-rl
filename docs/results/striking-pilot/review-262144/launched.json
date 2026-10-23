@@ -1,0 +1,55 @@
+{
+  "state": {
+    "status": "running",
+    "pid": 411,
+    "started_utc": "2026-10-23T03:19:01.183451+00:00",
+    "ceiling": 524288,
+    "foundation_steps": 474992640,
+    "foundation_sha256": "b39b1990945e8a374802c3a190e5ac5e026ae39e7fd5ef61c5c2b01ad291c6fc",
+    "assistance": false,
+    "optimizer_saved": true,
+    "physics_state_saved": false,
+    "discarded_collected_steps": 0,
+    "engagement_distance": 0.45,
+    "engagement_reward_distance": 0.45,
+    "consumed_steps": 291840,
+    "optimized_steps": 291840,
+    "world_control_steps": 145920,
+    "combined_project_consumed_steps": 475284480,
+    "updated_utc": "2026-10-23T03:21:27.687201+00:00",
+    "rounds": 30,
+    "fall_rounds": 3,
+    "scored_by_corner": [
+      2.0,
+      3.0
+    ],
+    "actor_steps_per_second": 202.6978860046029,
+    "phase": "updated",
+    "mean_loss": -0.022455921629443765
+  },
+  "current_checkpoint": {
+    "file": "step-291840.pkl",
+    "sha256": "2997746c3a951b12963a930cbb85c81cb390d8357fe232229a89449b95afbae0",
+    "consumed_steps": 291840,
+    "optimized_steps": 291840,
+    "foundation_sha256": "b39b1990945e8a374802c3a190e5ac5e026ae39e7fd5ef61c5c2b01ad291c6fc",
+    "engagement_distance": 0.45,
+    "engagement_reward_distance": 0.45
+  },
+  "verified_adam_count": 4560,
+  "source_adam_count": 4096,
+  "host": {
+    "mirror": "runs/striking-pilot",
+    "pid": 14968,
+    "ceiling": 524288,
+    "started_utc": "2026-10-23T03:18:44.0970402Z",
+    "durable_output": "$HOME/boxing-runs/striking-pilot-v1"
+  },
+  "code_sha256": {
+    "boxer/striking_train.py": "36afef823c52e1fd948b14c460c49b847204893d27c448c4bf065cc2788d2c3f",
+    "boxer/striking_env.py": "257590d66bb30a6ca8cbf5b649106a08dbfbd74531c83006925b235fa2258f66",
+    "boxer/impact_scorecard.py": "a77d5b148ddac04a747be183aea14b186317b52422ba64a7317c4033be19ce0c",
+    "boxer/paired_foundation.py": "716bcc52c4e736082cf4a93e23dba04c45cc36bbc284bf9d2ea0e3035bf2062f"
+  },
+  "checks": "Exact latest main actor/critic/norm/Adam/RNG retained; no discarded steps, no duplicate learner, no source rollback; initial spawn and scorecard unchanged."
+}

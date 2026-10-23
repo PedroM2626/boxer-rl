@@ -23,16 +23,35 @@ def main():
     parser.add_argument('--seeds',type=int,nargs='+',default=[7,23,31,47])
     parser.add_argument('--seconds',type=float,default=10.)
     parser.add_argument('--video',type=Path)
+    parser.add_argument('--engagement-distance',type=float,
+                        help='explicit diagnostic profile override; impact criteria remain fixed')
     args=parser.parse_args()
     if not np.isfinite(args.seconds) or args.seconds<=0:
         raise ValueError('positive finite duration required')
     foundation=UnassistedG1('approach',impl='jax')
     params,source=load_policy_params(Path('checkpoints/curriculum/approach'))
     if contract(foundation)!=source['contract']:raise ValueError('motor contract mismatch')
-    env=StrikingEnv(foundation,params)
-    residual_hash=None
+    distance,reward_distance=.58,.6
+    manifest=None
     if args.checkpoint:
         manifest=json.loads((args.checkpoint/'latest.json').read_text())
+        distance=manifest.get('engagement_distance',distance)
+        reward_distance=manifest.get('engagement_reward_distance',reward_distance)
+        config_path=args.checkpoint/'config.json'
+        if not config_path.exists():config_path=args.checkpoint.parent/'config.json'
+        if config_path.exists():
+            config=json.loads(config_path.read_text())
+            for key in ('engagement_distance','engagement_reward_distance'):
+                if key in manifest and key in config and manifest[key]!=config[key]:
+                    raise ValueError('checkpoint and configuration engagement profiles disagree')
+            distance=config.get('engagement_distance',.58)
+            reward_distance=config.get('engagement_reward_distance',.6)
+    if args.engagement_distance is not None:
+        distance=reward_distance=args.engagement_distance
+    env=StrikingEnv(foundation,params,engagement_distance=distance,
+                    engagement_reward_distance=reward_distance)
+    residual_hash=None
+    if args.checkpoint:
         payload=(args.checkpoint/manifest['file']).read_bytes()
         residual_hash=hashlib.sha256(payload).hexdigest()
         if residual_hash!=manifest['sha256']:raise ValueError('striking checksum mismatch')
@@ -95,6 +114,8 @@ def main():
         assistance=False,source_sha256=source['sha256'],striking_sha256=residual_hash,
         simulated_world_transitions=transitions,optimization_transitions=0,
         scorecard_version=1,episode_seconds=args.seconds,trials=results,
+        engagement_distance=distance,engagement_reward_distance=reward_distance,
+        diagnostic_profile_override=args.engagement_distance is not None,
         certification=False))
 
 

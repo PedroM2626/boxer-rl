@@ -76,6 +76,26 @@ def update_norm(norm, obs):
     return dict(mean=norm['mean']+delta*n/total,var=variance,count=total)
 
 
+LEGACY_ENGAGEMENT = dict(engagement_distance=.58, engagement_reward_distance=.6)
+
+
+def engagement_profile(previous=None, override=None):
+    profile={key:(previous or {}).get(key,value) for key,value in LEGACY_ENGAGEMENT.items()}
+    if override is not None:
+        profile={key:override for key in profile}
+    if not all(np.isfinite(value) and value>0 for value in profile.values()):
+        raise ValueError('engagement distances must be finite and positive')
+    return profile
+
+
+def validate_resume_config(previous, current, explicit_profile_change=False):
+    expected=dict(previous,**engagement_profile(previous))
+    ignored=set(LEGACY_ENGAGEMENT) if explicit_profile_change else set()
+    if {k:v for k,v in expected.items() if k not in ignored} != {
+            k:v for k,v in current.items() if k not in ignored}:
+        raise ValueError('resume requires the exact profile except an explicitly reviewed engagement change')
+
+
 def main(argv=None):
     import fcntl
     parser=argparse.ArgumentParser(description=__doc__)
@@ -86,6 +106,8 @@ def main(argv=None):
     parser.add_argument('--unroll',type=int,default=128)
     parser.add_argument('--seed',type=int,default=53)
     parser.add_argument('--resume',action='store_true')
+    parser.add_argument('--engagement-distance',type=float,
+                        help='explicit reviewed change of approach stop and engagement reward peak')
     parser.add_argument('--publish-dir',type=Path,
                         help='optional repository mirror; durable per-step ledger stays in output')
     args=parser.parse_args(argv)
@@ -111,6 +133,9 @@ def main(argv=None):
 
 
 def train(args):
+    config_path=args.output/'config.json'
+    previous=json.loads(config_path.read_text()) if config_path.exists() else None
+    profile=engagement_profile(previous,args.engagement_distance)
     foundation=UnassistedG1('approach',impl='jax')
     for stage in ('balance','walk_easy','walk','approach'):
         source=json.loads((args.foundation.parent/stage/'latest.json').read_text())
@@ -126,12 +151,12 @@ def train(args):
         worlds=args.worlds,unroll=args.unroll,seed=args.seed,actor_inputs=146,actions=17,
         arm_residual_radians=.8,command_offsets=[.15,.15,.25],assistance=False,
         dt=.02,physics_dt=.002,round_steps=500,learning_rate=.0001,epochs=4,
-        minibatches=4,gamma=.99,gae_lambda=.95,scorecard_version=1)
-    config_path=args.output/'config.json'
+        minibatches=4,gamma=.99,gae_lambda=.95,scorecard_version=1,**profile)
     checkpoint_path=args.output/'checkpoint/latest.json'
-    if config_path.exists():
-        if not args.resume or json.loads(config_path.read_text())!=config:
+    if previous:
+        if not args.resume:
             raise ValueError('existing pilot requires --resume with the exact same configuration')
+        validate_resume_config(previous,config,args.engagement_distance is not None)
     atomic_json(config_path,config)
     actor,critic=Actor(),Critic()
     key=jax.random.PRNGKey(args.seed)
@@ -189,7 +214,7 @@ def train(args):
         ap,vp=optax.apply_updates((ap,vp),updates)
         return ap,vp,optimizer,loss_value
 
-    envs=[StrikingEnv(foundation,motor_params) for _ in range(args.worlds)]
+    envs=[StrikingEnv(foundation,motor_params,**profile) for _ in range(args.worlds)]
     # Share the already compiled frozen network across worlds.
     for env in envs[1:]:env.motor=envs[0].motor
     episode=np.full(args.worlds,consumed//rows,dtype=np.int64)
@@ -197,7 +222,7 @@ def train(args):
     state=dict(status='running',pid=os.getpid(),started_utc=utc(),ceiling=args.ceiling,
         foundation_steps=metadata['total_steps'],foundation_sha256=metadata['sha256'],
         assistance=False,optimizer_saved=True,physics_state_saved=False,
-        discarded_collected_steps=consumed-optimized)
+        discarded_collected_steps=consumed-optimized,**profile)
     started=time.monotonic()
     session_start=consumed
     completed_rounds=falls=0
@@ -268,12 +293,12 @@ def train(args):
         norm=update_norm(norm,flat_obs)
         optimized+=block
         saved=dict(actor=ap,critic=vp,optimizer=optimizer,norm=norm,key=key,
-            optimized_steps=optimized,consumed_steps=consumed,foundation_sha256=metadata['sha256'])
+            optimized_steps=optimized,consumed_steps=consumed,foundation_sha256=metadata['sha256'],**profile)
         payload=pickle.dumps(jax.device_get(saved),protocol=pickle.HIGHEST_PROTOCOL)
         name=f'step-{consumed}.pkl'
         atomic_bytes(checkpoint_path.parent/name,payload)
         atomic_json(checkpoint_path,dict(file=name,sha256=hashlib.sha256(payload).hexdigest(),
-            consumed_steps=consumed,optimized_steps=optimized,foundation_sha256=metadata['sha256']))
+            consumed_steps=consumed,optimized_steps=optimized,foundation_sha256=metadata['sha256'],**profile))
         record(phase='updated',mean_loss=float(np.mean(losses)))
         publish()
         print(json.dumps(json.loads((args.output/'progress.json').read_text())),flush=True)
