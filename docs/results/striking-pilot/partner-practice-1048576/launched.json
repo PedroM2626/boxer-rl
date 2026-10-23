@@ -1,0 +1,122 @@
+{
+  "updated_utc": "2026-10-23T07:14:43.241069+00:00",
+  "parent": {
+    "status": "running",
+    "phase": "training",
+    "pid": 499,
+    "started_utc": "2026-10-23T07:13:17.822831+00:00",
+    "diagnostic_output": "/home/pedro/boxing-runs/striking-partner-1048576",
+    "source_sha256": "efad0ccd1051ee5305d4ccf8ebbd7d0e402211f12ecd0cdf175b473b24a7b5b0",
+    "source_offset": 1048576,
+    "source_world_offset": 524288,
+    "diagnostic_ceiling": 131072,
+    "diagnostic_consumed_steps": 0,
+    "diagnostic_evaluation_world_controls": 7226,
+    "assistance": false,
+    "learners_per_world": 1,
+    "opponent_mode": "neutral_motor",
+    "main_consumed_retained": 1048576,
+    "policy_adoption": "none",
+    "evaluations": {
+      "source-neutral-0": {
+        "pair_survivors": 6,
+        "complete_episode_impacts": 0.0,
+        "learner_corner": 0,
+        "source_sha256": "efad0ccd1051ee5305d4ccf8ebbd7d0e402211f12ecd0cdf175b473b24a7b5b0"
+      },
+      "source-neutral-1": {
+        "pair_survivors": 8,
+        "complete_episode_impacts": 0.0,
+        "learner_corner": 1,
+        "source_sha256": "efad0ccd1051ee5305d4ccf8ebbd7d0e402211f12ecd0cdf175b473b24a7b5b0"
+      }
+    },
+    "active_evaluation": "source-neutral-1",
+    "updated_utc": "2026-10-23T07:14:18.924042+00:00"
+  },
+  "live_child_progress": {
+    "consumed_steps": 1049470,
+    "optimized_steps": 1049088,
+    "world_control_steps": 525182,
+    "combined_project_consumed_steps": 476042110,
+    "updated_utc": "2026-10-23T07:14:43.182739+00:00",
+    "rounds": 0,
+    "fall_rounds": 0,
+    "scored_by_corner": [
+      0.0,
+      0.0
+    ],
+    "actor_steps_per_second": 99.7201023818662,
+    "phase": "collecting"
+  },
+  "live_child_state": {
+    "status": "running",
+    "pid": 1105,
+    "started_utc": "2026-10-23T07:14:34.217638+00:00",
+    "ceiling": 1179648,
+    "foundation_steps": 474992640,
+    "foundation_sha256": "b39b1990945e8a374802c3a190e5ac5e026ae39e7fd5ef61c5c2b01ad291c6fc",
+    "assistance": false,
+    "optimizer_saved": true,
+    "physics_state_saved": false,
+    "discarded_collected_steps": 0,
+    "actor_inputs": 146,
+    "actions": 17,
+    "learners_per_world": 1,
+    "opponent_mode": "neutral_motor",
+    "engagement_distance": 0.45,
+    "engagement_reward_distance": 0.45,
+    "consumed_steps": 1049470,
+    "optimized_steps": 1049088,
+    "world_control_steps": 525182,
+    "combined_project_consumed_steps": 476042110,
+    "updated_utc": "2026-10-23T07:14:43.182739+00:00",
+    "rounds": 0,
+    "fall_rounds": 0,
+    "scored_by_corner": [
+      0.0,
+      0.0
+    ],
+    "actor_steps_per_second": 99.7201023818662,
+    "phase": "collecting"
+  },
+  "checkpoint_snapshot": {
+    "file": "step-1049088.pkl",
+    "sha256": "3f6b5eb93e255c63c263153b1231b3ad0de1baa1f66dc33c6452773d1af4fabc",
+    "consumed_steps": 1049088,
+    "optimized_steps": 1049088,
+    "world_control_steps": 524800,
+    "foundation_sha256": "b39b1990945e8a374802c3a190e5ac5e026ae39e7fd5ef61c5c2b01ad291c6fc",
+    "actor_inputs": 146,
+    "actions": 17,
+    "learners_per_world": 1,
+    "opponent_mode": "neutral_motor",
+    "engagement_distance": 0.45,
+    "engagement_reward_distance": 0.45
+  },
+  "learning_state_finite": true,
+  "error_log_findings": {
+    "source-neutral-0-errors.log": "",
+    "source-neutral-1-errors.log": "",
+    "learner/errors.log": ""
+  },
+  "main_consumed_unchanged": 1048576,
+  "foundation_consumed_unchanged": 474992640,
+  "diagnostic_ppo_before_job": 794880,
+  "diagnostic_ppo_at_observation": 795774,
+  "formal_evaluation_world_controls_at_observation": 232570,
+  "code_sha256": {
+    "boxer/striking_train.py": "9103ad40d628e4fd01e0442fb07c862f158b1ea18737e8bc4d1c56ac5b8eb3ca",
+    "boxer/striking_partner.py": "e0a7ddd2385832f100045bc97596acc0fb9dddfb99545f5ca4e706d5f5a255de",
+    "tools/striking_partner_job.py": "37b80db901acdf19149033b12a7512d300cfa675be23e3ceefe9d1cd67624bbd",
+    "tools/evaluate_striking.py": "a3b994e214b2bed74d9941846054ae8736332a51c7ac0a360b12fd070a82a702"
+  },
+  "hidden_host": {
+    "main_consumed_steps": 1048576,
+    "diagnostic_output": "/home/pedro/boxing-runs/striking-partner-1048576",
+    "pid": 20676,
+    "started_utc": "2026-10-23T07:13:12.2929126Z",
+    "diagnostic_ceiling": 131072
+  },
+  "process_check": "One Linux parent (499) and one learner child (1105); no other striking or foundation learner observed."
+}

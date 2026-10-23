@@ -61,6 +61,12 @@ Success at this easier task does not establish defense or complete the boxing
 project. Failure triggers policy/contact/exploration review before any new finite
 allocation; it does not silently grant another 131,072 steps.
 
+If this task earns two complete passes, the next proposed task is best-response
+training against a frozen attacking checkpoint that passed it, followed by an
+opponent pool and active two-sided sparring. Those stages are not implemented or
+preapproved budget extensions here. Each needs explicit physical evaluation and
+its own reviewed finite allocation; all retain free bodies and separated spawns.
+
 ## Operation, provenance and accounting
 
 ```powershell
@@ -108,3 +114,21 @@ added. Three two-control evaluator checks covered default and both neutral roles
 The hidden launcher passed PowerShell parsing. Smoke actors are archived under
 `checkpoints/striking-validation/partner-practice-smoke-1048576/` and initialize
 neither main nor the full diagnostic.
+
+## Verified launch
+
+The full job completed all sixteen source trials: learner-red trials survived
+6/8, learner-blue trials 8/8, with no impacts in surviving episodes in either
+role. They used **7,226 evaluation world controls**, so formal diagnostic/evaluation
+consumption is **232,570** before the final checks. This is the measured starting
+point, not a phase pass. The
+[launch snapshot and source reports](results/striking-pilot/partner-practice-1048576/launched.json)
+pin the checkpoint, code hashes, counters and live finite-state inspection.
+
+Training then started in hidden Windows WSL host 20676, Linux parent 499 and its
+single learner child 1105. The first complete 512-row update had a verified finite
+payload and exactly 512 additional physical controls. No other main, foundation or
+diagnostic PPO process was active and no physics warnings were found. Parent
+training totals remain zero until child completion; its live progress ledger is
+authoritative for current diagnostic work. These are observations at launch, not
+permanent process identities or a completed training result.
