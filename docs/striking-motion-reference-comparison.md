@@ -144,3 +144,13 @@ learning state and no physics warnings. The main payload hash was unchanged.
 [smoke evidence](results/striking-pilot/imitation-comparison-1048576/validation.json)
 and historical Warp6/Warp7 configurations are archived alongside the report.
 No main or foundation learner was active, and the existing monitor is unchanged.
+
+## Completed motion-reference comparison and current interface diagnostic
+
+The motion-reference arm finished with 7/8 pair survival and zero evaluated
+impacts; the repeated baseline had 7/8 and three impacts in a falling episode.
+Neither qualified or was adopted. Main remains stopped at 1,048,576. The
+[matched whole-body authority investigation](striking-body-authority-comparison.md)
+records the archived result and the active next comparison. Inspect its durable
+body-comparison output before any launch; do not repeat the finished reward
+experiments. No main budget extension or foundation promotion is granted.

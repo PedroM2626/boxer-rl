@@ -33,6 +33,7 @@ def main():
     if contract(foundation)!=source['contract']:raise ValueError('motor contract mismatch')
     distance,reward_distance=.58,.6
     manifest=None
+    config={}
     if args.checkpoint:
         manifest=json.loads((args.checkpoint/'latest.json').read_text())
         distance=manifest.get('engagement_distance',distance)
@@ -41,15 +42,26 @@ def main():
         if not config_path.exists():config_path=args.checkpoint.parent/'config.json'
         if config_path.exists():
             config=json.loads(config_path.read_text())
-            for key in ('engagement_distance','engagement_reward_distance'):
+            for key in ('engagement_distance','engagement_reward_distance','actor_inputs','actions','body_residual_radians'):
                 if key in manifest and key in config and manifest[key]!=config[key]:
                     raise ValueError('checkpoint and configuration engagement profiles disagree')
             distance=config.get('engagement_distance',.58)
             reward_distance=config.get('engagement_reward_distance',.6)
     if args.engagement_distance is not None:
         distance=reward_distance=args.engagement_distance
-    env=StrikingEnv(foundation,params,engagement_distance=distance,
-                    engagement_reward_distance=reward_distance)
+    inputs=config.get('actor_inputs',(manifest or {}).get('actor_inputs',146))
+    actions=config.get('actions',(manifest or {}).get('actions',17))
+    body_bound=config.get('body_residual_radians',(manifest or {}).get('body_residual_radians',0.))
+    if (inputs,actions)==(146,17):
+        if body_bound!=0.:raise ValueError('legacy interface cannot carry body residual authority')
+        env=StrikingEnv(foundation,params,engagement_distance=distance,
+                       engagement_reward_distance=reward_distance)
+    elif (inputs,actions)==(161,32):
+        from boxer.striking_body import WholeBodyStrikingEnv
+        env=WholeBodyStrikingEnv(foundation,params,engagement_distance=distance,
+            engagement_reward_distance=reward_distance,body_residual_radians=body_bound)
+    else:
+        raise ValueError('unsupported striking interface dimensions')
     residual_hash=None
     if args.checkpoint:
         payload=(args.checkpoint/manifest['file']).read_bytes()
@@ -60,7 +72,7 @@ def main():
         if not all(np.isfinite(x).all() for x in jax.tree_util.tree_leaves(
                 tuple(saved[k] for k in ('actor','critic','optimizer','norm','key')))):
             raise FloatingPointError('non-finite striking checkpoint')
-        actor=Actor()
+        actor=Actor(action_size=actions)
         policy=jax.jit(lambda observation:jp.tanh(actor.apply(saved['actor'],observation)[0]))
         modes=['trained']
     else:
@@ -78,8 +90,8 @@ def main():
                 max_residual=np.zeros(2)
                 for step in range(round(args.seconds/env.pair.dt)):
                     if mode=='trained':action=np.asarray(policy(jp.array(normalize(obs,saved['norm']))))
-                    elif mode=='exploration':action=np.tanh(rng.normal(0.,np.exp(-1.9),(2,17)))
-                    else:action=np.zeros((2,17))
+                    elif mode=='exploration':action=np.tanh(rng.normal(0.,np.exp(-1.9),(2,actions)))
+                    else:action=np.zeros((2,actions))
                     previous_scores=env.pair.scorecard.last_score.copy()
                     obs,reward,done,outcome=env.step(action);transitions+=1
                     hits+=outcome['scored'];impulses+=outcome['legal_contact_impulse']
@@ -115,6 +127,7 @@ def main():
         simulated_world_transitions=transitions,optimization_transitions=0,
         scorecard_version=1,episode_seconds=args.seconds,trials=results,
         engagement_distance=distance,engagement_reward_distance=reward_distance,
+        actor_inputs=inputs,actions=actions,body_residual_radians=body_bound,
         diagnostic_profile_override=args.engagement_distance is not None,
         certification=False))
 

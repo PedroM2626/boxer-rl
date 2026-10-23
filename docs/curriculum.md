@@ -9,17 +9,21 @@ added 430,080 transitions. The exact actor payload was retained at transition.
 **Current operation:** the [opponent-aware striking pilot](striking-pilot.md)
 adds trainable arm residuals and independent fist-impact events over the unchanged
 certified motor actor. Main boxing PPO remains stopped at **1,048,576 learner
-transitions**, without a budget extension. Both arms of the proximity-reward
-comparison failed the predefined physical screening; neither policy was adopted.
-The [results, interface probe and current motion-reference comparison](striking-motion-reference-comparison.md)
-record the decision. A fresh common-source baseline and a CMU-reference reward
-arm each receive 131,072 new diagnostic transitions, separate from all main work.
-Inspect `/home/pedro/boxing-runs/striking-imitation-compare-1048576/comparison.json`
-and its active child/process before launching anything. The completed reach
-comparison must not be relaunched. Keep the foundation stopped; no stage promotion
-or boxing mastery is claimed. Main source, 0.45 m profile, 2 m initial spawns,
-free physics and independent impact criteria remain unchanged. Review both full
-evaluations before any subsequent training or adoption decision.
+transitions**, without a budget extension or diagnostic actor adoption. Both
+proximity and motion-reference reward comparisons failed their physical screening.
+The [completed results and active whole-body authority comparison](striking-body-authority-comparison.md)
+record the next decision. Two matched 161-input/32-output diagnostic networks
+start from the same explicit warm-state expansion; only additional joint-target
+authority differs (zero versus 0.1 rad on twelve leg/three waist joints).
+Each gets 131,072 new diagnostic transitions, with the original reward and full
+physical evaluation. Inspect
+`/home/pedro/boxing-runs/striking-body-compare-1048576/comparison.json`
+and its child/process before any launch. Keep the foundation and main stopped;
+do not rerun completed reward comparisons. Original motor certification does
+not certify the new composite controller; any favorable candidate needs broader
+balance/locomotion and held-out physical validation before adoption. No gate
+is weakened or stage promoted. Main source, 0.45 m range, 2 m spawns and free
+unassisted physics remain unchanged.
 
 Full walking resumed at 422.89152M main transitions after a
 [supervisor log-read fault](curriculum-log-read-recovery.md). The targeted bounded

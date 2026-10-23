@@ -15,16 +15,19 @@ policies. At **1,048,576 boxing learner transitions**, final evaluation found
 6/8 surviving pairs and three impacts concentrated in an episode ending in a
 fall. Main PPO stopped at its reviewed ceiling; no further main steps are granted.
 
-The [completed proximity comparison and current motion-reference test](docs/striking-motion-reference-comparison.md)
-keep diagnostic compute separate from main. Proximity shaping failed to improve
-stable contacts, and neither diagnostic actor was adopted. The current sequential
-comparison clones the same main source into an unchanged baseline and an untimed
-CMU-jab reward arm, **131,072 new diagnostic transitions each**, with full original
-physical evaluation and no automatic adoption. It adds learning guidance without
-scripted actuator trajectories or root assistance. Read the report before any
-restart. Durable state is
-`/home/pedro/boxing-runs/striking-imitation-compare-1048576/comparison.json`;
-`runs/striking_comparison_host.json` identifies its hidden WSL host.
+The [completed reward experiments and active body-authority comparison](docs/striking-body-authority-comparison.md)
+keep diagnostic compute separate from main. Neither proximity shaping nor the
+CMU-jab reward met the physical screening criteria; neither actor was adopted.
+The current diagnostic uses matched 161-input/32-output warm-state expansions
+of the unchanged main policy. Only body residual authority differs: zero versus
+up to 0.1 radian on the twelve leg/three waist joint targets. Each arm gets
+**131,072 new diagnostic transitions**, with unchanged original reward, physical
+impact rules and full evaluation. No support forces or scripted trajectories are
+introduced. A favorable composite controller needs broader balance/locomotion
+and held-out validation; the original motor certificate alone does not certify it.
+Read the report before any restart. Durable state is
+`/home/pedro/boxing-runs/striking-body-compare-1048576/comparison.json`;
+`runs/striking_body_host.json` identifies its hidden WSL host.
 
 The [closed-fist replay repair](docs/closed-fist-rendering.md) restores the
 original visual feature without changing learning or physics. Historical videos

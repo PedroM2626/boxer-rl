@@ -75,7 +75,8 @@ class StrikingEnv:
             upright = [p.data.sensor(z['side']+'upvector_torso').data[2] for z in (m,other)]
             rows.append(np.concatenate([base[i], *relative, upright, self.previous[i]]))
         result = np.asarray(rows, np.float32)
-        if result.shape != (2, self.observation_size) or not np.isfinite(result).all():
+        # This is the fixed base block; diagnostic subclasses may append features.
+        if result.shape != (2, StrikingEnv.observation_size) or not np.isfinite(result).all():
             raise FloatingPointError('invalid opponent-aware observation')
         return result
 

@@ -1,0 +1,70 @@
+{
+  "comparison": {
+    "status": "running",
+    "pid": 704,
+    "started_utc": "2026-10-23T05:48:43.451873+00:00",
+    "source_sha256": "efad0ccd1051ee5305d4ccf8ebbd7d0e402211f12ecd0cdf175b473b24a7b5b0",
+    "expanded_sha256": "043c9e0323541b9b000ca6aa6b3ddee9d0256ac9ec242f19ec133fd42ab13e9a",
+    "main_consumed_retained": 1048576,
+    "diagnostic_steps_per_arm": 131072,
+    "diagnostic_steps_ceiling": 262144,
+    "diagnostic_consumed_steps": 0,
+    "diagnostic_output": "/home/pedro/boxing-runs/striking-body-compare-1048576",
+    "policy_adoption": "none",
+    "arms": {},
+    "active_arm": "frozen_body",
+    "phase": "training",
+    "updated_utc": "2026-10-23T05:48:43.464100+00:00"
+  },
+  "progress": {
+    "consumed_steps": 1104004,
+    "optimized_steps": 1103872,
+    "world_control_steps": 552002,
+    "combined_project_consumed_steps": 476096644,
+    "updated_utc": "2026-10-23T05:52:59.482069+00:00",
+    "rounds": 59,
+    "fall_rounds": 7,
+    "scored_by_corner": [
+      3.0,
+      0.0
+    ],
+    "actor_steps_per_second": 232.50988749174323,
+    "phase": "collecting"
+  },
+  "current_checkpoint": {
+    "file": "step-1103872.pkl",
+    "sha256": "72057929a7fae3d4661b622f32b63ee40aca8588f97092b93fc2ed4ad3b25cd2",
+    "consumed_steps": 1103872,
+    "optimized_steps": 1103872,
+    "foundation_sha256": "b39b1990945e8a374802c3a190e5ac5e026ae39e7fd5ef61c5c2b01ad291c6fc",
+    "actor_inputs": 161,
+    "actions": 32,
+    "body_residual_radians": 0.0,
+    "engagement_distance": 0.45,
+    "engagement_reward_distance": 0.45
+  },
+  "learning_state_finite": true,
+  "main_source_unchanged": true,
+  "foundation_motor_certifications": {
+    "balance": true,
+    "walk_easy": true,
+    "walk": true,
+    "approach": true
+  },
+  "host": {
+    "main_consumed_steps": 1048576,
+    "diagnostic_output": "/home/pedro/boxing-runs/striking-body-compare-1048576",
+    "pid": 3340,
+    "steps_per_arm": 131072,
+    "started_utc": "2026-10-23T05:48:38.8047361Z"
+  },
+  "single_diagnostic_learner_no_main_or_foundation": true,
+  "tests_passed": 50,
+  "code_sha256": {
+    "boxer/striking_body.py": "b6527cb2d465b798a0bb2b5e4176e1ce07567bb33e728a2cb4fd52d70e1712fd",
+    "boxer/striking_env.py": "2ae945ba6392491e182cd3343f3bc437f0cace5607a510031957a8d586d89b88",
+    "boxer/striking_train.py": "d8ea79ca3b28ea1cd5d4ce79342931eeeac7e81beeb730e13410d793af60885c",
+    "tools/evaluate_striking.py": "cf3a0eaf00455583a476ced07e15100a862b17eb995eaf256301dbc694e59ad4",
+    "tools/striking_body_compare.py": "90b3201587cd48fe41616fecd903a4a692169f087c3e63fe35d58e3eb1cfab33"
+  }
+}

@@ -30,12 +30,13 @@ from boxer.striking_env import StrikingEnv
 
 
 class Actor(nn.Module):
+    action_size: int = 17
     @nn.compact
     def __call__(self, obs):
         x=nn.tanh(nn.Dense(128)(obs))
         x=nn.tanh(nn.Dense(128)(x))
-        mean=nn.Dense(17,kernel_init=nn.initializers.zeros)(x)
-        log_std=self.param('log_std',nn.initializers.constant(-1.9),(17,))
+        mean=nn.Dense(self.action_size,kernel_init=nn.initializers.zeros)(x)
+        log_std=self.param('log_std',nn.initializers.constant(-1.9),(self.action_size,))
         return mean,jp.clip(log_std,-3.,-.5)
 
 
@@ -147,8 +148,12 @@ def train(args):
     motor_params,metadata=load_policy_params(args.foundation)
     if contract(foundation)!=metadata['contract']:
         raise ValueError('frozen motor contract mismatch')
+    observation_size, action_size = StrikingEnv.observation_size, StrikingEnv.action_size
+    interface_metadata = dict(actor_inputs=observation_size, actions=action_size)
+    if action_size == 32:
+        interface_metadata['body_residual_radians'] = StrikingEnv.body_residual_radians
     config=dict(version=1,foundation_sha256=metadata['sha256'],foundation_main_steps=metadata['total_steps'],
-        worlds=args.worlds,unroll=args.unroll,seed=args.seed,actor_inputs=146,actions=17,
+        worlds=args.worlds,unroll=args.unroll,seed=args.seed,**interface_metadata,
         arm_residual_radians=.8,command_offsets=[.15,.15,.25],assistance=False,
         dt=.02,physics_dt=.002,round_steps=500,learning_rate=.0001,epochs=4,
         minibatches=4,gamma=.99,gae_lambda=.95,scorecard_version=1,**profile)
@@ -158,12 +163,12 @@ def train(args):
             raise ValueError('existing pilot requires --resume with the exact same configuration')
         validate_resume_config(previous,config,args.engagement_distance is not None)
     atomic_json(config_path,config)
-    actor,critic=Actor(),Critic()
+    actor,critic=Actor(action_size=action_size),Critic()
     key=jax.random.PRNGKey(args.seed)
-    ap=actor.init(key,jp.zeros((1,146)));vp=critic.init(jax.random.fold_in(key,1),jp.zeros((1,146)))
+    ap=actor.init(key,jp.zeros((1,observation_size)));vp=critic.init(jax.random.fold_in(key,1),jp.zeros((1,observation_size)))
     tx=optax.chain(optax.clip_by_global_norm(1.),optax.adam(.0001))
     optimizer=tx.init((ap,vp))
-    norm=dict(mean=np.zeros(146),var=np.ones(146),count=1e-4)
+    norm=dict(mean=np.zeros(observation_size),var=np.ones(observation_size),count=1e-4)
     consumed=optimized=0
     if args.resume and checkpoint_path.exists():
         manifest=json.loads(checkpoint_path.read_text())
@@ -218,11 +223,11 @@ def train(args):
     # Share the already compiled frozen network across worlds.
     for env in envs[1:]:env.motor=envs[0].motor
     episode=np.full(args.worlds,consumed//rows,dtype=np.int64)
-    obs=np.stack([env.reset(args.seed+1009*i+int(episode[i]),swap=bool(i%2)) for i,env in enumerate(envs)]).reshape(rows,146)
+    obs=np.stack([env.reset(args.seed+1009*i+int(episode[i]),swap=bool(i%2)) for i,env in enumerate(envs)]).reshape(rows,observation_size)
     state=dict(status='running',pid=os.getpid(),started_utc=utc(),ceiling=args.ceiling,
         foundation_steps=metadata['total_steps'],foundation_sha256=metadata['sha256'],
         assistance=False,optimizer_saved=True,physics_state_saved=False,
-        discarded_collected_steps=consumed-optimized,**profile)
+        discarded_collected_steps=consumed-optimized,**interface_metadata,**profile)
     started=time.monotonic()
     session_start=consumed
     completed_rounds=falls=0
@@ -256,7 +261,7 @@ def train(args):
             key,sub=jax.random.split(key)
             action,raw,logp=act(ap,jp.array(normalized),sub)
             predicted=np.asarray(value(vp,jp.array(normalized)))
-            actions=np.asarray(action).reshape(args.worlds,2,17)
+            actions=np.asarray(action).reshape(args.worlds,2,action_size)
             rewards=[];dones=[];following=[]
             for i,env in enumerate(envs):
                 consumed+=2
@@ -273,12 +278,12 @@ def train(args):
             for k,v in dict(obs=obs.copy(),raw=np.asarray(raw),logp=np.asarray(logp),
                 reward=np.asarray(rewards),done=np.asarray(dones,dtype=np.float32),value=predicted).items():
                 storage[k].append(v)
-            obs=np.asarray(following).reshape(rows,146)
+            obs=np.asarray(following).reshape(rows,observation_size)
         rollout={k:np.asarray(v) for k,v in storage.items()}
         bootstrap=np.asarray(value(vp,jp.array(normalize(obs,norm))))
         adv,returns=advantages(rollout['reward'],rollout['done'],rollout['value'],bootstrap)
-        flat_obs=rollout['obs'].reshape(block,146)
-        batch=dict(obs=normalize(flat_obs,norm),raw=rollout['raw'].reshape(block,17),
+        flat_obs=rollout['obs'].reshape(block,observation_size)
+        batch=dict(obs=normalize(flat_obs,norm),raw=rollout['raw'].reshape(block,action_size),
             logp=rollout['logp'].reshape(block),adv=((adv-adv.mean())/(adv.std()+1e-8)).reshape(block),
             returns=returns.reshape(block))
         losses=[]
@@ -293,12 +298,12 @@ def train(args):
         norm=update_norm(norm,flat_obs)
         optimized+=block
         saved=dict(actor=ap,critic=vp,optimizer=optimizer,norm=norm,key=key,
-            optimized_steps=optimized,consumed_steps=consumed,foundation_sha256=metadata['sha256'],**profile)
+            optimized_steps=optimized,consumed_steps=consumed,foundation_sha256=metadata['sha256'],**interface_metadata,**profile)
         payload=pickle.dumps(jax.device_get(saved),protocol=pickle.HIGHEST_PROTOCOL)
         name=f'step-{consumed}.pkl'
         atomic_bytes(checkpoint_path.parent/name,payload)
         atomic_json(checkpoint_path,dict(file=name,sha256=hashlib.sha256(payload).hexdigest(),
-            consumed_steps=consumed,optimized_steps=optimized,foundation_sha256=metadata['sha256'],**profile))
+            consumed_steps=consumed,optimized_steps=optimized,foundation_sha256=metadata['sha256'],**interface_metadata,**profile))
         record(phase='updated',mean_loss=float(np.mean(losses)))
         publish()
         print(json.dumps(json.loads((args.output/'progress.json').read_text())),flush=True)
