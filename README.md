@@ -1,42 +1,34 @@
 # boxer — two humanoids learning to fight each other in JAX
 
-## Current experiment: unassisted balance and locomotion curriculum
+## Current experiment: unassisted paired boxing diagnostics
 
-The assisted continuation was stopped at the user's request after **116,633,600
-observed transitions**; its last complete checkpoint, **115,712,000**, is
-preserved. That controller cannot learn footwork because it holds leg targets
-and stabilizes the pelvis.
+All four [foundation stages](docs/curriculum.md) passed their unchanged complete
+physical gates twice on distinct checkpoints. Foundation learning finished at
+**474,992,640 consumed transitions**; keep it stopped. Both paired robots retain
+free roots and legs, without pelvis springs, welds or gravity compensation.
 
-The replacement learns **all 29 joints, including 12 leg joints**, using the
-established G1 task from a pinned MuJoCo Playground revision. The body is free:
-no pelvis springs, welds, gravity compensation or root movement controller.
-Standing with gentle movement practice, slow walking, full walking and navigation
-toward a marker starting 1.8–2.2 m away have periodic physical promotion gates.
-Two consecutive complete passes advance the same policy immediately. Standing
-practice is retained during walking. The **initial shared total ceiling was 200M**,
-not a mandatory budget per stage. That first allocation stopped at
-197.30M without two consecutive balance passes. The current
-[recovery continuation](docs/curriculum-recovery.md) retains that consumed counter,
-restores the stronger 181.58M candidate, trains with fresh episode resets and
-disturbances, and extends the shared ceiling to **400M total**.
-Oscillating rewards do not stop it.
-Navigation stops at boxing range; the marker is not yet a physical opponent.
-The later transfer to two interacting boxers remains a separate experiment
-after the locomotion gates pass. This is not a claim that unassisted boxing
-has already been learned.
+The [striking policy](docs/striking-pilot.md) adds opponent-aware arm residuals and
+movement-command offsets over that frozen learned motor actor. It starts two
+robots nominally 2 m apart and credits independent physical fist impacts. It
+has not established stable boxing or superiority to the archived unassisted
+policies. At **1,048,576 boxing learner transitions**, final evaluation found
+6/8 surviving pairs and three impacts concentrated in an episode ending in a
+fall. Main PPO stopped at its reviewed ceiling; no further main steps are granted.
 
-```powershell
-# First install the separate WSL runtime: bash tools/setup_curriculum.sh
-powershell -ExecutionPolicy Bypass -File tools/start_curriculum.ps1 -Publish -WarmStart -MaxTotalSteps 400000000 -RestartFrom checkpoints/curriculum/recovery-seed-181575680
-# -WarmStart restores weights and observation
-# statistics with fresh Adam and RNG; it is not a full-state continuation.
-```
+A [bounded sequential reward comparison](docs/striking-reward-comparison.md)
+clones that complete learning state into an unchanged baseline and a training-only
+hand-proximity shaping arm, **131,072 diagnostic transitions each**. Both receive
+the original full physical evaluation. Diagnostic consumption is separate from
+main work, and neither actor is automatically adopted. Read the report before
+restarting anything. Persistent state is under
+`/home/pedro/boxing-runs/striking-reward-compare-1048576/comparison.json`;
+`runs/striking_comparison_host.json` identifies its hidden WSL host.
 
-See [curriculum design, gates and operations](docs/curriculum.md).
-Local job state: `runs/curriculum/state.json`; training progress:
-`runs/curriculum/<level>/progress.json`. Published snapshots:
-`checkpoints/curriculum/`; measurements: `docs/results/curriculum/`.
-All source, documentation, logs and video labels are in English.
+The [closed-fist replay repair](docs/closed-fist-rendering.md) restores the
+original visual feature without changing learning or physics. Historical videos
+and all earlier policies remain archived. Project code, documentation and labels
+are in English. The original training stacks below are historical references,
+not evidence that the current experiment has already learned their skills.
 
 ## Archived assisted boxing: runnable sparring reference
 

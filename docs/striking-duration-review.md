@@ -104,3 +104,13 @@ Subsequent [closed-fist replay restoration](closed-fist-rendering.md) changes on
 the model used to render recorded coordinates. It adds 1,000 replay world controls
 to the diagnostic ledger (43,656 total), without changing this training decision,
 the active simulation, physical criteria or checkpoint lineage.
+
+## Subsequent 1,048,576-step stop
+
+The [final review and reward comparison](striking-reward-comparison.md) supersedes
+the preceding running status. Main PPO reached its ceiling with 6/8 pair survival
+and three impacts concentrated in an episode ending in a fall. Main steps are
+not extended. The active bounded diagnostic comparison has two sequential
+131,072-transition arms, separate counters, complete unchanged physical evaluation
+and no automatic policy adoption. Inspect its durable output before launching
+anything else.

@@ -236,3 +236,13 @@ learner-transition ceiling**, retaining the latest actor and all learning state.
 If physical contacts or survival do not recover, another unchanged extension
 requires a controlled reward/exploration investigation instead. No physical
 criterion, source foundation policy or initial separation changed.
+
+## Subsequent 1,048,576-step stop
+
+The [final review and reward comparison](striking-reward-comparison.md) supersedes
+the preceding running status. Main PPO reached its ceiling with 6/8 pair survival
+and three impacts concentrated in an episode ending in a fall. Main steps are
+not extended. The active bounded diagnostic comparison has two sequential
+131,072-transition arms, separate counters, complete unchanged physical evaluation
+and no automatic policy adoption. Inspect its durable output before launching
+anything else.
