@@ -17,15 +17,28 @@ checks also found zero impacts. The subsequent
 found one reproducible stable two-way exchange, but no robust benefit from body
 authority. The first [neutral-partner boxing pilot](striking-partner-curriculum.md)
 completed 131,072 diagnostic transitions, with unchanged 6/8 and 8/8 role survival
-and no final learner impacts. The [reviewed duration continuation](striking-partner-duration-review.md)
-retains its exact learning state and unchanged task for at most **524,288 new
-diagnostic transitions**, checking all sixteen partner and eight self-play trials
-every 131,072. It stops on survival regression, two stagnant checks, two complete
-consecutive phase passes, or its finite budget. Main does not adopt the actor.
-Inspect `/home/pedro/boxing-runs/striking-partner-duration-1179648/duration.json`
-and its active child before any launch. Keep main and foundation stopped; do not
-repeat completed comparisons, holdouts or the original partner pilot. Diagnostics
-do not count as main advancement, and the navigation probe changes were rejected.
+and no final learner impacts. The [duration continuation](striking-partner-duration-review.md)
+stopped after **262,144** additional diagnostic transitions on two stagnant full
+checks. No phase passed and the unused allocation is not automatically resumed.
+The [completed read-only exploration audit](striking-exploration-review.md) rejected
+all four noise profiles: none produced stable own strikes; held/scaled noise
+caused 16/16 pair falls. The next [target-directed feasibility diagnostic](striking-directed-feasibility.md)
+found four reproducible directed-strike trajectories completing ten seconds, but
+poor overall controller survival; it is not a learned policy or a phase pass.
+Its fixed variant completed a sixteen-seed holdout with fifteen exact-replayed
+ten-second strike trajectories and 49 failures. The completed
+[supervised initialization and next comparison](striking-demonstration-initialization.md)
+used fifteen demonstrations and 2,000 actor updates. The network learned isolated
+stable strikes against a neutral partner, but neither checkpoint passed and
+active self-play regressed to 4/8 at 2,000 updates.
+Inspect `/home/pedro/boxing-runs/striking-demonstration-init-1441792/initialization.json`
+and processes before any launch. All jobs are currently completed. Keep PPO
+stopped; do not repeat completed comparisons or resume blind imitation. The next
+bounded work is a matched contact-history input comparison after tested migration
+of the latest supervised actor, optimizer and sampling state; its complete
+protocol is in that review. Diagnostic PPO totals 1,188,096; formal world controls
+are 366,084. Supervised updates are separate compute, incompatible with PPO resume.
+Main counters and all physical gates remain unchanged. No actor is adopted.
 No gate is relaxed, stage promoted or candidate composite controller certified.
 
 Full walking resumed at 422.89152M main transitions after a

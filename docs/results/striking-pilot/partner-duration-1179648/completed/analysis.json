@@ -1,0 +1,159 @@
+{
+  "updated_utc": "2026-10-23T08:50:20.314976+00:00",
+  "stop_reason": "two_stagnant_checks",
+  "phase_promoted": false,
+  "policy_adoption": "none",
+  "checks": [
+    {
+      "checkpoint": {
+        "file": "step-1310720.pkl",
+        "sha256": "ca052c80d84c9ac1a48c834fade526fca8bbba62f086d2a15045d405acdac099",
+        "consumed_steps": 1310720,
+        "optimized_steps": 1310720,
+        "world_control_steps": 786432,
+        "foundation_sha256": "b39b1990945e8a374802c3a190e5ac5e026ae39e7fd5ef61c5c2b01ad291c6fc",
+        "actor_inputs": 146,
+        "actions": 17,
+        "learners_per_world": 1,
+        "opponent_mode": "neutral_motor",
+        "engagement_distance": 0.45,
+        "engagement_reward_distance": 0.45
+      },
+      "finite": true,
+      "evaluations": {
+        "selfplay": {
+          "survivors": 5,
+          "events": 2.0,
+          "surviving_events": 0.0,
+          "world_controls": 3080
+        },
+        "neutral-0": {
+          "survivors": 6,
+          "events": 2.0,
+          "surviving_events": 0.0,
+          "world_controls": 3133
+        },
+        "neutral-1": {
+          "survivors": 8,
+          "events": 0.0,
+          "surviving_events": 0.0,
+          "world_controls": 4000
+        }
+      },
+      "log_std": [
+        -1.985056757926941,
+        -1.9227070808410645,
+        -1.9444286823272705,
+        -2.0227487087249756,
+        -1.9706062078475952,
+        -1.9594881534576416,
+        -1.972963571548462,
+        -1.9280146360397339,
+        -1.9732905626296997,
+        -1.8900238275527954,
+        -1.995310664176941,
+        -1.9565129280090332,
+        -1.9592047929763794,
+        -1.9593428373336792,
+        -1.918823003768921,
+        -1.9306623935699463,
+        -1.9363391399383545
+      ],
+      "review": {
+        "stop_reason": null,
+        "phase_pass": false,
+        "consecutive_passes": 0,
+        "stagnant_checks": 1,
+        "improved": false,
+        "best_distance": 0.27557867153882115,
+        "best_scoring_role_seeds": []
+      }
+    },
+    {
+      "checkpoint": {
+        "file": "step-1441792.pkl",
+        "sha256": "87eb01ff6392b592395b64fc6f6a29f78e35fd1c1ad2941fafbcc8001146f5d8",
+        "consumed_steps": 1441792,
+        "optimized_steps": 1441792,
+        "world_control_steps": 917504,
+        "foundation_sha256": "b39b1990945e8a374802c3a190e5ac5e026ae39e7fd5ef61c5c2b01ad291c6fc",
+        "actor_inputs": 146,
+        "actions": 17,
+        "learners_per_world": 1,
+        "opponent_mode": "neutral_motor",
+        "engagement_distance": 0.45,
+        "engagement_reward_distance": 0.45
+      },
+      "finite": true,
+      "evaluations": {
+        "selfplay": {
+          "survivors": 7,
+          "events": 0.0,
+          "surviving_events": 0.0,
+          "world_controls": 3546
+        },
+        "neutral-0": {
+          "survivors": 7,
+          "events": 0.0,
+          "surviving_events": 0.0,
+          "world_controls": 3544
+        },
+        "neutral-1": {
+          "survivors": 8,
+          "events": 0.0,
+          "surviving_events": 0.0,
+          "world_controls": 4000
+        }
+      },
+      "log_std": [
+        -1.9901927709579468,
+        -1.921242594718933,
+        -1.9396365880966187,
+        -2.0498642921447754,
+        -1.966721534729004,
+        -1.9642490148544312,
+        -1.974819302558899,
+        -1.9322789907455444,
+        -1.9856221675872803,
+        -1.8932318687438965,
+        -1.9941514730453491,
+        -1.9630721807479858,
+        -1.9538038969039917,
+        -1.9687052965164185,
+        -1.9226996898651123,
+        -1.9231632947921753,
+        -1.9354196786880493
+      ],
+      "review": {
+        "stop_reason": "two_stagnant_checks",
+        "phase_pass": false,
+        "consecutive_passes": 0,
+        "stagnant_checks": 2,
+        "improved": false,
+        "best_distance": 0.27557867153882115,
+        "best_scoring_role_seeds": []
+      }
+    }
+  ],
+  "all_learning_states_and_losses_finite": true,
+  "error_logs": {
+    "check-1310720/neutral-0-errors.log": "",
+    "check-1310720/selfplay-errors.log": "",
+    "check-1310720/neutral-1-errors.log": "",
+    "learner/block-1-errors.log": "",
+    "learner/block-2-errors.log": "",
+    "check-1441792/neutral-0-errors.log": "",
+    "check-1441792/selfplay-errors.log": "",
+    "check-1441792/neutral-1-errors.log": ""
+  },
+  "main_consumed_retained": 1048576,
+  "foundation_consumed_retained": 474992640,
+  "combined_main_consumed_retained": 476041216,
+  "foundation_complete_histories_and_hashes_valid": true,
+  "new_diagnostic_steps": 262144,
+  "unused_allocation": 262144,
+  "diagnostic_ppo_total": 1188096,
+  "evaluation_world_controls": 21303,
+  "formal_world_controls_total": 283004,
+  "next_action": "Fixed-policy arm exploration coverage audit; no additional PPO allocation."
+}

@@ -16,6 +16,13 @@ from boxer.striking_env import StrikingEnv
 from boxer.striking_train import Actor, normalize
 
 
+def arm_perturbation(noise, held, step, hold=1, scale=1.):
+    """Change only arm covariance; command/body random draws remain untouched."""
+    if step%hold==0:held=noise[:,3:17].copy()
+    noise[:,3:17]=held*scale
+    return noise,held
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--checkpoint',type=Path)
@@ -25,6 +32,10 @@ def main():
     parser.add_argument('--video',type=Path)
     parser.add_argument('--sampled',action='store_true',
                         help='diagnostic saved-Gaussian policy; does not replace deterministic screening')
+    parser.add_argument('--arm-noise-scale',type=float,default=1.,
+                        help='sampled diagnostic only: scale arm noise, preserving command noise')
+    parser.add_argument('--arm-noise-hold',type=int,default=1,
+                        help='sampled diagnostic only: reuse arm perturbation across this many controls')
     parser.add_argument('--neutral-partner',type=int,choices=(0,1),metavar='LEARNER_CORNER',
                         help='diagnostic only: zero the other corner high-level commands; keep all physics')
     parser.add_argument('--zero-command-offsets',action='store_true',
@@ -36,6 +47,10 @@ def main():
     args=parser.parse_args()
     if args.sampled and not args.checkpoint:
         raise ValueError('sampled diagnostic requires a saved policy')
+    if not np.isfinite(args.arm_noise_scale) or args.arm_noise_scale<=0 or args.arm_noise_hold<1:
+        raise ValueError('positive finite arm noise scale and positive hold required')
+    if not args.sampled and (args.arm_noise_scale!=1. or args.arm_noise_hold!=1):
+        raise ValueError('arm noise overrides require explicit sampled diagnostic')
     if not np.isfinite(args.seconds) or args.seconds<=0:
         raise ValueError('positive finite duration required')
     foundation=UnassistedG1('approach',impl='jax')
@@ -107,6 +122,7 @@ def main():
             for swap in (False,True):
                 obs=env.reset(seed,swap)
                 rng=np.random.default_rng(seed+int(swap)*1009)
+                held_arm_noise=None
                 hits=np.zeros(2);impulses=np.zeros(2)
                 impact_events=[]
                 minimum_hand_distance=env.hand_distances().copy()
@@ -116,7 +132,12 @@ def main():
                     if mode=='trained':action=np.asarray(policy(jp.array(normalize(obs,saved['norm']))))
                     elif mode=='sampled':
                         mean,log_std=map(np.asarray,distribution(jp.array(normalize(obs,saved['norm']))))
-                        action=np.tanh(mean+np.exp(log_std)*rng.normal(size=mean.shape))
+                        noise=rng.normal(size=mean.shape)
+                        # Draw every control in every profile to retain paired command
+                        # noise streams. Only the fourteen arm noise channels vary.
+                        noise,held_arm_noise=arm_perturbation(noise,held_arm_noise,step,
+                            args.arm_noise_hold,args.arm_noise_scale)
+                        action=np.tanh(mean+np.exp(log_std)*noise)
                     elif mode=='exploration':action=np.tanh(rng.normal(0.,np.exp(-1.9),(2,actions)))
                     else:action=np.zeros((2,actions))
                     if args.neutral_partner is not None:
@@ -166,6 +187,8 @@ def main():
         engagement_distance=distance,engagement_reward_distance=reward_distance,
         actor_inputs=inputs,actions=actions,body_residual_radians=body_bound,
         sampled_policy=args.sampled,
+        diagnostic_arm_noise_scale=args.arm_noise_scale,
+        diagnostic_arm_noise_hold=args.arm_noise_hold,
         neutral_partner_learner_corner=args.neutral_partner,
         diagnostic_zero_command_offsets=args.zero_command_offsets,
         diagnostic_approach_gain=args.approach_gain,

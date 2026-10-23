@@ -24,14 +24,23 @@ is evidence of that episode, not reliable boxing.
 
 The [neutral-partner curriculum pilot](docs/striking-partner-curriculum.md) completed
 131,072 diagnostic transitions without passing: survival stayed 6/8 and 8/8 by
-learner role, with no final learner impacts. The [reviewed duration experiment](docs/striking-partner-duration-review.md)
-preserves that learning state and unchanged task for at most **524,288 additional
-diagnostic transitions**, with complete physical checks every 131,072 and automatic
-stops for regression or stagnation. Both bodies/legs remain free and all contacts
-active. No actor is adopted into main and no physical gate is weakened. Inspect
-`/home/pedro/boxing-runs/striking-partner-duration-1179648/duration.json` and its
-child before another launch; `runs/striking_partner_duration_host.json` identifies
-the hidden WSL host.
+learner role, with no final learner impacts. The duration continuation stopped
+after 262,144 additional steps on two stagnant complete checks. No phase passed.
+The [completed exploration audit](docs/striking-exploration-review.md) found no
+stable own strikes under any of four noise profiles. The next
+[physical feasibility diagnostic](docs/striking-directed-feasibility.md) found
+four reproducible ten-second directed-strike trajectories, but poor overall
+controller survival. It is not a trained boxer or a phase pass. A sixteen-seed
+holdout produced fifteen further trajectories, all exactly replayed. The
+[completed supervised initialization](docs/striking-demonstration-initialization.md)
+learned isolated stable strikes against a neutral partner, but neither checkpoint
+passed and active self-play regressed. The next reviewed work compares physical
+contact-history inputs with a matched control after validated state migration.
+**No additional PPO** is allocated. Both bodies/legs remain free and all contacts
+active. No actor is adopted and no physical gate is weakened. Inspect
+`/home/pedro/boxing-runs/striking-demonstration-init-1441792/initialization.json`
+and processes before another launch; that job is completed. Main and PPO remain
+stopped. The next comparison's finite protocol is in the completed review.
 
 The [closed-fist replay repair](docs/closed-fist-rendering.md) restores the
 original visual feature without changing learning or physics. Historical videos

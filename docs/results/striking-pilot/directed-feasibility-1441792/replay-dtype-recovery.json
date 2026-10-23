@@ -1,0 +1,8 @@
+{
+  "reason": "Replay initially converted saved float32 actions to float64. The residual filter is dtype-sensitive; exact observation comparison correctly rejected the replay.",
+  "reproduced_controls_before_same_failure": 2,
+  "original_failed_replay_controls": 2,
+  "total_rejected_replay_controls": 4,
+  "max_observation_error": 1.4901161193847656e-08,
+  "fix": "Preserve saved action dtype; keep exact comparisons unchanged."
+}

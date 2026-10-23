@@ -97,6 +97,11 @@ def validate_resume_config(previous, current, explicit_profile_change=False):
         raise ValueError('resume requires the exact profile except an explicitly reviewed engagement change')
 
 
+def require_ppo_checkpoint(saved):
+    if saved.get('training_kind','ppo')!='ppo':
+        raise ValueError('non-PPO checkpoint requires an explicit validated optimizer migration before PPO resume')
+
+
 def main(argv=None):
     import fcntl
     parser=argparse.ArgumentParser(description=__doc__)
@@ -182,6 +187,7 @@ def train(args):
         if hashlib.sha256(payload).hexdigest()!=manifest['sha256']:
             raise ValueError('boxing checkpoint checksum mismatch')
         saved=pickle.loads(payload)
+        require_ppo_checkpoint(saved)
         if saved['foundation_sha256']!=metadata['sha256']:
             raise ValueError('boxing motor provenance mismatch')
         ap,vp,optimizer,norm,key=(saved[k] for k in ('actor','critic','optimizer','norm','key'))

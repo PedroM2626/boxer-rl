@@ -1,0 +1,111 @@
+{
+  "state_snapshot": {
+    "status": "running",
+    "phase": "physical_evaluation",
+    "pid": 472,
+    "started_utc": "2026-10-23T09:24:27.276390+00:00",
+    "diagnostic_output": "/home/pedro/boxing-runs/striking-demonstration-init-1441792",
+    "source_sha256": "87eb01ff6392b592395b64fc6f6a29f78e35fd1c1ad2941fafbcc8001146f5d8",
+    "source_lineage_steps": 1441792,
+    "demonstration_files": {
+      "head-advance-1-role-0-seed-2000003-swap-0.npz": "0981b54ec9611488a1e51a1dde9a4ce12e6291f2a642b36db6c7947bb9a3af1f",
+      "head-advance-1-role-0-seed-2000004-swap-1.npz": "afaa07df857888fd545ed6f2d534fe26b1c864cba21640d1498187009108f758",
+      "head-advance-1-role-0-seed-2000005-swap-0.npz": "fe2afd12e2c03053330c6bf4330b338154a003e4826be479bedeb380cf274c21",
+      "head-advance-1-role-0-seed-2000007-swap-0.npz": "92d6a796fa456796ac285421259bec05016e655986e89e94ad39aa68bdb1fde9",
+      "head-advance-1-role-0-seed-2000008-swap-0.npz": "3b41ed347d0a7231fbebb81061785e0b8a3d55d4e838758c53edb8fc7aabbcfb",
+      "head-advance-1-role-0-seed-2000009-swap-0.npz": "77ce811997b4a0884cad068e47db6e160ec013f4faa58eca03fb8bbdf44cc8c3",
+      "head-advance-1-role-0-seed-2000010-swap-1.npz": "19a70b3311624fd0e5c45369bcdf155849fcf469524cd60d3713a2df264ec8bb",
+      "head-advance-1-role-0-seed-2000012-swap-0.npz": "ebfbf28e01e1eba7e24e482bb86f991968d7fa139f2e5b58440540399bbbf95e",
+      "head-advance-1-role-0-seed-2000014-swap-1.npz": "6677302796fac7d094fdfe91294848ca17dfd312b4975be2d9ba73c5b28954d4",
+      "head-advance-1-role-1-seed-2000006-swap-0.npz": "95fbb4d67dfee5d789ae5cb003d315d3d70416ad4cd21766e95c3eb739a6d9ab",
+      "head-advance-1-role-1-seed-2000008-swap-0.npz": "0a0a9b7c5d1b4f09f8a2d45d816ea8e00e3b64e9d709a70a4e41ce050abd6373",
+      "head-advance-1-role-1-seed-2000014-swap-0.npz": "37fbdf27772950e8b9703cf353198d3a6173bb684cff427c9e103c602ca6dfc6",
+      "head-advance-1-role-1-seed-2000016-swap-1.npz": "8867d61493d2eea9bb79439d62ff6b48da001f847eaf81bd5658f38a28a77004",
+      "head-advance-1-role-1-seed-2000017-swap-0.npz": "7f0290fafe27790221529464237a25d02d5edf44acb734939f362d1840bf56f4",
+      "head-advance-1-role-1-seed-2000017-swap-1.npz": "96943753094f1e5c114a60f707c38d6ab621a658d76cc9360d516a061f82d273"
+    },
+    "demonstration_rows": 7500,
+    "maximum_supervised_updates": 2000,
+    "batch_size": 256,
+    "supervised_updates": 2000,
+    "data_presentations": 512000,
+    "new_ppo_transitions": 0,
+    "diagnostic_ppo_retained": 1188096,
+    "formal_world_controls_before_job": 346091,
+    "diagnostic_evaluation_world_controls": 13124,
+    "maximum_evaluation_world_controls": 24000,
+    "teacher_used_at_evaluation": false,
+    "policy_adoption": "none",
+    "checks": [
+      {
+        "supervised_updates": 500,
+        "checkpoint_sha256": "278035bd49e5af794a3f39057199a17ef512a3ad6aa1da7297fa7162fd1917ba",
+        "evaluations": {
+          "neutral-0": {
+            "pair_survivors": 6,
+            "own_surviving_scoring_seeds": [
+              7
+            ],
+            "own_surviving_events": 1.0
+          },
+          "neutral-1": {
+            "pair_survivors": 7,
+            "own_surviving_scoring_seeds": [
+              31
+            ],
+            "own_surviving_events": 1.0
+          },
+          "selfplay": {
+            "pair_survivors": 6,
+            "own_surviving_scoring_seeds": [],
+            "own_surviving_events": 0.0
+          }
+        }
+      }
+    ],
+    "loss": 0.016452128067612648,
+    "updated_utc": "2026-10-23T09:25:57.115119+00:00",
+    "active_checkpoint": "/home/pedro/boxing-runs/striking-demonstration-init-1441792/update-2000"
+  },
+  "checkpoint_500": {
+    "file": "bc-update-500.pkl",
+    "sha256": "278035bd49e5af794a3f39057199a17ef512a3ad6aa1da7297fa7162fd1917ba",
+    "consumed_steps": 1441792,
+    "optimized_steps": 1441792,
+    "world_control_steps": 917504,
+    "foundation_sha256": "b39b1990945e8a374802c3a190e5ac5e026ae39e7fd5ef61c5c2b01ad291c6fc",
+    "actor_inputs": 146,
+    "actions": 17,
+    "learners_per_world": 1,
+    "opponent_mode": "neutral_motor",
+    "engagement_distance": 0.45,
+    "engagement_reward_distance": 0.45,
+    "training_kind": "supervised_demonstration",
+    "supervised_updates": 500,
+    "ppo_optimizer_compatible": false
+  },
+  "finite": true,
+  "source_critic_normalizer_rng_and_log_std_retained": true,
+  "ppo_resume_rejected": true,
+  "physics_errors": {
+    "update-2000/neutral-0-errors.log": "",
+    "update-2000/neutral-1-errors.log": "",
+    "update-500/neutral-0-errors.log": "",
+    "update-500/selfplay-errors.log": "",
+    "update-500/neutral-1-errors.log": ""
+  },
+  "hidden_host": {
+    "maximum_supervised_updates": 2000,
+    "maximum_world_controls": 24000,
+    "diagnostic_output": "/home/pedro/boxing-runs/striking-demonstration-init-1441792",
+    "pid": 29736,
+    "main_consumed_steps": 1048576,
+    "optimization_transitions": 0,
+    "started_utc": "2026-10-23T09:24:19.7708924Z"
+  },
+  "code_sha256": {
+    "tools/striking_demonstration_init.py": "b41c01df2918cf5269af856bee6ac0625327c05664ebfdac5b8ee63b7ded146e",
+    "boxer/striking_train.py": "9c1223cd88a314924719d0a9055b104ee75861154e5569d07ce3ce9bf1ac22c6",
+    "tools/evaluate_striking.py": "8873e69a821755f6e98694aa06b6bb04e40268f0f5ad8b91dd6b9700bbe5fc59"
+  }
+}

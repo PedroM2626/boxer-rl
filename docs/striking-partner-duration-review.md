@@ -1,5 +1,10 @@
 # Neutral-partner result and bounded duration review
 
+**Current status:** the duration test completed after 262,144 new transitions,
+stopping on two stagnant checks. The remaining allocation is not being consumed.
+The [complete result and exploration coverage audit](striking-exploration-review.md)
+supersede the launch status below. No phase passed or main actor was adopted.
+
 ## Completed pilot
 
 The first [single-learner partner pilot](striking-partner-curriculum.md) finished
