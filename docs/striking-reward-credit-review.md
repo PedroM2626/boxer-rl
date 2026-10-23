@@ -1,11 +1,11 @@
 # Reward-credit review and completed horizon comparison
 
-**Current status:** the longer-horizon continuation and all 32 passive matched
-replays are completed and reviewed. No further optimization is allocated.
-The latest final has post-contact red low-pelvis failures in active play and a
-blue self-leg termination against a neutral partner. A fixed controller-channel
-ablation diagnostic tests those selected cases; see the
-[current result and contract](#completed-transfer-traces-and-controller-ablation-2026-10-23).
+**Current status:** the continuation, 32 passive matched replays and 12 selected
+controller ablations are completed and reviewed. No further optimization is
+allocated. Both ablations rescue the selected falls, but only zero command
+offsets retains legal strikes. A fixed full-screen/fresh holdout diagnostic
+checks whether that selected-case effect generalizes; see the
+[current result and contract](#completed-controller-ablations-and-full-holdout-2026-10-23).
 
 ## Completed neutral curriculum review
 
@@ -422,3 +422,61 @@ remains **1,679,616**, main boxing **1,048,576**, combined main **476,041,216**;
 all standalone and integrated supervised compute is unchanged. Preserve the
 existing monitor. Existing channel-isolation and read-only physics tests are
 included in the 12 passing checks; Python/shell/PowerShell syntax checks pass.
+
+
+## Completed controller ablations and full holdout (2026-10-23)
+
+Both preregistered interventions completed all selected cases: **12 episodes /
+6,000 world controls**, finite hashed trace arrays, empty native error logs,
+zero optimizer updates. All selected failures are rescued: **6/6 surviving
+pairs per intervention versus 3/6 in the unchanged selected baseline**. Removing
+command offsets retains one active red event and one neutral blue event;
+removing arm residuals produces no events. The command intervention rescues the
+early and late active red low-pelvis cases and the neutral blue self-leg case,
+while leaving high-level arm residuals learned and active. This is a controlled
+closed-loop effect on these selected cases, not a unique causal explanation or
+proof of reliable boxing. The neutral seed's four baseline surviving blue
+strikes become one; stability and scoring must both be assessed on full sets.
+
+Raw reports, all twelve traces, per-case baseline comparisons, completed state
+and review are archived under
+`docs/results/striking-pilot/horizon-control-ablation-1736704/`.
+Formal diagnostic simulation is **834,100 world controls**; diagnostic PPO is
+still **1,679,616**, with no new learned state, replay presentations or consumed
+training credits. The latest final and all main/foundation accounting remain
+unchanged. No actor is adopted and no phase passes.
+
+### Full diagnostic contract, zero optimization
+
+The selected-set result justifies a single broader read-only assay using only
+latest final SHA
+`55976fc15b74b9997b4cb56cf13683f1f87315ac6d67c5cc966ab3c644dd2d73`.
+Evaluate the **unmodified final on new seeds 12,000,003..12,000,006**, both swaps,
+all three full profiles (neutral 0/1 and active). Then evaluate the **zero-command
+offset intervention** on original screen seeds 7/23/31/47 and on those same new
+12M seeds, all profiles/swaps. The unmodified original screen is already fully
+archived for this exact final hash. This is **72 complete episodes / at most
+36,000 world controls**, no training. Preserve all full reports and attempted
+counts, reject native numerical/capacity errors and incomplete/incorrect-hash
+reports, and apply the existing complete survival/multiseed-strike criteria
+without changing thresholds. Compare against the matched unmodified fresh
+baseline, not against hand-picked old clips or different seed pools.
+
+This assay is explicitly ineligible for promotion or actor adoption. A masked
+controller is an intervention; two seed sets on one unchanged checkpoint are
+not two distinct passing training generations. Any future training integration
+requires a separately reviewed explicit profile change preserving checkpoint,
+optimizer and consumed-step provenance. No such allocation is granted now.
+Unassisted roots/legs, learned motor feedback, fist geometry, reward, scorecard
+and independent physical criteria are unchanged. Inspect both complete outcomes
+before deciding whether to implement a correction or reject the intervention.
+
+Hidden persistent launcher: `tools/start_striking_zero_command_holdout.ps1`.
+Live state:
+`/home/pedro/boxing-runs/striking-zero-command-holdout-1736704/holdout.json`.
+Read its state/process and attempted progress before another launch. At the
+full cap formal diagnostic simulation would reach **870,100**, while diagnostic
+PPO remains **1,679,616**, main boxing **1,048,576**, combined main **476,041,216**.
+Preserve the existing monitor, latest final and all consumed work. The runner
+reuses the tested complete-evidence guards; Python/shell/PowerShell syntax checks
+pass. The 12 focused checks cover channel isolation and unchanged native physics.

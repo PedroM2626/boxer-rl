@@ -1,4 +1,4 @@
-# Fixed latest-final controller-channel diagnostic
+# Completed latest-final controller-channel diagnostic
 
 The [completed trace review and fixed contract](../../../striking-reward-credit-review.md#completed-transfer-traces-and-controller-ablation-2026-10-23)
 record all 32 exact source/final replays and the measured active regression.
@@ -30,3 +30,13 @@ Pre-assay diagnostic PPO is 1,679,616 and formal simulation 828,100 world contro
 Record actual new simulation separately. Main boxing/combined main remain
 1,048,576/476,041,216; all optimizer, supervised and foundation counters retain
 their prior values. Review both completed interventions before any next action.
+
+
+**Completed and reviewed:** all 12 episodes/6,000 controls are archived with
+finite hashed trace arrays and empty native logs. Both interventions rescue all
+selected falls (6/6 pairs each versus 3/6 baseline); zero commands retains two
+legal events, zero arms produces none. `analysis.json` and `completed-ablation.json`
+retain the exact comparisons and limitations. Formal simulation totals 834,100;
+PPO stays 1,679,616. The [full-screen/new-seed diagnostic](../../../striking-reward-credit-review.md#completed-controller-ablations-and-full-holdout-2026-10-23)
+is the next fixed zero-learning assay. Startup snapshots above are historical;
+this completed job must not be relaunched. No actor is adopted.

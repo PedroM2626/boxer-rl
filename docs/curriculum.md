@@ -1,15 +1,15 @@
 # Adaptive unassisted G1 curriculum
 
 **Latest striking operation (2026-10-23):** the longer-horizon continuation
-failed both complete generations. The subsequent 32 matched passive replays
-reproduced every original physical result exactly. Latest-final active failures
-are post-contact red low-pelvis terminations; the neutral failure is blue
-self-leg contact. **No further optimization is allocated.** A fixed diagnostic
-removes high-level command offsets or arm residuals separately on the selected
-failed-seed sets (12 episodes / at most 6,000 controls). Read the
-[current result and contract](striking-reward-credit-review.md#completed-transfer-traces-and-controller-ablation-2026-10-23)
+failed both complete generations. All 32 passive replays matched exactly. Both
+subsequent controller ablations rescue selected falls (6/6 pairs each versus
+3/6 baseline), but only removing command offsets retains strikes. **No further
+optimization is allocated.** A fixed full-screen/fresh diagnostic compares that
+intervention with the unmodified final on new 12M seeds (72 episodes / at most
+36,000 controls). This is not promotion or actor adoption. Read the
+[current result and contract](striking-reward-credit-review.md#completed-controller-ablations-and-full-holdout-2026-10-23)
 and live process before any launch. Diagnostic PPO is **1,679,616 learner credits**,
-formal simulation **828,100 controls** before that assay. Main counters and
+formal simulation **834,100 controls** before that assay. Main counters and
 complete foundation certifications remain unchanged. Historical allocations
 below are completed evidence, not permission to restart them.
 

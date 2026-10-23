@@ -80,15 +80,19 @@ No more optimizer steps are allocated. All 32 subsequent passive source/final re
 reproduce the original physical results exactly, with finite states and no
 numerical/capacity errors. Latest-final active failures are red low-pelvis
 terminations after interbody contact; the neutral failure is blue self-leg
-contact. A fixed diagnostic now removes command offsets or arm residuals
-separately on those selected failed-seed sets (12 episodes / at most 6,000
-world controls, zero learning). Inspect
-`/home/pedro/boxing-runs/striking-horizon-control-ablation-1736704/ablation.json`
-and its process before any launch. Diagnostic PPO is **1,679,616** and formal
-diagnostic simulation **828,100 world controls** before this assay; main counters
-remain unchanged. Full
-[results and the investigation contract](docs/striking-reward-credit-review.md#completed-transfer-traces-and-controller-ablation-2026-10-23)
-retain failures and provenance. No phase is promoted or actor adopted.
+contact. The fixed controller ablations have now completed: each
+rescues all selected falls (6/6 surviving pairs versus 3/6 unchanged baseline).
+Removing command offsets retains two legal strikes; removing arm residuals
+produces none. A full-screen/new-seed diagnostic now tests the command intervention
+against the unmodified latest final (72 complete episodes / at most 36,000 world
+controls, zero learning). This selected-case effect is not a promotion or actor
+adoption. Inspect
+`/home/pedro/boxing-runs/striking-zero-command-holdout-1736704/holdout.json`
+and its process before any launch. Diagnostic PPO is **1,679,616**, formal
+diagnostic simulation **834,100 world controls** before the assay; main counters
+remain unchanged. Read the
+[full results and bounded contract](docs/striking-reward-credit-review.md#completed-controller-ablations-and-full-holdout-2026-10-23)
+before another intervention. No phase is promoted or actor adopted.
 
 The [closed-fist replay repair](docs/closed-fist-rendering.md) restores the
 original visual feature without changing learning or physics. Historical videos
