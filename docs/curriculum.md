@@ -37,11 +37,16 @@ Neither arm passes: contact history has 5/8 active pair survival, versus 3/8 for
 control, and no surviving blue-role own events. No actor is adopted and blind
 imitation remains stopped. Inspect
 `/home/pedro/boxing-runs/striking-contact-compare-bc2000/comparison.json` and
-processes before another launch. The next bounded work is a read-only policy-state
-coverage/first-fall audit, at most 12,000 world controls after instrumentation
-checks. No additional supervised or PPO learning is allocated. Diagnostic PPO
-remains 1,188,096; formal world controls are now 385,343. Cumulative supervised
-compute is 6,000 updates, counted separately and incompatible with PPO resume.
+processes before another launch. The [coverage and channel audits](striking-policy-coverage-audit.md)
+are now also completed. Passive traces exactly reproduce all 24 original trials;
+selected early falls disappear when high-level arm residuals are removed, with
+all learned motor actions and free-body physics retained. These short interventions
+are not adopted policies or gates. The next bounded work is a fresh pre-contact
+sample comparison, at most 4,800 world controls, zero learning. Inspect the latest
+`/home/pedro/boxing-runs/striking-channel-contact-bc4000/channels.json` and processes
+before launching anything. Diagnostic PPO remains 1,188,096; formal world controls
+are now 398,434. Cumulative supervised compute is 6,000 updates, counted separately
+and incompatible with PPO resume. No optimizer extension or promotion is granted.
 Main counters and all physical gates remain unchanged. No actor is adopted.
 No gate is relaxed, stage promoted or candidate composite controller certified.
 

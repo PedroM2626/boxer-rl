@@ -1,0 +1,1947 @@
+{
+  "source_sha256": "2da4302cb992d5067a86c8886f72bac2cf54f2def1c41f7f87201d5f76c0bf9a",
+  "complete_original_physical_results_match_exactly": true,
+  "trace_rows_checked": 32,
+  "new_supervised_updates": 0,
+  "new_ppo_transitions": 0,
+  "diagnostic_world_controls": 9698,
+  "formal_world_controls_total": 395041,
+  "diagnostic_ppo_retained": 1188096,
+  "cumulative_supervised_updates": 6000,
+  "foundation_consumed": 474992640,
+  "main_boxing_consumed": 1048576,
+  "main_project_consumed": 476041216,
+  "native_numerical_or_capacity_warnings": false,
+  "policy_adoption": "none",
+  "promotion": false,
+  "leave_trajectory_out_baselines": {
+    "0": {
+      "motor": {
+        "q50": 0.33109666666536575,
+        "q95": 0.782697938277078,
+        "q99": 1.0630091320665138
+      },
+      "opponent": {
+        "q50": 0.07307701798999545,
+        "q95": 0.2785549074804612,
+        "q99": 0.45926138178796594
+      },
+      "previous_action": {
+        "q50": 0.30745444003058464,
+        "q95": 0.5852974043356732,
+        "q99": 0.7624428146298023
+      },
+      "contact_history": {
+        "q50": 0.0,
+        "q95": 0.0,
+        "q99": 0.0
+      }
+    },
+    "1": {
+      "motor": {
+        "q50": 0.3484513337943408,
+        "q95": 0.8063488237697742,
+        "q99": 1.0678554059109506
+      },
+      "opponent": {
+        "q50": 0.06949378716104526,
+        "q95": 0.3066721398981066,
+        "q99": 0.5589311347961753
+      },
+      "previous_action": {
+        "q50": 0.32903830375792414,
+        "q95": 0.6104282045331338,
+        "q99": 0.789496323526212
+      },
+      "contact_history": {
+        "q50": 0.0,
+        "q95": 0.0,
+        "q99": 0.0
+      }
+    }
+  },
+  "physical_summary": {
+    "neutral-0": {
+      "pair_survivors": 6,
+      "pair_falls": 2,
+      "pair_falls_without_preceding_cross_body_force": 1,
+      "controlled_role_falls": 2,
+      "controlled_role_falls_without_own_valid_score": 1,
+      "low_pelvis_flags": 1,
+      "tilt_flags": 0,
+      "self_leg_contact_flags": 1
+    },
+    "neutral-1": {
+      "pair_survivors": 6,
+      "pair_falls": 2,
+      "pair_falls_without_preceding_cross_body_force": 0,
+      "controlled_role_falls": 2,
+      "controlled_role_falls_without_own_valid_score": 1,
+      "low_pelvis_flags": 2,
+      "tilt_flags": 0,
+      "self_leg_contact_flags": 0
+    },
+    "selfplay": {
+      "pair_survivors": 5,
+      "pair_falls": 3,
+      "pair_falls_without_preceding_cross_body_force": 1,
+      "controlled_role_falls": 3,
+      "controlled_role_falls_without_own_valid_score": 3,
+      "low_pelvis_flags": 3,
+      "tilt_flags": 0,
+      "self_leg_contact_flags": 0
+    }
+  },
+  "controlled_role_trials": [
+    {
+      "evaluation": "neutral-0",
+      "seed": 7,
+      "swap": false,
+      "role": 0,
+      "pair_survived": true,
+      "own_fell": false,
+      "controls": 500,
+      "first_cross_body_force": 2.2179999999999773,
+      "first_own_fist_target_force": 2.4799999999999485,
+      "first_own_valid_score": null,
+      "first_pair_fall": null,
+      "terminal": {
+        "pelvis_height": 0.7605294733612752,
+        "upright": 0.9888895006874077,
+        "low_pelvis": false,
+        "tilted": false,
+        "self_leg_contact": false
+      },
+      "minimum_pelvis": 0.7343861521804164,
+      "minimum_upright": 0.9783014263906883,
+      "phase_coverage": {
+        "before_hit": {
+          "motor": {
+            "rows": 500,
+            "mean": 0.4436694322720134,
+            "q95": 0.7751866467985079,
+            "fraction_above_demonstration_q99": 0.01,
+            "first_time_above_q99": 0.020000000000000004
+          },
+          "opponent": {
+            "rows": 500,
+            "mean": 0.12149545586414881,
+            "q95": 0.3951390545399285,
+            "fraction_above_demonstration_q99": 0.042,
+            "first_time_above_q99": 0.0
+          },
+          "previous_action": {
+            "rows": 500,
+            "mean": 0.41373644822772876,
+            "q95": 0.6898928088424376,
+            "fraction_above_demonstration_q99": 0.024,
+            "first_time_above_q99": 0.08000000000000006
+          },
+          "contact_history": {
+            "rows": 500,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        }
+      }
+    },
+    {
+      "evaluation": "neutral-0",
+      "seed": 7,
+      "swap": true,
+      "role": 0,
+      "pair_survived": true,
+      "own_fell": false,
+      "controls": 500,
+      "first_cross_body_force": 1.7180000000000013,
+      "first_own_fist_target_force": null,
+      "first_own_valid_score": null,
+      "first_pair_fall": null,
+      "terminal": {
+        "pelvis_height": 0.7551778799434473,
+        "upright": 0.9987790166391769,
+        "low_pelvis": false,
+        "tilted": false,
+        "self_leg_contact": false
+      },
+      "minimum_pelvis": 0.735123680476407,
+      "minimum_upright": 0.974413457441816,
+      "phase_coverage": {
+        "before_hit": {
+          "motor": {
+            "rows": 500,
+            "mean": 0.6307162150838109,
+            "q95": 0.8358760404269463,
+            "fraction_above_demonstration_q99": 0.008,
+            "first_time_above_q99": 0.020000000000000004
+          },
+          "opponent": {
+            "rows": 500,
+            "mean": 0.23052437972464446,
+            "q95": 0.31930827560975444,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          },
+          "previous_action": {
+            "rows": 500,
+            "mean": 0.6871790868317541,
+            "q95": 0.981129685119767,
+            "fraction_above_demonstration_q99": 0.468,
+            "first_time_above_q99": 2.1799999999999815
+          },
+          "contact_history": {
+            "rows": 500,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        }
+      }
+    },
+    {
+      "evaluation": "neutral-0",
+      "seed": 23,
+      "swap": false,
+      "role": 0,
+      "pair_survived": false,
+      "own_fell": true,
+      "controls": 102,
+      "first_cross_body_force": 1.2460000000000009,
+      "first_own_fist_target_force": 1.408000000000001,
+      "first_own_valid_score": 1.6820000000000013,
+      "first_pair_fall": 2.021999999999999,
+      "terminal": {
+        "pelvis_height": 0.694490936186173,
+        "upright": 0.9852556493685045,
+        "low_pelvis": false,
+        "tilted": false,
+        "self_leg_contact": true
+      },
+      "minimum_pelvis": 0.6818641037528743,
+      "minimum_upright": 0.9646306848510551,
+      "phase_coverage": {
+        "before_hit": {
+          "motor": {
+            "rows": 85,
+            "mean": 1.0875408001427702,
+            "q95": 1.618092891668785,
+            "fraction_above_demonstration_q99": 0.5176470588235295,
+            "first_time_above_q99": 0.3800000000000003
+          },
+          "opponent": {
+            "rows": 85,
+            "mean": 0.5161897392140845,
+            "q95": 0.7421570777402222,
+            "fraction_above_demonstration_q99": 0.6588235294117647,
+            "first_time_above_q99": 0.2600000000000002
+          },
+          "previous_action": {
+            "rows": 85,
+            "mean": 0.6156852791300735,
+            "q95": 0.9380140991450812,
+            "fraction_above_demonstration_q99": 0.25882352941176473,
+            "first_time_above_q99": 0.4000000000000003
+          },
+          "contact_history": {
+            "rows": 85,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        },
+        "after_hit": {
+          "motor": {
+            "rows": 17,
+            "mean": 1.7129883484903157,
+            "q95": 2.0487207142797006,
+            "fraction_above_demonstration_q99": 1.0,
+            "first_time_above_q99": 1.7000000000000013
+          },
+          "opponent": {
+            "rows": 17,
+            "mean": 0.7459385070223267,
+            "q95": 0.878222348938982,
+            "fraction_above_demonstration_q99": 1.0,
+            "first_time_above_q99": 1.7000000000000013
+          },
+          "previous_action": {
+            "rows": 17,
+            "mean": 0.8899630090452345,
+            "q95": 1.0702439195815252,
+            "fraction_above_demonstration_q99": 0.8235294117647058,
+            "first_time_above_q99": 1.7000000000000013
+          },
+          "contact_history": {
+            "rows": 17,
+            "mean": 0.7035975502858334,
+            "q95": 0.7035975502858334,
+            "fraction_above_demonstration_q99": 1.0,
+            "first_time_above_q99": 1.7000000000000013
+          }
+        }
+      }
+    },
+    {
+      "evaluation": "neutral-0",
+      "seed": 23,
+      "swap": true,
+      "role": 0,
+      "pair_survived": true,
+      "own_fell": false,
+      "controls": 500,
+      "first_cross_body_force": 1.9920000000000015,
+      "first_own_fist_target_force": null,
+      "first_own_valid_score": null,
+      "first_pair_fall": null,
+      "terminal": {
+        "pelvis_height": 0.7528138022094294,
+        "upright": 0.9996111728978624,
+        "low_pelvis": false,
+        "tilted": false,
+        "self_leg_contact": false
+      },
+      "minimum_pelvis": 0.7258738324318033,
+      "minimum_upright": 0.9736229057774578,
+      "phase_coverage": {
+        "before_hit": {
+          "motor": {
+            "rows": 500,
+            "mean": 0.5467404746786327,
+            "q95": 1.0119328383723347,
+            "fraction_above_demonstration_q99": 0.032,
+            "first_time_above_q99": 0.020000000000000004
+          },
+          "opponent": {
+            "rows": 500,
+            "mean": 0.13564932261616883,
+            "q95": 0.2867903016318426,
+            "fraction_above_demonstration_q99": 0.006,
+            "first_time_above_q99": 3.09999999999988
+          },
+          "previous_action": {
+            "rows": 500,
+            "mean": 0.46380399014945883,
+            "q95": 0.7731086856967646,
+            "fraction_above_demonstration_q99": 0.06,
+            "first_time_above_q99": 1.7800000000000014
+          },
+          "contact_history": {
+            "rows": 500,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        }
+      }
+    },
+    {
+      "evaluation": "neutral-0",
+      "seed": 31,
+      "swap": false,
+      "role": 0,
+      "pair_survived": true,
+      "own_fell": false,
+      "controls": 500,
+      "first_cross_body_force": 2.511999999999945,
+      "first_own_fist_target_force": 2.73999999999992,
+      "first_own_valid_score": null,
+      "first_pair_fall": null,
+      "terminal": {
+        "pelvis_height": 0.7532400100844978,
+        "upright": 0.994646827892384,
+        "low_pelvis": false,
+        "tilted": false,
+        "self_leg_contact": false
+      },
+      "minimum_pelvis": 0.7389178250159028,
+      "minimum_upright": 0.9661605388753801,
+      "phase_coverage": {
+        "before_hit": {
+          "motor": {
+            "rows": 500,
+            "mean": 0.6078635405741388,
+            "q95": 0.837687548308363,
+            "fraction_above_demonstration_q99": 0.016,
+            "first_time_above_q99": 0.020000000000000004
+          },
+          "opponent": {
+            "rows": 500,
+            "mean": 0.23695089025484944,
+            "q95": 0.47834273017537876,
+            "fraction_above_demonstration_q99": 0.06,
+            "first_time_above_q99": 0.0
+          },
+          "previous_action": {
+            "rows": 500,
+            "mean": 0.675296872162418,
+            "q95": 0.955333993123608,
+            "fraction_above_demonstration_q99": 0.442,
+            "first_time_above_q99": 0.06000000000000004
+          },
+          "contact_history": {
+            "rows": 500,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        }
+      }
+    },
+    {
+      "evaluation": "neutral-0",
+      "seed": 31,
+      "swap": true,
+      "role": 0,
+      "pair_survived": true,
+      "own_fell": false,
+      "controls": 500,
+      "first_cross_body_force": 1.5300000000000011,
+      "first_own_fist_target_force": null,
+      "first_own_valid_score": null,
+      "first_pair_fall": null,
+      "terminal": {
+        "pelvis_height": 0.7540505331235078,
+        "upright": 0.9947861042217888,
+        "low_pelvis": false,
+        "tilted": false,
+        "self_leg_contact": false
+      },
+      "minimum_pelvis": 0.7330441675676337,
+      "minimum_upright": 0.9755009572633913,
+      "phase_coverage": {
+        "before_hit": {
+          "motor": {
+            "rows": 500,
+            "mean": 0.35187203403518275,
+            "q95": 0.6312003141428096,
+            "fraction_above_demonstration_q99": 0.002,
+            "first_time_above_q99": 0.020000000000000004
+          },
+          "opponent": {
+            "rows": 500,
+            "mean": 0.08186403768865011,
+            "q95": 0.19633507811745957,
+            "fraction_above_demonstration_q99": 0.016,
+            "first_time_above_q99": 0.0
+          },
+          "previous_action": {
+            "rows": 500,
+            "mean": 0.3506843412100411,
+            "q95": 0.592792653323966,
+            "fraction_above_demonstration_q99": 0.004,
+            "first_time_above_q99": 1.8000000000000014
+          },
+          "contact_history": {
+            "rows": 500,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        }
+      }
+    },
+    {
+      "evaluation": "neutral-0",
+      "seed": 47,
+      "swap": false,
+      "role": 0,
+      "pair_survived": false,
+      "own_fell": true,
+      "controls": 46,
+      "first_cross_body_force": null,
+      "first_own_fist_target_force": null,
+      "first_own_valid_score": null,
+      "first_pair_fall": 0.9080000000000007,
+      "terminal": {
+        "pelvis_height": 0.5479004351208926,
+        "upright": 0.7298335278342082,
+        "low_pelvis": true,
+        "tilted": false,
+        "self_leg_contact": false
+      },
+      "minimum_pelvis": 0.5479004351208926,
+      "minimum_upright": 0.7298335278342082,
+      "phase_coverage": {
+        "before_hit": {
+          "motor": {
+            "rows": 46,
+            "mean": 1.4096554960864183,
+            "q95": 2.164073162924193,
+            "fraction_above_demonstration_q99": 0.7391304347826086,
+            "first_time_above_q99": 0.020000000000000004
+          },
+          "opponent": {
+            "rows": 46,
+            "mean": 1.8488536223891898,
+            "q95": 4.264431084473142,
+            "fraction_above_demonstration_q99": 1.0,
+            "first_time_above_q99": 0.0
+          },
+          "previous_action": {
+            "rows": 46,
+            "mean": 0.6857701743489183,
+            "q95": 0.9946448083012944,
+            "fraction_above_demonstration_q99": 0.3695652173913043,
+            "first_time_above_q99": 0.5000000000000003
+          },
+          "contact_history": {
+            "rows": 46,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        }
+      }
+    },
+    {
+      "evaluation": "neutral-0",
+      "seed": 47,
+      "swap": true,
+      "role": 0,
+      "pair_survived": true,
+      "own_fell": false,
+      "controls": 500,
+      "first_cross_body_force": 2.1179999999999883,
+      "first_own_fist_target_force": 2.2819999999999703,
+      "first_own_valid_score": 2.2959999999999687,
+      "first_pair_fall": null,
+      "terminal": {
+        "pelvis_height": 0.752758035041534,
+        "upright": 0.999383175487228,
+        "low_pelvis": false,
+        "tilted": false,
+        "self_leg_contact": false
+      },
+      "minimum_pelvis": 0.7248437501213625,
+      "minimum_upright": 0.967854499537688,
+      "phase_coverage": {
+        "before_hit": {
+          "motor": {
+            "rows": 115,
+            "mean": 0.8469478391083392,
+            "q95": 1.1629927300502272,
+            "fraction_above_demonstration_q99": 0.10434782608695652,
+            "first_time_above_q99": 0.020000000000000004
+          },
+          "opponent": {
+            "rows": 115,
+            "mean": 0.34669512966324667,
+            "q95": 0.6461458449451181,
+            "fraction_above_demonstration_q99": 0.2782608695652174,
+            "first_time_above_q99": 0.0
+          },
+          "previous_action": {
+            "rows": 115,
+            "mean": 0.5199809119175938,
+            "q95": 0.8035718713830851,
+            "fraction_above_demonstration_q99": 0.06956521739130435,
+            "first_time_above_q99": 0.6600000000000005
+          },
+          "contact_history": {
+            "rows": 115,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        },
+        "after_hit": {
+          "motor": {
+            "rows": 385,
+            "mean": 0.3034493198850807,
+            "q95": 0.754404126101072,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          },
+          "opponent": {
+            "rows": 385,
+            "mean": 0.05706432094982825,
+            "q95": 0.1573840354316801,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          },
+          "previous_action": {
+            "rows": 385,
+            "mean": 0.2901547781943129,
+            "q95": 0.554770064608735,
+            "fraction_above_demonstration_q99": 0.01038961038961039,
+            "first_time_above_q99": 2.319999999999966
+          },
+          "contact_history": {
+            "rows": 385,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        }
+      }
+    },
+    {
+      "evaluation": "neutral-1",
+      "seed": 7,
+      "swap": false,
+      "role": 1,
+      "pair_survived": false,
+      "own_fell": true,
+      "controls": 267,
+      "first_cross_body_force": 2.1259999999999875,
+      "first_own_fist_target_force": 2.393999999999958,
+      "first_own_valid_score": 2.401999999999957,
+      "first_pair_fall": 5.321999999999636,
+      "terminal": {
+        "pelvis_height": 0.5481282691082546,
+        "upright": 0.8468989183362057,
+        "low_pelvis": true,
+        "tilted": false,
+        "self_leg_contact": false
+      },
+      "minimum_pelvis": 0.5481282691082546,
+      "minimum_upright": 0.8077300973812922,
+      "phase_coverage": {
+        "before_hit": {
+          "motor": {
+            "rows": 121,
+            "mean": 0.5656886906309584,
+            "q95": 0.8645575994958851,
+            "fraction_above_demonstration_q99": 0.01652892561983471,
+            "first_time_above_q99": 0.020000000000000004
+          },
+          "opponent": {
+            "rows": 121,
+            "mean": 0.2303899163427801,
+            "q95": 0.37513963157012287,
+            "fraction_above_demonstration_q99": 0.008264462809917356,
+            "first_time_above_q99": 0.0
+          },
+          "previous_action": {
+            "rows": 121,
+            "mean": 0.42288584608623536,
+            "q95": 0.7631429448727255,
+            "fraction_above_demonstration_q99": 0.03305785123966942,
+            "first_time_above_q99": 2.019999999999999
+          },
+          "contact_history": {
+            "rows": 121,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        },
+        "after_hit": {
+          "motor": {
+            "rows": 146,
+            "mean": 0.9639916316808523,
+            "q95": 2.3386560195764696,
+            "fraction_above_demonstration_q99": 0.21232876712328766,
+            "first_time_above_q99": 3.1599999999998736
+          },
+          "opponent": {
+            "rows": 146,
+            "mean": 0.3036463512822247,
+            "q95": 0.8588968661305928,
+            "fraction_above_demonstration_q99": 0.13013698630136986,
+            "first_time_above_q99": 4.959999999999676
+          },
+          "previous_action": {
+            "rows": 146,
+            "mean": 0.5908447046049301,
+            "q95": 0.8377999039537689,
+            "fraction_above_demonstration_q99": 0.0821917808219178,
+            "first_time_above_q99": 2.8799999999999044
+          },
+          "contact_history": {
+            "rows": 146,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        }
+      }
+    },
+    {
+      "evaluation": "neutral-1",
+      "seed": 7,
+      "swap": true,
+      "role": 1,
+      "pair_survived": true,
+      "own_fell": false,
+      "controls": 500,
+      "first_cross_body_force": 1.7740000000000014,
+      "first_own_fist_target_force": null,
+      "first_own_valid_score": null,
+      "first_pair_fall": null,
+      "terminal": {
+        "pelvis_height": 0.751872819765275,
+        "upright": 0.9985665741775764,
+        "low_pelvis": false,
+        "tilted": false,
+        "self_leg_contact": false
+      },
+      "minimum_pelvis": 0.7220650613893312,
+      "minimum_upright": 0.9727777004652127,
+      "phase_coverage": {
+        "before_hit": {
+          "motor": {
+            "rows": 500,
+            "mean": 0.622500944602257,
+            "q95": 1.144971619066084,
+            "fraction_above_demonstration_q99": 0.06,
+            "first_time_above_q99": 0.020000000000000004
+          },
+          "opponent": {
+            "rows": 500,
+            "mean": 0.163518783787913,
+            "q95": 0.34139809708827307,
+            "fraction_above_demonstration_q99": 0.004,
+            "first_time_above_q99": 0.0
+          },
+          "previous_action": {
+            "rows": 500,
+            "mean": 0.4991091410699869,
+            "q95": 0.7750623884857663,
+            "fraction_above_demonstration_q99": 0.048,
+            "first_time_above_q99": 1.6200000000000012
+          },
+          "contact_history": {
+            "rows": 500,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        }
+      }
+    },
+    {
+      "evaluation": "neutral-1",
+      "seed": 23,
+      "swap": false,
+      "role": 1,
+      "pair_survived": true,
+      "own_fell": false,
+      "controls": 500,
+      "first_cross_body_force": 1.8600000000000014,
+      "first_own_fist_target_force": 2.0599999999999947,
+      "first_own_valid_score": null,
+      "first_pair_fall": null,
+      "terminal": {
+        "pelvis_height": 0.7486594109707743,
+        "upright": 0.9942196826652965,
+        "low_pelvis": false,
+        "tilted": false,
+        "self_leg_contact": false
+      },
+      "minimum_pelvis": 0.7305124951146488,
+      "minimum_upright": 0.969597905555017,
+      "phase_coverage": {
+        "before_hit": {
+          "motor": {
+            "rows": 500,
+            "mean": 0.6367511146025602,
+            "q95": 0.8565845318456443,
+            "fraction_above_demonstration_q99": 0.008,
+            "first_time_above_q99": 0.020000000000000004
+          },
+          "opponent": {
+            "rows": 500,
+            "mean": 0.2509959167951977,
+            "q95": 0.3837107899672045,
+            "fraction_above_demonstration_q99": 0.006,
+            "first_time_above_q99": 0.0
+          },
+          "previous_action": {
+            "rows": 500,
+            "mean": 0.6944580022689449,
+            "q95": 0.9971714695035342,
+            "fraction_above_demonstration_q99": 0.42,
+            "first_time_above_q99": 0.08000000000000006
+          },
+          "contact_history": {
+            "rows": 500,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        }
+      }
+    },
+    {
+      "evaluation": "neutral-1",
+      "seed": 23,
+      "swap": true,
+      "role": 1,
+      "pair_survived": true,
+      "own_fell": false,
+      "controls": 500,
+      "first_cross_body_force": 1.8320000000000014,
+      "first_own_fist_target_force": null,
+      "first_own_valid_score": null,
+      "first_pair_fall": null,
+      "terminal": {
+        "pelvis_height": 0.7563649824071533,
+        "upright": 0.9968492358701067,
+        "low_pelvis": false,
+        "tilted": false,
+        "self_leg_contact": false
+      },
+      "minimum_pelvis": 0.7353137812392004,
+      "minimum_upright": 0.9721316454320693,
+      "phase_coverage": {
+        "before_hit": {
+          "motor": {
+            "rows": 500,
+            "mean": 0.4318932646824675,
+            "q95": 0.77518300683243,
+            "fraction_above_demonstration_q99": 0.004,
+            "first_time_above_q99": 0.020000000000000004
+          },
+          "opponent": {
+            "rows": 500,
+            "mean": 0.10077489031963609,
+            "q95": 0.2202935114387397,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          },
+          "previous_action": {
+            "rows": 500,
+            "mean": 0.3973597443132419,
+            "q95": 0.6719523459429947,
+            "fraction_above_demonstration_q99": 0.008,
+            "first_time_above_q99": 1.8200000000000014
+          },
+          "contact_history": {
+            "rows": 500,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        }
+      }
+    },
+    {
+      "evaluation": "neutral-1",
+      "seed": 31,
+      "swap": false,
+      "role": 1,
+      "pair_survived": false,
+      "own_fell": true,
+      "controls": 341,
+      "first_cross_body_force": 2.347999999999963,
+      "first_own_fist_target_force": null,
+      "first_own_valid_score": null,
+      "first_pair_fall": 6.811999999999472,
+      "terminal": {
+        "pelvis_height": 0.547777202356517,
+        "upright": 0.8978491462093214,
+        "low_pelvis": true,
+        "tilted": false,
+        "self_leg_contact": false
+      },
+      "minimum_pelvis": 0.547777202356517,
+      "minimum_upright": 0.8978491462093214,
+      "phase_coverage": {
+        "before_hit": {
+          "motor": {
+            "rows": 341,
+            "mean": 0.9308327721596595,
+            "q95": 2.1777488281221604,
+            "fraction_above_demonstration_q99": 0.25806451612903225,
+            "first_time_above_q99": 0.020000000000000004
+          },
+          "opponent": {
+            "rows": 341,
+            "mean": 0.35056935354160096,
+            "q95": 0.9560634274506176,
+            "fraction_above_demonstration_q99": 0.20234604105571846,
+            "first_time_above_q99": 0.08000000000000006
+          },
+          "previous_action": {
+            "rows": 341,
+            "mean": 0.5530184825428713,
+            "q95": 0.8531506503121602,
+            "fraction_above_demonstration_q99": 0.11436950146627566,
+            "first_time_above_q99": 0.3800000000000003
+          },
+          "contact_history": {
+            "rows": 341,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        }
+      }
+    },
+    {
+      "evaluation": "neutral-1",
+      "seed": 31,
+      "swap": true,
+      "role": 1,
+      "pair_survived": true,
+      "own_fell": false,
+      "controls": 500,
+      "first_cross_body_force": 1.430000000000001,
+      "first_own_fist_target_force": 1.5640000000000012,
+      "first_own_valid_score": null,
+      "first_pair_fall": null,
+      "terminal": {
+        "pelvis_height": 0.7543928228982684,
+        "upright": 0.9986931723138104,
+        "low_pelvis": false,
+        "tilted": false,
+        "self_leg_contact": false
+      },
+      "minimum_pelvis": 0.7403393688668575,
+      "minimum_upright": 0.95576493909523,
+      "phase_coverage": {
+        "before_hit": {
+          "motor": {
+            "rows": 500,
+            "mean": 0.4240076811553843,
+            "q95": 0.817909486177684,
+            "fraction_above_demonstration_q99": 0.004,
+            "first_time_above_q99": 0.020000000000000004
+          },
+          "opponent": {
+            "rows": 500,
+            "mean": 0.11030064625097512,
+            "q95": 0.3016781958733766,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          },
+          "previous_action": {
+            "rows": 500,
+            "mean": 0.38602064918759904,
+            "q95": 0.6052105228017971,
+            "fraction_above_demonstration_q99": 0.014,
+            "first_time_above_q99": 1.0800000000000007
+          },
+          "contact_history": {
+            "rows": 500,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        }
+      }
+    },
+    {
+      "evaluation": "neutral-1",
+      "seed": 47,
+      "swap": false,
+      "role": 1,
+      "pair_survived": true,
+      "own_fell": false,
+      "controls": 500,
+      "first_cross_body_force": 2.4339999999999535,
+      "first_own_fist_target_force": 2.619999999999933,
+      "first_own_valid_score": null,
+      "first_pair_fall": null,
+      "terminal": {
+        "pelvis_height": 0.7579802175715823,
+        "upright": 0.9923111974255038,
+        "low_pelvis": false,
+        "tilted": false,
+        "self_leg_contact": false
+      },
+      "minimum_pelvis": 0.7218825599569753,
+      "minimum_upright": 0.9724002350443192,
+      "phase_coverage": {
+        "before_hit": {
+          "motor": {
+            "rows": 500,
+            "mean": 0.6992614302031559,
+            "q95": 1.3585124370170159,
+            "fraction_above_demonstration_q99": 0.074,
+            "first_time_above_q99": 0.020000000000000004
+          },
+          "opponent": {
+            "rows": 500,
+            "mean": 0.27910532224642887,
+            "q95": 0.7294146976709938,
+            "fraction_above_demonstration_q99": 0.066,
+            "first_time_above_q99": 0.0
+          },
+          "previous_action": {
+            "rows": 500,
+            "mean": 0.7085394461737121,
+            "q95": 0.9957265977603313,
+            "fraction_above_demonstration_q99": 0.432,
+            "first_time_above_q99": 0.10000000000000007
+          },
+          "contact_history": {
+            "rows": 500,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        }
+      }
+    },
+    {
+      "evaluation": "neutral-1",
+      "seed": 47,
+      "swap": true,
+      "role": 1,
+      "pair_survived": true,
+      "own_fell": false,
+      "controls": 500,
+      "first_cross_body_force": 1.9000000000000015,
+      "first_own_fist_target_force": null,
+      "first_own_valid_score": null,
+      "first_pair_fall": null,
+      "terminal": {
+        "pelvis_height": 0.7514367290752345,
+        "upright": 0.9959465484382762,
+        "low_pelvis": false,
+        "tilted": false,
+        "self_leg_contact": false
+      },
+      "minimum_pelvis": 0.7336394289986217,
+      "minimum_upright": 0.9588043405732708,
+      "phase_coverage": {
+        "before_hit": {
+          "motor": {
+            "rows": 500,
+            "mean": 0.6526825176837857,
+            "q95": 0.8811074954611933,
+            "fraction_above_demonstration_q99": 0.018,
+            "first_time_above_q99": 0.020000000000000004
+          },
+          "opponent": {
+            "rows": 500,
+            "mean": 0.24130656613979676,
+            "q95": 0.580710434642046,
+            "fraction_above_demonstration_q99": 0.054,
+            "first_time_above_q99": 0.0
+          },
+          "previous_action": {
+            "rows": 500,
+            "mean": 0.6498476053951329,
+            "q95": 0.9338528708313407,
+            "fraction_above_demonstration_q99": 0.236,
+            "first_time_above_q99": 0.08000000000000006
+          },
+          "contact_history": {
+            "rows": 500,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        }
+      }
+    },
+    {
+      "evaluation": "selfplay",
+      "seed": 7,
+      "swap": false,
+      "role": 0,
+      "pair_survived": true,
+      "own_fell": false,
+      "controls": 500,
+      "first_cross_body_force": 2.0339999999999976,
+      "first_own_fist_target_force": null,
+      "first_own_valid_score": null,
+      "first_pair_fall": null,
+      "terminal": {
+        "pelvis_height": 0.7533535148691227,
+        "upright": 0.9958338445365881,
+        "low_pelvis": false,
+        "tilted": false,
+        "self_leg_contact": false
+      },
+      "minimum_pelvis": 0.7362814938659056,
+      "minimum_upright": 0.973191001785195,
+      "phase_coverage": {
+        "before_hit": {
+          "motor": {
+            "rows": 500,
+            "mean": 0.5176201034426481,
+            "q95": 0.9081913147957793,
+            "fraction_above_demonstration_q99": 0.012,
+            "first_time_above_q99": 0.020000000000000004
+          },
+          "opponent": {
+            "rows": 500,
+            "mean": 0.22773535496929484,
+            "q95": 0.4440830453486702,
+            "fraction_above_demonstration_q99": 0.046,
+            "first_time_above_q99": 0.0
+          },
+          "previous_action": {
+            "rows": 500,
+            "mean": 0.5298712070503013,
+            "q95": 0.9117412129569901,
+            "fraction_above_demonstration_q99": 0.152,
+            "first_time_above_q99": 0.08000000000000006
+          },
+          "contact_history": {
+            "rows": 500,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        }
+      }
+    },
+    {
+      "evaluation": "selfplay",
+      "seed": 7,
+      "swap": false,
+      "role": 1,
+      "pair_survived": true,
+      "own_fell": false,
+      "controls": 500,
+      "first_cross_body_force": 2.0339999999999976,
+      "first_own_fist_target_force": 6.265999999999532,
+      "first_own_valid_score": 6.447999999999512,
+      "first_pair_fall": null,
+      "terminal": {
+        "pelvis_height": 0.7546135392550135,
+        "upright": 0.9958177761574626,
+        "low_pelvis": false,
+        "tilted": false,
+        "self_leg_contact": false
+      },
+      "minimum_pelvis": 0.7266357301874746,
+      "minimum_upright": 0.9750025867500591,
+      "phase_coverage": {
+        "before_hit": {
+          "motor": {
+            "rows": 323,
+            "mean": 0.673597635340119,
+            "q95": 1.0545239036830072,
+            "fraction_above_demonstration_q99": 0.04643962848297214,
+            "first_time_above_q99": 0.020000000000000004
+          },
+          "opponent": {
+            "rows": 323,
+            "mean": 0.24838757155727123,
+            "q95": 0.39746629718290793,
+            "fraction_above_demonstration_q99": 0.0030959752321981426,
+            "first_time_above_q99": 0.0
+          },
+          "previous_action": {
+            "rows": 323,
+            "mean": 0.5498875274389957,
+            "q95": 0.8663470049319141,
+            "fraction_above_demonstration_q99": 0.14241486068111456,
+            "first_time_above_q99": 2.139999999999986
+          },
+          "contact_history": {
+            "rows": 323,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        },
+        "after_hit": {
+          "motor": {
+            "rows": 177,
+            "mean": 0.4774088718655819,
+            "q95": 1.0490968549560624,
+            "fraction_above_demonstration_q99": 0.04519774011299435,
+            "first_time_above_q99": 6.459999999999511
+          },
+          "opponent": {
+            "rows": 177,
+            "mean": 0.1500958764508645,
+            "q95": 0.36903062324640123,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          },
+          "previous_action": {
+            "rows": 177,
+            "mean": 0.4230516145702523,
+            "q95": 0.8242022212560327,
+            "fraction_above_demonstration_q99": 0.07909604519774012,
+            "first_time_above_q99": 6.479999999999508
+          },
+          "contact_history": {
+            "rows": 177,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        }
+      }
+    },
+    {
+      "evaluation": "selfplay",
+      "seed": 7,
+      "swap": true,
+      "role": 0,
+      "pair_survived": true,
+      "own_fell": false,
+      "controls": 500,
+      "first_cross_body_force": 1.6100000000000012,
+      "first_own_fist_target_force": null,
+      "first_own_valid_score": null,
+      "first_pair_fall": null,
+      "terminal": {
+        "pelvis_height": 0.7579694564975437,
+        "upright": 0.9982427997617366,
+        "low_pelvis": false,
+        "tilted": false,
+        "self_leg_contact": false
+      },
+      "minimum_pelvis": 0.7391629964418228,
+      "minimum_upright": 0.9729745163369954,
+      "phase_coverage": {
+        "before_hit": {
+          "motor": {
+            "rows": 500,
+            "mean": 0.376453697675888,
+            "q95": 0.6864981371518684,
+            "fraction_above_demonstration_q99": 0.002,
+            "first_time_above_q99": 0.020000000000000004
+          },
+          "opponent": {
+            "rows": 500,
+            "mean": 0.1505761755310561,
+            "q95": 0.2921829497583045,
+            "fraction_above_demonstration_q99": 0.004,
+            "first_time_above_q99": 0.12000000000000009
+          },
+          "previous_action": {
+            "rows": 500,
+            "mean": 0.3405627911721091,
+            "q95": 0.5436210788950889,
+            "fraction_above_demonstration_q99": 0.004,
+            "first_time_above_q99": 1.6600000000000013
+          },
+          "contact_history": {
+            "rows": 500,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        }
+      }
+    },
+    {
+      "evaluation": "selfplay",
+      "seed": 7,
+      "swap": true,
+      "role": 1,
+      "pair_survived": true,
+      "own_fell": false,
+      "controls": 500,
+      "first_cross_body_force": 1.6100000000000012,
+      "first_own_fist_target_force": null,
+      "first_own_valid_score": null,
+      "first_pair_fall": null,
+      "terminal": {
+        "pelvis_height": 0.7537917891337717,
+        "upright": 0.9978726671334935,
+        "low_pelvis": false,
+        "tilted": false,
+        "self_leg_contact": false
+      },
+      "minimum_pelvis": 0.7309796562994286,
+      "minimum_upright": 0.978486627413966,
+      "phase_coverage": {
+        "before_hit": {
+          "motor": {
+            "rows": 500,
+            "mean": 0.4316494172101402,
+            "q95": 0.7272874942058243,
+            "fraction_above_demonstration_q99": 0.004,
+            "first_time_above_q99": 0.020000000000000004
+          },
+          "opponent": {
+            "rows": 500,
+            "mean": 0.16009893011884896,
+            "q95": 0.28966316001951886,
+            "fraction_above_demonstration_q99": 0.002,
+            "first_time_above_q99": 0.0
+          },
+          "previous_action": {
+            "rows": 500,
+            "mean": 0.3877247897241493,
+            "q95": 0.6488196280009267,
+            "fraction_above_demonstration_q99": 0.01,
+            "first_time_above_q99": 1.9000000000000015
+          },
+          "contact_history": {
+            "rows": 500,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        }
+      }
+    },
+    {
+      "evaluation": "selfplay",
+      "seed": 23,
+      "swap": false,
+      "role": 0,
+      "pair_survived": false,
+      "own_fell": true,
+      "controls": 104,
+      "first_cross_body_force": 1.2180000000000009,
+      "first_own_fist_target_force": null,
+      "first_own_valid_score": null,
+      "first_pair_fall": 2.075999999999993,
+      "terminal": {
+        "pelvis_height": 0.5481385604894796,
+        "upright": 0.6928481466237943,
+        "low_pelvis": true,
+        "tilted": false,
+        "self_leg_contact": false
+      },
+      "minimum_pelvis": 0.5481385604894796,
+      "minimum_upright": 0.6928481466237943,
+      "phase_coverage": {
+        "before_hit": {
+          "motor": {
+            "rows": 104,
+            "mean": 1.251138162522899,
+            "q95": 2.0335626196220695,
+            "fraction_above_demonstration_q99": 0.6346153846153846,
+            "first_time_above_q99": 0.3800000000000003
+          },
+          "opponent": {
+            "rows": 104,
+            "mean": 0.623172565473795,
+            "q95": 1.1374917098246997,
+            "fraction_above_demonstration_q99": 0.7403846153846154,
+            "first_time_above_q99": 0.22000000000000017
+          },
+          "previous_action": {
+            "rows": 104,
+            "mean": 0.6208372930544995,
+            "q95": 0.8879904026556885,
+            "fraction_above_demonstration_q99": 0.22115384615384615,
+            "first_time_above_q99": 0.4000000000000003
+          },
+          "contact_history": {
+            "rows": 104,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        }
+      }
+    },
+    {
+      "evaluation": "selfplay",
+      "seed": 23,
+      "swap": false,
+      "role": 1,
+      "pair_survived": false,
+      "own_fell": false,
+      "controls": 104,
+      "first_cross_body_force": 1.2180000000000009,
+      "first_own_fist_target_force": null,
+      "first_own_valid_score": null,
+      "first_pair_fall": 2.075999999999993,
+      "terminal": {
+        "pelvis_height": 0.574040728727629,
+        "upright": 0.685632901126791,
+        "low_pelvis": false,
+        "tilted": false,
+        "self_leg_contact": false
+      },
+      "minimum_pelvis": 0.574040728727629,
+      "minimum_upright": 0.685632901126791,
+      "phase_coverage": {
+        "before_hit": {
+          "motor": {
+            "rows": 104,
+            "mean": 0.9976784806822171,
+            "q95": 2.3108009847247795,
+            "fraction_above_demonstration_q99": 0.34615384615384615,
+            "first_time_above_q99": 0.020000000000000004
+          },
+          "opponent": {
+            "rows": 104,
+            "mean": 0.5654771481769738,
+            "q95": 0.9065850727101666,
+            "fraction_above_demonstration_q99": 0.4807692307692308,
+            "first_time_above_q99": 0.0
+          },
+          "previous_action": {
+            "rows": 104,
+            "mean": 0.5332307242873087,
+            "q95": 0.8326509343731326,
+            "fraction_above_demonstration_q99": 0.09615384615384616,
+            "first_time_above_q99": 0.08000000000000006
+          },
+          "contact_history": {
+            "rows": 104,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        }
+      }
+    },
+    {
+      "evaluation": "selfplay",
+      "seed": 23,
+      "swap": true,
+      "role": 0,
+      "pair_survived": true,
+      "own_fell": false,
+      "controls": 500,
+      "first_cross_body_force": 1.6440000000000012,
+      "first_own_fist_target_force": 1.9920000000000015,
+      "first_own_valid_score": null,
+      "first_pair_fall": null,
+      "terminal": {
+        "pelvis_height": 0.754767871517761,
+        "upright": 0.9985812685938438,
+        "low_pelvis": false,
+        "tilted": false,
+        "self_leg_contact": false
+      },
+      "minimum_pelvis": 0.7319533292999231,
+      "minimum_upright": 0.9769453728367038,
+      "phase_coverage": {
+        "before_hit": {
+          "motor": {
+            "rows": 500,
+            "mean": 0.5024410513422509,
+            "q95": 0.8673999694703292,
+            "fraction_above_demonstration_q99": 0.01,
+            "first_time_above_q99": 0.020000000000000004
+          },
+          "opponent": {
+            "rows": 500,
+            "mean": 0.17827096718122937,
+            "q95": 0.3312092017047862,
+            "fraction_above_demonstration_q99": 0.006,
+            "first_time_above_q99": 0.7200000000000005
+          },
+          "previous_action": {
+            "rows": 500,
+            "mean": 0.45360348940894424,
+            "q95": 0.8117675354449948,
+            "fraction_above_demonstration_q99": 0.072,
+            "first_time_above_q99": 1.6600000000000013
+          },
+          "contact_history": {
+            "rows": 500,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        }
+      }
+    },
+    {
+      "evaluation": "selfplay",
+      "seed": 23,
+      "swap": true,
+      "role": 1,
+      "pair_survived": true,
+      "own_fell": false,
+      "controls": 500,
+      "first_cross_body_force": 1.6440000000000012,
+      "first_own_fist_target_force": null,
+      "first_own_valid_score": null,
+      "first_pair_fall": null,
+      "terminal": {
+        "pelvis_height": 0.7533356195327551,
+        "upright": 0.9967740263351215,
+        "low_pelvis": false,
+        "tilted": false,
+        "self_leg_contact": false
+      },
+      "minimum_pelvis": 0.7347485829776352,
+      "minimum_upright": 0.969103837912093,
+      "phase_coverage": {
+        "before_hit": {
+          "motor": {
+            "rows": 500,
+            "mean": 0.5550612742746197,
+            "q95": 0.7530207397760876,
+            "fraction_above_demonstration_q99": 0.004,
+            "first_time_above_q99": 0.020000000000000004
+          },
+          "opponent": {
+            "rows": 500,
+            "mean": 0.20322427624761422,
+            "q95": 0.3160099483073972,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          },
+          "previous_action": {
+            "rows": 500,
+            "mean": 0.5706300467257095,
+            "q95": 0.9403703832979287,
+            "fraction_above_demonstration_q99": 0.12,
+            "first_time_above_q99": 1.6800000000000013
+          },
+          "contact_history": {
+            "rows": 500,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        }
+      }
+    },
+    {
+      "evaluation": "selfplay",
+      "seed": 31,
+      "swap": false,
+      "role": 0,
+      "pair_survived": false,
+      "own_fell": false,
+      "controls": 292,
+      "first_cross_body_force": 2.201999999999979,
+      "first_own_fist_target_force": null,
+      "first_own_valid_score": null,
+      "first_pair_fall": 5.8339999999995795,
+      "terminal": {
+        "pelvis_height": 0.7572294722726758,
+        "upright": 0.9829457807713977,
+        "low_pelvis": false,
+        "tilted": false,
+        "self_leg_contact": false
+      },
+      "minimum_pelvis": 0.7374115910063018,
+      "minimum_upright": 0.9742478341083995,
+      "phase_coverage": {
+        "before_hit": {
+          "motor": {
+            "rows": 292,
+            "mean": 0.5776793290599044,
+            "q95": 1.0385649083767656,
+            "fraction_above_demonstration_q99": 0.04452054794520548,
+            "first_time_above_q99": 0.020000000000000004
+          },
+          "opponent": {
+            "rows": 292,
+            "mean": 0.3947722736829101,
+            "q95": 1.0881631437994301,
+            "fraction_above_demonstration_q99": 0.2226027397260274,
+            "first_time_above_q99": 0.0
+          },
+          "previous_action": {
+            "rows": 292,
+            "mean": 0.4848416288904008,
+            "q95": 0.7703106223187196,
+            "fraction_above_demonstration_q99": 0.06506849315068493,
+            "first_time_above_q99": 0.06000000000000004
+          },
+          "contact_history": {
+            "rows": 292,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        }
+      }
+    },
+    {
+      "evaluation": "selfplay",
+      "seed": 31,
+      "swap": false,
+      "role": 1,
+      "pair_survived": false,
+      "own_fell": true,
+      "controls": 292,
+      "first_cross_body_force": 2.201999999999979,
+      "first_own_fist_target_force": null,
+      "first_own_valid_score": null,
+      "first_pair_fall": 5.8339999999995795,
+      "terminal": {
+        "pelvis_height": 0.5479090706484534,
+        "upright": 0.774523729630897,
+        "low_pelvis": true,
+        "tilted": false,
+        "self_leg_contact": false
+      },
+      "minimum_pelvis": 0.5479090706484534,
+      "minimum_upright": 0.774523729630897,
+      "phase_coverage": {
+        "before_hit": {
+          "motor": {
+            "rows": 292,
+            "mean": 0.71033776902167,
+            "q95": 1.3718338678272126,
+            "fraction_above_demonstration_q99": 0.1095890410958904,
+            "first_time_above_q99": 0.020000000000000004
+          },
+          "opponent": {
+            "rows": 292,
+            "mean": 0.4364385200625138,
+            "q95": 1.2970312124494687,
+            "fraction_above_demonstration_q99": 0.2191780821917808,
+            "first_time_above_q99": 0.08000000000000006
+          },
+          "previous_action": {
+            "rows": 292,
+            "mean": 0.5042050381652794,
+            "q95": 0.7624687135843873,
+            "fraction_above_demonstration_q99": 0.0410958904109589,
+            "first_time_above_q99": 0.3800000000000003
+          },
+          "contact_history": {
+            "rows": 292,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        }
+      }
+    },
+    {
+      "evaluation": "selfplay",
+      "seed": 31,
+      "swap": true,
+      "role": 0,
+      "pair_survived": true,
+      "own_fell": false,
+      "controls": 500,
+      "first_cross_body_force": 1.1880000000000008,
+      "first_own_fist_target_force": null,
+      "first_own_valid_score": null,
+      "first_pair_fall": null,
+      "terminal": {
+        "pelvis_height": 0.7547550052247479,
+        "upright": 0.9978250586786344,
+        "low_pelvis": false,
+        "tilted": false,
+        "self_leg_contact": false
+      },
+      "minimum_pelvis": 0.7383260234291792,
+      "minimum_upright": 0.9699640210232676,
+      "phase_coverage": {
+        "before_hit": {
+          "motor": {
+            "rows": 500,
+            "mean": 0.5003737840173865,
+            "q95": 0.8015176894408772,
+            "fraction_above_demonstration_q99": 0.004,
+            "first_time_above_q99": 0.020000000000000004
+          },
+          "opponent": {
+            "rows": 500,
+            "mean": 0.2334157032597583,
+            "q95": 0.38240822325140966,
+            "fraction_above_demonstration_q99": 0.012,
+            "first_time_above_q99": 0.0
+          },
+          "previous_action": {
+            "rows": 500,
+            "mean": 0.5030512429594145,
+            "q95": 0.8122093680667887,
+            "fraction_above_demonstration_q99": 0.076,
+            "first_time_above_q99": 1.2000000000000008
+          },
+          "contact_history": {
+            "rows": 500,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        }
+      }
+    },
+    {
+      "evaluation": "selfplay",
+      "seed": 31,
+      "swap": true,
+      "role": 1,
+      "pair_survived": true,
+      "own_fell": false,
+      "controls": 500,
+      "first_cross_body_force": 1.1880000000000008,
+      "first_own_fist_target_force": null,
+      "first_own_valid_score": null,
+      "first_pair_fall": null,
+      "terminal": {
+        "pelvis_height": 0.7532192253163315,
+        "upright": 0.9881104943711675,
+        "low_pelvis": false,
+        "tilted": false,
+        "self_leg_contact": false
+      },
+      "minimum_pelvis": 0.738519632767065,
+      "minimum_upright": 0.9576706741993012,
+      "phase_coverage": {
+        "before_hit": {
+          "motor": {
+            "rows": 500,
+            "mean": 0.49193580893676286,
+            "q95": 0.8194380041070116,
+            "fraction_above_demonstration_q99": 0.006,
+            "first_time_above_q99": 0.020000000000000004
+          },
+          "opponent": {
+            "rows": 500,
+            "mean": 0.2044205642405504,
+            "q95": 0.3922853054917484,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          },
+          "previous_action": {
+            "rows": 500,
+            "mean": 0.4220713207657402,
+            "q95": 0.7136047075997687,
+            "fraction_above_demonstration_q99": 0.018,
+            "first_time_above_q99": 1.0800000000000007
+          },
+          "contact_history": {
+            "rows": 500,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        }
+      }
+    },
+    {
+      "evaluation": "selfplay",
+      "seed": 47,
+      "swap": false,
+      "role": 0,
+      "pair_survived": false,
+      "own_fell": true,
+      "controls": 46,
+      "first_cross_body_force": null,
+      "first_own_fist_target_force": null,
+      "first_own_valid_score": null,
+      "first_pair_fall": 0.9020000000000007,
+      "terminal": {
+        "pelvis_height": 0.5493538506056234,
+        "upright": 0.7752991266611108,
+        "low_pelvis": true,
+        "tilted": false,
+        "self_leg_contact": false
+      },
+      "minimum_pelvis": 0.5493538506056234,
+      "minimum_upright": 0.7752991266611108,
+      "phase_coverage": {
+        "before_hit": {
+          "motor": {
+            "rows": 46,
+            "mean": 1.4568595414529804,
+            "q95": 2.3380514252660656,
+            "fraction_above_demonstration_q99": 0.7391304347826086,
+            "first_time_above_q99": 0.020000000000000004
+          },
+          "opponent": {
+            "rows": 46,
+            "mean": 1.726791091646646,
+            "q95": 3.823110698754331,
+            "fraction_above_demonstration_q99": 1.0,
+            "first_time_above_q99": 0.0
+          },
+          "previous_action": {
+            "rows": 46,
+            "mean": 0.6832488100428369,
+            "q95": 1.0153576064679906,
+            "fraction_above_demonstration_q99": 0.3695652173913043,
+            "first_time_above_q99": 0.5600000000000004
+          },
+          "contact_history": {
+            "rows": 46,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        }
+      }
+    },
+    {
+      "evaluation": "selfplay",
+      "seed": 47,
+      "swap": false,
+      "role": 1,
+      "pair_survived": false,
+      "own_fell": false,
+      "controls": 46,
+      "first_cross_body_force": null,
+      "first_own_fist_target_force": null,
+      "first_own_valid_score": null,
+      "first_pair_fall": 0.9020000000000007,
+      "terminal": {
+        "pelvis_height": 0.7322594080331186,
+        "upright": 0.9940486346296674,
+        "low_pelvis": false,
+        "tilted": false,
+        "self_leg_contact": false
+      },
+      "minimum_pelvis": 0.7217325120461525,
+      "minimum_upright": 0.9813967745328773,
+      "phase_coverage": {
+        "before_hit": {
+          "motor": {
+            "rows": 46,
+            "mean": 1.4737567169854062,
+            "q95": 2.12942895741815,
+            "fraction_above_demonstration_q99": 0.8043478260869565,
+            "first_time_above_q99": 0.020000000000000004
+          },
+          "opponent": {
+            "rows": 46,
+            "mean": 1.0386754450944384,
+            "q95": 1.6499391736630455,
+            "fraction_above_demonstration_q99": 0.9782608695652174,
+            "first_time_above_q99": 0.0
+          },
+          "previous_action": {
+            "rows": 46,
+            "mean": 0.7095093451167306,
+            "q95": 0.9274633978352228,
+            "fraction_above_demonstration_q99": 0.34782608695652173,
+            "first_time_above_q99": 0.10000000000000007
+          },
+          "contact_history": {
+            "rows": 46,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        }
+      }
+    },
+    {
+      "evaluation": "selfplay",
+      "seed": 47,
+      "swap": true,
+      "role": 0,
+      "pair_survived": true,
+      "own_fell": false,
+      "controls": 500,
+      "first_cross_body_force": 1.8200000000000014,
+      "first_own_fist_target_force": null,
+      "first_own_valid_score": null,
+      "first_pair_fall": null,
+      "terminal": {
+        "pelvis_height": 0.7544162749924122,
+        "upright": 0.9982216851494596,
+        "low_pelvis": false,
+        "tilted": false,
+        "self_leg_contact": false
+      },
+      "minimum_pelvis": 0.7269062535819442,
+      "minimum_upright": 0.9683266180653135,
+      "phase_coverage": {
+        "before_hit": {
+          "motor": {
+            "rows": 500,
+            "mean": 0.5221193750112645,
+            "q95": 1.0083928262406754,
+            "fraction_above_demonstration_q99": 0.016,
+            "first_time_above_q99": 0.020000000000000004
+          },
+          "opponent": {
+            "rows": 500,
+            "mean": 0.24416815860226623,
+            "q95": 0.5585862750931831,
+            "fraction_above_demonstration_q99": 0.066,
+            "first_time_above_q99": 0.0
+          },
+          "previous_action": {
+            "rows": 500,
+            "mean": 0.5136293345675673,
+            "q95": 0.8388070179070591,
+            "fraction_above_demonstration_q99": 0.08,
+            "first_time_above_q99": 0.7000000000000005
+          },
+          "contact_history": {
+            "rows": 500,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        }
+      }
+    },
+    {
+      "evaluation": "selfplay",
+      "seed": 47,
+      "swap": true,
+      "role": 1,
+      "pair_survived": true,
+      "own_fell": false,
+      "controls": 500,
+      "first_cross_body_force": 1.8200000000000014,
+      "first_own_fist_target_force": null,
+      "first_own_valid_score": null,
+      "first_pair_fall": null,
+      "terminal": {
+        "pelvis_height": 0.749052246749338,
+        "upright": 0.9778034135034525,
+        "low_pelvis": false,
+        "tilted": false,
+        "self_leg_contact": false
+      },
+      "minimum_pelvis": 0.7337976460667651,
+      "minimum_upright": 0.9591477724827873,
+      "phase_coverage": {
+        "before_hit": {
+          "motor": {
+            "rows": 500,
+            "mean": 0.44518431407254605,
+            "q95": 0.8329710776645967,
+            "fraction_above_demonstration_q99": 0.018,
+            "first_time_above_q99": 0.020000000000000004
+          },
+          "opponent": {
+            "rows": 500,
+            "mean": 0.19918396147214343,
+            "q95": 0.5840281410359204,
+            "fraction_above_demonstration_q99": 0.056,
+            "first_time_above_q99": 0.0
+          },
+          "previous_action": {
+            "rows": 500,
+            "mean": 0.349164372425428,
+            "q95": 0.6238056194619119,
+            "fraction_above_demonstration_q99": 0.006,
+            "first_time_above_q99": 0.08000000000000006
+          },
+          "contact_history": {
+            "rows": 500,
+            "mean": 0.0,
+            "q95": 0.0,
+            "fraction_above_demonstration_q99": 0.0,
+            "first_time_above_q99": null
+          }
+        }
+      }
+    }
+  ],
+  "limitation": "Successful-data marginal distances are descriptive, not joint coverage, causal proof or changed gates.",
+  "decision": "Review first-fall and coverage evidence before allocating learning; no automatic promotion or extension."
+}

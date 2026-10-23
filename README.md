@@ -42,8 +42,11 @@ for control, without sufficient own scoring in both roles.
 active. No actor is adopted and no physical gate is weakened. Inspect
 `/home/pedro/boxing-runs/striking-contact-compare-bc2000/comparison.json`
 and processes before another launch; that job is completed. Main and PPO remain
-stopped. The next bounded work is a read-only policy-state coverage/first-fall
-audit, documented in the comparison review; no more learning is allocated.
+stopped. The [completed coverage/channel audits](docs/striking-policy-coverage-audit.md)
+reproduced every physical result and localized selected early falls to the arm
+residual channel. Their short interventions are diagnostic, not adopted policies.
+The next bounded work validates motor-preserving pre-contact examples on fresh
+seeds; no additional learning is allocated.
 
 The [closed-fist replay repair](docs/closed-fist-rendering.md) restores the
 original visual feature without changing learning or physics. Historical videos

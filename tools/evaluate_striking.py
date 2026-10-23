@@ -23,6 +23,14 @@ def arm_perturbation(noise, held, step, hold=1, scale=1.):
     return noise,held
 
 
+def ablate_action(action,zero_commands=False,zero_arms=False):
+    if not zero_commands and not zero_arms:return action
+    result=action.copy()
+    if zero_commands:result[:,:3]=0.
+    if zero_arms:result[:,3:17]=0.
+    return result
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--checkpoint',type=Path)
@@ -31,6 +39,7 @@ def main():
     parser.add_argument('--seconds',type=float,default=10.)
     parser.add_argument('--video',type=Path)
     parser.add_argument('--progress',type=Path,help='durable attempted controls for diagnostic recovery')
+    parser.add_argument('--trace-directory',type=Path,help='passive observations/actions and first-contact timing')
     parser.add_argument('--sampled',action='store_true',
                         help='diagnostic saved-Gaussian policy; does not replace deterministic screening')
     parser.add_argument('--arm-noise-scale',type=float,default=1.,
@@ -41,12 +50,15 @@ def main():
                         help='diagnostic only: zero the other corner high-level commands; keep all physics')
     parser.add_argument('--zero-command-offsets',action='store_true',
                         help='diagnostic ablation: keep learned motor navigation, remove high-level command offsets')
+    parser.add_argument('--zero-arm-residuals',action='store_true',
+                        help='diagnostic ablation: zero only high-level fourteen arm residual outputs')
     parser.add_argument('--approach-gain',type=float,
                         help='diagnostic navigation proportional gain; original default is 0.8')
     parser.add_argument('--engagement-distance',type=float,
                         help='explicit diagnostic profile override; impact criteria remain fixed')
     args=parser.parse_args()
     if args.progress and args.progress.exists():raise ValueError('evaluation progress exists; inspect before rerun')
+    if args.trace_directory:args.trace_directory.mkdir(parents=True,exist_ok=False)
     if args.sampled and not args.checkpoint:
         raise ValueError('sampled diagnostic requires a saved policy')
     if not np.isfinite(args.arm_noise_scale) or args.arm_noise_scale<=0 or args.arm_noise_hold<1:
@@ -133,6 +145,10 @@ def main():
         for seed in args.seeds:
             for swap in (False,True):
                 obs=env.reset(seed,swap)
+                trace=None
+                if args.trace_directory:
+                    from boxer.striking_trace import StrikingTrace,terminal_details
+                    trace=StrikingTrace(env)
                 rng=np.random.default_rng(seed+int(swap)*1009)
                 held_arm_noise=None
                 hits=np.zeros(2);impulses=np.zeros(2)
@@ -155,15 +171,15 @@ def main():
                     if args.neutral_partner is not None:
                         action=action.copy()
                         action[1-args.neutral_partner]=0.
-                    if args.zero_command_offsets:
-                        action=action.copy()
-                        action[:,:3]=0.
+                    action=ablate_action(action,args.zero_command_offsets,args.zero_arm_residuals)
                     previous_scores=env.pair.scorecard.last_score.copy()
+                    if trace:trace.before(env,obs,action)
                     transitions+=1
                     if args.progress:
                         atomic_json(args.progress,dict(status='running',simulated_world_transitions=transitions,
                             seed=seed,swap=swap,control_step=step,striking_sha256=residual_hash,updated_utc=utc()))
                     obs,reward,done,outcome=env.step(action)
+                    if trace:trace.after(env,obs,outcome)
                     hits+=outcome['scored'];impulses+=outcome['legal_contact_impulse']
                     if np.any(outcome['scored']):
                         recent=env.pair.scorecard.last_score > previous_scores
@@ -189,6 +205,13 @@ def main():
                     mean_abs_arm_residual=(residual_activity/(step+1)).tolist(),
                     max_abs_arm_residual=max_residual.tolist())
                 result['impact_events']=impact_events
+                if trace:
+                    trace_file=args.trace_directory/f'{mode}-seed-{seed}-swap-{int(swap)}.npz'
+                    result['first_observed_contacts']=trace.save(trace_file,env)
+                    result['trace_file']=str(trace_file)
+                    result['trace_sha256']=hashlib.sha256(trace_file.read_bytes()).hexdigest()
+                    result['first_fall_time']=env.pair.elapsed if env.pair.done else None
+                    result['terminal_state']=terminal_details(env)
                 results.append(result);print(json.dumps(result),flush=True)
     if frames:
         from tools.evaluate_paired_foundation import render
@@ -207,6 +230,7 @@ def main():
         diagnostic_arm_noise_hold=args.arm_noise_hold,
         neutral_partner_learner_corner=args.neutral_partner,
         diagnostic_zero_command_offsets=args.zero_command_offsets,
+        diagnostic_zero_arm_residuals=args.zero_arm_residuals,
         diagnostic_approach_gain=args.approach_gain,
         diagnostic_profile_override=args.engagement_distance is not None,
         certification=False))

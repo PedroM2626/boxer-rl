@@ -241,6 +241,16 @@ class PairedFoundation:
             advancing = np.zeros((2, 2))
             for k, contact in enumerate(self.data.contact):
                 geoms = set(map(int, contact.geom))
+                # Optional passive diagnostic: first positive normal force at
+                # native substep resolution; no physics/scoring modification.
+                contact_times = getattr(self, 'diagnostic_contact_times', None)
+                if contact_times is not None:
+                    pair_key = tuple(sorted(geoms))
+                    if pair_key not in contact_times:
+                        diagnostic_force = np.zeros(6)
+                        mujoco.mj_contactForce(self.model, self.data, k, diagnostic_force)
+                        if diagnostic_force[0] > 0:
+                            contact_times[pair_key] = float(self.data.time)
                 for i in range(2):
                     for hand, fist in enumerate(self.fists[i]):
                         target_set = geoms & self.targets[1-i]
