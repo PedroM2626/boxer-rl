@@ -1,5 +1,66 @@
 # Whole-body comparison result and broader fixed-policy assessment
 
+**Current decision (2026-10-23):** all 256 holdout episodes and the contact
+intervention audit are complete. Neither controller is adopted. The next bounded
+experiment is [single-learner partner practice](striking-partner-curriculum.md),
+starting from the preserved original main actor. Main and foundation stay stopped.
+
+## Completed holdouts and contact audit
+
+| Controller / action mode | Both standing at ten seconds | Physical events | Events in surviving episodes |
+| --- | ---: | ---: | ---: |
+| Zero body / mean | 57/64 | 3 | 0 |
+| Adaptive body / mean | 53/64 | 2 | 0 |
+| Zero body / sampled | 55/64 | 6 | 0 |
+| Adaptive body / sampled | 53/64 | 6 | 2 |
+
+The two surviving events belong to **one episode on one seed**, 1,000,008 without
+the side swap. Red scores at 1.640 s and blue at 1.694 s; both remain standing
+through ten seconds. Their contact-window impulses are 0.56018 and 1.04431 Ns.
+The [actual closed-fist replay](../fights/striking-pilot/stable-two-way-exchange-1179648.mp4)
+was checked visually at 2.02 and 9.98 seconds. Its two trial records reproduce
+the original held-out rows exactly. This is executable stable two-way striking,
+but **1/64 sampled episodes on one seed is not reliable boxing**. The adaptive
+controller also has worse survival than its matched control in both action modes.
+The original deterministic screening remains failed; no controller is adopted.
+
+The audit replays **all seven scoring episodes**, not just the favorable video.
+Every unmodified baseline reproduces its original events, impulses, survival and
+elapsed time exactly. In the six falling episodes, remove only the four explicit
+opponent-fist-to-victim-head/torso pairs and replay the recorded high-level actions.
+The frozen motor remains reactive; roots, legs, inertias and other contacts remain
+unchanged. Three counterfactuals avoid the original fall within its observed
+horizon, while three still fall. These interventions support a role for incoming
+contacts in some failures; they do not make every fall a proven knockout or an
+unforced balance failure. Their horizons are censored at the original first fall,
+not extended to certify ten-second survival. No modified-physics trial is eligible
+for evaluation, training, promotion or boxing evidence.
+
+Separately, zeroing the adaptive body authority while replaying its high-level
+actions preserves the stable episode and its one event per corner. Two other
+adaptive cases still fall and one avoids the original fall over its short horizon.
+Thus the single stable exchange does not establish that extra body authority is
+necessary or generally helpful. Full closed-loop removal could differ from this
+fixed high-level action intervention.
+
+An earlier attempt to suppress forces using contact `gap` failed its independent
+solver-force assay. Its entire interpretation is rejected and archived, together
+with the exact attempted tool source. Its **2,970** executed controls remain in
+the ledger. The corrected method omits the four explicit pairs at model
+compilation; the assay confirms positive baseline force, zero removed-pair force,
+unchanged masses/inertias and no assistance. It uses **2,959** controls. Neither
+attempt trained a policy. Never use the rejected counterfactuals as causal evidence.
+
+[Raw holdouts, corrected/rejected audits, replay and integrity analysis](results/striking-pilot/body-holdout-1179648/analysis.json)
+archive all four result sets and reconcile **113,067** holdout world controls,
+**1,000** replay controls and both audit costs. Before the new partner job,
+diagnostic PPO totals **794,880 learner transitions**, including 1,536 new smoke
+transitions; formal striking evaluation/diagnostic controls total **225,344**,
+including twelve smoke evaluator controls. PPO collection controls remain recorded
+separately in each diagnostic's physical counter. Main totals are unchanged.
+
+The completed-protocol description below is retained as the pre-result plan.
+
 ## Completed learning comparison
 
 The matched zero/0.1-rad body-authority arms completed 131,072 new diagnostic

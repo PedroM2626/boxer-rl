@@ -25,6 +25,8 @@ def main():
     parser.add_argument('--video',type=Path)
     parser.add_argument('--sampled',action='store_true',
                         help='diagnostic saved-Gaussian policy; does not replace deterministic screening')
+    parser.add_argument('--neutral-partner',type=int,choices=(0,1),metavar='LEARNER_CORNER',
+                        help='diagnostic only: zero the other corner high-level commands; keep all physics')
     parser.add_argument('--engagement-distance',type=float,
                         help='explicit diagnostic profile override; impact criteria remain fixed')
     args=parser.parse_args()
@@ -82,7 +84,7 @@ def main():
         modes=['sampled' if args.sampled else 'trained']
     else:
         modes=['neutral','exploration']
-    results=[];transitions=0;frames=[]
+    results=[];transitions=0;frames=[];frame_times=[]
     for mode in modes:
         for seed in args.seeds:
             for swap in (False,True):
@@ -100,6 +102,9 @@ def main():
                         action=np.tanh(mean+np.exp(log_std)*rng.normal(size=mean.shape))
                     elif mode=='exploration':action=np.tanh(rng.normal(0.,np.exp(-1.9),(2,actions)))
                     else:action=np.zeros((2,actions))
+                    if args.neutral_partner is not None:
+                        action=action.copy()
+                        action[1-args.neutral_partner]=0.
                     previous_scores=env.pair.scorecard.last_score.copy()
                     obs,reward,done,outcome=env.step(action);transitions+=1
                     hits+=outcome['scored'];impulses+=outcome['legal_contact_impulse']
@@ -117,6 +122,7 @@ def main():
                     max_residual=np.maximum(max_residual,np.max(np.abs(outcome['arm_residual']),axis=1))
                     if args.video and mode==modes[0] and seed==args.seeds[0] and not swap and step%2==0:
                         frames.append(env.pair.data.qpos.copy())
+                        frame_times.append(env.pair.elapsed)
                     if done:break
                 result=dict(mode=mode,seed=seed,swap=swap,survived=not env.pair.done,
                     elapsed=env.pair.elapsed,final_distance=outcome['distance'],
@@ -129,7 +135,10 @@ def main():
                 results.append(result);print(json.dumps(result),flush=True)
     if frames:
         from tools.evaluate_paired_foundation import render
-        render(env.pair,frames,args.video,caption='Unassisted striking pilot | Physical contacts | Evaluation')
+        caption=(f'Diagnostic body {body_bound:.2f} rad | {"Sampled" if args.sampled else "Mean"} policy | '
+                 f'{manifest["consumed_steps"]:,} lineage steps') if manifest else 'Unassisted striking interface | Evaluation'
+        render(env.pair,frames,args.video,caption=caption,frame_times=frame_times,
+               impact_events=results[0]['impact_events'])
     atomic_json(args.output,dict(kind='striking_interface_evaluation',updated_utc=utc(),
         assistance=False,source_sha256=source['sha256'],striking_sha256=residual_hash,
         simulated_world_transitions=transitions,optimization_transitions=0,
@@ -137,6 +146,7 @@ def main():
         engagement_distance=distance,engagement_reward_distance=reward_distance,
         actor_inputs=inputs,actions=actions,body_residual_radians=body_bound,
         sampled_policy=args.sampled,
+        neutral_partner_learner_corner=args.neutral_partner,
         diagnostic_profile_override=args.engagement_distance is not None,
         certification=False))
 

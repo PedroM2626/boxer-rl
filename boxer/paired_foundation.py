@@ -13,7 +13,7 @@ from boxer import scene
 from boxer.impact_scorecard import ImpactScorecard
 
 
-def build_pair(foundation, separation=2.0, *, visual_fists=False):
+def build_pair(foundation, separation=2.0, *, visual_fists=False, diagnostic_excluded_pairs=()):
     if not np.isfinite(separation) or separation < 1.8:
         raise ValueError("transfer spawns must be separated by at least 1.8 m")
     source = foundation.mj_model
@@ -81,7 +81,10 @@ def build_pair(foundation, separation=2.0, *, visual_fists=False):
             for target in ("left_foot", "right_foot", "left_shin", "right_shin",
                            "left_thigh", "right_thigh", "torso_collision", "pelvis_collision"):
                 wanted.add(tuple(sorted((side + limb, other + target))))
-    for first, second in sorted(wanted):
+    excluded={tuple(sorted(pair)) for pair in diagnostic_excluded_pairs}
+    if not excluded <= wanted:
+        raise ValueError('diagnostic exclusion must name existing cross-robot pairs')
+    for first, second in sorted(wanted-excluded):
         spec.add_pair(geomname1=first, geomname2=second, condim=3, friction=[.6, .6, .005, .0001, .0001])
     model = spec.compile()
     if model.neq or np.any(model.body_gravcomp):
@@ -99,9 +102,9 @@ class PairedFoundation:
 
     dt = .02
 
-    def __init__(self, foundation, separation=2.0):
+    def __init__(self, foundation, separation=2.0, *, diagnostic_excluded_pairs=()):
         self.foundation = foundation
-        self.model = build_pair(foundation, separation)
+        self.model = build_pair(foundation, separation, diagnostic_excluded_pairs=diagnostic_excluded_pairs)
         self.data = mujoco.MjData(self.model)
         self.pose = np.asarray(foundation._default_pose)
         self.action_scale = float(foundation._config.action_scale)

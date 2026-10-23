@@ -160,12 +160,13 @@ pins code hashes and runtime counters; [smoke validation](results/striking-pilot
 records separate compute and compatibility evidence. No main or foundation
 learner was active, and the monitoring schedule is unchanged.
 
-## Completed body comparison and current read-only holdouts
+## Completed body comparison and holdouts
 
 Both body-authority arms finished at their reviewed diagnostic budget, each
 with 7/8 pair survival and zero deterministic impacts. Neither was adopted.
-The [result and current broader holdout assessment](striking-body-holdout-review.md)
-record separate sampled checks and the active 256-episode fixed-policy job.
-Main remains stopped at 1,048,576; no additional PPO is authorized by this
-assessment. Inspect its durable holdout state before launching anything, and
-review all four complete result sets before a new decision.
+The [completed 256-episode holdout and contact audit](striking-body-holdout-review.md)
+record one stable two-way exchange without a robust body-authority advantage.
+Main remains stopped at 1,048,576 and neither actor is adopted. The next reviewed
+decision is [bounded single-learner partner practice](striking-partner-curriculum.md),
+using the original main checkpoint and separate diagnostic compute. Inspect that
+job's state and process before launching anything else.

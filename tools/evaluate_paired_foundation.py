@@ -75,7 +75,8 @@ def evaluate(checkpoint, trials=2, seeds=(7, 23, 31, 47), seconds=10., video=Non
         trials=results)
 
 
-def render(env, frames, path, caption='Paired transfer diagnostic | Free bodies | Navigation only'):
+def render(env, frames, path, caption='Paired transfer diagnostic | Free bodies | Navigation only',
+           frame_times=None, impact_events=None):
     import mujoco
     import imageio.v2 as imageio
     from PIL import Image, ImageDraw
@@ -90,12 +91,18 @@ def render(env, frames, path, caption='Paired transfer diagnostic | Free bodies 
     camera.lookat[:]=[0,0,.75]
     with mujoco.Renderer(model,height=480,width=640) as renderer:
         with imageio.get_writer(path,fps=25) as writer:
-            for qpos in frames:
+            for index,qpos in enumerate(frames):
                 data.qpos[:]=qpos;mujoco.mj_forward(model,data)
                 renderer.update_scene(data,camera=camera)
                 image=Image.fromarray(renderer.render());draw=ImageDraw.Draw(image)
                 draw.rectangle((0,0,640,40),fill='black')
                 draw.text((8,8),caption,fill='white')
+                if frame_times is not None:
+                    elapsed=frame_times[index]
+                    scores=np.sum([event['scored_by_corner'] for event in (impact_events or [])
+                                   if event['elapsed'] <= elapsed + 1e-9],axis=0) if any(
+                                       event['elapsed'] <= elapsed + 1e-9 for event in (impact_events or [])) else [0,0]
+                    draw.text((8,24),f'Simulation {elapsed:.2f} s | Red {int(scores[0])} | Blue {int(scores[1])}',fill='white')
                 writer.append_data(np.asarray(image))
 
 

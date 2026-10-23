@@ -15,17 +15,21 @@ policies. At **1,048,576 boxing learner transitions**, final evaluation found
 6/8 surviving pairs and three impacts concentrated in an episode ending in a
 fall. Main PPO stopped at its reviewed ceiling; no further main steps are granted.
 
-The [completed body comparison and current broader assessment](docs/striking-body-holdout-review.md)
-keep diagnostic compute separate from main. Both matched body-authority arms
-finished with 7/8 pair survival and no deterministic impacts; no actor was
-adopted. Independent sampled-policy checks also found no impacts. The current
-read-only job tests both fixed controllers in both action modes over thirty-two
-new seeds and both side arrangements: **256 episodes, no additional training**.
-Physical criteria remain unchanged. Read all four complete results before
-another continuation decision; stable striking or boxing mastery is not claimed.
-Durable state is
-`/home/pedro/boxing-runs/striking-body-holdout-1179648/holdout.json`;
-`runs/striking_holdout_host.json` identifies its hidden WSL host.
+The [completed 256-episode holdout and contact audit](docs/striking-body-holdout-review.md)
+found one reproducible ten-second episode with a legal impact from each corner
+and both robots still standing. It is rare (one of 64 adaptive sampled trials),
+and adaptive body authority regressed survival against control. Neither actor is
+adopted. The [actual replay](fights/striking-pilot/stable-two-way-exchange-1179648.mp4)
+is evidence of that episode, not reliable boxing.
+
+The next [bounded boxing curriculum experiment](docs/striking-partner-curriculum.md)
+trains one corner against a neutral learned motor partner, with both bodies and
+legs free and all contacts active. Its separate ceiling is **131,072 new diagnostic
+learner transitions**; it warm-starts the original main actor without migration.
+Source/final partner trials and the original full self-play evaluation are required.
+No foundation or main gate is weakened. Inspect durable state at
+`/home/pedro/boxing-runs/striking-partner-1048576/partner.json` and its child before
+another launch; `runs/striking_partner_host.json` identifies the hidden WSL host.
 
 The [closed-fist replay repair](docs/closed-fist-rendering.md) restores the
 original visual feature without changing learning or physics. Historical videos

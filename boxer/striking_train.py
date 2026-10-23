@@ -149,7 +149,13 @@ def train(args):
     if contract(foundation)!=metadata['contract']:
         raise ValueError('frozen motor contract mismatch')
     observation_size, action_size = StrikingEnv.observation_size, StrikingEnv.action_size
+    learners_per_world = getattr(StrikingEnv, 'learners_per_world', 2)
+    if learners_per_world not in (1, 2):
+        raise ValueError('one or two learners per paired world required')
     interface_metadata = dict(actor_inputs=observation_size, actions=action_size)
+    if learners_per_world != 2:
+        interface_metadata.update(learners_per_world=learners_per_world,
+                                  opponent_mode=StrikingEnv.opponent_mode)
     if action_size == 32:
         interface_metadata['body_residual_radians'] = StrikingEnv.body_residual_radians
     config=dict(version=1,foundation_sha256=metadata['sha256'],foundation_main_steps=metadata['total_steps'],
@@ -169,7 +175,7 @@ def train(args):
     tx=optax.chain(optax.clip_by_global_norm(1.),optax.adam(.0001))
     optimizer=tx.init((ap,vp))
     norm=dict(mean=np.zeros(observation_size),var=np.ones(observation_size),count=1e-4)
-    consumed=optimized=0
+    consumed=optimized=world_controls=0
     if args.resume and checkpoint_path.exists():
         manifest=json.loads(checkpoint_path.read_text())
         payload=(checkpoint_path.parent/manifest['file']).read_bytes()
@@ -181,12 +187,19 @@ def train(args):
         ap,vp,optimizer,norm,key=(saved[k] for k in ('actor','critic','optimizer','norm','key'))
         optimized=saved['optimized_steps']
         progress_path=args.output/'progress.json'
-        consumed=max(saved['consumed_steps'],json.loads(progress_path.read_text())['consumed_steps'])
+        progress=json.loads(progress_path.read_text())
+        consumed=max(saved['consumed_steps'],progress['consumed_steps'])
+        # Older two-learner payloads used an implicit physical counter. Preserve
+        # that prefix when an explicitly cloned diagnostic changes learner count.
+        world_controls=max(saved.get('world_control_steps',saved['consumed_steps']//2),
+                           progress.get('world_control_steps',progress['consumed_steps']//2))
     elif args.resume:
         # A failure before the first PPO update still consumed simulation.
         # Keep that ledger when recreating the original neutral head.
-        consumed=json.loads((args.output/'progress.json').read_text())['consumed_steps']
-    rows=args.worlds*2
+        progress=json.loads((args.output/'progress.json').read_text())
+        consumed=progress['consumed_steps']
+        world_controls=progress.get('world_control_steps',consumed//learners_per_world)
+    rows=args.worlds*learners_per_world
     block=rows*args.unroll
     if block%4:
         raise ValueError('rollout must divide into four minibatches')
@@ -234,7 +247,7 @@ def train(args):
     scored=np.zeros(2)
     def record(status='running',**extra):
         progress=dict(consumed_steps=consumed,optimized_steps=optimized,
-            world_control_steps=consumed//2,combined_project_consumed_steps=metadata['total_steps']+consumed,
+            world_control_steps=world_controls,combined_project_consumed_steps=metadata['total_steps']+consumed,
             updated_utc=utc(),rounds=completed_rounds,fall_rounds=falls,scored_by_corner=scored.tolist(),
             actor_steps_per_second=(consumed-session_start)/max(time.monotonic()-started,1e-6),**extra)
         atomic_json(args.output/'progress.json',progress)
@@ -261,14 +274,15 @@ def train(args):
             key,sub=jax.random.split(key)
             action,raw,logp=act(ap,jp.array(normalized),sub)
             predicted=np.asarray(value(vp,jp.array(normalized)))
-            actions=np.asarray(action).reshape(args.worlds,2,action_size)
+            actions=np.asarray(action).reshape(args.worlds,learners_per_world,action_size)
             rewards=[];dones=[];following=[]
             for i,env in enumerate(envs):
-                consumed+=2
+                consumed+=learners_per_world
+                world_controls+=1
                 # Count attempted physics even if a later world/update fails.
                 record(phase='collecting')
                 next_obs,reward,done,outcome=env.step(actions[i])
-                rewards.extend(reward);dones.extend([done,done])
+                rewards.extend(reward);dones.extend([done]*learners_per_world)
                 scored+=outcome['scored']
                 if done:
                     completed_rounds+=1;falls+=int(outcome['done'])
@@ -298,12 +312,14 @@ def train(args):
         norm=update_norm(norm,flat_obs)
         optimized+=block
         saved=dict(actor=ap,critic=vp,optimizer=optimizer,norm=norm,key=key,
-            optimized_steps=optimized,consumed_steps=consumed,foundation_sha256=metadata['sha256'],**interface_metadata,**profile)
+            optimized_steps=optimized,consumed_steps=consumed,world_control_steps=world_controls,
+            foundation_sha256=metadata['sha256'],**interface_metadata,**profile)
         payload=pickle.dumps(jax.device_get(saved),protocol=pickle.HIGHEST_PROTOCOL)
         name=f'step-{consumed}.pkl'
         atomic_bytes(checkpoint_path.parent/name,payload)
         atomic_json(checkpoint_path,dict(file=name,sha256=hashlib.sha256(payload).hexdigest(),
-            consumed_steps=consumed,optimized_steps=optimized,foundation_sha256=metadata['sha256'],**interface_metadata,**profile))
+            consumed_steps=consumed,optimized_steps=optimized,world_control_steps=world_controls,
+            foundation_sha256=metadata['sha256'],**interface_metadata,**profile))
         record(phase='updated',mean_loss=float(np.mean(losses)))
         publish()
         print(json.dumps(json.loads((args.output/'progress.json').read_text())),flush=True)

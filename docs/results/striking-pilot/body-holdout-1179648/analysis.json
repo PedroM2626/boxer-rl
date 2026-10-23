@@ -1,0 +1,137 @@
+{
+  "updated_utc": "2026-10-23T07:10:38.879628+00:00",
+  "policy_adoption": "none",
+  "main_consumed_steps": 1048576,
+  "foundation_consumed_steps": 474992640,
+  "combined_main_consumed_steps": 476041216,
+  "checks": {
+    "balance": {
+      "history_entries": 29,
+      "complete_current_promotion": true,
+      "sha256": "8cea6a2f62ae68fd9a3118b881301785900df7d3af73322fccacfa0e2e3bc1f6"
+    },
+    "walk_easy": {
+      "history_entries": 41,
+      "complete_current_promotion": true,
+      "sha256": "f1e0e6f023ff4ac477171382069fe132af9180ae818b509a18c2572eca0200ee"
+    },
+    "walk": {
+      "history_entries": 13,
+      "complete_current_promotion": true,
+      "sha256": "d547d60455be5d8b6f9f49c7bec256cb0b0d6963e3345a7160a16f974d0c531c"
+    },
+    "approach": {
+      "history_entries": 2,
+      "complete_current_promotion": true,
+      "sha256": "b39b1990945e8a374802c3a190e5ac5e026ae39e7fd5ef61c5c2b01ad291c6fc"
+    },
+    "main": {
+      "sha256": "efad0ccd1051ee5305d4ccf8ebbd7d0e402211f12ecd0cdf175b473b24a7b5b0",
+      "consumed_steps": 1048576,
+      "learning_state_finite": true
+    },
+    "frozen_body": {
+      "sha256": "e95cf8a6ab17ed40ed231035a9e995bdcc9f5299444f7fcce02d2ad05391bb4f",
+      "consumed_steps": 1179648,
+      "learning_state_finite": true
+    },
+    "adaptive_body": {
+      "sha256": "3d3e21617adab8c146579cdf66ebf2835894746be33899bd9745884dc74b359f",
+      "consumed_steps": 1179648,
+      "learning_state_finite": true
+    }
+  },
+  "holdout_summary": {
+    "frozen_body-trained": {
+      "pair_survivors": 57,
+      "impacts": 3.0,
+      "complete_episode_impacts": 0.0,
+      "surviving_scoring_episodes": 0,
+      "scoring_seeds": [
+        1000008
+      ],
+      "surviving_scoring_seeds": [],
+      "diagnostic_world_controls": 29224
+    },
+    "adaptive_body-trained": {
+      "pair_survivors": 53,
+      "impacts": 2.0,
+      "complete_episode_impacts": 0.0,
+      "surviving_scoring_episodes": 0,
+      "scoring_seeds": [
+        1000030
+      ],
+      "surviving_scoring_seeds": [],
+      "diagnostic_world_controls": 27645
+    },
+    "frozen_body-sampled": {
+      "pair_survivors": 55,
+      "impacts": 6.0,
+      "complete_episode_impacts": 0.0,
+      "surviving_scoring_episodes": 0,
+      "scoring_seeds": [
+        1000008,
+        1000012
+      ],
+      "surviving_scoring_seeds": [],
+      "diagnostic_world_controls": 28506
+    },
+    "adaptive_body-sampled": {
+      "pair_survivors": 53,
+      "impacts": 6.0,
+      "complete_episode_impacts": 2.0,
+      "surviving_scoring_episodes": 1,
+      "scoring_seeds": [
+        1000006,
+        1000008,
+        1000030
+      ],
+      "surviving_scoring_seeds": [
+        1000008
+      ],
+      "diagnostic_world_controls": 27692
+    }
+  },
+  "stable_replay_matches_heldout_trials_exactly": true,
+  "holdout_error_log_findings": {
+    "frozen_body-sampled-errors.log": [],
+    "frozen_body-trained-errors.log": [],
+    "adaptive_body-sampled-errors.log": [],
+    "adaptive_body-trained-errors.log": []
+  },
+  "contact_audit": {
+    "cases": 7,
+    "baseline_replays_exact": true,
+    "removed_incoming_contacts_cases": 6,
+    "avoided_fall_within_baseline_horizon": 3,
+    "causal_limit": "Fixed high-level action replay; reactive motor; altered physical trajectories and censored short horizons. Not a policy evaluation or proof of a universal knockdown cause."
+  },
+  "compute_ledger": {
+    "diagnostic_ppo_before_smokes": 793344,
+    "holdout_world_controls": 113067,
+    "stable_replay_world_controls": 1000,
+    "rejected_gap_audit_world_controls": 2970,
+    "corrected_contact_audit_world_controls": 2959,
+    "formal_world_controls_before_smokes": 225332,
+    "smoke_ppo_transitions": 1536,
+    "diagnostic_ppo_before_partner_job": 794880,
+    "smoke_evaluation_world_controls": 12,
+    "formal_world_controls_before_partner_job": 225344
+  },
+  "legacy_learning_state_bit_identical": true,
+  "partner_smoke": {
+    "consumed": 1049088,
+    "world_controls": 524800,
+    "new_learner_steps": 512,
+    "new_world_controls": 512,
+    "finite": true
+  },
+  "next_decision": {
+    "experiment": "single learner against a neutral learned motor partner",
+    "source": "original main 146/17 checkpoint; no candidate substitution or parameter migration",
+    "diagnostic_learner_ceiling": 131072,
+    "diagnostic_training_world_control_ceiling": 131072,
+    "maximum_evaluation_world_controls": 28000,
+    "main_extension": false
+  }
+}

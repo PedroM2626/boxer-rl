@@ -1,0 +1,968 @@
+{
+  "status": "completed",
+  "started_utc": "2026-10-23T06:50:45.385795+00:00",
+  "optimization_transitions": 0,
+  "counterfactual_physics_interventions": true,
+  "counterfactuals_evaluation_eligible": false,
+  "diagnostic_world_controls": 2970,
+  "policy_adoption": "none",
+  "cases": [
+    {
+      "arm": "frozen_body",
+      "mode": "trained",
+      "seed": 1000008,
+      "swap": false,
+      "source_sha256": "e95cf8a6ab17ed40ed231035a9e995bdcc9f5299444f7fcce02d2ad05391bb4f",
+      "baseline_matches": true,
+      "baseline": {
+        "mode": "trained",
+        "seed": 1000008,
+        "swap": false,
+        "survived": false,
+        "elapsed": 3.981999999999783,
+        "final_distance": 0.40106707176798495,
+        "scored_by_corner": [
+          1.0,
+          2.0
+        ],
+        "raw_legal_impulse": [
+          8.460003984359169,
+          2.86180920421666
+        ],
+        "fallen": [
+          true,
+          false
+        ],
+        "finite": true,
+        "minimum_hand_target_distance": [
+          0.15526353687562258,
+          0.15662615382068218
+        ],
+        "mean_abs_arm_residual": [
+          0.16340117093511466,
+          0.1464698511683909
+        ],
+        "max_abs_arm_residual": [
+          0.6049028046743425,
+          0.5538239213210635
+        ],
+        "impact_events": [
+          {
+            "control_step": 169,
+            "elapsed": 3.399999999999847,
+            "scored_by_corner": [
+              1.0,
+              0.0
+            ],
+            "hands": [
+              {
+                "corner": 0,
+                "hand": 1,
+                "score_time": 3.3859999999998487,
+                "contact_window_impulse": 0.7265783765318861
+              }
+            ],
+            "fallen": [
+              false,
+              false
+            ]
+          },
+          {
+            "control_step": 170,
+            "elapsed": 3.419999999999845,
+            "scored_by_corner": [
+              0.0,
+              1.0
+            ],
+            "hands": [
+              {
+                "corner": 1,
+                "hand": 1,
+                "score_time": 3.4079999999998463,
+                "contact_window_impulse": 0.8963008247947544
+              }
+            ],
+            "fallen": [
+              false,
+              false
+            ]
+          },
+          {
+            "control_step": 183,
+            "elapsed": 3.6799999999998163,
+            "scored_by_corner": [
+              0.0,
+              1.0
+            ],
+            "hands": [
+              {
+                "corner": 1,
+                "hand": 1,
+                "score_time": 3.663999999999818,
+                "contact_window_impulse": 0.9579524676242117
+              }
+            ],
+            "fallen": [
+              false,
+              false
+            ]
+          }
+        ]
+      },
+      "high_level_controls": 200,
+      "counterfactuals": [
+        {
+          "kind": "no_incoming_legal_forces",
+          "victim": 0,
+          "evaluation_eligible": false,
+          "fixed_high_level_action_replay": true,
+          "suppressed_pairs": [
+            [
+              "red/head_collision",
+              "blue/left_hand_collision"
+            ],
+            [
+              "red/torso_collision",
+              "blue/left_hand_collision"
+            ],
+            [
+              "red/head_collision",
+              "blue/right_hand_collision"
+            ],
+            [
+              "red/torso_collision",
+              "blue/right_hand_collision"
+            ]
+          ],
+          "survived_observed_control_horizon": false,
+          "elapsed": 3.981999999999783,
+          "controls": 200,
+          "baseline_control_horizon_seconds": 4.0,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "fallen": [
+            true,
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "arm": "frozen_body",
+      "mode": "sampled",
+      "seed": 1000008,
+      "swap": false,
+      "source_sha256": "e95cf8a6ab17ed40ed231035a9e995bdcc9f5299444f7fcce02d2ad05391bb4f",
+      "baseline_matches": true,
+      "baseline": {
+        "mode": "sampled",
+        "seed": 1000008,
+        "swap": false,
+        "survived": false,
+        "elapsed": 2.9899999999998923,
+        "final_distance": 0.4236272763926157,
+        "scored_by_corner": [
+          1.0,
+          1.0
+        ],
+        "raw_legal_impulse": [
+          4.419188924957314,
+          10.537864072626288
+        ],
+        "fallen": [
+          true,
+          false
+        ],
+        "finite": true,
+        "minimum_hand_target_distance": [
+          0.13867064138167204,
+          0.11488100001500452
+        ],
+        "mean_abs_arm_residual": [
+          0.13934692535379006,
+          0.13848117648271624
+        ],
+        "max_abs_arm_residual": [
+          0.609282425752603,
+          0.5245521674256353
+        ],
+        "impact_events": [
+          {
+            "control_step": 134,
+            "elapsed": 2.6999999999999242,
+            "scored_by_corner": [
+              0.0,
+              1.0
+            ],
+            "hands": [
+              {
+                "corner": 1,
+                "hand": 1,
+                "score_time": 2.6899999999999253,
+                "contact_window_impulse": 1.3946192707960503
+              }
+            ],
+            "fallen": [
+              false,
+              false
+            ]
+          },
+          {
+            "control_step": 139,
+            "elapsed": 2.7999999999999132,
+            "scored_by_corner": [
+              1.0,
+              0.0
+            ],
+            "hands": [
+              {
+                "corner": 0,
+                "hand": 1,
+                "score_time": 2.781999999999915,
+                "contact_window_impulse": 1.9647280407319778
+              }
+            ],
+            "fallen": [
+              false,
+              false
+            ]
+          }
+        ]
+      },
+      "high_level_controls": 150,
+      "counterfactuals": [
+        {
+          "kind": "no_incoming_legal_forces",
+          "victim": 0,
+          "evaluation_eligible": false,
+          "fixed_high_level_action_replay": true,
+          "suppressed_pairs": [
+            [
+              "red/head_collision",
+              "blue/left_hand_collision"
+            ],
+            [
+              "red/torso_collision",
+              "blue/left_hand_collision"
+            ],
+            [
+              "red/head_collision",
+              "blue/right_hand_collision"
+            ],
+            [
+              "red/torso_collision",
+              "blue/right_hand_collision"
+            ]
+          ],
+          "survived_observed_control_horizon": false,
+          "elapsed": 2.9899999999998923,
+          "controls": 150,
+          "baseline_control_horizon_seconds": 3.0,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "fallen": [
+            true,
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "arm": "frozen_body",
+      "mode": "sampled",
+      "seed": 1000012,
+      "swap": true,
+      "source_sha256": "e95cf8a6ab17ed40ed231035a9e995bdcc9f5299444f7fcce02d2ad05391bb4f",
+      "baseline_matches": true,
+      "baseline": {
+        "mode": "sampled",
+        "seed": 1000012,
+        "swap": true,
+        "survived": false,
+        "elapsed": 4.295999999999749,
+        "final_distance": 0.40405706767990995,
+        "scored_by_corner": [
+          1.0,
+          3.0
+        ],
+        "raw_legal_impulse": [
+          10.402196891860978,
+          33.5795576490586
+        ],
+        "fallen": [
+          true,
+          false
+        ],
+        "finite": true,
+        "minimum_hand_target_distance": [
+          0.14154254292072022,
+          0.1094821724257354
+        ],
+        "mean_abs_arm_residual": [
+          0.11679108566193261,
+          0.12835316316872533
+        ],
+        "max_abs_arm_residual": [
+          0.49083730748056364,
+          0.5390843091789909
+        ],
+        "impact_events": [
+          {
+            "control_step": 136,
+            "elapsed": 2.73999999999992,
+            "scored_by_corner": [
+              1.0,
+              0.0
+            ],
+            "hands": [
+              {
+                "corner": 0,
+                "hand": 0,
+                "score_time": 2.7319999999999207,
+                "contact_window_impulse": 0.6756697605119134
+              }
+            ],
+            "fallen": [
+              false,
+              false
+            ]
+          },
+          {
+            "control_step": 141,
+            "elapsed": 2.839999999999909,
+            "scored_by_corner": [
+              0.0,
+              1.0
+            ],
+            "hands": [
+              {
+                "corner": 1,
+                "hand": 0,
+                "score_time": 2.8339999999999095,
+                "contact_window_impulse": 0.6285702965335691
+              }
+            ],
+            "fallen": [
+              false,
+              false
+            ]
+          },
+          {
+            "control_step": 176,
+            "elapsed": 3.5399999999998317,
+            "scored_by_corner": [
+              0.0,
+              1.0
+            ],
+            "hands": [
+              {
+                "corner": 1,
+                "hand": 0,
+                "score_time": 3.5399999999998317,
+                "contact_window_impulse": 0.5014551864353535
+              }
+            ],
+            "fallen": [
+              false,
+              false
+            ]
+          },
+          {
+            "control_step": 189,
+            "elapsed": 3.799999999999803,
+            "scored_by_corner": [
+              0.0,
+              1.0
+            ],
+            "hands": [
+              {
+                "corner": 1,
+                "hand": 0,
+                "score_time": 3.7879999999998044,
+                "contact_window_impulse": 1.1641422616898858
+              }
+            ],
+            "fallen": [
+              false,
+              false
+            ]
+          }
+        ]
+      },
+      "high_level_controls": 215,
+      "counterfactuals": [
+        {
+          "kind": "no_incoming_legal_forces",
+          "victim": 0,
+          "evaluation_eligible": false,
+          "fixed_high_level_action_replay": true,
+          "suppressed_pairs": [
+            [
+              "red/head_collision",
+              "blue/left_hand_collision"
+            ],
+            [
+              "red/torso_collision",
+              "blue/left_hand_collision"
+            ],
+            [
+              "red/head_collision",
+              "blue/right_hand_collision"
+            ],
+            [
+              "red/torso_collision",
+              "blue/right_hand_collision"
+            ]
+          ],
+          "survived_observed_control_horizon": false,
+          "elapsed": 4.295999999999749,
+          "controls": 215,
+          "baseline_control_horizon_seconds": 4.3,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "fallen": [
+            true,
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "arm": "adaptive_body",
+      "mode": "trained",
+      "seed": 1000030,
+      "swap": true,
+      "source_sha256": "3d3e21617adab8c146579cdf66ebf2835894746be33899bd9745884dc74b359f",
+      "baseline_matches": true,
+      "baseline": {
+        "mode": "trained",
+        "seed": 1000030,
+        "swap": true,
+        "survived": false,
+        "elapsed": 1.6180000000000012,
+        "final_distance": 0.4364651852540711,
+        "scored_by_corner": [
+          1.0,
+          1.0
+        ],
+        "raw_legal_impulse": [
+          8.733248617703309,
+          2.8600443112876865
+        ],
+        "fallen": [
+          true,
+          false
+        ],
+        "finite": true,
+        "minimum_hand_target_distance": [
+          0.14768751419901105,
+          0.159160989666673
+        ],
+        "mean_abs_arm_residual": [
+          0.11505994140376395,
+          0.1294722152635926
+        ],
+        "max_abs_arm_residual": [
+          0.41153908206317646,
+          0.4895598100039513
+        ],
+        "impact_events": [
+          {
+            "control_step": 55,
+            "elapsed": 1.1200000000000008,
+            "scored_by_corner": [
+              1.0,
+              0.0
+            ],
+            "hands": [
+              {
+                "corner": 0,
+                "hand": 1,
+                "score_time": 1.1140000000000008,
+                "contact_window_impulse": 1.0813268534435327
+              }
+            ],
+            "fallen": [
+              false,
+              false
+            ]
+          },
+          {
+            "control_step": 56,
+            "elapsed": 1.1400000000000008,
+            "scored_by_corner": [
+              0.0,
+              1.0
+            ],
+            "hands": [
+              {
+                "corner": 1,
+                "hand": 1,
+                "score_time": 1.1220000000000008,
+                "contact_window_impulse": 2.0650116366459605
+              }
+            ],
+            "fallen": [
+              false,
+              false
+            ]
+          }
+        ]
+      },
+      "high_level_controls": 81,
+      "counterfactuals": [
+        {
+          "kind": "no_incoming_legal_forces",
+          "victim": 0,
+          "evaluation_eligible": false,
+          "fixed_high_level_action_replay": true,
+          "suppressed_pairs": [
+            [
+              "red/head_collision",
+              "blue/left_hand_collision"
+            ],
+            [
+              "red/torso_collision",
+              "blue/left_hand_collision"
+            ],
+            [
+              "red/head_collision",
+              "blue/right_hand_collision"
+            ],
+            [
+              "red/torso_collision",
+              "blue/right_hand_collision"
+            ]
+          ],
+          "survived_observed_control_horizon": false,
+          "elapsed": 1.6180000000000012,
+          "controls": 81,
+          "baseline_control_horizon_seconds": 1.62,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "fallen": [
+            true,
+            false
+          ]
+        },
+        {
+          "kind": "zero_body_authority",
+          "victim": null,
+          "evaluation_eligible": false,
+          "fixed_high_level_action_replay": true,
+          "suppressed_pairs": [],
+          "survived_observed_control_horizon": false,
+          "elapsed": 1.5580000000000012,
+          "controls": 78,
+          "baseline_control_horizon_seconds": 1.62,
+          "scored_by_corner": [
+            1.0,
+            1.0
+          ],
+          "fallen": [
+            true,
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "arm": "adaptive_body",
+      "mode": "sampled",
+      "seed": 1000006,
+      "swap": true,
+      "source_sha256": "3d3e21617adab8c146579cdf66ebf2835894746be33899bd9745884dc74b359f",
+      "baseline_matches": true,
+      "baseline": {
+        "mode": "sampled",
+        "seed": 1000006,
+        "swap": true,
+        "survived": false,
+        "elapsed": 2.403999999999957,
+        "final_distance": 0.4524591876621834,
+        "scored_by_corner": [
+          1.0,
+          1.0
+        ],
+        "raw_legal_impulse": [
+          2.715057414761215,
+          4.687705150563154
+        ],
+        "fallen": [
+          true,
+          false
+        ],
+        "finite": true,
+        "minimum_hand_target_distance": [
+          0.15468939958041017,
+          0.17377233160654404
+        ],
+        "mean_abs_arm_residual": [
+          0.12833518381503314,
+          0.1386542460591044
+        ],
+        "max_abs_arm_residual": [
+          0.5006732453717486,
+          0.5265263003362197
+        ],
+        "impact_events": [
+          {
+            "control_step": 116,
+            "elapsed": 2.339999999999964,
+            "scored_by_corner": [
+              0.0,
+              1.0
+            ],
+            "hands": [
+              {
+                "corner": 1,
+                "hand": 1,
+                "score_time": 2.3239999999999656,
+                "contact_window_impulse": 1.250336623815969
+              }
+            ],
+            "fallen": [
+              false,
+              false
+            ]
+          },
+          {
+            "control_step": 118,
+            "elapsed": 2.3799999999999595,
+            "scored_by_corner": [
+              1.0,
+              0.0
+            ],
+            "hands": [
+              {
+                "corner": 0,
+                "hand": 1,
+                "score_time": 2.3619999999999615,
+                "contact_window_impulse": 1.5983241511772694
+              }
+            ],
+            "fallen": [
+              false,
+              false
+            ]
+          }
+        ]
+      },
+      "high_level_controls": 121,
+      "counterfactuals": [
+        {
+          "kind": "no_incoming_legal_forces",
+          "victim": 0,
+          "evaluation_eligible": false,
+          "fixed_high_level_action_replay": true,
+          "suppressed_pairs": [
+            [
+              "red/head_collision",
+              "blue/left_hand_collision"
+            ],
+            [
+              "red/torso_collision",
+              "blue/left_hand_collision"
+            ],
+            [
+              "red/head_collision",
+              "blue/right_hand_collision"
+            ],
+            [
+              "red/torso_collision",
+              "blue/right_hand_collision"
+            ]
+          ],
+          "survived_observed_control_horizon": false,
+          "elapsed": 2.403999999999957,
+          "controls": 121,
+          "baseline_control_horizon_seconds": 2.42,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "fallen": [
+            true,
+            false
+          ]
+        },
+        {
+          "kind": "zero_body_authority",
+          "victim": null,
+          "evaluation_eligible": false,
+          "fixed_high_level_action_replay": true,
+          "suppressed_pairs": [],
+          "survived_observed_control_horizon": false,
+          "elapsed": 2.057999999999995,
+          "controls": 103,
+          "baseline_control_horizon_seconds": 2.42,
+          "scored_by_corner": [
+            0.0,
+            0.0
+          ],
+          "fallen": [
+            true,
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "arm": "adaptive_body",
+      "mode": "sampled",
+      "seed": 1000008,
+      "swap": false,
+      "source_sha256": "3d3e21617adab8c146579cdf66ebf2835894746be33899bd9745884dc74b359f",
+      "baseline_matches": true,
+      "baseline": {
+        "mode": "sampled",
+        "seed": 1000008,
+        "swap": false,
+        "survived": true,
+        "elapsed": 10.000000000000009,
+        "final_distance": 0.6893687067289613,
+        "scored_by_corner": [
+          1.0,
+          1.0
+        ],
+        "raw_legal_impulse": [
+          16.95515526233263,
+          12.198151430336916
+        ],
+        "fallen": [
+          false,
+          false
+        ],
+        "finite": true,
+        "minimum_hand_target_distance": [
+          0.16902936840779398,
+          0.16579738311134082
+        ],
+        "mean_abs_arm_residual": [
+          0.15175612992184295,
+          0.16008137583557067
+        ],
+        "max_abs_arm_residual": [
+          0.5556041015059742,
+          0.5770158106377578
+        ],
+        "impact_events": [
+          {
+            "control_step": 81,
+            "elapsed": 1.6400000000000012,
+            "scored_by_corner": [
+              1.0,
+              0.0
+            ],
+            "hands": [
+              {
+                "corner": 0,
+                "hand": 1,
+                "score_time": 1.6400000000000012,
+                "contact_window_impulse": 0.5601829468627707
+              }
+            ],
+            "fallen": [
+              false,
+              false
+            ]
+          },
+          {
+            "control_step": 84,
+            "elapsed": 1.7000000000000013,
+            "scored_by_corner": [
+              0.0,
+              1.0
+            ],
+            "hands": [
+              {
+                "corner": 1,
+                "hand": 1,
+                "score_time": 1.6940000000000013,
+                "contact_window_impulse": 1.0443104408951316
+              }
+            ],
+            "fallen": [
+              false,
+              false
+            ]
+          }
+        ]
+      },
+      "high_level_controls": 500,
+      "counterfactuals": [
+        {
+          "kind": "zero_body_authority",
+          "victim": null,
+          "evaluation_eligible": false,
+          "fixed_high_level_action_replay": true,
+          "suppressed_pairs": [],
+          "survived_observed_control_horizon": true,
+          "elapsed": 10.000000000000009,
+          "controls": 500,
+          "baseline_control_horizon_seconds": 10.0,
+          "scored_by_corner": [
+            1.0,
+            1.0
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        }
+      ]
+    },
+    {
+      "arm": "adaptive_body",
+      "mode": "sampled",
+      "seed": 1000030,
+      "swap": true,
+      "source_sha256": "3d3e21617adab8c146579cdf66ebf2835894746be33899bd9745884dc74b359f",
+      "baseline_matches": true,
+      "baseline": {
+        "mode": "sampled",
+        "seed": 1000030,
+        "swap": true,
+        "survived": false,
+        "elapsed": 1.6840000000000013,
+        "final_distance": 0.37980461641605395,
+        "scored_by_corner": [
+          0.0,
+          2.0
+        ],
+        "raw_legal_impulse": [
+          7.599035165604981,
+          6.225814416169799
+        ],
+        "fallen": [
+          true,
+          false
+        ],
+        "finite": true,
+        "minimum_hand_target_distance": [
+          0.15114898191847642,
+          0.11285878092686773
+        ],
+        "mean_abs_arm_residual": [
+          0.12159581878208604,
+          0.1396367069382965
+        ],
+        "max_abs_arm_residual": [
+          0.45570352856911717,
+          0.5186478541296566
+        ],
+        "impact_events": [
+          {
+            "control_step": 58,
+            "elapsed": 1.1800000000000008,
+            "scored_by_corner": [
+              0.0,
+              1.0
+            ],
+            "hands": [
+              {
+                "corner": 1,
+                "hand": 1,
+                "score_time": 1.1620000000000008,
+                "contact_window_impulse": 2.3239023056899883
+              }
+            ],
+            "fallen": [
+              false,
+              false
+            ]
+          },
+          {
+            "control_step": 79,
+            "elapsed": 1.6000000000000012,
+            "scored_by_corner": [
+              0.0,
+              1.0
+            ],
+            "hands": [
+              {
+                "corner": 1,
+                "hand": 1,
+                "score_time": 1.5940000000000012,
+                "contact_window_impulse": 0.9301244159992933
+              }
+            ],
+            "fallen": [
+              false,
+              false
+            ]
+          }
+        ]
+      },
+      "high_level_controls": 85,
+      "counterfactuals": [
+        {
+          "kind": "no_incoming_legal_forces",
+          "victim": 0,
+          "evaluation_eligible": false,
+          "fixed_high_level_action_replay": true,
+          "suppressed_pairs": [
+            [
+              "red/head_collision",
+              "blue/left_hand_collision"
+            ],
+            [
+              "red/torso_collision",
+              "blue/left_hand_collision"
+            ],
+            [
+              "red/head_collision",
+              "blue/right_hand_collision"
+            ],
+            [
+              "red/torso_collision",
+              "blue/right_hand_collision"
+            ]
+          ],
+          "survived_observed_control_horizon": false,
+          "elapsed": 1.6840000000000013,
+          "controls": 85,
+          "baseline_control_horizon_seconds": 1.7,
+          "scored_by_corner": [
+            0.0,
+            0.0
+          ],
+          "fallen": [
+            true,
+            false
+          ]
+        },
+        {
+          "kind": "zero_body_authority",
+          "victim": null,
+          "evaluation_eligible": false,
+          "fixed_high_level_action_replay": true,
+          "suppressed_pairs": [],
+          "survived_observed_control_horizon": true,
+          "elapsed": 1.7000000000000013,
+          "controls": 85,
+          "baseline_control_horizon_seconds": 1.7,
+          "scored_by_corner": [
+            1.0,
+            2.0
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        }
+      ]
+    }
+  ],
+  "updated_utc": "2026-10-23T06:51:21.030164+00:00",
+  "interpretation_valid": false,
+  "rejection_reason": "The pair-gap implementation failed the independent positive-contact force assay. Do not interpret its force-removal counterfactuals."
+}
