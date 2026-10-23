@@ -8,8 +8,9 @@ added 430,080 transitions. The exact actor payload was retained at transition.
 
 **Current operation:** the [opponent-aware striking pilot](striking-pilot.md)
 adds trainable arm residuals and independent fist-impact events over the unchanged
-certified motor actor. The reviewed boxing pilot ceiling is **32,768 learner
-transitions**, separately accounted from foundation and diagnostic compute.
+certified motor actor. The reviewed boxing pilot ceiling is **262,144 learner
+transitions** after the initial 32,768-step review. Boxing steps remain separately
+accounted from foundation and diagnostic compute.
 Inspect `runs/striking-pilot` and the durable Linux output referenced in that
 report. The completed foundation must not be restarted. No boxing mastery is
 claimed; physical impact/fall evaluation must follow the bounded pilot.

@@ -143,3 +143,57 @@ with no falls, finite losses and no scored impacts. Short sustained throughput
 was about 164 learner transitions/s on local Linux storage. This is active
 learning plumbing evidence, not learned punching. Source code SHA-256 values are
 saved with the launch decision; the monitor should read the latest live state.
+
+## First budget review and bounded continuation
+
+The 32,768-transition run ended normally at its exact ceiling after **32 PPO
+updates and 32 completed training rounds, with zero falls and zero scored hits**.
+All policy/critic/Adam/normalizer/RNG leaves are finite and the payload matches
+its manifest and evaluated hash. The complete snapshot is archived under
+`checkpoints/striking-pilot/step-32768/`.
+
+The [independent final evaluation](results/striking-pilot/evaluation-32768.json)
+used all four seeds and swapped sides, ten seconds each: **8/8 paired episodes
+survived**, with **zero actual legal-target contacts and zero scored impacts**.
+Mean absolute filtered arm residuals were about 0.029-0.038 (before the 0.8-rad
+scale), so the new head is active but movements remain small. The closest
+hand-to-target centres were about 0.301-0.374 m, still short of legal surfaces.
+The video `fights/striking-pilot/step-32768.mp4` was visually inspected and
+shows physical footwork and guard, not learned punches. Its caption
+identifies it as an unassisted striking pilot evaluation.
+
+**Decision:** extend this same boxing pilot to a **262,144 total learner-step
+ceiling**, adding at most **229,376** transitions. The first short run establishes
+that PPO and bounded residual exploration preserve physical standing; only 32
+updates have occurred, so a longer bounded same-profile segment is reasonable
+before attributing the missing contacts to a learning plateau. This is not
+boxing certification or evidence that more steps alone will solve it.
+Preserve the exact learned head, frozen motor, Adam, RNG and observation stats;
+use ordinary resume. Physics, reward and independent impact thresholds remain
+unchanged. The [decision record](results/striking-pilot/continuation-32768.json)
+records the limits and provenance. The source foundation remains stopped at
+474,992,640, and diagnostic learning remains separately counted at 640 steps.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tools/start_striking.ps1 -Resume -Ceiling 262144
+```
+
+At the next budget review, missing actual contacts or stationary residuals
+require a concrete arm-reach/exploration investigation before another extension.
+Inspect held-out physical behavior, not just shaped reward or optimization loss.
+Round/fall/hit statistics in live progress are per invocation; consumed and
+optimized transition counters are cumulative across resumes. Do not interpret
+a session's reset statistics as a rewind of consumed training.
+
+Formal new interface/evaluation diagnostics total **12,100 world-control
+transitions** (8,000 neutral/exploration baseline, 100 checkpoint replay, 4,000
+post-pilot evaluation), in addition to the separately preserved earlier paired
+transfer and tracking investigations. No evaluation transition enters PPO.
+
+The resumed hidden host was verified as Windows PID 34812 and Linux learner
+438 at launch. Exactly one boxing learner and no foundation learner were active.
+Its consumed/optimized counters advanced beyond 32,768 with finite saved learning
+state and a verified checkpoint hash under the new 262,144 ceiling. The source
+foundation payload and inherited profile remained unchanged; the existing
+30-minute monitor schedule was preserved. Runtime identities are recorded in
+`results/striking-pilot/continuation-launched.json`, not reusable restart targets.

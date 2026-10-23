@@ -1,0 +1,30 @@
+{
+  "previous_ceiling": 32768,
+  "new_ceiling": 262144,
+  "additional_available": 229376,
+  "checkpoint_sha256": "5ec096b230da31139fdde031d152c05a8f6c4ea1acdbe1447e50a7f355ec915d",
+  "source_foundation_sha256": "b39b1990945e8a374802c3a190e5ac5e026ae39e7fd5ef61c5c2b01ad291c6fc",
+  "main_boxing_consumed": 32768,
+  "main_boxing_optimized": 32768,
+  "foundation_main_consumed": 474992640,
+  "combined_main_consumed": 475025408,
+  "diagnostic_optimization_learner_steps": 640,
+  "diagnostic_evaluation_world_steps_this_integration": 12100,
+  "training_rounds": 32,
+  "training_fall_rounds": 0,
+  "evaluation_pair_survivors": 8,
+  "evaluation_episodes": 8,
+  "evaluation_scored_events": 0,
+  "evaluation_raw_legal_impulse": 0.0,
+  "mean_abs_residual_range": [
+    0.02919234194634679,
+    0.037848233744752616
+  ],
+  "minimum_hand_target_distance_range": [
+    0.3005064072172179,
+    0.3744260933422882
+  ],
+  "rationale": "The small 32-update pilot validated finite PPO, preserved balance and active bounded residuals; it did not learn a punch. Continue one bounded same-profile segment from its exact optimizer/normalizer/RNG state rather than reinitialize. Sparse-event learning is not established after 32 updates; do not infer boxing from loss or shaped reward.",
+  "continuation": "No impact threshold/physics/reward change. Review final actual legal contacts, survival, residual activity and reach before any further allocation; zero events or stationary residuals then require a concrete exploration/reach diagnosis rather than another blind step extension.",
+  "settings": "ordinary --resume; four worlds,128-step rollout,LR1e-4,all17 outputs and frozen motor unchanged"
+}
