@@ -1,4 +1,8 @@
-# Neutral-retention stop and unchanged reward-credit investigation
+# Reward-credit review and completed horizon comparison
+
+**Current status:** both horizon arms are completed and reviewed. Neither passes.
+The latest gamma-0.999 actor receives one bounded 32,768-credit continuation;
+see the [current result and contract](#completed-horizon-comparison-and-bounded-continuation-2026-10-23).
 
 ## Completed neutral curriculum review
 
@@ -187,3 +191,89 @@ are archived under `docs/results/striking-pilot/credit-horizon-1671168/` and
 diagnostic PPO is **1,582,336**, formal diagnostic simulation **724,013 world
 controls**, plus **1,024** separately recorded new collection controls. Later live
 progress continues beyond this snapshot within the fixed matched allocation.
+
+
+## Completed horizon comparison and bounded continuation (2026-10-23)
+
+Both fixed arms completed normally at **16:42:41 UTC**. The source and all
+120 full physical episodes are retained. All checkpoint hashes, finite leaves,
+32 update metrics per arm, retained Adam counts, role credit ledgers, matched
+auxiliary sampler streams and complete foundation histories were independently
+verified with `tools/review_striking_credit_horizon.py`. Native error logs are
+empty. Neither final actor passes the unchanged complete criteria.
+
+| Final policy / sample | Neutral 0 survival / own events | Neutral 1 survival / own events | Active survival | Active surviving red / blue events | Active scoring seeds | Surviving two-way episodes |
+| --- | --- | --- | --- | --- | --- | --- |
+| Gamma 0.99 / screen | 8/8 / 0 | 7/8 / 0 | 8/8 | 0 / 1 | 1 | 0 |
+| Gamma 0.99 / fresh | 8/8 / 0 | 8/8 / 0 | 8/8 | 0 / 0 | 0 | 0 |
+| Gamma 0.999 / screen | 6/8 / 2 | 8/8 / 0 | 6/8 | 1 / 3 | 2 | 1 |
+| Gamma 0.999 / fresh | 8/8 / 0 | 7/8 / 0 | 7/8 | 2 / 4 | 4 | 1 |
+
+Fresh seeds are 10,000,003 through 10,000,006, both swaps. The treatment's
+six surviving active events span all four seeds, unlike the control's zero.
+One fresh mean-policy episode (10,000,003, swap true) lasts ten seconds with
+one red and two blue valid events: blue 9.318 s / 0.635 Ns, red 9.742 s /
+1.090 Ns, blue 9.776 s / 0.827 Ns. This is broader measured active striking,
+but only one two-way episode out of eight; screen stability regresses, one
+fresh active pair falls, and neither neutral role has fresh surviving own
+strikes. The longer discount is a promising diagnostic, not certified boxing.
+The inherited critic's old discount calibration remains a limitation.
+
+The final gamma-0.99 hash is
+`7a5d8b80b6504341e2f026836dbdc17ad31f80f7b29e5cedc30883869940ca16`;
+gamma-0.999 is
+`22f4908af40b7c5269952d40a98f35630c2300d50d2bf8ba54c125f36cb6dd55`.
+Each lineage reaches **1,703,936 learner credits / 1,081,344 world controls**;
+actor/critic Adam counts are **9,096 / 32,768**. Final role credit ledgers are
+33,112/32,424 (control), 33,273/32,263 (treatment); they include the source
+32,768-credit prefix. Final models/configurations, complete reports, per-block
+metrics and review are archived under the existing `credit-horizon-1671168`
+result and validation directories. No old actor is substituted.
+
+Actual new diagnostic compute is **65,536 PPO credits / 65,536 collection world
+controls**, **58,073 evaluation world controls**, and 262,144 integrated replay
+presentations. Cumulative diagnostic PPO is **1,646,848**; formal diagnostic
+simulation is **770,086 world controls**. Standalone BC remains 8,000 updates;
+main boxing **1,048,576**, combined main **476,041,216**, and the foundation's
+475M ceiling remain unchanged.
+
+### Next single allocation
+
+The wider fresh active scoring and independently verified warm state justify
+**one 32,768-credit diagnostic continuation** from the latest gamma-0.999 final.
+This tests whether the new signal survives further ordinary optimization;
+it is not permission to continue indefinitely if neutral strikes remain absent.
+Inherit version 5 exactly: gamma 0.999, lambda 0.95, replay coefficient 1,
+eight one-learner neutral-partner worlds, contact history, normalization,
+all optimizer moments/counts, samplers and consumed/role prefixes. Do not reset
+the critic or roll back to the selected earlier two-way actor. Physics,
+rewards, independent gates, fist geometry and unassisted free legs are unchanged.
+
+The lineage ceiling is **1,736,704 learner credits / 1,114,112 world controls**.
+At full allocation actor/critic counts become **9,608 / 33,280**, cumulative
+diagnostic PPO **1,679,616**, with 32,768 additional collection controls and
+131,072 integrated replay presentations. Keep attempted/discarded work counted.
+Check all three full eight-episode screen profiles at **16,384 and 32,768**
+new credits, preserving distinct exact checkpoint payloads. If any profile
+has at most **3/8 surviving pairs**, stop training early and run the final fresh
+check. Source and final fresh seeds are **11,000,003..11,000,006**, both swaps;
+these plus the two full screens are at most **96 episodes / 48,000 evaluation
+controls**. Retain failed generations. No gate changes, main actor adoption,
+phase promotion or additional allocation is automatic; review the complete
+result before deciding another step. Two distinct consecutive complete passes
+remain required, including role survival and own strikes on multiple seeds.
+
+Hidden persistent launcher: `tools/start_striking_credit_horizon_continue.ps1`;
+live state:
+`/home/pedro/boxing-runs/striking-credit-horizon-continue-1703936/continuation.json`.
+Inspect that state and process before launching anything else. Keep the existing
+monitoring schedule. The supervisor and learner use separate locks.
+
+
+The completed review and continuation guards pass **14 focused tests**, including
+rejection of incomplete swaps, stale evaluated hashes and nonfinite trials, and
+ensuring a successful selected active exchange cannot mask failed neutral gates.
+The existing horizon/state-preservation, optimizer-prefix and neutral-routing
+checks also pass. Python compilation, LF shell syntax, PowerShell launcher
+parsing and `git diff --check` succeed. The actual hidden process was verified
+running its preregistered fresh source evaluation before any new optimization.

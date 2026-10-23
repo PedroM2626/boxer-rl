@@ -1,4 +1,7 @@
-# Matched discount-horizon comparison: launch evidence
+# Matched discount-horizon comparison: completed review
+
+**Current status: completed, independently reviewed; neither arm passes.**
+The final review and one bounded follow-up are recorded below.
 
 See the [completed audit and bounded comparison contract](../../../striking-reward-credit-review.md).
 Live state is `/home/pedro/boxing-runs/striking-credit-horizon-1671168/comparison.json`.
@@ -37,9 +40,21 @@ not pass complete striking criteria. All raw source reports are archived here.
 `402a50b3e5f1444bdcdfc5c1a8b4718bab4b06345a6874ecf1a641f26590778e`.
 The payload/configuration is archived under
 `checkpoints/striking-validation/credit-horizon-1671168/control-initial-block/`.
-Native logs are empty and ordinary remaining training is active. The gamma-0.999
-arm's own guard remains pending; this is integration evidence, not a boxing pass.
+At that earlier snapshot native logs were empty and control training was active;
+the gamma-0.999 guard was pending. Both arms subsequently completed and their
+individual integration proofs are archived. These guards are not boxing passes.
 
 At this boundary cumulative diagnostic PPO is 1,582,336, formal diagnostic
 simulation 724,013 world controls, plus 1,024 new collection controls separately.
 `integration-state.json` is historical; read current progress before intervention.
+
+
+The comparison is now **completed and reviewed**. See `analysis.json`,
+`completed-comparison.json`, both arm directories (full screen/fresh reports,
+progress, state, initial native proof and 32 finite update metrics), and final
+models under `checkpoints/striking-validation/credit-horizon-1671168/`.
+Gamma 0.999 has six surviving active events across four fresh seeds and one
+surviving two-way episode; neither arm passes complete neutral/active criteria.
+No actor is adopted. The [review and single bounded follow-up](../../../striking-reward-credit-review.md#completed-horizon-comparison-and-bounded-continuation-2026-10-23)
+record the decision, exact hashes, actual compute and limits. The launch and
+integration snapshots above describe earlier boundaries, not current counters.

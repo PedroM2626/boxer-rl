@@ -68,13 +68,18 @@ also fails both complete screens: stable active contacts persist, while neutral
 practice remains unsuccessful. The [completed neutral-partner task](docs/striking-reward-credit-review.md)
 also fails both complete screens: final survival is 7/8, 8/8 and 7/8, with no
 stable legal events. No actor is adopted or phase promoted. Training receives no
-unchanged extension. The [completed reward-credit audit and horizon comparison](docs/striking-reward-credit-review.md)
-reproduced all 26 physical trials exactly and measured strong temporal attenuation
-of late legal impacts under the existing discount. A bounded matched gamma 0.99
-versus 0.999 comparison is active, preserving latest learned state, rewards,
-physical criteria and main ceilings. Inspect
-`/home/pedro/boxing-runs/striking-credit-horizon-1671168/comparison.json`, its active
-child, full reports, progress and native logs before another launch. Neither a
+unchanged extension. The [completed reward-credit audit and matched horizon comparison](docs/striking-reward-credit-review.md)
+verified all raw physical gates and checkpoints. Gamma 0.999 produces six
+surviving active impacts across four fresh seeds, including one deterministic
+ten-second two-way episode, versus no fresh impacts at gamma 0.99. Neither
+passes: neutral strikes remain absent and some pairs fall. One further
+**32,768-credit diagnostic ordinary continuation** of the latest gamma-0.999
+checkpoint is allocated, with complete checks at 16,384/32,768 and fresh seeds
+at the end. Inspect
+`/home/pedro/boxing-runs/striking-credit-horizon-continue-1703936/continuation.json`
+and its process before any launch. Before this continuation, cumulative
+diagnostic PPO is **1,646,848**, formal diagnostic simulation **770,086 world
+controls**; main counters remain unchanged. No blind extension or adoption;
 higher discounted return nor an isolated replay certifies boxing.
 
 The [closed-fist replay repair](docs/closed-fist-rendering.md) restores the

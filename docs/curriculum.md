@@ -1,12 +1,15 @@
 # Adaptive unassisted G1 curriculum
 
-**Latest striking operation (2026-10-23):** the neutral-retention allocation is
-completed with two failed complete generations. The subsequent exact reward
-measurement is completed. A matched gamma 0.99 / 0.999 diagnostic is active;
-read its live state and the [current bounded contract](striking-reward-credit-review.md).
-Pre-comparison diagnostic counters are 1,581,312 learner credits and 712,013
-formal world controls; main counters are unchanged. Historical allocations below
-are completed evidence, not permission to restart or extend them.
+**Latest striking operation (2026-10-23):** the matched gamma 0.99 / 0.999
+comparison is completed and independently reviewed. Neither arm passes. Gamma
+0.999 produces surviving active strikes on four fresh seeds, including one
+ten-second two-way episode, but neutral scoring and stability remain incomplete.
+A single **32,768-credit diagnostic ordinary continuation** of its latest final
+is allocated, with full checks halfway and at completion; inspect its live state
+before launching anything. Read the [result and bounded contract](striking-reward-credit-review.md#completed-horizon-comparison-and-bounded-continuation-2026-10-23).
+Pre-continuation diagnostic counters are **1,646,848 learner credits / 770,086
+formal world controls**. Main counters and foundation certifications are unchanged.
+Historical allocations below are completed evidence, not permission to restart them.
 
 **Current stage (2026-10-22):** all four foundation levels are certified by
 [two distinct consecutive complete physical passes](results/curriculum/foundation-certification/README.md).
