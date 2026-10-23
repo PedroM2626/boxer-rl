@@ -1,5 +1,13 @@
 # Adaptive unassisted G1 curriculum
 
+**Latest striking operation (2026-10-23):** the neutral-retention allocation is
+completed with two failed complete generations. The subsequent exact reward
+measurement is completed. A matched gamma 0.99 / 0.999 diagnostic is active;
+read its live state and the [current bounded contract](striking-reward-credit-review.md).
+Pre-comparison diagnostic counters are 1,581,312 learner credits and 712,013
+formal world controls; main counters are unchanged. Historical allocations below
+are completed evidence, not permission to restart or extend them.
+
 **Current stage (2026-10-22):** all four foundation levels are certified by
 [two distinct consecutive complete physical passes](results/curriculum/foundation-certification/README.md).
 The foundation finished normally at **474,992,640 consumed main transitions**
@@ -70,17 +78,22 @@ reviewed both further distinct complete generations: neither passes, and no
 screen neutral learner scores. Active fresh survival rises to 7/8 with another
 surviving two-way episode, but neutral-role-1 fresh survival is 6/8. Stop the
 active-only extension. Cumulative diagnostic PPO is now **1,548,544**, formal
-diagnostic simulation **656,030 world controls**. A bounded **32,768-credit**
-neutral-partner task is active from the latest final actor, preserving replay,
-Adam counts 8,072 / 31,744 and every historical counter. Eight one-learner worlds
-retain the 1,024-row PPO batch; each learner credit now consumes one physical
-world control, with both role ledgers recorded. The full evaluator still tests
-both active learned agents and both neutral profiles with unchanged criteria.
-Inspect `/home/pedro/boxing-runs/striking-neutral-retention-1638400/curriculum.json`,
-its active child, role counters, full gate history, checkpoint hashes and native
-logs before new work. The preceding continuation is completed; no actor adoption,
-phase pass, rollback or further automatic extension is authorized. Free legs,
-unassisted physics and all main counters/ceilings are preserved.
+diagnostic simulation **656,030 world controls**. The [completed neutral-retention review and credit-horizon comparison](striking-reward-credit-review.md)
+verified both further full generations and role ledgers. Both screens fail;
+final original/fresh profiles have zero stable events despite 7/8, 8/8, 7/8
+survival. No unchanged neutral-training extension is granted. Cumulative
+diagnostic PPO remains **1,581,312**, formal diagnostic simulation is now
+**712,013 world controls** after the 12,222-control read-only reward audit.
+All 26 original physical trials and actual reward reconstruction match exactly.
+A bounded matched **gamma 0.99 versus 0.999** comparison is active from the
+latest neutral actor, with 32,768 new learner credits per arm (65,536 maximum),
+unchanged rewards, replay, one-learner task, physics and full physical criteria.
+The isolated variable is temporal discount; critic state and all learned prefixes
+are retained. Inspect
+`/home/pedro/boxing-runs/striking-credit-horizon-1671168/comparison.json`, its
+active child/progress, hashes, raw full evaluations and native logs before new
+work. The reward measurement is completed. No rollback, actor adoption, phase
+promotion, main ceiling change or automatic further extension is authorized.
 Main counters and all physical gates remain unchanged. No actor is adopted.
 No gate is relaxed, stage promoted or candidate composite controller certified.
 

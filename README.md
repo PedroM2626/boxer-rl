@@ -65,13 +65,17 @@ No phase advances or actor is adopted. The selected exchange and matched failure
 traces reproduce exactly; the video uses actual recorded coordinates and closed
 fists. The [completed follow-up active continuation](docs/striking-neutral-retention-curriculum.md)
 also fails both complete screens: stable active contacts persist, while neutral
-practice remains unsuccessful. A short neutral-partner curriculum task is active
-from the latest actor with replay and optimizer state retained, at most 32,768
-new learner credits. Both bodies/legs remain free; the independent evaluator
-still tests both active learned corners and all unchanged full criteria. No
-actor is adopted or phase promoted. Inspect
-`/home/pedro/boxing-runs/striking-neutral-retention-1638400/curriculum.json`, its
-active child, role credits, full reports and native logs before another launch.
+practice remains unsuccessful. The [completed neutral-partner task](docs/striking-reward-credit-review.md)
+also fails both complete screens: final survival is 7/8, 8/8 and 7/8, with no
+stable legal events. No actor is adopted or phase promoted. Training receives no
+unchanged extension. The [completed reward-credit audit and horizon comparison](docs/striking-reward-credit-review.md)
+reproduced all 26 physical trials exactly and measured strong temporal attenuation
+of late legal impacts under the existing discount. A bounded matched gamma 0.99
+versus 0.999 comparison is active, preserving latest learned state, rewards,
+physical criteria and main ceilings. Inspect
+`/home/pedro/boxing-runs/striking-credit-horizon-1671168/comparison.json`, its active
+child, full reports, progress and native logs before another launch. Neither a
+higher discounted return nor an isolated replay certifies boxing.
 
 The [closed-fist replay repair](docs/closed-fist-rendering.md) restores the
 original visual feature without changing learning or physics. Historical videos

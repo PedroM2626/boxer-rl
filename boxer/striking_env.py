@@ -110,6 +110,13 @@ class StrikingEnv:
             reward += .5*progress + self.pair.dt*(
                 .1*np.asarray(facing) + .15*np.exp(-((distance-self.engagement_reward_distance)/.2)**2)
                 - .03*np.mean(self.residual**2,axis=1))
+        if getattr(self,'diagnostic_reward_terms',False):
+            from boxer.striking_reward_audit import reward_terms
+            parts=reward_terms(outcome['scored'],outcome['fallen'],progress,facing,distance,
+                self.residual,self.pair.dt,self.engagement_reward_distance,both_up)
+            np.testing.assert_allclose(sum(parts.values()),reward,rtol=1e-7,atol=1e-8)
+            outcome['diagnostic_reward_terms']=parts
+            outcome['diagnostic_base_reward']=reward.astype(np.float32)
         timed_out = self.age >= 500
         outcome.update(distance=distance, timed_out=timed_out,
                        applied_actions=motor, arm_residual=self.residual.copy())

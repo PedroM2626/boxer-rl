@@ -15,6 +15,7 @@ class StrikingTrace:
     def __init__(self, env):
         self.rows=[]
         env.pair.diagnostic_contact_times={}
+        env.diagnostic_reward_terms=True
 
     def before(self, env, observation, action):
         self.pending=dict(observation=observation.copy(),action=action.copy(),
@@ -30,6 +31,9 @@ class StrikingTrace:
             hand_distance=env.hand_distances().copy(),
             pelvis_height=np.array([pair.data.qpos[m['root']+2] for m in pair.maps]),
             upright=np.array([pair.data.sensor(m['side']+'upvector_torso').data[2] for m in pair.maps]))
+        if 'diagnostic_reward_terms' in outcome:
+            self.pending.update({f'reward_{name}':value.copy() for name,value in outcome['diagnostic_reward_terms'].items()})
+            self.pending['reward_base_total']=outcome['diagnostic_base_reward'].copy()
         self.rows.append(self.pending);del self.pending
 
     def save(self, path, env):

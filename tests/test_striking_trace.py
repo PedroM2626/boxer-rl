@@ -27,6 +27,8 @@ def test_trace_is_read_only_with_identical_native_trajectory(foundation,tmp_path
     file=tmp_path/'trace.npz';contacts=trace.save(file,traced)
     with np.load(file) as stored:
         assert stored['observation'].shape==(5,2,148)
+        terms=[stored['reward_'+name] for name in ('scored','received','fall','progress','facing','engagement','residual')]
+        np.testing.assert_allclose(sum(terms),stored['reward_base_total'],rtol=1e-6,atol=1e-8)
         assert stored['action'].dtype==np.float32
         np.testing.assert_array_equal(stored['action'],np.repeat(action[None],5,axis=0))
         np.testing.assert_array_equal(stored['next_observation'][-1],b)

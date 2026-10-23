@@ -1,5 +1,10 @@
 # Completed active continuation and neutral-partner retention curriculum
 
+**Completed:** both fixed neutral-task generations and all independent trials
+finished. Neither generation passes; final profiles contain no stable scored
+events. See the [completed review and bounded reward-credit measurement](striking-reward-credit-review.md).
+The launch/integration notes below are historical; no unchanged extension is granted.
+
 ## Reviewed completed allocation
 
 The latest active-retention continuation exhausted its fixed **32,768-credit**

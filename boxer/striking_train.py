@@ -105,6 +105,9 @@ def require_ppo_checkpoint(saved):
         from boxer.striking_ppo_warmstart import OPTIMIZER_KIND,validate_split_checkpoint
         if kind!=OPTIMIZER_KIND:raise ValueError('unsupported optimizer format')
         validate_split_checkpoint(saved)
+        if saved.get('credit_horizon_ppo'):
+            from boxer.striking_credit_horizon import validate_horizon_state
+            validate_horizon_state(saved)
     elif 'optimizer' in saved:
         try:mu=saved['optimizer'][1][0].mu
         except (KeyError,IndexError,TypeError,AttributeError) as error:
@@ -154,6 +157,8 @@ def main(argv=None):
     parser.add_argument('--demonstration-ppo',action='store_true')
     parser.add_argument('--retention-loss-weight',type=float,choices=(0.,1.),default=0.)
     parser.add_argument('--neutral-contact-ppo',action='store_true')
+    parser.add_argument('--credit-horizon-ppo',action='store_true')
+    parser.add_argument('--training-gamma',type=float,choices=(.99,.999),default=.99)
     parser.add_argument('--engagement-distance',type=float,
                         help='explicit reviewed change of approach stop and engagement reward peak')
     parser.add_argument('--publish-dir',type=Path,
@@ -169,6 +174,10 @@ def main(argv=None):
         raise ValueError('retention loss requires explicit demonstration PPO')
     if args.neutral_contact_ppo and (not args.demonstration_ppo or args.retention_loss_weight!=1.):
         raise ValueError('neutral contact task requires the reviewed demonstration-retention path')
+    if args.credit_horizon_ppo and not args.neutral_contact_ppo:
+        raise ValueError('credit-horizon comparison requires the reviewed neutral task')
+    if not args.credit_horizon_ppo and args.training_gamma!=.99:
+        raise ValueError('discount change requires explicit credit-horizon provenance')
     if args.ceiling <= 0 or args.worlds <= 0 or args.unroll < 2:
         raise ValueError('positive ceiling/worlds and unroll >=2 required')
     if jax.devices()[0].platform!='cpu':
@@ -208,6 +217,7 @@ def train(args):
     contact_ppo=getattr(args,'contact_ppo',False)
     demonstration_ppo=getattr(args,'demonstration_ppo',False)
     neutral_contact_ppo=getattr(args,'neutral_contact_ppo',False)
+    credit_horizon_ppo=getattr(args,'credit_horizon_ppo',False)
     env_class=StrikingEnv
     if contact_ppo:
         from boxer.striking_contact import ContactAwareStrikingEnv
@@ -243,6 +253,9 @@ def train(args):
             if neutral_contact_ppo:
                 interface_metadata['neutral_contact_ppo']=True
                 config.update(interface_metadata,version=4)
+                if credit_horizon_ppo:
+                    interface_metadata.update(credit_horizon_ppo=True,training_gamma=args.training_gamma)
+                    config.update(interface_metadata,version=5,gamma=args.training_gamma)
     checkpoint_path=args.output/'checkpoint/latest.json'
     if previous:
         if not args.resume:
@@ -269,6 +282,10 @@ def train(args):
             raise ValueError('explicit demonstration checkpoint and training path must agree')
         if neutral_contact_ppo != saved.get('neutral_contact_ppo',False):
             raise ValueError('explicit neutral checkpoint and task must agree')
+        if credit_horizon_ppo != saved.get('credit_horizon_ppo',False):
+            raise ValueError('explicit credit-horizon checkpoint and training path must agree')
+        if credit_horizon_ppo and saved['training_gamma']!=args.training_gamma:
+            raise ValueError('checkpoint and requested discount disagree')
         if demonstration_ppo and saved['retention_loss_weight']!=args.retention_loss_weight:
             raise ValueError('retention checkpoint and requested coefficient disagree')
         if contact_ppo != (saved.get('optimizer_kind')=='split_adam_v1'):
@@ -402,7 +419,8 @@ def train(args):
             obs=np.asarray(following).reshape(rows,observation_size)
         rollout={k:np.asarray(v) for k,v in storage.items()}
         bootstrap=np.asarray(value(vp,jp.array(normalize(obs,norm))))
-        adv,returns=advantages(rollout['reward'],rollout['done'],rollout['value'],bootstrap)
+        adv,returns=advantages(rollout['reward'],rollout['done'],rollout['value'],bootstrap,
+            gamma=config['gamma'],lam=config['gae_lambda'])
         flat_obs=rollout['obs'].reshape(block,observation_size)
         batch=dict(obs=normalize(flat_obs,norm),raw=rollout['raw'].reshape(block,action_size),
             logp=rollout['logp'].reshape(block),adv=((adv-adv.mean())/(adv.std()+1e-8)).reshape(block),

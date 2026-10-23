@@ -1,4 +1,9 @@
-# Neutral-partner curriculum with demonstration retention: launch evidence
+# Neutral-partner curriculum with demonstration retention
+
+**Completed:** both full generations fail. Final models, all source/final fresh
+trials, complete screens, `completed-curriculum.json`, role ledgers, training
+metrics and `analysis.json` are archived here. See the [completed review](../../../striking-reward-credit-review.md).
+Launch and first-block notes below retain their original historical scope.
 
 See the [completed review and bounded task contract](../../../striking-neutral-retention-curriculum.md).
 Live state is `/home/pedro/boxing-runs/striking-neutral-retention-1638400/curriculum.json`.
