@@ -46,14 +46,16 @@ comparison](striking-motor-anchoring.md) verified 32 unique candidate prefixes
 and completed a bounded matched BC correction: 1,000 updates per arm and all
 120 complete physical episodes. The correction improves some survival but
 reduces scoring; neither actor passes the complete criteria. Further identical
-imitation is stopped. The [next PPO contract](striking-ppo-warmstart-plan.md)
-requires validated explicit actor/critic optimizer migration from the latest
-zero-anchor BC5000 actor before its conditional bounded diagnostic comparison.
-No PPO job is implemented or running yet. Inspect
-`/home/pedro/boxing-runs/striking-anchor-learning-bc4000/learning.json` and processes
-before new work. Diagnostic PPO remains 1,188,096; formal evaluation controls
-are 458,469 and cumulative supervised compute 8,000 updates. No actor adoption
-or stage promotion occurs from this comparison.
+imitation is stopped. The [validated PPO continuation](striking-ppo-warmstart-plan.md)
+now preserves the latest zero-anchor BC5000 actor and both independent Adam
+histories. Its hidden matched comparison started at 2026-10-23 11:32 UTC with
+fresh source evaluation before two bounded 131,072-credit diagnostic PPO arms
+(auxiliary approach anchoring weights 0 and 0.02). Inspect
+`/home/pedro/boxing-runs/striking-ppo-anchor-bc5000/comparison.json`, its active
+child, progress, hashes and logs before new work. Pre-job diagnostic PPO is
+1,188,096, formal evaluation controls 458,469 and cumulative supervised compute
+8,000 updates. The job records new PPO collection and evaluation controls
+separately; no policy adoption or stage promotion occurs automatically.
 Main counters and all physical gates remain unchanged. No actor is adopted.
 No gate is relaxed, stage promoted or candidate composite controller certified.
 

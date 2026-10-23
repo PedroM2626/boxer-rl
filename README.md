@@ -38,10 +38,10 @@ passed and active self-play regressed. The [contact-history comparison](docs/str
 completed 2,000 further supervised updates per arm and all 48 physical episodes.
 Both variants failed; contact feedback reached 5/8 self-play survival versus 3/8
 for control, without sufficient own scoring in both roles.
-**No additional PPO** is allocated. Both bodies/legs remain free and all contacts
+No additional PPO was allocated to that imitation comparison. Both bodies/legs remain free and all contacts
 active. No actor is adopted and no physical gate is weakened. Inspect
 `/home/pedro/boxing-runs/striking-contact-compare-bc2000/comparison.json`
-and processes before another launch; that job is completed. Main and PPO remain
+and processes before another launch; that job is completed. The main run remains
 stopped. The [completed coverage/channel audits](docs/striking-policy-coverage-audit.md)
 reproduced every physical result and localized selected early falls to the arm
 residual channel. Their short interventions are diagnostic, not adopted policies.
@@ -50,10 +50,13 @@ validated 32 unique approach prefixes and completed 1,000 supervised updates
 per matched arm plus all 120 full physical episodes. The corrected actor has
 7/8 active survival on fresh seeds but only one surviving impact; neither arm
 passes the complete criteria. No actor or stage is adopted. Further identical
-imitation is stopped. The next [PPO continuation contract](docs/striking-ppo-warmstart-plan.md)
-requires explicit validated optimizer migration from the latest BC5000 actor.
-Inspect `/home/pedro/boxing-runs/striking-anchor-learning-bc4000/learning.json`
-and processes before new work; that job is completed. No PPO comparison is running.
+imitation is stopped. The [validated PPO continuation](docs/striking-ppo-warmstart-plan.md)
+preserves the latest BC5000 actor and independently counted actor/critic Adam
+states. A hidden matched comparison is running, beginning with fresh full source
+evaluation: 131,072 diagnostic learner credits per arm, with auxiliary approach
+anchoring at weight 0 or 0.02. Main ceilings and physical gates are unchanged.
+Inspect `/home/pedro/boxing-runs/striking-ppo-anchor-bc5000/comparison.json`,
+its active child, progress and logs before any new launch.
 
 The [closed-fist replay repair](docs/closed-fist-rendering.md) restores the
 original visual feature without changing learning or physics. Historical videos

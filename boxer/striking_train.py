@@ -98,8 +98,41 @@ def validate_resume_config(previous, current, explicit_profile_change=False):
 
 
 def require_ppo_checkpoint(saved):
-    if saved.get('training_kind','ppo')!='ppo':
+    if saved.get('training_kind','ppo')!='ppo' or saved.get('ppo_optimizer_compatible') is False:
         raise ValueError('non-PPO checkpoint requires an explicit validated optimizer migration before PPO resume')
+    kind=saved.get('optimizer_kind')
+    if kind is not None:
+        from boxer.striking_ppo_warmstart import OPTIMIZER_KIND,validate_split_checkpoint
+        if kind!=OPTIMIZER_KIND:raise ValueError('unsupported optimizer format')
+        validate_split_checkpoint(saved)
+    elif 'optimizer' in saved:
+        try:mu=saved['optimizer'][1][0].mu
+        except (KeyError,IndexError,TypeError,AttributeError) as error:
+            raise ValueError('invalid legacy joint optimizer; explicit optimizer migration required') from error
+        if not isinstance(mu,tuple) or len(mu)!=2:
+            raise ValueError('joint PPO optimizer required; explicit optimizer migration required')
+
+
+def make_ppo_update(actor,critic,tx,anchor_weight=None):
+    if anchor_weight is not None:
+        from boxer.striking_ppo_warmstart import anchor_loss
+    @jax.jit
+    def update(ap,vp,optimizer,batch):
+        def loss(ap,vp):
+            mean,log_std=actor.apply(ap,batch['obs'])
+            ratio=jp.exp(log_probability(batch['raw'],mean,log_std)-batch['logp'])
+            policy=-jp.mean(jp.minimum(ratio*batch['adv'],jp.clip(ratio,.8,1.2)*batch['adv']))
+            value_loss=jp.mean((critic.apply(vp,batch['obs'])-batch['returns'])**2)
+            entropy=jp.sum(log_std+.5*np.log(2*np.pi*np.e))
+            result=policy+.25*value_loss-.001*entropy
+            if anchor_weight is not None:
+                result+=anchor_weight*anchor_loss(actor,ap,batch['anchor_obs'],batch['anchor_labels'])
+            return result
+        loss_value,grads=jax.value_and_grad(loss,argnums=(0,1))(ap,vp)
+        updates,optimizer=tx.update(grads,optimizer,(ap,vp))
+        ap,vp=optax.apply_updates((ap,vp),updates)
+        return ap,vp,optimizer,loss_value
+    return update
 
 
 def main(argv=None):
@@ -112,11 +145,17 @@ def main(argv=None):
     parser.add_argument('--unroll',type=int,default=128)
     parser.add_argument('--seed',type=int,default=53)
     parser.add_argument('--resume',action='store_true')
+    parser.add_argument('--contact-ppo',action='store_true',help='explicit migrated 148-input split-Adam training')
+    parser.add_argument('--anchor-loss-weight',type=float,choices=(0.,.02),default=0.)
     parser.add_argument('--engagement-distance',type=float,
                         help='explicit reviewed change of approach stop and engagement reward peak')
     parser.add_argument('--publish-dir',type=Path,
                         help='optional repository mirror; durable per-step ledger stays in output')
     args=parser.parse_args(argv)
+    if args.contact_ppo and (not args.resume or args.engagement_distance is not None):
+        raise ValueError('contact PPO requires explicit migrated resume and inherited engagement profile')
+    if not args.contact_ppo and args.anchor_loss_weight!=0.:
+        raise ValueError('auxiliary loss requires explicit contact PPO')
     if args.ceiling <= 0 or args.worlds <= 0 or args.unroll < 2:
         raise ValueError('positive ceiling/worlds and unroll >=2 required')
     if jax.devices()[0].platform!='cpu':
@@ -153,14 +192,19 @@ def train(args):
     motor_params,metadata=load_policy_params(args.foundation)
     if contract(foundation)!=metadata['contract']:
         raise ValueError('frozen motor contract mismatch')
-    observation_size, action_size = StrikingEnv.observation_size, StrikingEnv.action_size
-    learners_per_world = getattr(StrikingEnv, 'learners_per_world', 2)
+    contact_ppo=getattr(args,'contact_ppo',False)
+    env_class=StrikingEnv
+    if contact_ppo:
+        from boxer.striking_contact import ContactAwareStrikingEnv
+        env_class=ContactAwareStrikingEnv
+    observation_size, action_size = env_class.observation_size, env_class.action_size
+    learners_per_world = getattr(env_class, 'learners_per_world', 2)
     if learners_per_world not in (1, 2):
         raise ValueError('one or two learners per paired world required')
     interface_metadata = dict(actor_inputs=observation_size, actions=action_size)
     if learners_per_world != 2:
         interface_metadata.update(learners_per_world=learners_per_world,
-                                  opponent_mode=StrikingEnv.opponent_mode)
+                                  opponent_mode=env_class.opponent_mode)
     if action_size == 32:
         interface_metadata['body_residual_radians'] = StrikingEnv.body_residual_radians
     config=dict(version=1,foundation_sha256=metadata['sha256'],foundation_main_steps=metadata['total_steps'],
@@ -168,6 +212,12 @@ def train(args):
         arm_residual_radians=.8,command_offsets=[.15,.15,.25],assistance=False,
         dt=.02,physics_dt=.002,round_steps=500,learning_rate=.0001,epochs=4,
         minibatches=4,gamma=.99,gae_lambda=.95,scorecard_version=1,**profile)
+    if contact_ppo:
+        from boxer.striking_ppo_warmstart import OPTIMIZER_KIND,SplitAdam
+        if previous is None:raise ValueError('migrated contact configuration required')
+        interface_metadata.update(contact_history=True,learners_per_world=2,opponent_mode='active_selfplay',
+            optimizer_kind=OPTIMIZER_KIND,anchor_loss_weight=args.anchor_loss_weight)
+        config.update(interface_metadata,version=2)
     checkpoint_path=args.output/'checkpoint/latest.json'
     if previous:
         if not args.resume:
@@ -178,9 +228,11 @@ def train(args):
     key=jax.random.PRNGKey(args.seed)
     ap=actor.init(key,jp.zeros((1,observation_size)));vp=critic.init(jax.random.fold_in(key,1),jp.zeros((1,observation_size)))
     tx=optax.chain(optax.clip_by_global_norm(1.),optax.adam(.0001))
+    if contact_ppo:tx=SplitAdam()
     optimizer=tx.init((ap,vp))
     norm=dict(mean=np.zeros(observation_size),var=np.ones(observation_size),count=1e-4)
     consumed=optimized=world_controls=0
+    continuation={}
     if args.resume and checkpoint_path.exists():
         manifest=json.loads(checkpoint_path.read_text())
         payload=(checkpoint_path.parent/manifest['file']).read_bytes()
@@ -188,6 +240,12 @@ def train(args):
             raise ValueError('boxing checkpoint checksum mismatch')
         saved=pickle.loads(payload)
         require_ppo_checkpoint(saved)
+        if contact_ppo != (saved.get('optimizer_kind')=='split_adam_v1'):
+            raise ValueError('optimizer format requires the matching explicit training path')
+        for key in ('actor_inputs','actions','contact_history','learners_per_world','opponent_mode','anchor_loss_weight'):
+            default=2 if key=='learners_per_world' else False if key=='contact_history' else None
+            if key in saved and saved[key]!=interface_metadata.get(key,default):
+                raise ValueError('checkpoint and training interface disagree')
         if saved['foundation_sha256']!=metadata['sha256']:
             raise ValueError('boxing motor provenance mismatch')
         ap,vp,optimizer,norm,key=(saved[k] for k in ('actor','critic','optimizer','norm','key'))
@@ -199,7 +257,9 @@ def train(args):
         # that prefix when an explicitly cloned diagnostic changes learner count.
         world_controls=max(saved.get('world_control_steps',saved['consumed_steps']//2),
                            progress.get('world_control_steps',progress['consumed_steps']//2))
+        if contact_ppo:continuation=dict(saved)
     elif args.resume:
+        if contact_ppo:raise ValueError('explicit migrated contact checkpoint required')
         # A failure before the first PPO update still consumed simulation.
         # Keep that ledger when recreating the original neutral head.
         progress=json.loads((args.output/'progress.json').read_text())
@@ -213,6 +273,12 @@ def train(args):
     def stop(signum,frame):
         stopping[0]=True
     signal.signal(signal.SIGTERM,stop);signal.signal(signal.SIGINT,stop)
+    if contact_ppo:
+        from boxer.striking_anchor import load_anchor_candidates
+        anchor_data,anchor_manifest=load_anchor_candidates()
+        if anchor_manifest['sha256']!=continuation['anchor_dataset_sha256']:
+            raise ValueError('auxiliary anchor provenance mismatch')
+        aux_rng=np.random.default_rng();aux_rng.bit_generator.state=continuation['aux_sampler_state']
 
     @jax.jit
     def act(parameters, obs, rng):
@@ -224,21 +290,9 @@ def train(args):
     def value(parameters,obs):
         return critic.apply(parameters,obs)
 
-    @jax.jit
-    def update(ap,vp,optimizer,batch):
-        def loss(ap,vp):
-            mean,log_std=actor.apply(ap,batch['obs'])
-            ratio=jp.exp(log_probability(batch['raw'],mean,log_std)-batch['logp'])
-            policy=-jp.mean(jp.minimum(ratio*batch['adv'],jp.clip(ratio,.8,1.2)*batch['adv']))
-            value_loss=jp.mean((critic.apply(vp,batch['obs'])-batch['returns'])**2)
-            entropy=jp.sum(log_std+.5*np.log(2*np.pi*np.e))
-            return policy+.25*value_loss-.001*entropy
-        loss_value,grads=jax.value_and_grad(loss,argnums=(0,1))(ap,vp)
-        updates,optimizer=tx.update(grads,optimizer,(ap,vp))
-        ap,vp=optax.apply_updates((ap,vp),updates)
-        return ap,vp,optimizer,loss_value
+    update=make_ppo_update(actor,critic,tx,args.anchor_loss_weight if contact_ppo else None)
 
-    envs=[StrikingEnv(foundation,motor_params,**profile) for _ in range(args.worlds)]
+    envs=[env_class(foundation,motor_params,**profile) for _ in range(args.worlds)]
     # Share the already compiled frozen network across worlds.
     for env in envs[1:]:env.motor=envs[0].motor
     episode=np.full(args.worlds,consumed//rows,dtype=np.int64)
@@ -256,6 +310,10 @@ def train(args):
             world_control_steps=world_controls,combined_project_consumed_steps=metadata['total_steps']+consumed,
             updated_utc=utc(),rounds=completed_rounds,fall_rounds=falls,scored_by_corner=scored.tolist(),
             actor_steps_per_second=(consumed-session_start)/max(time.monotonic()-started,1e-6),**extra)
+        if contact_ppo:
+            progress['combined_foundation_and_lineage_steps']=progress.pop('combined_project_consumed_steps')
+            progress.update(actor_adam_count=int(optimizer['actor_adam'][0].count),
+                critic_adam_count=int(optimizer['critic_adam'][0].count))
         atomic_json(args.output/'progress.json',progress)
         atomic_json(args.output/'state.json',dict(state,status=status,**progress))
     def publish():
@@ -311,21 +369,32 @@ def train(args):
             key,sub=jax.random.split(key)
             order=np.asarray(jax.random.permutation(sub,block))
             for indices in np.split(order,4):
-                ap,vp,optimizer,loss=update(ap,vp,optimizer,{k:jp.array(v[indices]) for k,v in batch.items()})
+                minibatch={k:jp.array(v[indices]) for k,v in batch.items()}
+                if contact_ppo:
+                    ai=aux_rng.integers(0,len(anchor_data['observation']),64)
+                    minibatch.update(anchor_obs=jp.array(normalize(anchor_data['observation'][ai],norm)),
+                        anchor_labels=jp.array(anchor_data['action'][ai]))
+                ap,vp,optimizer,loss=update(ap,vp,optimizer,minibatch)
                 losses.append(float(loss))
+        if contact_ppo and not np.isfinite(losses).all():raise FloatingPointError('nonfinite contact PPO loss')
         if not all(np.isfinite(x).all() for x in jax.tree_util.tree_leaves((ap,vp,optimizer))):
             raise FloatingPointError('non-finite boxing update; prior checkpoint retained')
         norm=update_norm(norm,flat_obs)
         optimized+=block
-        saved=dict(actor=ap,critic=vp,optimizer=optimizer,norm=norm,key=key,
+        saved=dict(continuation,actor=ap,critic=vp,optimizer=optimizer,norm=norm,key=key,
             optimized_steps=optimized,consumed_steps=consumed,world_control_steps=world_controls,
             foundation_sha256=metadata['sha256'],**interface_metadata,**profile)
+        if contact_ppo:
+            saved['aux_sampler_state']=aux_rng.bit_generator.state
+            require_ppo_checkpoint(saved)
         payload=pickle.dumps(jax.device_get(saved),protocol=pickle.HIGHEST_PROTOCOL)
         name=f'step-{consumed}.pkl'
         atomic_bytes(checkpoint_path.parent/name,payload)
+        checkpoint_metadata=dict(interface_metadata)
+        if contact_ppo:checkpoint_metadata.update(training_kind='ppo',ppo_optimizer_compatible=True,migration_version=1)
         atomic_json(checkpoint_path,dict(file=name,sha256=hashlib.sha256(payload).hexdigest(),
             consumed_steps=consumed,optimized_steps=optimized,world_control_steps=world_controls,
-            foundation_sha256=metadata['sha256'],**interface_metadata,**profile))
+            foundation_sha256=metadata['sha256'],**checkpoint_metadata,**profile))
         record(phase='updated',mean_loss=float(np.mean(losses)))
         publish()
         print(json.dumps(json.loads((args.output/'progress.json').read_text())),flush=True)
