@@ -1,8 +1,10 @@
 # Mixed-opponent coverage: completed comparison and bounded continuation
 
-**Current status:** both matched arms completed and were independently reviewed.
-Neither passes. One bounded ordinary mixed-profile continuation is allocated;
-see the [current result and contract](#completed-comparison-and-one-bounded-continuation-2026-10-23).
+**Current status:** the subsequent ordinary mixed continuation is completed
+with two failed complete generations and fresh physical regression. No further
+full training allocation is granted. See the [current policy-update investigation](striking-policy-update-investigation.md)
+for the complete final review, zero-simulation audit and completed one-block probe and bounded actor-rate comparison.
+Historical allocations below are completed evidence, not active jobs.
 
 The full [command-offset intervention review](striking-reward-credit-review.md#completed-full-holdout-and-next-coverage-decision-2026-10-23)
 does not justify adopting a masked controller. Original-screen survival improves,

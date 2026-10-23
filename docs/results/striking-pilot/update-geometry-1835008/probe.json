@@ -1,0 +1,63 @@
+{
+  "status": "completed",
+  "pid": 424,
+  "started_utc": "2026-10-23T21:29:50.967355+00:00",
+  "phase": "awaiting_review",
+  "diagnostic_output": "/home/pedro/boxing-runs/striking-update-geometry-1835008",
+  "source_sha256": "8c99c2dfe21cd6c94a90ed31c487620118df5b0d0fdfe430eabe2471745a31c2",
+  "maximum_new_ppo_steps": 1024,
+  "maximum_collection_world_controls": 1024,
+  "maximum_evaluation_world_controls": 0,
+  "diagnostic_consumed_steps": 1024,
+  "diagnostic_collection_world_controls": 1024,
+  "diagnostic_ppo_before_job": 1810688,
+  "formal_evaluation_world_controls_retained": 989355,
+  "main_consumed_retained": 1048576,
+  "main_project_consumed_retained": 476041216,
+  "standalone_supervised_updates_retained": 8000,
+  "maximum_new_integrated_replay_presentations": 4096,
+  "passive_instrumentation": true,
+  "optimizer_or_objective_changed": false,
+  "assistance": false,
+  "policy_adoption": "none",
+  "promotion": false,
+  "updated_utc": "2026-10-23T21:30:27.007947+00:00",
+  "diagnostic_ppo_total": 1811712,
+  "final_checkpoint_sha256": "8f680f4d1d52ffc4cc18354687505f2d2b9ec21b8085a76dbc04b2bcac00afc2",
+  "final_measurement": {
+    "epoch": 4,
+    "minibatch": -1,
+    "phase": "after_normalizer",
+    "loss": null,
+    "profiles": {
+      "all": {
+        "rows": 1024,
+        "exact_gaussian_kl_mean": 0.037905320027134676,
+        "exact_gaussian_kl_p95": 0.07007191378410023,
+        "command_kl_mean": 0.0072186892999933985,
+        "arm_kl_mean": 0.03068663072714128,
+        "sampled_approx_kl": 0.06252290378129592,
+        "ratio_clip_fraction": 0.5234375
+      },
+      "neutral": {
+        "rows": 512,
+        "exact_gaussian_kl_mean": 0.03682689954879412,
+        "exact_gaussian_kl_p95": 0.06336386865953503,
+        "command_kl_mean": 0.006877597417333561,
+        "arm_kl_mean": 0.029949302131460555,
+        "sampled_approx_kl": 0.04030961103331442,
+        "ratio_clip_fraction": 0.501953125
+      },
+      "active": {
+        "rows": 512,
+        "exact_gaussian_kl_mean": 0.03898374050547525,
+        "exact_gaussian_kl_p95": 0.07922944550492342,
+        "command_kl_mean": 0.007559781182653238,
+        "arm_kl_mean": 0.03142395932282201,
+        "sampled_approx_kl": 0.08473619652927741,
+        "ratio_clip_fraction": 0.544921875
+      }
+    }
+  },
+  "native_error_logs_empty": true
+}

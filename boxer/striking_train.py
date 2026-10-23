@@ -108,6 +108,9 @@ def require_ppo_checkpoint(saved):
         if saved.get('credit_horizon_ppo'):
             from boxer.striking_credit_horizon import validate_horizon_state
             validate_horizon_state(saved)
+        if saved.get('conservative_actor_ppo'):
+            from boxer.striking_conservative_actor import validate_conservative_metadata
+            validate_conservative_metadata(saved)
     elif 'optimizer' in saved:
         try:mu=saved['optimizer'][1][0].mu
         except (KeyError,IndexError,TypeError,AttributeError) as error:
@@ -159,6 +162,10 @@ def main(argv=None):
     parser.add_argument('--neutral-contact-ppo',action='store_true')
     parser.add_argument('--credit-horizon-ppo',action='store_true')
     parser.add_argument('--mixed-partner-ppo',action='store_true')
+    parser.add_argument('--conservative-actor-ppo',action='store_true')
+    parser.add_argument('--actor-learning-rate',type=float,choices=(.0001,.00001),default=.0001)
+    parser.add_argument('--update-audit-directory',type=Path,
+                        help='passive update diagnostics on one explicit mixed-profile rollout only')
     parser.add_argument('--training-gamma',type=float,choices=(.99,.999),default=.99)
     parser.add_argument('--engagement-distance',type=float,
                         help='explicit reviewed change of approach stop and engagement reward peak')
@@ -182,6 +189,12 @@ def main(argv=None):
     if args.mixed_partner_ppo and (not args.credit_horizon_ppo or args.training_gamma!=.999
             or args.worlds!=8 or args.unroll!=128):
         raise ValueError('mixed partner requires explicit gamma-0.999 lineage and eight 128-step worlds')
+    if args.update_audit_directory is not None and not args.mixed_partner_ppo:
+        raise ValueError('update audit requires the explicit mixed diagnostic path')
+    if args.conservative_actor_ppo and (not args.mixed_partner_ppo or args.actor_learning_rate!=.00001):
+        raise ValueError('conservative actor requires explicit mixed lineage and actor rate 1e-5')
+    if not args.conservative_actor_ppo and args.actor_learning_rate!=.0001:
+        raise ValueError('actor rate change requires explicit conservative provenance')
     if args.ceiling <= 0 or args.worlds <= 0 or args.unroll < 2:
         raise ValueError('positive ceiling/worlds and unroll >=2 required')
     if jax.devices()[0].platform!='cpu':
@@ -223,6 +236,7 @@ def train(args):
     neutral_contact_ppo=getattr(args,'neutral_contact_ppo',False)
     credit_horizon_ppo=getattr(args,'credit_horizon_ppo',False)
     mixed_partner_ppo=getattr(args,'mixed_partner_ppo',False)
+    conservative_actor_ppo=getattr(args,'conservative_actor_ppo',False)
     env_class=StrikingEnv
     if contact_ppo:
         from boxer.striking_contact import ContactAwareStrikingEnv
@@ -267,6 +281,9 @@ def train(args):
                     if mixed_partner_ppo:
                         interface_metadata.update(mixed_partner_ppo=True,active_world_indices=list(MIXED_ACTIVE_WORLDS))
                         config.update(interface_metadata,version=6)
+                        if conservative_actor_ppo:
+                            interface_metadata.update(conservative_actor_ppo=True,actor_learning_rate=args.actor_learning_rate)
+                            config.update(interface_metadata,version=7)
     checkpoint_path=args.output/'checkpoint/latest.json'
     if previous:
         if not args.resume:
@@ -277,7 +294,7 @@ def train(args):
     key=jax.random.PRNGKey(args.seed)
     ap=actor.init(key,jp.zeros((1,observation_size)));vp=critic.init(jax.random.fold_in(key,1),jp.zeros((1,observation_size)))
     tx=optax.chain(optax.clip_by_global_norm(1.),optax.adam(.0001))
-    if contact_ppo:tx=SplitAdam()
+    if contact_ppo:tx=SplitAdam(actor_learning_rate=getattr(args,'actor_learning_rate',.0001))
     optimizer=tx.init((ap,vp))
     norm=dict(mean=np.zeros(observation_size),var=np.ones(observation_size),count=1e-4)
     consumed=optimized=world_controls=0
@@ -297,6 +314,10 @@ def train(args):
             raise ValueError('explicit credit-horizon checkpoint and training path must agree')
         if mixed_partner_ppo != saved.get('mixed_partner_ppo',False):
             raise ValueError('explicit mixed checkpoint and training task must agree')
+        if conservative_actor_ppo != saved.get('conservative_actor_ppo',False):
+            raise ValueError('explicit conservative checkpoint and training path must agree')
+        if conservative_actor_ppo and saved['actor_learning_rate']!=args.actor_learning_rate:
+            raise ValueError('checkpoint and requested actor rate disagree')
         if credit_horizon_ppo and saved['training_gamma']!=args.training_gamma:
             raise ValueError('checkpoint and requested discount disagree')
         if demonstration_ppo and saved['retention_loss_weight']!=args.retention_loss_weight:
@@ -330,6 +351,12 @@ def train(args):
     block=rows*args.unroll
     if block%4:
         raise ValueError('rollout must divide into four minibatches')
+    update_audit=None
+    if getattr(args,'update_audit_directory',None) is not None:
+        if not mixed_partner_ppo or args.ceiling-consumed!=block:
+            raise ValueError('passive update diagnostic is bounded to exactly one mixed rollout')
+        from boxer.striking_update_audit import UpdateAudit
+        update_audit=UpdateAudit(actor,log_probability,args.update_audit_directory)
     stopping=[False]
     def stop(signum,frame):
         stopping[0]=True
@@ -456,10 +483,12 @@ def train(args):
             logp=rollout['logp'].reshape(block),adv=((adv-adv.mean())/(adv.std()+1e-8)).reshape(block),
             returns=returns.reshape(block))
         losses=[]
+        if update_audit is not None:
+            update_audit.begin(ap,batch,np.tile([int(i in MIXED_ACTIVE_WORLDS) for i in range(args.worlds)],args.unroll))
         for epoch in range(4):
             key,sub=jax.random.split(key)
             order=np.asarray(jax.random.permutation(sub,block))
-            for indices in np.split(order,4):
+            for minibatch_index,indices in enumerate(np.split(order,4)):
                 minibatch={k:jp.array(v[indices]) for k,v in batch.items()}
                 if contact_ppo:
                     ai=aux_rng.integers(0,len(anchor_data['observation']),64)
@@ -468,10 +497,12 @@ def train(args):
                     if demonstration_ppo:minibatch.update(retention_batch(retention_data,retention_rng,norm))
                 ap,vp,optimizer,loss=update(ap,vp,optimizer,minibatch)
                 losses.append(float(loss))
+                if update_audit is not None:update_audit.observe(ap,epoch,minibatch_index,loss=float(loss))
         if contact_ppo and not np.isfinite(losses).all():raise FloatingPointError('nonfinite contact PPO loss')
         if not all(np.isfinite(x).all() for x in jax.tree_util.tree_leaves((ap,vp,optimizer))):
             raise FloatingPointError('non-finite boxing update; prior checkpoint retained')
         norm=update_norm(norm,flat_obs)
+        if update_audit is not None:update_audit.after_normalizer(ap,normalize(flat_obs,norm))
         optimized+=block
         saved=dict(continuation,actor=ap,critic=vp,optimizer=optimizer,norm=norm,key=key,
             optimized_steps=optimized,consumed_steps=consumed,world_control_steps=world_controls,

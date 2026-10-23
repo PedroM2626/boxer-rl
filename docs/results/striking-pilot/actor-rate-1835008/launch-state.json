@@ -1,0 +1,104 @@
+{
+  "status": "running",
+  "pid": 436,
+  "started_utc": "2026-10-23T21:47:30.911679+00:00",
+  "phase": "training",
+  "diagnostic_output": "/home/pedro/boxing-runs/striking-actor-rate-1835008",
+  "source_sha256": "8c99c2dfe21cd6c94a90ed31c487620118df5b0d0fdfe430eabe2471745a31c2",
+  "source_consumed_offset": 1835008,
+  "source_world_offset": 1212416,
+  "maximum_new_ppo_steps": 32768,
+  "new_ppo_steps_per_arm": 16384,
+  "maximum_evaluation_world_controls": 84000,
+  "diagnostic_consumed_steps": 1024,
+  "diagnostic_collection_world_controls": 1024,
+  "diagnostic_evaluation_world_controls": 10395,
+  "diagnostic_ppo_before_job": 1811712,
+  "formal_evaluation_world_controls_before_job": 989355,
+  "main_consumed_retained": 1048576,
+  "main_project_consumed_retained": 476041216,
+  "cumulative_supervised_updates_retained": 8000,
+  "new_separate_supervised_updates": 0,
+  "assistance": false,
+  "unchanged_rewards": true,
+  "policy_adoption": "none",
+  "promotion": false,
+  "fresh_seeds": [
+    15000003,
+    15000004,
+    15000005,
+    15000006
+  ],
+  "arms": [
+    {
+      "arm": "conservative_actor",
+      "initial_sha256": "6ddb863d9e6f83eaac00aaf331a6e52ffc2bd78ed28dbc510dec714c844a16e1",
+      "gates": [],
+      "initial_update_geometry": {
+        "epoch": 4,
+        "minibatch": -1,
+        "phase": "after_normalizer",
+        "loss": null,
+        "profiles": {
+          "all": {
+            "rows": 1024,
+            "exact_gaussian_kl_mean": 0.0029149151104249857,
+            "exact_gaussian_kl_p95": 0.004810905398682357,
+            "command_kl_mean": 0.0005094493627958768,
+            "arm_kl_mean": 0.0024054657476291087,
+            "sampled_approx_kl": 0.004290737620387512,
+            "ratio_clip_fraction": 0.03125
+          },
+          "neutral": {
+            "rows": 512,
+            "exact_gaussian_kl_mean": 0.0028479499284242704,
+            "exact_gaussian_kl_p95": 0.00439281348917512,
+            "command_kl_mean": 0.0005163018822035883,
+            "arm_kl_mean": 0.0023316480462206818,
+            "sampled_approx_kl": 0.0032674465361568665,
+            "ratio_clip_fraction": 0.013671875
+          },
+          "active": {
+            "rows": 512,
+            "exact_gaussian_kl_mean": 0.002981880292425701,
+            "exact_gaussian_kl_p95": 0.005254377336674478,
+            "command_kl_mean": 0.0005025968433881652,
+            "arm_kl_mean": 0.002479283449037536,
+            "sampled_approx_kl": 0.005314028704618158,
+            "ratio_clip_fraction": 0.048828125
+          }
+        }
+      }
+    }
+  ],
+  "active_evaluation": "/home/pedro/boxing-runs/striking-actor-rate-1835008/source-fresh/selfplay",
+  "updated_utc": "2026-10-23T21:49:59.600816+00:00",
+  "source_fresh": {
+    "neutral-0": {
+      "pair_survivors": 5,
+      "own_surviving_events": 2.0,
+      "own_surviving_scoring_seeds": [
+        15000003,
+        15000004
+      ]
+    },
+    "neutral-1": {
+      "pair_survivors": 4,
+      "own_surviving_events": 2.0,
+      "own_surviving_scoring_seeds": [
+        15000003,
+        15000004
+      ]
+    },
+    "selfplay": {
+      "pair_survivors": 7,
+      "own_surviving_events": 4.0,
+      "own_surviving_scoring_seeds": [
+        15000003,
+        15000006
+      ]
+    }
+  },
+  "active_arm": "conservative_actor",
+  "active_training_output": "/home/pedro/boxing-runs/striking-actor-rate-1835008/conservative_actor"
+}

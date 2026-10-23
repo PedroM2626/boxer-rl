@@ -1,4 +1,4 @@
-# One bounded ordinary mixed-profile continuation
+# Completed ordinary mixed-profile continuation
 
 The [completed matched comparison and current contract](../../../striking-mixed-partner-comparison.md#completed-comparison-and-one-bounded-continuation-2026-10-23)
 record the improved measured stability, sparse strikes, failed complete gates
@@ -52,3 +52,18 @@ model/configuration is archived under
 Source fresh consumes 10,815 controls; formal simulation is 957,562 and diagnostic
 PPO 1,746,176 at this integration boundary. Later live training advances beyond
 these historical snapshots. Full physical gates remain pending.
+
+
+**Completed and reviewed:** 65,536 new credits, all 96 full physical trials and
+42,608 actual evaluation controls are retained. Both complete generations fail.
+Intermediate neutral profiles pass but active survival does not; final fresh
+survival regresses 21/24 to 15/24. `analysis.json`, `completed-continuation.json`,
+two distinct gate model/report folders, final fresh data and 64 finite PPO metrics
+retain the complete outcome. No nonfinite/capacity incident or rollback.
+
+Diagnostic PPO is 1,810,688, formal simulation 989,355. The zero-simulation
+`policy-drift.json` audits 65 checkpoint payloads on hashed fixed archived states;
+parameter change dominates normalizer-only change there, not a causal explanation
+of falls. The [current investigation and bounded one-block probe](../../../striking-policy-update-investigation.md)
+stop further full training pending actual update measurements. Startup snapshots
+above are historical; this completed continuation must not be relaunched.

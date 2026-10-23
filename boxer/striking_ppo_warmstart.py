@@ -11,16 +11,17 @@ OPTIMIZER_KIND='split_adam_v1'
 
 class SplitAdam:
     """One joint gradient clip, followed by two independently counted Adam states."""
-    def __init__(self):
+    def __init__(self,actor_learning_rate=.0001):
         self.clip=optax.clip_by_global_norm(1.)
         self.adam=optax.adam(.0001)
+        self.actor_adam=optax.adam(actor_learning_rate)
 
     def init(self,params):
-        return dict(actor_adam=self.adam.init(params[0]),critic_adam=self.adam.init(params[1]))
+        return dict(actor_adam=self.actor_adam.init(params[0]),critic_adam=self.adam.init(params[1]))
 
     def update(self,grads,state,params):
         clipped,_=self.clip.update(grads,optax.EmptyState())
-        actor,sa=self.adam.update(clipped[0],state['actor_adam'],params[0])
+        actor,sa=self.actor_adam.update(clipped[0],state['actor_adam'],params[0])
         critic,sv=self.adam.update(clipped[1],state['critic_adam'],params[1])
         return (actor,critic),dict(actor_adam=sa,critic_adam=sv)
 

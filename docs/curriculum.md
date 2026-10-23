@@ -1,16 +1,14 @@
 # Adaptive unassisted G1 curriculum
 
-**Latest striking operation (2026-10-23):** the matched mixed/control comparison
-is completed and independently reviewed. Neither arm passes. Mixed fresh survival
-is 24/24 versus 18/24 control and 22/24 source, but strikes remain insufficient.
-The severely regressed neutral control is stopped. One ordinary **65,536-credit
-bounded mixed-profile continuation** is allocated from its latest final, with
-full checks at 32,768/65,536, severe-regression and no-improvement early stops.
-Read the [current results and contract](striking-mixed-partner-comparison.md#completed-comparison-and-one-bounded-continuation-2026-10-23)
-and live job/process before any launch. Pre-continuation diagnostic PPO is
-**1,745,152**, formal simulation **946,747 world controls**. Main counters, physical
-gates and complete foundation certifications remain unchanged. No actor is
-adopted or phase promoted; historical allocations below must not be restarted.
+**Latest striking operation (2026-10-23):** the completed mixed continuation
+regressed on matched fresh physical tests (21/24 source versus 15/24 final
+survivors). The subsequent actual-rollout probe measured 52.34% clipped action
+ratios after 16 updates. A bounded **16,384-credit-per-arm** actor-rate comparison
+now tests 0.00001 against unchanged 0.0001, retaining critic rate, all moments,
+physics and full gates. Read the [evidence and exact contract](striking-policy-update-investigation.md).
+Before this comparison diagnostic PPO is **1,811,712**, formal simulation
+**989,355**; ceilings are **1,844,480 / 1,073,355** respectively. Main training
+stays stopped. No rollback to a favorable actor, adoption or promotion.
 
 **Current stage (2026-10-22):** all four foundation levels are certified by
 [two distinct consecutive complete physical passes](results/curriculum/foundation-certification/README.md).

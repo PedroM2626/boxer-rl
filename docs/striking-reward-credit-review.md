@@ -1,10 +1,10 @@
 # Reward-credit review and completed horizon comparison
 
-**Current status:** the subsequent mixed/control training comparison is
-completed and reviewed. Neither passes; mixed improves measured stability.
-A single ordinary bounded mixed continuation is allocated with early stops.
-Read the [current result and contract](striking-mixed-partner-comparison.md#completed-comparison-and-one-bounded-continuation-2026-10-23).
-Historical reward/command investigations below are completed, not active jobs.
+**Current status:** the later mixed continuation also completed with regression.
+No further full training extension is granted. The
+[current policy-update investigation](striking-policy-update-investigation.md)
+records its final physical outcomes and the completed one-block measurement and bounded actor-rate comparison.
+Reward/command investigations below are historical, not active jobs.
 
 ## Completed neutral curriculum review
 

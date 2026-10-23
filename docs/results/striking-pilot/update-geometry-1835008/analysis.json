@@ -1,0 +1,51 @@
+{
+  "status": "reviewed",
+  "diagnostic_ppo_total": 1811712,
+  "formal_world_controls_total": 989355,
+  "new_collection_world_controls": 1024,
+  "new_integrated_replay_presentations": 4096,
+  "source_sha256": "8c99c2dfe21cd6c94a90ed31c487620118df5b0d0fdfe430eabe2471745a31c2",
+  "final_checkpoint_sha256": "8f680f4d1d52ffc4cc18354687505f2d2b9ec21b8085a76dbc04b2bcac00afc2",
+  "native_error_logs_empty": true,
+  "minibatch_updates": 16,
+  "rollout_rows": 1024,
+  "final_measurement": {
+    "epoch": 4,
+    "minibatch": -1,
+    "phase": "after_normalizer",
+    "loss": null,
+    "profiles": {
+      "all": {
+        "rows": 1024,
+        "exact_gaussian_kl_mean": 0.037905320027134676,
+        "exact_gaussian_kl_p95": 0.07007191378410023,
+        "command_kl_mean": 0.0072186892999933985,
+        "arm_kl_mean": 0.03068663072714128,
+        "sampled_approx_kl": 0.06252290378129592,
+        "ratio_clip_fraction": 0.5234375
+      },
+      "neutral": {
+        "rows": 512,
+        "exact_gaussian_kl_mean": 0.03682689954879412,
+        "exact_gaussian_kl_p95": 0.06336386865953503,
+        "command_kl_mean": 0.006877597417333561,
+        "arm_kl_mean": 0.029949302131460555,
+        "sampled_approx_kl": 0.04030961103331442,
+        "ratio_clip_fraction": 0.501953125
+      },
+      "active": {
+        "rows": 512,
+        "exact_gaussian_kl_mean": 0.03898374050547525,
+        "exact_gaussian_kl_p95": 0.07922944550492342,
+        "command_kl_mean": 0.007559781182653238,
+        "arm_kl_mean": 0.03142395932282201,
+        "sampled_approx_kl": 0.08473619652927741,
+        "ratio_clip_fraction": 0.544921875
+      }
+    }
+  },
+  "peak_optimizer_exact_kl": 0.039621985208154124,
+  "main_adoption": false,
+  "promotion": false,
+  "decision": "No long unchanged continuation. The actual sampled rollout reaches 0.0379 nats exact KL and over 52 percent clipped ratios after 16 updates; the normalizer refresh changes KL little. This does not prove a cause of falls. Test one bounded matched actor-only learning-rate reduction 1e-4 to 1e-5 against unchanged control from the same latest fully evaluated final, retaining all moments, critic rate, objectives, physics, gates and counters. The 1024-credit probe child is diagnostic only and is not adopted or used as a rollback destination."
+}
