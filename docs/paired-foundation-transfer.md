@@ -1,5 +1,9 @@
 # Paired unassisted foundation transfer
 
+The subsequent [opponent-aware striking pilot](striking-pilot.md) implements the
+next action, impact-event and PPO interface described below. This report retains
+the original transfer experiment and its limitations.
+
 ## Certified starting point
 
 All four foundation stages passed two distinct complete consecutive physical

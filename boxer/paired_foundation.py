@@ -10,6 +10,7 @@ import mujoco
 import numpy as np
 
 from boxer import scene
+from boxer.impact_scorecard import ImpactScorecard
 
 
 def build_pair(foundation, separation=2.0):
@@ -114,6 +115,12 @@ class PairedFoundation:
             self.maps.append(dict(act=actuators, q=self.model.jnt_qposadr[joints],
                                   v=self.model.jnt_dofadr[joints], root=int(self.model.jnt_qposadr[root]),
                                   rootv=int(self.model.jnt_dofadr[root]), side=side))
+        self.fists = np.array([[self.model.geom(side + hand).id for hand in scene.HAND_GEOMS]
+                               for side in scene.SIDES])
+        self.targets = [{self.model.geom(side + target).id
+                         for target in ('head_collision', 'torso_collision')}
+                        for side in scene.SIDES]
+        self.scorecard = ImpactScorecard()
         self.reset()
 
     def reset(self, seed=0, swap=False, randomized=True):
@@ -123,6 +130,7 @@ class PairedFoundation:
         self.frequency = rng.uniform(1.25, 1.5, (2, 1))
         self.last_action = np.zeros((2, 29))
         self.done = False
+        self.scorecard.reset()
         self.elapsed = 0.
         for index, mapping in enumerate(self.maps):
             q, rv, side = mapping['root'], mapping['rootv'], mapping['side']
@@ -190,11 +198,28 @@ class PairedFoundation:
         if actions.shape != (2, 29) or not np.isfinite(actions).all():
             raise ValueError("actions must be finite with shape (2, 29)")
         impulses = np.zeros(2)
+        scored = np.zeros(2)
         self.data.xfrc_applied[:] = 0
         self.data.qfrc_applied[:] = 0
         for i, m in enumerate(self.maps):
             self.data.ctrl[m['act']] = self.pose + self.action_scale * actions[i]
         for _ in range(self.substeps):
+            # Cache velocities before the constraint solver changes them on
+            # impact. A motionless fist cannot score when an opponent falls in.
+            velocities = {}
+            for geom in set(self.fists.ravel()) | self.targets[0] | self.targets[1]:
+                velocity = np.zeros(6)
+                mujoco.mj_objectVelocity(self.model, self.data, mujoco.mjtObj.mjOBJ_GEOM,
+                                         int(geom), velocity, 0)
+                velocities[geom] = velocity[3:].copy()
+            positions = self.data.geom_xpos.copy()
+            torso_motion = []
+            for m in self.maps:
+                site = self.model.site(m['side'] + 'imu_in_torso').id
+                velocity = np.zeros(6)
+                mujoco.mj_objectVelocity(self.model, self.data, mujoco.mjtObj.mjOBJ_SITE,
+                                         site, velocity, 0)
+                torso_motion.append((self.data.site_xpos[site].copy(), velocity))
             mujoco.mj_step(self.model, self.data)
             for name in ('mjWARN_BADQPOS', 'mjWARN_BADQVEL', 'mjWARN_BADQACC',
                          'mjWARN_CNSTRFULL', 'mjWARN_CONTACTFULL'):
@@ -203,20 +228,39 @@ class PairedFoundation:
                     # Native MuJoCo can reset an invalid state internally.
                     # Such a reset must never become apparent trial survival.
                     raise FloatingPointError(f'Invalid paired physics: {name}')
+            present = np.zeros((2, 2), bool)
+            per_hand = np.zeros((2, 2))
+            closing = np.zeros((2, 2))
+            advancing = np.zeros((2, 2))
             for k, contact in enumerate(self.data.contact):
-                names = [self.model.geom(int(g)).name for g in contact.geom]
-                for i, side in enumerate(scene.SIDES):
-                    legal = any(side + hand in names and
-                                any(scene.OPPONENT[side] + target in names for target in
-                                    ('head_collision', 'torso_collision')) for hand in scene.HAND_GEOMS)
-                    if legal:
+                geoms = set(map(int, contact.geom))
+                for i in range(2):
+                    for hand, fist in enumerate(self.fists[i]):
+                        target_set = geoms & self.targets[1-i]
+                        if fist not in geoms or not target_set:
+                            continue
+                        target = next(iter(target_set))
                         force = np.zeros(6)
                         mujoco.mj_contactForce(self.model, self.data, k, force)
-                        impulses[i] += max(0., force[0]) * self.model.opt.timestep
-            if self.fallen().any():
+                        per_hand[i, hand] += max(0., force[0]) * self.model.opt.timestep
+                        present[i, hand] = True
+                        direction = positions[target] - positions[fist]
+                        direction /= max(np.linalg.norm(direction), 1e-8)
+                        closing[i, hand] = max(closing[i, hand],
+                            float((velocities[fist] - velocities[target]) @ direction))
+                        origin, velocity = torso_motion[i]
+                        torso_at_fist = velocity[3:] + np.cross(velocity[:3], positions[fist] - origin)
+                        advancing[i, hand] = max(advancing[i, hand],
+                            float((velocities[fist] - torso_at_fist) @ direction))
+            impulses += per_hand.sum(axis=1)
+            fallen = self.fallen()
+            scored += self.scorecard.update(present, per_hand, closing, advancing,
+                self.data.time, self.model.opt.timestep, both_up=not fallen.any())
+            if fallen.any():
                 self.done = True
                 break
         self.last_action = actions.copy()
         self.phase = (self.phase + 2 * np.pi * self.dt * self.frequency + np.pi) % (2*np.pi) - np.pi
         self.elapsed = float(self.data.time)
-        return dict(done=self.done, fallen=self.fallen(), legal_contact_impulse=impulses)
+        return dict(done=self.done, fallen=self.fallen(), legal_contact_impulse=impulses,
+                    scored=scored)

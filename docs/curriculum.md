@@ -6,11 +6,13 @@ The foundation finished normally at **474,992,640 consumed main transitions**
 under the **475M** ceiling. Full walking passed at 474,562,560; approach then
 added 430,080 transitions. The exact actor payload was retained at transition.
 
-**Current operation:** validate [paired free-body transfer](paired-foundation-transfer.md)
-before training strikes. The foundation job is stopped and certified. Two
-actors now share one physical scene with real opponent contacts and separated
-spawns; this transfer diagnostic is independently accounted, with zero training
-updates. No boxing mastery is claimed, and no further main allocation is implied.
+**Current operation:** the [opponent-aware striking pilot](striking-pilot.md)
+adds trainable arm residuals and independent fist-impact events over the unchanged
+certified motor actor. The reviewed boxing pilot ceiling is **32,768 learner
+transitions**, separately accounted from foundation and diagnostic compute.
+Inspect `runs/striking-pilot` and the durable Linux output referenced in that
+report. The completed foundation must not be restarted. No boxing mastery is
+claimed; physical impact/fall evaluation must follow the bounded pilot.
 
 Full walking resumed at 422.89152M main transitions after a
 [supervisor log-read fault](curriculum-log-read-recovery.md). The targeted bounded

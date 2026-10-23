@@ -1,0 +1,27 @@
+{
+  "foundation_main_steps": 474992640,
+  "foundation_ceiling": 475000000,
+  "foundation_sha256": "b39b1990945e8a374802c3a190e5ac5e026ae39e7fd5ef61c5c2b01ad291c6fc",
+  "boxing_pilot_learner_ceiling": 32768,
+  "worlds": 4,
+  "unroll": 128,
+  "expected_iterations": 32,
+  "world_control_ceiling": 16384,
+  "diagnostic_training_learner_steps": 640,
+  "interface_diagnostic_world_steps": 8000,
+  "assistance": false,
+  "scorecard_version": 1,
+  "source": "New exact-neutral opponent-aware residual head over the unchanged certified motor actor; no smoke actor substitution.",
+  "rationale": "All eight neutral and eight bounded-exploration 10-second paired episodes survived; exact neutral/leg-isolation tests and real active-versus-passive impact assay passed. Bounded pilot tests optimization stability and contact exploration, not mastery.",
+  "continuation": "Review the final policy with tools/evaluate_striking.py and compare against interface-baseline.json before any further training allocation. Inspect falls, actual events, hashes and losses; no blind extension or gate relaxation.",
+  "durable_output": "/home/pedro/boxing-runs/striking-pilot-v1",
+  "mirror": "runs/striking-pilot",
+  "checkpoint_semantics": "Actor/critic/normalizer/Adam/RNG saved. Physics is reset on resume. Retain durable consumed ledger including incomplete or rejected rollouts; do not reset the foundation.",
+  "checkpoint_evaluation_smoke_world_steps": 100,
+  "code_sha256": {
+    "boxer/striking_train.py": "213845a0e31aa93eff0076b75a004cf7c3c76b3e305e8acfbcb99759125c5b81",
+    "boxer/striking_env.py": "1437e05d457c44524f5898a5ef055833e7431f2b0425cb9f98605a3041cb4a8b",
+    "boxer/impact_scorecard.py": "a77d5b148ddac04a747be183aea14b186317b52422ba64a7317c4033be19ce0c",
+    "boxer/paired_foundation.py": "716bcc52c4e736082cf4a93e23dba04c45cc36bbc284bf9d2ea0e3035bf2062f"
+  }
+}

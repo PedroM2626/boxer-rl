@@ -117,3 +117,24 @@ def test_native_numerical_warning_invalidates_round(pair):
     with pytest.raises(FloatingPointError,match='BADQACC'):
         pair.step(np.zeros((2,29)))
     pair.reset(randomized=False)
+
+
+def test_active_fist_impact_scores_but_passive_contact_does_not(pair):
+    pair.reset(randomized=False)
+    fist=pair.model.geom('red/left_hand_collision').id
+    head=pair.model.geom('blue/head_collision').id
+    root=pair.maps[1]['root']
+    pair.data.qpos[root:root+3] += (pair.data.geom_xpos[fist]+[.05,0,0]
+                                   - pair.data.geom_xpos[head])
+    mujoco.mj_forward(pair.model,pair.data)
+    jacobian=np.zeros((3,pair.model.nv));rotation=np.zeros_like(jacobian)
+    mujoco.mj_jacGeom(pair.model,pair.data,jacobian,rotation,fist)
+    arm_dofs=pair.maps[0]['v'][15:]
+    weights=jacobian[0,arm_dofs]
+    pair.data.qvel[arm_dofs]=weights/max(weights@weights,1e-6)
+    mujoco.mj_forward(pair.model,pair.data)
+    assert not pair.fallen().any()
+    outcome=pair.step(np.zeros((2,29)))
+    assert not outcome['done']
+    np.testing.assert_array_equal(outcome['scored'],[1.,0.])
+    assert outcome['legal_contact_impulse'][0]>.5

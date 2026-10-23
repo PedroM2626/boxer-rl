@@ -75,7 +75,7 @@ def evaluate(checkpoint, trials=2, seeds=(7, 23, 31, 47), seconds=10., video=Non
         trials=results)
 
 
-def render(env, frames, path):
+def render(env, frames, path, caption='Paired transfer diagnostic | Free bodies | Navigation only'):
     import mujoco
     import imageio.v2 as imageio
     from PIL import Image, ImageDraw
@@ -90,7 +90,7 @@ def render(env, frames, path):
                 renderer.update_scene(data,camera=camera)
                 image=Image.fromarray(renderer.render());draw=ImageDraw.Draw(image)
                 draw.rectangle((0,0,640,40),fill='black')
-                draw.text((8,8),'Paired transfer diagnostic | Free bodies | Navigation only',fill='white')
+                draw.text((8,8),caption,fill='white')
                 writer.append_data(np.asarray(image))
 
 
