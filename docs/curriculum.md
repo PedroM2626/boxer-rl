@@ -9,21 +9,19 @@ added 430,080 transitions. The exact actor payload was retained at transition.
 **Current operation:** the [opponent-aware striking pilot](striking-pilot.md)
 adds trainable arm residuals and independent fist-impact events over the unchanged
 certified motor actor. Main boxing PPO remains stopped at **1,048,576 learner
-transitions**, without a budget extension or diagnostic actor adoption. Both
-proximity and motion-reference reward comparisons failed their physical screening.
-The [completed results and active whole-body authority comparison](striking-body-authority-comparison.md)
-record the next decision. Two matched 161-input/32-output diagnostic networks
-start from the same explicit warm-state expansion; only additional joint-target
-authority differs (zero versus 0.1 rad on twelve leg/three waist joints).
-Each gets 131,072 new diagnostic transitions, with the original reward and full
-physical evaluation. Inspect
-`/home/pedro/boxing-runs/striking-body-compare-1048576/comparison.json`
-and its child/process before any launch. Keep the foundation and main stopped;
-do not rerun completed reward comparisons. Original motor certification does
-not certify the new composite controller; any favorable candidate needs broader
-balance/locomotion and held-out physical validation before adoption. No gate
-is weakened or stage promoted. Main source, 0.45 m range, 2 m spawns and free
-unassisted physics remain unchanged.
+transitions**, without a budget extension or actor adoption. The matched
+whole-body authority comparison completed; both controllers had 7/8 paired
+survival and zero deterministic impacts. The separate eight-episode saved-Gaussian
+checks also found zero impacts. Training events increased with body authority,
+but stable independent striking is not established.
+The [completed comparison and current broader holdout assessment](striking-body-holdout-review.md)
+record the decision. Two fixed controllers, two action modes and thirty-two new
+seeds with swapped sides give 256 read-only episodes, with no PPO or migration.
+Inspect `/home/pedro/boxing-runs/striking-body-holdout-1179648/holdout.json`
+and its active evaluator/process before any launch. Keep main and foundation
+stopped; do not repeat completed reward/body comparisons. Review all four complete
+jobs together, including event/fall timing, before another training decision.
+No gate is relaxed, stage promoted or candidate composite controller certified.
 
 Full walking resumed at 422.89152M main transitions after a
 [supervisor log-read fault](curriculum-log-read-recovery.md). The targeted bounded

@@ -266,3 +266,13 @@ Neither qualified or was adopted. Main remains stopped at 1,048,576. The
 records the archived result and the active next comparison. Inspect its durable
 body-comparison output before any launch; do not repeat the finished reward
 experiments. No main budget extension or foundation promotion is granted.
+
+## Completed body comparison and current read-only holdouts
+
+Both body-authority arms finished at their reviewed diagnostic budget, each
+with 7/8 pair survival and zero deterministic impacts. Neither was adopted.
+The [result and current broader holdout assessment](striking-body-holdout-review.md)
+record separate sampled checks and the active 256-episode fixed-policy job.
+Main remains stopped at 1,048,576; no additional PPO is authorized by this
+assessment. Inspect its durable holdout state before launching anything, and
+review all four complete result sets before a new decision.

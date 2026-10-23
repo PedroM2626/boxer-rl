@@ -23,9 +23,13 @@ def main():
     parser.add_argument('--seeds',type=int,nargs='+',default=[7,23,31,47])
     parser.add_argument('--seconds',type=float,default=10.)
     parser.add_argument('--video',type=Path)
+    parser.add_argument('--sampled',action='store_true',
+                        help='diagnostic saved-Gaussian policy; does not replace deterministic screening')
     parser.add_argument('--engagement-distance',type=float,
                         help='explicit diagnostic profile override; impact criteria remain fixed')
     args=parser.parse_args()
+    if args.sampled and not args.checkpoint:
+        raise ValueError('sampled diagnostic requires a saved policy')
     if not np.isfinite(args.seconds) or args.seconds<=0:
         raise ValueError('positive finite duration required')
     foundation=UnassistedG1('approach',impl='jax')
@@ -74,7 +78,8 @@ def main():
             raise FloatingPointError('non-finite striking checkpoint')
         actor=Actor(action_size=actions)
         policy=jax.jit(lambda observation:jp.tanh(actor.apply(saved['actor'],observation)[0]))
-        modes=['trained']
+        distribution=jax.jit(lambda observation:actor.apply(saved['actor'],observation))
+        modes=['sampled' if args.sampled else 'trained']
     else:
         modes=['neutral','exploration']
     results=[];transitions=0;frames=[]
@@ -90,6 +95,9 @@ def main():
                 max_residual=np.zeros(2)
                 for step in range(round(args.seconds/env.pair.dt)):
                     if mode=='trained':action=np.asarray(policy(jp.array(normalize(obs,saved['norm']))))
+                    elif mode=='sampled':
+                        mean,log_std=map(np.asarray,distribution(jp.array(normalize(obs,saved['norm']))))
+                        action=np.tanh(mean+np.exp(log_std)*rng.normal(size=mean.shape))
                     elif mode=='exploration':action=np.tanh(rng.normal(0.,np.exp(-1.9),(2,actions)))
                     else:action=np.zeros((2,actions))
                     previous_scores=env.pair.scorecard.last_score.copy()
@@ -128,6 +136,7 @@ def main():
         scorecard_version=1,episode_seconds=args.seconds,trials=results,
         engagement_distance=distance,engagement_reward_distance=reward_distance,
         actor_inputs=inputs,actions=actions,body_residual_radians=body_bound,
+        sampled_policy=args.sampled,
         diagnostic_profile_override=args.engagement_distance is not None,
         certification=False))
 

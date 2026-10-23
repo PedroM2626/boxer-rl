@@ -159,3 +159,13 @@ rechecked unchanged. The [launch record](results/striking-pilot/body-comparison-
 pins code hashes and runtime counters; [smoke validation](results/striking-pilot/body-comparison-1048576/validation.json)
 records separate compute and compatibility evidence. No main or foundation
 learner was active, and the monitoring schedule is unchanged.
+
+## Completed body comparison and current read-only holdouts
+
+Both body-authority arms finished at their reviewed diagnostic budget, each
+with 7/8 pair survival and zero deterministic impacts. Neither was adopted.
+The [result and current broader holdout assessment](striking-body-holdout-review.md)
+record separate sampled checks and the active 256-episode fixed-policy job.
+Main remains stopped at 1,048,576; no additional PPO is authorized by this
+assessment. Inspect its durable holdout state before launching anything, and
+review all four complete result sets before a new decision.

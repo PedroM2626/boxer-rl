@@ -15,19 +15,17 @@ policies. At **1,048,576 boxing learner transitions**, final evaluation found
 6/8 surviving pairs and three impacts concentrated in an episode ending in a
 fall. Main PPO stopped at its reviewed ceiling; no further main steps are granted.
 
-The [completed reward experiments and active body-authority comparison](docs/striking-body-authority-comparison.md)
-keep diagnostic compute separate from main. Neither proximity shaping nor the
-CMU-jab reward met the physical screening criteria; neither actor was adopted.
-The current diagnostic uses matched 161-input/32-output warm-state expansions
-of the unchanged main policy. Only body residual authority differs: zero versus
-up to 0.1 radian on the twelve leg/three waist joint targets. Each arm gets
-**131,072 new diagnostic transitions**, with unchanged original reward, physical
-impact rules and full evaluation. No support forces or scripted trajectories are
-introduced. A favorable composite controller needs broader balance/locomotion
-and held-out validation; the original motor certificate alone does not certify it.
-Read the report before any restart. Durable state is
-`/home/pedro/boxing-runs/striking-body-compare-1048576/comparison.json`;
-`runs/striking_body_host.json` identifies its hidden WSL host.
+The [completed body comparison and current broader assessment](docs/striking-body-holdout-review.md)
+keep diagnostic compute separate from main. Both matched body-authority arms
+finished with 7/8 pair survival and no deterministic impacts; no actor was
+adopted. Independent sampled-policy checks also found no impacts. The current
+read-only job tests both fixed controllers in both action modes over thirty-two
+new seeds and both side arrangements: **256 episodes, no additional training**.
+Physical criteria remain unchanged. Read all four complete results before
+another continuation decision; stable striking or boxing mastery is not claimed.
+Durable state is
+`/home/pedro/boxing-runs/striking-body-holdout-1179648/holdout.json`;
+`runs/striking_holdout_host.json` identifies its hidden WSL host.
 
 The [closed-fist replay repair](docs/closed-fist-rendering.md) restores the
 original visual feature without changing learning or physics. Historical videos
