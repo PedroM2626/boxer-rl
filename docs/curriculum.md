@@ -31,13 +31,22 @@ The user correctly questioned whether the videos show punches rather than touche
 The [visual and objective audit](striking-punch-quality-audit.md) finds that the
 current low-speed contact criteria do not certify punch mechanics; richer older
 motion checks were not fully retained. Seven scorecard tests pass, including a
-synthetic low-speed qualifying contact example. Next is passive punch-quality
-measurement before a prospective versioned objective comparison. No new physical
-or PPO allocation is declared by that static audit.
+synthetic low-speed qualifying contact example. The subsequent
+[bounded passive replay audit](results/striking-pilot/punch-quality-2080768/README.md)
+is completed and independently reviewed: four archived policies, eight known
+episodes, 4,000 diagnostic controls and zero PPO updates. Every original trial
+field reproduces exactly; fifteen focused tests pass. None of the 19 selected
+legacy events simultaneously meets the old speed/forward-cone references; video
+source hand excursion is only 5.3–9.1 cm in the preceding 250 ms. These descriptive
+references are not universal punch gates. Next implement a separate versioned
+strike-motion evaluation and audit positive demonstrations before the next
+objective/PPO allocation. No replay/training job is active.
 
 Reviewed diagnostic PPO is **2,163,968**, at its ceiling. Formal diagnostic
-simulation is **2,015,379**, below the completed comparison ceiling **2,020,816**;
-unused compute is not an automatic continuation allocation.
+simulation is **2,019,379**, at the separately declared punch-audit ceiling.
+Unused historical comparison compute is not an automatic continuation allocation.
+The completed audit is `/home/pedro/boxing-runs/striking-punch-quality-2080768/audit.json`;
+no new learner steps or physical controls are allocated after its review.
 Main boxing **1,048,576**, foundation **474,992,640**, combined main **476,041,216**,
 BC 8,000 remain unchanged. Completed live audit and explicit recovery are at
 `/home/pedro/boxing-runs/striking-gae-generalization-2064384/audit.json`.

@@ -1,5 +1,12 @@
 # Contact events do not establish learned boxing punches
 
+**Completed implementation:** the optional native observer now passes fifteen
+focused checks. The [separate bounded replay audit](results/striking-pilot/punch-quality-2080768/README.md)
+completed all 4,000 controls and exactly reproduced the original physical trial
+fields. No selected contact event meets both old speed/direction references.
+No training extension is granted. The static findings and zero-compute scope
+below remain the record of the initial inspection.
+
 ## User observation and verified scope, 2026-10-24
 
 The user reports that repository videos show touching rather than punching.

@@ -227,6 +227,9 @@ class PairedFoundation:
                 mujoco.mj_objectVelocity(self.model, self.data, mujoco.mjtObj.mjOBJ_SITE,
                                          site, velocity, 0)
                 torso_motion.append((self.data.site_xpos[site].copy(), velocity))
+            punch_trace = getattr(self, 'diagnostic_punch_trace', None)
+            if punch_trace is not None:
+                punch_trace.before_substep(self, positions, velocities, torso_motion)
             mujoco.mj_step(self.model, self.data)
             for name in ('mjWARN_BADQPOS', 'mjWARN_BADQVEL', 'mjWARN_BADQACC',
                          'mjWARN_CNSTRFULL', 'mjWARN_CONTACTFULL'):
@@ -273,6 +276,8 @@ class PairedFoundation:
             fallen = self.fallen()
             scored += self.scorecard.update(present, per_hand, closing, advancing,
                 self.data.time, self.model.opt.timestep, both_up=not fallen.any())
+            if punch_trace is not None:
+                punch_trace.after_substep(self, present, per_hand, closing, advancing)
             if fallen.any():
                 self.done = True
                 break

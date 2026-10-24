@@ -1,0 +1,190 @@
+{
+  "kind": "striking_interface_evaluation",
+  "updated_utc": "2026-10-24T16:53:31.452645+00:00",
+  "assistance": false,
+  "source_sha256": "b39b1990945e8a374802c3a190e5ac5e026ae39e7fd5ef61c5c2b01ad291c6fc",
+  "striking_sha256": "d93a000802e111a8c2a7c0a2902c9612add2edca57ec8a3d9e77b90ee785def5",
+  "opponent_sha256": null,
+  "evaluated_corner": null,
+  "diagnostic_base_yaw_scale": 1.0,
+  "simulated_world_transitions": 1000,
+  "optimization_transitions": 0,
+  "scorecard_version": 1,
+  "episode_seconds": 10.0,
+  "trials": [
+    {
+      "mode": "trained",
+      "seed": 32000003,
+      "swap": false,
+      "survived": true,
+      "elapsed": 10.000000000000009,
+      "final_distance": 0.5031667468402156,
+      "scored_by_corner": [
+        0.0,
+        0.0
+      ],
+      "raw_legal_impulse": [
+        6.463902316625931,
+        5.291444527287477
+      ],
+      "fallen": [
+        false,
+        false
+      ],
+      "finite": true,
+      "minimum_hand_target_distance": [
+        0.16516080369346386,
+        0.16391865473060738
+      ],
+      "mean_abs_arm_residual": [
+        0.19539930570975,
+        0.19021346185631588
+      ],
+      "max_abs_arm_residual": [
+        0.8339841631626199,
+        0.8396945577979436
+      ],
+      "impact_events": [],
+      "punch_trace_file": "/home/pedro/boxing-runs/striking-punch-quality-2080768/pool_final/native/trained-seed-32000003-swap-0.npz",
+      "punch_trace_sha256": "bff63b45d8d81531132bc4fe10a0c6cce64fd13ee166c0e498235788558bfe31",
+      "punch_measurements": []
+    },
+    {
+      "mode": "trained",
+      "seed": 32000003,
+      "swap": true,
+      "survived": true,
+      "elapsed": 10.000000000000009,
+      "final_distance": 0.5275002343326587,
+      "scored_by_corner": [
+        0.0,
+        2.0
+      ],
+      "raw_legal_impulse": [
+        0.389853505355893,
+        9.208350121833083
+      ],
+      "fallen": [
+        false,
+        false
+      ],
+      "finite": true,
+      "minimum_hand_target_distance": [
+        0.17547929645144492,
+        0.15840436457876797
+      ],
+      "mean_abs_arm_residual": [
+        0.2149527650239615,
+        0.20778962325642333
+      ],
+      "max_abs_arm_residual": [
+        0.834669049313412,
+        0.8421724274011771
+      ],
+      "impact_events": [
+        {
+          "control_step": 466,
+          "elapsed": 9.339999999999788,
+          "scored_by_corner": [
+            0.0,
+            1.0
+          ],
+          "hands": [
+            {
+              "corner": 1,
+              "hand": 1,
+              "score_time": 9.325999999999784,
+              "contact_window_impulse": 1.2175506661721265
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 491,
+          "elapsed": 9.839999999999955,
+          "scored_by_corner": [
+            0.0,
+            1.0
+          ],
+          "hands": [
+            {
+              "corner": 1,
+              "hand": 1,
+              "score_time": 9.829999999999952,
+              "contact_window_impulse": 1.5228615304419608
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        }
+      ],
+      "punch_trace_file": "/home/pedro/boxing-runs/striking-punch-quality-2080768/pool_final/native/trained-seed-32000003-swap-1.npz",
+      "punch_trace_sha256": "0fedad4545c9bf6ed9ec19481dbded264c072e2882f3e8a81e19bc2edd78a84d",
+      "punch_measurements": [
+        {
+          "corner": 1,
+          "hand": 1,
+          "onset_time": 9.321999999999782,
+          "event_time": 9.325999999999784,
+          "onset_relative_speed": 1.003125652878205,
+          "onset_forward_cosine": 0.22870655113424862,
+          "onset_contact_closing": 0.7089981772955162,
+          "onset_contact_advancing": 0.46238410459589496,
+          "pre_window_seconds": 0.24800000000008282,
+          "pre_peak_relative_speed": 1.003125652878205,
+          "pre_max_displacement_m": 0.05548364118996494,
+          "pre_path_length_m": 0.12549924979297455,
+          "pre_elbow_excursion_rad": 0.2049845335015178,
+          "event_window_impulse_ns": 0.5032315581865682,
+          "native_contact_window_impulse_ns": 0.5032315581865682,
+          "post_window_seconds": 0.4980000000001663,
+          "post_contact_seconds": 0.024,
+          "return_toward_pre_window_position_m": 0.03863482719265463,
+          "post_window_complete": true
+        },
+        {
+          "corner": 1,
+          "hand": 1,
+          "onset_time": 9.82399999999995,
+          "event_time": 9.829999999999952,
+          "onset_relative_speed": 0.6566586695468623,
+          "onset_forward_cosine": 0.7735874674410239,
+          "onset_contact_closing": 0.5421416842840375,
+          "onset_contact_advancing": 0.49494602447266434,
+          "pre_window_seconds": 0.24800000000008282,
+          "pre_peak_relative_speed": 0.700986451336582,
+          "pre_max_displacement_m": 0.03167282281498881,
+          "pre_path_length_m": 0.1065857329139434,
+          "pre_elbow_excursion_rad": 0.07764440309899723,
+          "event_window_impulse_ns": 0.6799399962808198,
+          "native_contact_window_impulse_ns": 0.6799399962808198,
+          "post_window_seconds": 0.1680000000000561,
+          "post_contact_seconds": 0.026000000000000002,
+          "return_toward_pre_window_position_m": -0.00036455904116760446,
+          "post_window_complete": false
+        }
+      ]
+    }
+  ],
+  "engagement_distance": 0.45,
+  "engagement_reward_distance": 0.45,
+  "actor_inputs": 148,
+  "actions": 17,
+  "body_residual_radians": 0.0,
+  "contact_history": true,
+  "sampled_policy": false,
+  "policy_sampling_log_std_offset": 0.0,
+  "diagnostic_arm_noise_scale": 1.0,
+  "diagnostic_arm_noise_hold": 1,
+  "neutral_partner_learner_corner": null,
+  "diagnostic_zero_command_offsets": false,
+  "diagnostic_zero_arm_residuals": false,
+  "diagnostic_approach_gain": null,
+  "diagnostic_profile_override": false,
+  "certification": false
+}

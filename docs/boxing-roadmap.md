@@ -32,7 +32,12 @@ a [bounded pool-versus-fixed comparison](results/striking-pilot/pool-2064384/REA
 completed with both final full gates failing and no demonstrated benefit.
 The user's video observation triggered a [punch-quality audit](striking-punch-quality-audit.md):
 current contact counters do not certify punch mechanics. No new PPO job is active.
-Measure actual punch motion before declaring the next versioned objective/budget.
+The [native audit](results/striking-pilot/punch-quality-2080768/README.md) now measures
+eight selected episodes exactly: 0/19 events meet both old component references,
+with only 5.3–9.1 cm pre-window hand travel in the published clip. Next implement
+separate strike-motion evaluation and calibrate positive demonstrations before
+declaring a versioned training objective/budget. These references do not define
+every punch type or replace failed historical gates.
 
 The immediate prerequisite is distinguishing moving touches from purposeful
 punches using passive kinematics, impulse timing, arm travel and recovery, with

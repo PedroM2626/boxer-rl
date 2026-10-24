@@ -42,6 +42,7 @@ def main(argv=None):
     parser.add_argument('--video',type=Path)
     parser.add_argument('--progress',type=Path,help='durable attempted controls for diagnostic recovery')
     parser.add_argument('--trace-directory',type=Path,help='passive observations/actions and first-contact timing')
+    parser.add_argument('--punch-trace-directory',type=Path,help='passive native-substep punch kinematics; not punch certification')
     parser.add_argument('--base-yaw-scale',type=float,choices=(1.,.5),default=1.,help='diagnostic-only scale of automatic approach yaw; learned offsets remain intact')
     parser.add_argument('--sampled',action='store_true',
                         help='diagnostic saved-Gaussian policy; does not replace deterministic screening')
@@ -66,6 +67,10 @@ def main(argv=None):
         raise ValueError('mixed-policy diagnostics require deterministic unchanged contact control with no ablation')
     if args.progress and args.progress.exists():raise ValueError('evaluation progress exists; inspect before rerun')
     if args.trace_directory:args.trace_directory.mkdir(parents=True,exist_ok=False)
+    if args.punch_trace_directory:
+        if args.checkpoint is None or args.progress is None or args.sampled:
+            raise ValueError('passive punch trace requires a deterministic checkpoint and durable progress')
+        args.punch_trace_directory.mkdir(parents=True,exist_ok=False)
     if args.sampled and not args.checkpoint:
         raise ValueError('sampled diagnostic requires a saved policy')
     if not np.isfinite(args.arm_noise_scale) or args.arm_noise_scale<=0 or args.arm_noise_hold<1:
@@ -188,6 +193,10 @@ def main(argv=None):
         for seed in args.seeds:
             for swap in (False,True):
                 obs=env.reset(seed,swap)
+                punch_trace=None
+                if args.punch_trace_directory:
+                    from boxer.striking_punch_trace import PunchTrace,describe_events
+                    punch_trace=PunchTrace();env.pair.diagnostic_punch_trace=punch_trace
                 trace=None
                 if args.trace_directory:
                     from boxer.striking_trace import StrikingTrace,terminal_details
@@ -252,6 +261,12 @@ def main(argv=None):
                     mean_abs_arm_residual=(residual_activity/(step+1)).tolist(),
                     max_abs_arm_residual=max_residual.tolist())
                 result['impact_events']=impact_events
+                if punch_trace is not None:
+                    punch_file=args.punch_trace_directory/f'{mode}-seed-{seed}-swap-{int(swap)}.npz'
+                    punch_trace.save(punch_file)
+                    result.update(punch_trace_file=str(punch_file),
+                        punch_trace_sha256=hashlib.sha256(punch_file.read_bytes()).hexdigest(),
+                        punch_measurements=describe_events(punch_trace.arrays()))
                 if trace:
                     trace_file=args.trace_directory/f'{mode}-seed-{seed}-swap-{int(swap)}.npz'
                     result['first_observed_contacts']=trace.save(trace_file,env)

@@ -14,8 +14,11 @@ full groups fail active combat. Opponent-pool integration now passes 41 focused
 tests; the [completed matched comparison](docs/results/striking-pilot/pool-2064384/README.md)
 found no demonstrated improvement and both final full gates fail. A
 [visual and objective audit](docs/striking-punch-quality-audit.md) also confirms
-that qualifying contacts do not establish recognizable punches. Next is passive
-punch-quality measurement before further PPO. General boxing remains
+that qualifying contacts do not establish recognizable punches. In the
+[completed passive punch-motion replay audit](docs/results/striking-pilot/punch-quality-2080768/README.md),
+all eight episodes reproduce exactly, but 0/19 selected contact events meet both
+old speed/direction references. Next is separate strike-motion evaluation and
+demonstration calibration before further PPO. General boxing remains
 uncertified, and the stopped main policy has not been replaced.
 
 An [earlier striking final](docs/striking-generalization-audit.md) passed two
