@@ -26,3 +26,18 @@ Native guard proves integration, not physical progress; cross-arm equality is
 pending the control arm. Full source fresh 18M reports and their independent
 analysis are archived (11,234 evaluation controls). Launch snapshots are historical;
 inspect live process and child progress before interventions or accounting updates.
+
+## Completed independent review
+
+All 168 episodes / 77,764 evaluation controls, four full screen generations,
+three fresh sets, four exact gate models, 32 finite metric blocks, empty native
+error logs and main/foundation histories/hashes are verified and archived.
+First-block learned/optimizer/normalizer/RNG/sampler leaves match exactly across
+arms. The frozen actor/normalizer fingerprint stays unchanged through both gates.
+Fresh source/control/fixed survivors total 20/24 / 12/24 / 23/24. No complete
+set passes: fixed original-screen survival regresses 7/7/7 to 5/8/5, and final
+fresh neutral-1 is 7/8 rather than the required 8/8. Latest candidate, not the
+more favorable intermediate, is retained. Diagnostic totals: 1,877,248 PPO /
+1,217,525 formal controls; new collection/replay 32,768 / 131,072 separately.
+`analysis.json` records one bounded 32,768-credit ordinary candidate continuation,
+with its original frozen adversary unchanged. No adoption or phase promotion.

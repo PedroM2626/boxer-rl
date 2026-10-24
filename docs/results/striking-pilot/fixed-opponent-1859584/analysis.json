@@ -1,0 +1,382 @@
+{
+  "status": "reviewed",
+  "main_adoption": false,
+  "promotion": false,
+  "diagnostic_ppo_total": 1877248,
+  "formal_world_controls_total": 1217525,
+  "new_collection_world_controls": 32768,
+  "new_integrated_replay_presentations": 131072,
+  "cumulative_supervised_updates": 8000,
+  "native_error_logs_empty": true,
+  "foundation_history_records": {
+    "balance": 29,
+    "walk_easy": 41,
+    "walk": 13,
+    "approach": 2
+  },
+  "arms": [
+    {
+      "arm": "fixed_opponent",
+      "gates": [
+        {
+          "new_ppo_steps": 8192,
+          "sha256": "b174b511dfeadb4cd88958fbddd87b3e77fe15783402cffe05e0250edb8a6338",
+          "screen": {
+            "profiles": {
+              "neutral-0": {
+                "pair_survivors": 7,
+                "own_surviving_scoring_seeds": [
+                  23,
+                  31,
+                  47
+                ],
+                "surviving_events_by_corner": [
+                  4.0,
+                  0.0
+                ],
+                "surviving_two_way_episodes": 0,
+                "passes_profile": true
+              },
+              "neutral-1": {
+                "pair_survivors": 7,
+                "own_surviving_scoring_seeds": [
+                  7,
+                  23,
+                  31,
+                  47
+                ],
+                "surviving_events_by_corner": [
+                  0.0,
+                  8.0
+                ],
+                "surviving_two_way_episodes": 0,
+                "passes_profile": false
+              },
+              "selfplay": {
+                "pair_survivors": 7,
+                "own_surviving_scoring_seeds": [
+                  7,
+                  23,
+                  31,
+                  47
+                ],
+                "surviving_events_by_corner": [
+                  5.0,
+                  12.0
+                ],
+                "surviving_two_way_episodes": 3,
+                "passes_profile": true
+              }
+            },
+            "passes_complete": false
+          }
+        },
+        {
+          "new_ppo_steps": 16384,
+          "sha256": "2f27731cd11deac143fc8b6ba002bbeb80092fcd3d6744a1494b62ff69258daf",
+          "screen": {
+            "profiles": {
+              "neutral-0": {
+                "pair_survivors": 5,
+                "own_surviving_scoring_seeds": [
+                  7
+                ],
+                "surviving_events_by_corner": [
+                  1.0,
+                  0.0
+                ],
+                "surviving_two_way_episodes": 0,
+                "passes_profile": false
+              },
+              "neutral-1": {
+                "pair_survivors": 8,
+                "own_surviving_scoring_seeds": [
+                  31,
+                  47
+                ],
+                "surviving_events_by_corner": [
+                  2.0,
+                  3.0
+                ],
+                "surviving_two_way_episodes": 1,
+                "passes_profile": true
+              },
+              "selfplay": {
+                "pair_survivors": 5,
+                "own_surviving_scoring_seeds": [
+                  7,
+                  23,
+                  47
+                ],
+                "surviving_events_by_corner": [
+                  5.0,
+                  0.0
+                ],
+                "surviving_two_way_episodes": 0,
+                "passes_profile": false
+              }
+            },
+            "passes_complete": false
+          }
+        }
+      ],
+      "fresh": {
+        "profiles": {
+          "neutral-0": {
+            "pair_survivors": 8,
+            "own_surviving_scoring_seeds": [
+              18000003,
+              18000004,
+              18000005,
+              18000006
+            ],
+            "surviving_events_by_corner": [
+              8.0,
+              1.0
+            ],
+            "surviving_two_way_episodes": 1,
+            "passes_profile": true
+          },
+          "neutral-1": {
+            "pair_survivors": 7,
+            "own_surviving_scoring_seeds": [
+              18000003,
+              18000004,
+              18000005,
+              18000006
+            ],
+            "surviving_events_by_corner": [
+              0.0,
+              8.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": false
+          },
+          "selfplay": {
+            "pair_survivors": 8,
+            "own_surviving_scoring_seeds": [
+              18000003,
+              18000004,
+              18000005,
+              18000006
+            ],
+            "surviving_events_by_corner": [
+              7.0,
+              5.0
+            ],
+            "surviving_two_way_episodes": 2,
+            "passes_profile": true
+          }
+        },
+        "passes_complete": false
+      },
+      "final_sha256": "2f27731cd11deac143fc8b6ba002bbeb80092fcd3d6744a1494b62ff69258daf"
+    },
+    {
+      "arm": "control",
+      "gates": [
+        {
+          "new_ppo_steps": 8192,
+          "sha256": "455c0b2bf74afa0f4635263a31113048cf619c1ca87c659ce1ed6445fb587edc",
+          "screen": {
+            "profiles": {
+              "neutral-0": {
+                "pair_survivors": 7,
+                "own_surviving_scoring_seeds": [
+                  7,
+                  23,
+                  31,
+                  47
+                ],
+                "surviving_events_by_corner": [
+                  13.0,
+                  2.0
+                ],
+                "surviving_two_way_episodes": 2,
+                "passes_profile": true
+              },
+              "neutral-1": {
+                "pair_survivors": 7,
+                "own_surviving_scoring_seeds": [
+                  23,
+                  31,
+                  47
+                ],
+                "surviving_events_by_corner": [
+                  0.0,
+                  7.0
+                ],
+                "surviving_two_way_episodes": 0,
+                "passes_profile": false
+              },
+              "selfplay": {
+                "pair_survivors": 4,
+                "own_surviving_scoring_seeds": [
+                  7,
+                  23,
+                  31,
+                  47
+                ],
+                "surviving_events_by_corner": [
+                  3.0,
+                  5.0
+                ],
+                "surviving_two_way_episodes": 2,
+                "passes_profile": false
+              }
+            },
+            "passes_complete": false
+          }
+        },
+        {
+          "new_ppo_steps": 16384,
+          "sha256": "93a613fa230ba3fa7b4b71f2ff9ccaee42994dabfe2c5d02fe6ea5583a17b2f8",
+          "screen": {
+            "profiles": {
+              "neutral-0": {
+                "pair_survivors": 5,
+                "own_surviving_scoring_seeds": [
+                  7,
+                  31
+                ],
+                "surviving_events_by_corner": [
+                  2.0,
+                  0.0
+                ],
+                "surviving_two_way_episodes": 0,
+                "passes_profile": false
+              },
+              "neutral-1": {
+                "pair_survivors": 8,
+                "own_surviving_scoring_seeds": [
+                  7,
+                  31,
+                  47
+                ],
+                "surviving_events_by_corner": [
+                  0.0,
+                  3.0
+                ],
+                "surviving_two_way_episodes": 0,
+                "passes_profile": true
+              },
+              "selfplay": {
+                "pair_survivors": 4,
+                "own_surviving_scoring_seeds": [
+                  7,
+                  31,
+                  47
+                ],
+                "surviving_events_by_corner": [
+                  1.0,
+                  4.0
+                ],
+                "surviving_two_way_episodes": 1,
+                "passes_profile": false
+              }
+            },
+            "passes_complete": false
+          }
+        }
+      ],
+      "fresh": {
+        "profiles": {
+          "neutral-0": {
+            "pair_survivors": 4,
+            "own_surviving_scoring_seeds": [
+              18000003,
+              18000004,
+              18000006
+            ],
+            "surviving_events_by_corner": [
+              3.0,
+              0.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": false
+          },
+          "neutral-1": {
+            "pair_survivors": 4,
+            "own_surviving_scoring_seeds": [
+              18000003,
+              18000005
+            ],
+            "surviving_events_by_corner": [
+              0.0,
+              2.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": false
+          },
+          "selfplay": {
+            "pair_survivors": 4,
+            "own_surviving_scoring_seeds": [
+              18000004,
+              18000005,
+              18000006
+            ],
+            "surviving_events_by_corner": [
+              6.0,
+              5.0
+            ],
+            "surviving_two_way_episodes": 3,
+            "passes_profile": false
+          }
+        },
+        "passes_complete": false
+      },
+      "final_sha256": "93a613fa230ba3fa7b4b71f2ff9ccaee42994dabfe2c5d02fe6ea5583a17b2f8"
+    }
+  ],
+  "source_fresh": {
+    "profiles": {
+      "neutral-0": {
+        "pair_survivors": 8,
+        "own_surviving_scoring_seeds": [
+          18000003,
+          18000004,
+          18000005
+        ],
+        "surviving_events_by_corner": [
+          4.0,
+          0.0
+        ],
+        "surviving_two_way_episodes": 0,
+        "passes_profile": true
+      },
+      "neutral-1": {
+        "pair_survivors": 4,
+        "own_surviving_scoring_seeds": [
+          18000003,
+          18000005
+        ],
+        "surviving_events_by_corner": [
+          0.0,
+          3.0
+        ],
+        "surviving_two_way_episodes": 0,
+        "passes_profile": false
+      },
+      "selfplay": {
+        "pair_survivors": 8,
+        "own_surviving_scoring_seeds": [
+          18000003,
+          18000004,
+          18000005,
+          18000006
+        ],
+        "surviving_events_by_corner": [
+          4.0,
+          5.0
+        ],
+        "surviving_two_way_episodes": 2,
+        "passes_profile": true
+      }
+    },
+    "passes_complete": false
+  },
+  "actual_new_evaluation_world_controls": 77764,
+  "first_block_learned_states_exactly_match": true,
+  "frozen_opponent_fingerprint_retained": "158d7b3dbdccc0a0aadec27d7d39b714677191d35b1d8a68759f12e5472873b0",
+  "decision": "The stationary-opponent final improves fresh paired survival to 23/24 versus 12/24 control and 20/24 source, but no complete original or fresh gate passes. Permit one 32768-credit ordinary version-8 confirmation from the latest candidate final only, retain its original frozen adversary and every optimizer prefix. Full original gates at +16384/+32768, severe-regression and first-gate stagnation stops, source/final matched fresh 19M tests. No main adoption, rollback, promotion or automatic subsequent allocation."
+}

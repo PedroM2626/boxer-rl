@@ -1,14 +1,14 @@
 # Adaptive unassisted G1 curriculum
 
-**Latest striking operation (2026-10-24):** global base-yaw scaling is rejected:
-neutral survival improves, active survival regresses in both 16M/17M samples.
-The original controller/physics remain intact. A bounded [fixed-opponent versus
-current-opponent training comparison](striking-fixed-opponent-comparison.md)
-starts from the latest original-profile final, preserving all learned optimizer
-prefixes. At most 16,384 learner controls per arm, full unchanged gates and early
-stops, followed by matched fresh 18M evaluations. No main adoption or promotion.
-Before this comparison: **1,844,480 PPO / 1,139,761 formal controls**; new ceilings
-**1,877,248 / 1,223,761**. Main and all four certifications remain unchanged.
+**Latest striking operation (2026-10-24):** the completed fixed-opponent trial
+has 23/24 fresh surviving pairs versus 12/24 current-opponent control and 20/24
+source. No complete original/fresh set passes; original-screen stability still
+regresses. One bounded [ordinary version-8 continuation](striking-fixed-opponent-comparison.md)
+uses the latest candidate final and retains its original frozen adversary and
+all optimizer prefixes. At most 32,768 new learner controls; full gates at
++16,384/+32,768, early stops and matched fresh 19M source/final tests are required.
+Before this job: **1,877,248 diagnostic PPO / 1,217,525 evaluation controls**;
+new ceilings **1,910,016 / 1,265,525**. No main adoption or phase promotion.
 
 **Current stage (2026-10-22):** all four foundation levels are certified by
 [two distinct consecutive complete physical passes](results/curriculum/foundation-certification/README.md).

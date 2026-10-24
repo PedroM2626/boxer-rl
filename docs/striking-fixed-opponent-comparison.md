@@ -1,5 +1,10 @@
 # Completed yaw review and bounded stationary-opponent training comparison
 
+**Current decision:** the completed matched review supports one bounded ordinary
+version-8 continuation from the latest fixed-opponent final. No complete gate
+passes. Keep the original frozen adversary, original physics and all optimizer
+prefixes; the completed outcome and new exact cap are documented below.
+
 ## Completed controller comparison
 
 The complete yaw diagnostic consumes **72 new episodes / 33,287 controls**,
@@ -104,3 +109,85 @@ The source fresh 18M full set is independently archived and consumes **11,234**
 evaluation controls. Live child progress may advance past these historical
 launch/guard snapshots; total actual PPO/collection must be computed from both
 child progress files and the retained global prefix before any next decision.
+
+## Completed matched physical outcome
+
+Independent reviewer `tools/review_striking_fixed_opponent.py` verifies all
+**168 complete episodes / 77,764 evaluation controls**, four full original
+screen generations, source/two final fresh sets, all four exact gate models,
+32 finite PPO blocks and empty native error logs. Source and both first-block
+learner/critic/normalizer/Adam/RNG/sampler leaves match exactly, as predeclared.
+The frozen opposing actor/normalizer fingerprint is retained through both gates.
+Complete foundation histories 29/41/13/2, finite correct motor hashes and stopped
+main boxing hash are reverified. No nonfinite or constraint-capacity failure is
+observed; no consumed work is discarded.
+
+| Same fresh 18M sample | Neutral 0 survivors / own events | Neutral 1 survivors / own events | Active survivors / red-blue events | Active two-way episodes |
+| --- | --- | --- | --- | --- |
+| Source | 8/8 / 4 | 4/8 / 3 | 8/8 / 4-5 | 2 |
+| Current-opponent control final | 4/8 / 3 | 4/8 / 2 | 4/8 / 6-5 | 3 |
+| Fixed-opponent final | 8/8 / 8 | 7/8 / 8 | 8/8 / 7-5 | 2 |
+
+Fixed final has **23/24** fresh surviving pairs versus **12/24** control and
+**20/24** source; learner own scoring occurs across all four fresh seeds in both
+neutral roles. This supports further confirmation of stationary-adversary
+training, not a universal superiority claim. Its original screen regresses
+from 7/7/7 survival at +8,192 to **5/8/5** at +16,384. Neither generation passes;
+the final fresh set also fails the unchanged neutral-1 8/8 criterion (7/8).
+Do not substitute the more favorable original-screen intermediate or treat
+fresh improvement as a phase pass. Evaluation is still mirrored current-policy
+combat; performance against a broader unseen-opponent population is unproven.
+
+Latest candidate SHA:
+`2f27731cd11deac143fc8b6ba002bbeb80092fcd3d6744a1494b62ff69258daf`.
+Each final lineage is **1,875,968 learner / 1,253,376 world**, Adam **11,784 /
+35,456**, mixed-mode totals **69,632 / 69,632**, historical neutral prefix intact.
+Diagnostic PPO is **1,877,248**, formal evaluation **1,217,525**; new collection
+32,768 and replay 131,072 presentations are separate. Main counters and BC 8,000
+updates remain unchanged. All reserved but unused evaluation capacity is unused.
+
+## One bounded ordinary fixed-opponent continuation
+
+The matched fresh physical benefit, retained scoring breadth and failed original
+screens justify **one 32,768-credit confirmation**, not an unrestricted extension.
+Start from the latest candidate final above with ordinary version-8 resume;
+keep the **original frozen adversary from 6bf3273a**, not a newly copied current
+actor. Do not call the one-time fixed-task transition again. Retain every
+learner/critic/normalizer, Adam, RNG, retention/auxiliary sampler and consumed
+prefix, exact configuration, gamma 0.999, retention 1 and original approach yaw.
+No physical authority, reward, scorecard, spawn or gate changes are made.
+
+Full original screens after **+16,384 / +32,768** on all three profiles and both
+swaps. Stop if any profile has at most 3/8 survivors, or at the first gate if no
+survival/scoring-breadth/two-way component improves over the source final original
+screen. These measurements govern stopping, not certification. Evaluate source
+and final on identical fresh **19,000,003..19,000,006** with all three profiles
+and both swaps: **96 complete episodes / maximum 48,000 evaluation controls**.
+Independent evaluation still uses current-policy versus current-policy. Two
+distinct consecutive complete passes remain necessary; no main adoption,
+phase promotion, frozen-opponent replacement or automatic later allocation.
+
+Global diagnostic ceilings: **1,910,016 PPO / 1,265,525 evaluation controls**.
+New collection maximum 32,768; replay maximum 131,072 presentations, separately
+recorded. At full use lineage becomes **1,908,736 learner / 1,286,144 world**,
+Adam **12,296 / 35,968**, mixed-mode totals **86,016 / 86,016**, historical neutral
+50,229/48,075 unchanged. Frozen-opponent fingerprint remains
+`158d7b3dbdccc0a0aadec27d7d39b714677191d35b1d8a68759f12e5472873b0`.
+
+Hidden launcher: `tools/start_striking_fixed_opponent_continue.ps1`; live state:
+`/home/pedro/boxing-runs/striking-fixed-opponent-continue-1875968/continuation.json`.
+Inspect that process and actual child progress before interventions. Preserve the
+existing monitoring schedule; archive every full generation and actual cost
+before any next decision. The preceding comparison/launch contracts are history.
+
+## Confirmation launch validation
+
+Seventeen focused tests pass for fixed-opponent immutability/provenance, mixed
+native routing/counter accounting and early-stop behavior. Python/Bash syntax
+and PowerShell parsing pass. The ordinary warm clone is verified identical in
+every source leaf and byte-identical inherited configuration, including the
+original frozen actor/normalizer. No task transition or optimizer reset occurs.
+The retained original-screen stop vector is **(5,1,8,2,5,3,0)**; an identical
+failed generation triggers the first-gate stagnation stop. Exact validation and
+historical launch snapshots are in `fixed-opponent-continue-1875968`. Inspect the
+live job for later actual counters; these snapshots are not a live status API.
