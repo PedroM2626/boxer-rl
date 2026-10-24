@@ -1,33 +1,27 @@
 # Adaptive unassisted G1 curriculum
 
-**Latest striking operation (2026-10-24):** the complete 128-episode
-[generalization audit](striking-generalization-audit.md) and 56-episode
-[motor-floor comparison](striking-motor-floor-audit.md) are independently reviewed.
-Motor-only pair survival is 31/32; full-head fresh groups still fail. The original
-version-8 two-pass interval is historical, without main adoption or phase promotion.
-The [posture-cost comparison](striking-posture-cost-comparison.md) is completed:
-fresh source/control/cost survival is 20/24 / 20/24 / 15/24; reject the cost.
-All four new full screens fail, so current version-8 and version-9 pass streaks
-are zero; the earlier version-8 two-pass interval remains in history.
-Formal evaluation is **1,454,558**, diagnostic PPO **1,950,976**. A read-only
-[training-distribution objective audit](striking-objective-audit.md) from latest
-control c47edf0b found four own-only and one partner-only fall in 33 completed
-sampled rounds. The completed action-mode comparison has 32 matched rounds:
-neutral sampled/mean pair survival 16/16 vs 12/16, active 11/16 vs 14/16.
-Formal total **1,487,326**, diagnostic PPO **1,950,976**. A bounded
-[on-policy sampling-profile comparison](striking-sampling-comparison.md) now
-tests half standard deviation against unchanged training from latest c47edf0b.
-Maximum 32,768 new credits (PPO ceiling **1,983,744**) and 84,000 evaluation
-controls (formal ceiling **1,571,326**). All source leaves, physics, rewards,
-original mean-action gates and main/BC counters remain intact; no automatic adoption.
+**Latest reviewed outcome (2026-10-24):** the complete
+[sampling comparison](striking-sampling-comparison.md) finished 168 episodes /
+71,289 evaluation controls / 32,768 diagnostic PPO credits. Both final fresh
+policies have 17/24 paired survivors and all complete final sets fail. The
+half-noise original pass was followed by regression; narrower covariance is
+not adopted. Version-8 original history has nine records and streak zero;
+version 10 retains pass/fail, also zero. All foundation certifications remain.
 
-**Interim physical result:** version 10 passed at +8,192 (c61f6e46, 22/24 paired
-survivors, two surviving two-way mirror episodes), but failed at +16,384
-(185e93e0, 18/24 original and 17/24 fresh survivors). Both generations and the
-fresh final are independently checked/archived; current version-10 streak is
-zero. No intermediate-actor restoration, extension, promotion or main adoption.
-The already bounded matched control is still running and must finish before
-the complete comparison decision.
+**Current operation:** one bounded [actor KL-guard comparison](striking-kl-guard-comparison.md)
+from latest control **97af5783**, retaining its full learned/Adam/normalizer/RNG
+state, original covariance, frozen adversary, rewards and all independent physical
+gates. Stop further actor updates within a rollout once its measured KL exceeds
+.02; keep all sixteen critic updates and exact per-rollout actor-step accounting.
+No source/intermediate restoration, assistance, main adoption or stage promotion.
+
+Reviewed diagnostic PPO is **1,983,744**, new ceiling **2,016,512** (at most
+16,384 credits per arm / 32,768 total). Reviewed formal evaluation is
+**1,558,615**, new ceiling **1,642,615** (at most 84,000 controls). Main boxing
+**1,048,576**, foundation **474,992,640**, combined main **476,041,216** and BC
+8,000 remain unchanged. Inspect the live comparison and both child outputs at
+`/home/pedro/boxing-runs/striking-kl-guard-1949696` before any launch. No duplicate
+jobs, forced rollback, blind retry or automatic further extension.
 
 **Current stage (2026-10-22):** all four foundation levels are certified by
 [two distinct consecutive complete physical passes](results/curriculum/foundation-certification/README.md).

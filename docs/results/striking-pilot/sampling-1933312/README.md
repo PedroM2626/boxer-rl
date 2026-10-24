@@ -58,3 +58,23 @@ remain retained; the earlier one-pass snapshot above must not override the
 later failure. No intermediate-actor restoration, extension or adoption.
 The matched control is still running within the existing cap; finish and review
 both arms before any next allocation or claim of relative improvement.
+
+## Completed full review
+
+`analysis.json` and `completed-comparison.json` now retain all 168 episodes /
+71,289 evaluation controls / 32,768 PPO credits. Both latest fresh finals are
+17/24, versus 16/24 source, and all complete final sets fail. Control original
+screens are 6/7/8 and 6/8/7 survivors, both failures. Narrower covariance is not
+adopted as a robust remedy and gets no extension. Latest control 97af5783 is
+retained for investigation, without restoration of an earlier actor.
+
+All 32 saved update payloads and 27 empty native logs are independently checked,
+including actual source-leaf equality, complete physical gates, initial density
+agreement, optimizer/world/mode prefixes and unchanged frozen adversary. Both
+geometries, metrics, raw screens/fresh trials and all four gate models are
+archived. Full version-8 history now has nine records (current streak zero);
+version-10 pass/fail history is retained, also zero.
+
+Formal total 1,558,615, diagnostic PPO 1,983,744; added collection 32,768 and
+131,072 retention presentations are separate. The next bounded operation is
+`docs/striking-kl-guard-comparison.md`. No stage promotion or main adoption.

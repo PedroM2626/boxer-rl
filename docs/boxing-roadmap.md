@@ -11,8 +11,10 @@ is completed and its extra cost rejected. Four newer full screens fail; both
 current task pass streaks are zero. A read-only
 [objective audit](striking-objective-audit.md) measured terminal reward and matched
 action-mode gaps. A bounded [on-policy sampling comparison](striking-sampling-comparison.md)
-now tests half Gaussian standard deviation against unchanged training with all
-original physical gates. See its contract for current accounting.
+completed without a sustained benefit from half Gaussian standard deviation.
+A bounded [actor KL-guard comparison](striking-kl-guard-comparison.md) now limits
+actor update drift while preserving critic schedule and original physical gates.
+See its contract for current accounting.
 
 1. Consolidate stable own strikes in both corners against a neutral partner.
    Preserve the existing independent complete physical gates and require two

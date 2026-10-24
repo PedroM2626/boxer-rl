@@ -163,3 +163,37 @@ allocated. Finish the already bounded matched control and independently review
 both complete arms before any continuation decision. Relative benefit versus
 control remains unresolved; software/probability correctness does not establish
 physically robust boxing.
+
+## Complete comparison review and next bounded intervention
+
+The full comparison finished normally: **168 episodes / 71,289 evaluation
+controls / 32,768 PPO credits**. All 32 saved update payloads are finite with
+exact optimizer/world/mode prefixes, all source leaves match at both starts,
+and all 27 native logs are empty. Baseline geometry in both arms has zero
+ratio clipping and approximately zero sampled KL, verifying collection/density
+agreement. Foundation histories/hashes and main boxing hash remain intact.
+
+Control original survival at +8,192 / +16,384 is **6/7/8 -> 6/8/7**, both full
+failures. Its final fresh survival is **5/6/6**, total **17/24**, with 12 red /
+11 blue surviving mirror events and three two-way episodes. Half-noise also
+finishes at 17/24, with worse final original mirror survival (4/8 vs 7/8) and
+larger initial optimizer KL/ratio clipping (.0866/.635 vs .0291/.426).
+Narrower covariance is rejected as a robust remedy, without a larger allocation.
+
+Latest control SHA **97af578363d9a8e43c2331546d07a85437e44a02a4673b50d7c1035352f09721**
+is retained for the next investigation, with both final policies at 1,949,696
+learner / 1,327,104 world and Adam 12,936 / 36,608. No source/intermediate
+restoration or main adoption. Full version-8 history now has nine records:
+fail/fail/fail/pass/pass/fail/fail/fail/fail, current streak zero. Version-10
+history remains pass/fail, also zero.
+
+Actual formal total **1,558,615**, diagnostic PPO **1,983,744**, added collection
+32,768 and retention presentations 131,072 recorded separately. Unused evaluation
+capacity is unused. The complete review, all arms' metrics, geometry, screens,
+fresh sets and four gate models are archived under `sampling-1933312`.
+
+The next intervention is the bounded [actor KL-guard comparison](striking-kl-guard-comparison.md):
+target .02 on collected observations, stop further actor Adam steps within the
+rollout while keeping all sixteen critic steps and actual actor-step accounting.
+Original covariance, rates, rewards, motor and physical gates remain unchanged.
+No automatic further extension, stage promotion or reliable-boxing claim.

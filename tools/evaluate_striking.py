@@ -142,6 +142,11 @@ def main(argv=None):
         residual_hash=hashlib.sha256(payload).hexdigest()
         if residual_hash!=manifest['sha256']:raise ValueError('striking checksum mismatch')
         saved=pickle.loads(payload)
+        if saved.get('training_kind')=='ppo' and saved.get('optimizer_kind')=='split_adam_v1':
+            from boxer.striking_train import require_ppo_checkpoint
+            require_ppo_checkpoint(saved)
+        if manifest.get('kl_guard_ppo',False)!=saved.get('kl_guard_ppo',False) or manifest.get('kl_guard_target')!=saved.get('kl_guard_target'):
+            raise ValueError('manifest and saved KL guard profile disagree')
         for key,expected in (('actor_inputs',inputs),('actions',actions),('contact_history',contact_history)):
             if key in saved and saved[key]!=expected:raise ValueError('payload and declared interface disagree')
         if saved['foundation_sha256']!=source['sha256']:raise ValueError('striking motor mismatch')

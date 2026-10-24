@@ -49,6 +49,10 @@ def validate_mixed_metadata(saved):
     credits = np.asarray(saved.get('mixed_credits_by_mode_and_corner', []))
     delta = saved['consumed_steps'] - 1736704
     optimized = saved['optimized_steps'] - 1736704
+    actor_count=9608+optimized//1024*16
+    if saved.get('kl_guard_ppo'):
+        from boxer.striking_kl_guard import expected_actor_count
+        actor_count=expected_actor_count(saved)
     if (saved.get('mixed_partner_ppo') is not True or saved.get('credit_horizon_ppo') is not True
             or saved.get('training_gamma') != .999 or saved.get('retention_loss_weight') != 1.
             or transition != dict(source_sha256=SOURCE_SHA, consumed_steps=1736704,
@@ -61,7 +65,7 @@ def validate_mixed_metadata(saved):
             or credits.shape != (2, 2) or credits.dtype.kind not in 'iu' or np.any(credits < 0)
             or delta < 0 or credits.sum() != delta or saved['world_control_steps'] != 1114112 + delta
             or optimized < 0 or optimized > delta or optimized % 1024
-            or int(saved['optimizer']['actor_adam'][0].count) != 9608 + optimized // 1024 * 16
+            or int(saved['optimizer']['actor_adam'][0].count) != actor_count
             or int(saved['optimizer']['critic_adam'][0].count) != 33280 + optimized // 1024 * 16):
         raise ValueError('explicit mixed task, optimizer and mode/corner prefixes required')
 

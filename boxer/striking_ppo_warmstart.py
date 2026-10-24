@@ -19,9 +19,10 @@ class SplitAdam:
     def init(self,params):
         return dict(actor_adam=self.actor_adam.init(params[0]),critic_adam=self.adam.init(params[1]))
 
-    def update(self,grads,state,params):
+    def update(self,grads,state,params,update_actor=True):
         clipped,_=self.clip.update(grads,optax.EmptyState())
-        actor,sa=self.actor_adam.update(clipped[0],state['actor_adam'],params[0])
+        if update_actor:actor,sa=self.actor_adam.update(clipped[0],state['actor_adam'],params[0])
+        else:actor,sa=jax.tree_util.tree_map(jp.zeros_like,params[0]),state['actor_adam']
         critic,sv=self.adam.update(clipped[1],state['critic_adam'],params[1])
         return (actor,critic),dict(actor_adam=sa,critic_adam=sv)
 

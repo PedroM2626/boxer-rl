@@ -15,8 +15,10 @@ has completed; reject its extra cost after 15/24 fresh survivors versus 20/24
 control. All four newer complete screens fail. A read-only
 [objective audit](striking-objective-audit.md) measured terminal reward and a
 profile-dependent sampled/mean gap. A bounded [on-policy sampling-profile
-comparison](striking-sampling-comparison.md) now tests half Gaussian standard
-deviation against unchanged training. No main adoption or phase promotion.
+comparison](striking-sampling-comparison.md) finished without sustained benefit.
+A bounded [actor KL-guard comparison](striking-kl-guard-comparison.md) now limits
+actor update drift while preserving covariance, critic schedule and physical
+criteria. No main adoption or phase promotion.
 
 ## Complete physical outcome
 

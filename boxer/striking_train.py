@@ -120,6 +120,9 @@ def require_ppo_checkpoint(saved):
         if 'sampling_log_std_offset' in saved or saved.get('reduced_noise_ppo'):
             from boxer.striking_sampling_profile import validate_sampling_metadata
             validate_sampling_metadata(saved)
+        if 'kl_guard_target' in saved or saved.get('kl_guard_ppo'):
+            from boxer.striking_kl_guard import validate_guard_metadata
+            validate_guard_metadata(saved)
         if saved.get('conservative_actor_ppo'):
             from boxer.striking_conservative_actor import validate_conservative_metadata
             validate_conservative_metadata(saved)
@@ -131,7 +134,7 @@ def require_ppo_checkpoint(saved):
             raise ValueError('joint PPO optimizer required; explicit optimizer migration required')
 
 
-def make_ppo_update(actor,critic,tx,anchor_weight=None,retention_weight=None):
+def make_ppo_update(actor,critic,tx,anchor_weight=None,retention_weight=None,actor_enabled=True):
     if anchor_weight is not None:
         from boxer.striking_ppo_warmstart import anchor_loss
     if retention_weight is not None:
@@ -151,8 +154,11 @@ def make_ppo_update(actor,critic,tx,anchor_weight=None,retention_weight=None):
                 result+=retention_weight*retention_loss(actor,ap,batch['retention_obs'],batch['retention_labels'],batch['retention_weights'])
             return result
         loss_value,grads=jax.value_and_grad(loss,argnums=(0,1))(ap,vp)
-        updates,optimizer=tx.update(grads,optimizer,(ap,vp))
+        old_ap=ap
+        if actor_enabled:updates,optimizer=tx.update(grads,optimizer,(ap,vp))
+        else:updates,optimizer=tx.update(grads,optimizer,(ap,vp),update_actor=False)
         ap,vp=optax.apply_updates((ap,vp),updates)
+        if not actor_enabled:ap=old_ap
         return ap,vp,optimizer,loss_value
     return update
 
@@ -177,6 +183,7 @@ def main(argv=None):
     parser.add_argument('--fixed-opponent-ppo',action='store_true')
     parser.add_argument('--posture-cost-ppo',action='store_true',help='explicit training-only posture margin cost')
     parser.add_argument('--reduced-noise-ppo',action='store_true',help='explicit half-standard-deviation on-policy sampling profile')
+    parser.add_argument('--kl-guard-ppo',action='store_true',help='explicit actor-only full-rollout KL stop, critic keeps all updates')
     parser.add_argument('--conservative-actor-ppo',action='store_true')
     parser.add_argument('--actor-learning-rate',type=float,choices=(.0001,.00001),default=.0001)
     parser.add_argument('--update-audit-directory',type=Path,
@@ -212,6 +219,8 @@ def main(argv=None):
         raise ValueError('posture cost requires the explicit inherited fixed-opponent path')
     if args.reduced_noise_ppo and (not args.fixed_opponent_ppo or args.posture_cost_ppo):
         raise ValueError('reduced noise requires the original fixed-opponent reward path')
+    if args.kl_guard_ppo and (not args.fixed_opponent_ppo or args.reduced_noise_ppo or args.posture_cost_ppo):
+        raise ValueError('KL guard requires original covariance and fixed-opponent rewards')
     if args.conservative_actor_ppo and (not args.mixed_partner_ppo or args.actor_learning_rate!=.00001):
         raise ValueError('conservative actor requires explicit mixed lineage and actor rate 1e-5')
     if not args.conservative_actor_ppo and args.actor_learning_rate!=.0001:
@@ -261,6 +270,7 @@ def train(args):
     fixed_opponent_ppo=getattr(args,'fixed_opponent_ppo',False)
     posture_cost_ppo=getattr(args,'posture_cost_ppo',False)
     reduced_noise_ppo=getattr(args,'reduced_noise_ppo',False)
+    kl_guard_ppo=getattr(args,'kl_guard_ppo',False)
     env_class=StrikingEnv
     if contact_ppo:
         from boxer.striking_contact import ContactAwareStrikingEnv
@@ -323,6 +333,10 @@ def train(args):
                                 from boxer.striking_sampling_profile import OFFSET
                                 interface_metadata.update(reduced_noise_ppo=True,sampling_log_std_offset=OFFSET)
                                 config.update(interface_metadata,version=10)
+                            if kl_guard_ppo:
+                                from boxer.striking_kl_guard import TARGET
+                                interface_metadata.update(kl_guard_ppo=True,kl_guard_target=TARGET)
+                                config.update(interface_metadata,version=11)
     checkpoint_path=args.output/'checkpoint/latest.json'
     if previous:
         if not args.resume:
@@ -359,6 +373,8 @@ def train(args):
             raise ValueError('posture-cost checkpoint and explicit training reward must agree')
         if reduced_noise_ppo != saved.get('reduced_noise_ppo',False):
             raise ValueError('sampling profile checkpoint and explicit on-policy distribution must agree')
+        if kl_guard_ppo != saved.get('kl_guard_ppo',False):
+            raise ValueError('KL guard checkpoint and explicit update protocol must agree')
         if conservative_actor_ppo != saved.get('conservative_actor_ppo',False):
             raise ValueError('explicit conservative checkpoint and training path must agree')
         if conservative_actor_ppo and saved['actor_learning_rate']!=args.actor_learning_rate:
@@ -434,6 +450,12 @@ def train(args):
 
     update=make_ppo_update(actor,critic,tx,args.anchor_loss_weight if contact_ppo else None,
         args.retention_loss_weight if demonstration_ppo else None)
+    if kl_guard_ppo:
+        from boxer.striking_kl_guard import mean_rollout_kl
+        critic_update=make_ppo_update(actor,critic,tx,args.anchor_loss_weight,args.retention_loss_weight,actor_enabled=False)
+        predict_distribution=jax.jit(lambda params,observations:actor.apply(params,observations))
+        guard_steps=list(continuation['kl_guard_actor_steps_by_rollout'])
+        last_guard={}
 
     envs=[env_class(foundation,motor_params,**profile,
         **({'active_opponent':i in MIXED_ACTIVE_WORLDS} if mixed_partner_ppo else {})) for i in range(args.worlds)]
@@ -470,6 +492,7 @@ def train(args):
         if neutral_contact_ppo:progress['neutral_credits_by_corner']=neutral_credits.tolist()
         if mixed_partner_ppo:progress['mixed_credits_by_mode_and_corner']=mixed_credits.tolist()
         if posture_cost_ppo:progress['session_posture_cost']=posture_cost_sum
+        if kl_guard_ppo:progress.update(kl_guard_actor_steps_total=sum(guard_steps),last_kl_guard=last_guard)
         atomic_json(args.output/'progress.json',progress)
         atomic_json(args.output/'state.json',dict(state,status=status,**progress))
     def publish():
@@ -536,6 +559,10 @@ def train(args):
             logp=rollout['logp'].reshape(block),adv=((adv-adv.mean())/(adv.std()+1e-8)).reshape(block),
             returns=returns.reshape(block))
         losses=[]
+        if kl_guard_ppo:
+            guard_observations=jp.array(batch['obs'])
+            guard_old=tuple(np.asarray(x) for x in predict_distribution(ap,guard_observations))
+            actor_active=True;executed_actor_steps=0
         if update_audit is not None:
             update_audit.begin(ap,batch,np.tile([int(i in MIXED_ACTIVE_WORLDS) for i in range(args.worlds)],args.unroll))
         for epoch in range(4):
@@ -548,19 +575,31 @@ def train(args):
                     minibatch.update(anchor_obs=jp.array(normalize(anchor_data['observation'][ai],norm)),
                         anchor_labels=jp.array(anchor_data['action'][ai]))
                     if demonstration_ppo:minibatch.update(retention_batch(retention_data,retention_rng,norm))
-                ap,vp,optimizer,loss=update(ap,vp,optimizer,minibatch)
+                selected_update=update
+                if kl_guard_ppo:
+                    kl=mean_rollout_kl(guard_old,predict_distribution(ap,guard_observations))
+                    if kl>config['kl_guard_target']:actor_active=False
+                    selected_update=update if actor_active else critic_update
+                    executed_actor_steps+=int(actor_active)
+                ap,vp,optimizer,loss=selected_update(ap,vp,optimizer,minibatch)
                 losses.append(float(loss))
                 if update_audit is not None:update_audit.observe(ap,epoch,minibatch_index,loss=float(loss))
         if contact_ppo and not np.isfinite(losses).all():raise FloatingPointError('nonfinite contact PPO loss')
         if not all(np.isfinite(x).all() for x in jax.tree_util.tree_leaves((ap,vp,optimizer))):
             raise FloatingPointError('non-finite boxing update; prior checkpoint retained')
         norm=update_norm(norm,flat_obs)
+        if kl_guard_ppo:
+            guard_steps.append(executed_actor_steps)
+            last_guard=dict(actor_steps=executed_actor_steps,critic_steps=16,
+                kl_before_normalizer=mean_rollout_kl(guard_old,predict_distribution(ap,guard_observations)),
+                kl_after_normalizer=mean_rollout_kl(guard_old,predict_distribution(ap,jp.array(normalize(flat_obs,norm)))))
         if update_audit is not None:update_audit.after_normalizer(ap,normalize(flat_obs,norm))
         optimized+=block
         saved=dict(continuation,actor=ap,critic=vp,optimizer=optimizer,norm=norm,key=key,
             optimized_steps=optimized,consumed_steps=consumed,world_control_steps=world_controls,
             foundation_sha256=metadata['sha256'],**interface_metadata,**profile)
         if contact_ppo:
+            if kl_guard_ppo:saved['kl_guard_actor_steps_by_rollout']=list(guard_steps)
             saved['aux_sampler_state']=aux_rng.bit_generator.state
             if neutral_contact_ppo:saved['neutral_credits_by_corner']=neutral_credits.tolist()
             if mixed_partner_ppo:saved['mixed_credits_by_mode_and_corner']=mixed_credits.tolist()
