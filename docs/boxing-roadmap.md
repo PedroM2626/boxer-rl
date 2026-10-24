@@ -13,7 +13,9 @@ current task pass streaks are zero. A read-only
 action-mode gaps. A bounded [on-policy sampling comparison](striking-sampling-comparison.md)
 completed without a sustained benefit from half Gaussian standard deviation.
 A bounded [actor KL-guard comparison](striking-kl-guard-comparison.md) completed without robust stability. A bounded [passive failure replay](striking-kl-failure-trace.md)
-now compares source and both latest endpoints before another training change.
+completed with exact source/endpoint reproduction. A bounded
+[GAE trace-length comparison](striking-gae-comparison.md) now tests longer direct
+terminal credit from the latest control, with all physical criteria retained.
 See its contract for current accounting.
 
 1. Consolidate stable own strikes in both corners against a neutral partner.

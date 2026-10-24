@@ -28,3 +28,15 @@ def test_passive_observer_does_not_change_update_params_moments_or_loss(tmp_path
     assert observer.records[-1]['profiles']['active']['rows']==4
     assert observer.records[-1]['phase']=='after_normalizer'
     with pytest.raises(ValueError):main(['--update-audit-directory',str(tmp_path/'bad')])
+
+
+def test_sampling_fingerprint_excludes_gae_targets_but_detects_action_changes(tmp_path):
+    actor=Actor();obs=jp.ones((4,148))*.01;params=actor.init(jax.random.PRNGKey(1),obs)
+    mean,std=actor.apply(params,obs)
+    batch=dict(obs=obs,raw=mean,logp=log_probability(mean,mean,std),adv=jp.ones(4),returns=jp.ones(4))
+    fingerprints=[]
+    for index,changed in enumerate((batch,dict(batch,adv=-batch['adv']),dict(batch,raw=mean+.01))):
+        observer=UpdateAudit(actor,log_probability,tmp_path/str(index));observer.begin(params,changed,np.array([0,1,0,1]))
+        fingerprints.append((observer.sampling_sha256,observer.collection_sha256))
+    assert fingerprints[0][0]==fingerprints[1][0] and fingerprints[0][1]!=fingerprints[1][1]
+    assert fingerprints[0][0]!=fingerprints[2][0]

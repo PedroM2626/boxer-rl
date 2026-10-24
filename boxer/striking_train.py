@@ -123,6 +123,9 @@ def require_ppo_checkpoint(saved):
         if 'kl_guard_target' in saved or saved.get('kl_guard_ppo'):
             from boxer.striking_kl_guard import validate_guard_metadata
             validate_guard_metadata(saved)
+        if 'training_gae_lambda' in saved or 'long_gae_transition' in saved or saved.get('long_gae_ppo'):
+            from boxer.striking_gae_profile import validate_gae_metadata
+            validate_gae_metadata(saved)
         if saved.get('conservative_actor_ppo'):
             from boxer.striking_conservative_actor import validate_conservative_metadata
             validate_conservative_metadata(saved)
@@ -184,6 +187,7 @@ def main(argv=None):
     parser.add_argument('--posture-cost-ppo',action='store_true',help='explicit training-only posture margin cost')
     parser.add_argument('--reduced-noise-ppo',action='store_true',help='explicit half-standard-deviation on-policy sampling profile')
     parser.add_argument('--kl-guard-ppo',action='store_true',help='explicit actor-only full-rollout KL stop, critic keeps all updates')
+    parser.add_argument('--long-gae-ppo',action='store_true',help='explicit lambda .99 over latest original fixed-opponent control')
     parser.add_argument('--conservative-actor-ppo',action='store_true')
     parser.add_argument('--actor-learning-rate',type=float,choices=(.0001,.00001),default=.0001)
     parser.add_argument('--update-audit-directory',type=Path,
@@ -221,6 +225,8 @@ def main(argv=None):
         raise ValueError('reduced noise requires the original fixed-opponent reward path')
     if args.kl_guard_ppo and (not args.fixed_opponent_ppo or args.reduced_noise_ppo or args.posture_cost_ppo):
         raise ValueError('KL guard requires original covariance and fixed-opponent rewards')
+    if args.long_gae_ppo and (not args.fixed_opponent_ppo or args.kl_guard_ppo or args.reduced_noise_ppo or args.posture_cost_ppo):
+        raise ValueError('long GAE requires the original fixed-opponent update and reward path')
     if args.conservative_actor_ppo and (not args.mixed_partner_ppo or args.actor_learning_rate!=.00001):
         raise ValueError('conservative actor requires explicit mixed lineage and actor rate 1e-5')
     if not args.conservative_actor_ppo and args.actor_learning_rate!=.0001:
@@ -271,6 +277,7 @@ def train(args):
     posture_cost_ppo=getattr(args,'posture_cost_ppo',False)
     reduced_noise_ppo=getattr(args,'reduced_noise_ppo',False)
     kl_guard_ppo=getattr(args,'kl_guard_ppo',False)
+    long_gae_ppo=getattr(args,'long_gae_ppo',False)
     env_class=StrikingEnv
     if contact_ppo:
         from boxer.striking_contact import ContactAwareStrikingEnv
@@ -337,6 +344,9 @@ def train(args):
                                 from boxer.striking_kl_guard import TARGET
                                 interface_metadata.update(kl_guard_ppo=True,kl_guard_target=TARGET)
                                 config.update(interface_metadata,version=11)
+                            if long_gae_ppo:
+                                interface_metadata.update(long_gae_ppo=True,training_gae_lambda=.99)
+                                config.update(interface_metadata,version=12,gae_lambda=.99)
     checkpoint_path=args.output/'checkpoint/latest.json'
     if previous:
         if not args.resume:
@@ -375,6 +385,8 @@ def train(args):
             raise ValueError('sampling profile checkpoint and explicit on-policy distribution must agree')
         if kl_guard_ppo != saved.get('kl_guard_ppo',False):
             raise ValueError('KL guard checkpoint and explicit update protocol must agree')
+        if long_gae_ppo != saved.get('long_gae_ppo',False):
+            raise ValueError('long GAE checkpoint and explicit advantage profile must agree')
         if conservative_actor_ppo != saved.get('conservative_actor_ppo',False):
             raise ValueError('explicit conservative checkpoint and training path must agree')
         if conservative_actor_ppo and saved['actor_learning_rate']!=args.actor_learning_rate:

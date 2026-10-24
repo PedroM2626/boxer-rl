@@ -50,3 +50,20 @@ and latest payload hashes plus the unchanged main boxing hash. All native
 comparison error logs are empty. Eight existing trace/first-fall checks pass;
 Python/Bash syntax and PowerShell parsing pass. The new replay must additionally
 verify exact original-trial reproduction during native execution.
+
+## Completed review and next bounded decision
+
+The [full archived replay](results/striking-pilot/kl-failure-trace-1966080/README.md)
+verifies all 72 episodes, 33,219 controls, finite/hash-checked traces, exact original
+physical fields and unchanged foundation/main provenance. Nine failures involve
+low pelvis, three self-leg contact; eleven follow interbody contact. These are
+temporal associations. Formal evaluation is now 1,666,653, PPO stays 2,016,512.
+The subsequent zero-simulation terminal-credit audit measures direct GAE
+attenuation and keeps its critic/off-policy/fragment limitations explicit.
+
+Permit one [bounded lambda .99/.95 comparison](striking-gae-comparison.md) from
+latest original control 24e23288; no older actor, new reward or action mask.
+New diagnostic PPO ceiling 2,049,280, formal evaluation ceiling 1,750,653; at
+most 16,384 learner/world credits per arm and 84,000 evaluation controls. All
+learned/Adam/normalizer/sampler state is retained. No automatic adoption or
+further extension; full physical gates and independent generalization decide.

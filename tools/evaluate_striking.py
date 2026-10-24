@@ -147,6 +147,8 @@ def main(argv=None):
             require_ppo_checkpoint(saved)
         if manifest.get('kl_guard_ppo',False)!=saved.get('kl_guard_ppo',False) or manifest.get('kl_guard_target')!=saved.get('kl_guard_target'):
             raise ValueError('manifest and saved KL guard profile disagree')
+        if manifest.get('long_gae_ppo',False)!=saved.get('long_gae_ppo',False) or manifest.get('training_gae_lambda')!=saved.get('training_gae_lambda'):
+            raise ValueError('manifest and saved GAE profile disagree')
         for key,expected in (('actor_inputs',inputs),('actions',actions),('contact_history',contact_history)):
             if key in saved and saved[key]!=expected:raise ValueError('payload and declared interface disagree')
         if saved['foundation_sha256']!=source['sha256']:raise ValueError('striking motor mismatch')

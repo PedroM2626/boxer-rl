@@ -21,6 +21,10 @@ class UpdateAudit:
         for key in sorted(batch):
             value=np.asarray(batch[key]);digest.update(json.dumps([key,value.dtype.str,list(value.shape)]).encode());digest.update(value.tobytes())
         self.collection_sha256=digest.hexdigest()
+        digest=hashlib.sha256()
+        for key in ('obs','raw','logp'):
+            value=np.asarray(batch[key]);digest.update(json.dumps([key,value.dtype.str,list(value.shape)]).encode());digest.update(value.tobytes())
+        self.sampling_sha256=digest.hexdigest()
         self.obs = jp.array(batch['obs']); self.raw = jp.array(batch['raw'])
         self.old_logp = np.asarray(batch['logp'],dtype=np.float64)
         self.mode_labels = np.asarray(mode_labels)
@@ -49,7 +53,7 @@ class UpdateAudit:
                 raise FloatingPointError('nonfinite PPO update diagnostic')
         self.records.append(row)
         atomic_json(self.folder/'minibatch-measurements.json',dict(read_only=True,
-            changes_training_objective=False,rollout_rows=len(log_ratio),collection_sha256=self.collection_sha256,records=self.records,
+            changes_training_objective=False,rollout_rows=len(log_ratio),collection_sha256=self.collection_sha256,sampling_sha256=self.sampling_sha256,records=self.records,
             note='Passive measurements on collected learner observations. This observer never stops or changes an optimizer; an explicit training profile may independently limit actor updates.'))
 
     def after_normalizer(self,params,normalized_observations):

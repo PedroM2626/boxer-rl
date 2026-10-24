@@ -16,7 +16,9 @@ found no sustained benefit from half standard deviation. A bounded
 [actor KL-guard comparison](docs/striking-kl-guard-comparison.md) completed without
 robust stability (19/24 fresh paired survivors versus 18/24 control and 23/24
 source). A bounded [passive failure replay](docs/striking-kl-failure-trace.md)
-now investigates the new falls before another training intervention. No policy is
+completed with exact episode reproduction and mostly post-contact low-pelvis
+failures. A bounded [GAE trace-length comparison](docs/striking-gae-comparison.md)
+now tests longer direct terminal credit while retaining the latest control. No policy is
 certified as reliable boxing.
 See the [completion roadmap](docs/boxing-roadmap.md). The
 [verified selected source replay](fights/striking-pilot/first-full-screen-pass-1908736.mp4)
