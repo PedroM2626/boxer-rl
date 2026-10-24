@@ -3,31 +3,32 @@
 Maintain the [trajectory and decision record](experiment-history.md) at every
 reviewed intervention, including failed results, accounting and pending evidence.
 
-**Latest reviewed outcome (2026-10-24):** the [complete GAE comparison](striking-gae-comparison.md)
-finished 168 episodes / 79,297 evaluation controls / 32,768 diagnostic PPO credits.
-Lambda .99 has fresh mirror pair survival 8/8 with six reciprocal episodes,
-versus control 7/8 with four and source 6/8 with four. Both distinct original
-mirror checkpoints also have six reciprocal episodes. Neutral fresh survival
-6/8 and 7/8 fails: every complete set fails and aggregate 21/24 only matches
-source. Version-8 history has thirteen records, current streak zero; version 12
-has two failures, also zero. All foundation certifications remain intact.
+**Latest reviewed outcome (2026-10-24):** the [longer-GAE continuation](striking-gae-continuation.md)
+has a complete 24/24 intermediate pass followed by 4/5/8 original survival and
+7/7/8 final fresh survival. Version-12 history fail/fail/pass/fail, streak zero.
+The subsequent [frozen gradient/critic assay](striking-gae-gradient-audit.md)
+completed 12,288 controls / twelve exact finite batches with zero optimizer
+updates. Retention norms are much smaller than PPO; final bootstrapped critic
+error is not larger. These limited measurements establish no causal remedy.
+All foundation certifications and main boxing are unchanged.
 
-**Current operation:** one [bounded ordinary longer-GAE continuation](striking-gae-continuation.md)
-from latest **95dbdff0**, retaining version 12 / lambda .99 and every learned,
-Adam, normalizer and sampler leaf. No new transition, earlier actor restoration,
-changed rewards/covariance/physics, main adoption or stage promotion. Complete
-screens at +8,192/+16,384; stop after the first if severe regression or no
-source-relative full-screen measure improves. Source/final new 27M full sets.
+**Current operation:** one [bounded unchanged consolidation](striking-gae-consolidation.md)
+from latest **3052e0f6**, retaining version 12 / lambda .99 and every learned,
+Adam, normalizer and sampler leaf. Up to 65,536 learner/world credits, complete
+original gates every 16,384, untouched 29M source/final full sets. Stop on severe
+regression, three consecutive failed screens without a new progress-frontier
+component, two distinct consecutive complete passes (freeze latest for fresh
+review), or the fixed ceiling. No restored intermediate, parameter change,
+weaker neutral gates, main adoption, automatic promotion or further allocation.
 
-Reviewed diagnostic PPO is **2,049,280**, new ceiling **2,065,664** (at most
-16,384 additional learner/world credits). Reviewed formal evaluation is
-**1,745,950**, new ceiling **1,793,950** (at most 48,000 controls). Main boxing
-**1,048,576**, foundation **474,992,640**, combined main **476,041,216**, BC 8,000
-remain unchanged. Inspect the live state and child processes at
-`/home/pedro/boxing-runs/striking-gae-continue-1982464/continuation.json` before
-any launch. Prior comparisons and replay are completed and archived. Preserve
-all failed histories and unused allocation. No duplicate jobs, forced rollback,
-blind retry, automatic promotion or further extension.
+Reviewed diagnostic PPO is **2,065,664**, new ceiling **2,131,200**. Reviewed
+formal diagnostic simulation is **1,804,660**, new ceiling **1,876,660** (at most
+72,000 evaluation controls). Assay collection 12,288 and diagnostic label rows
+3,072 are separate from PPO/training-retention credit. Main boxing **1,048,576**,
+foundation **474,992,640**, combined main **476,041,216**, BC 8,000 stay unchanged.
+Inspect `/home/pedro/boxing-runs/striking-gae-consolidate-1998848/continuation.json`,
+child processes and logs before launching anything. Prior continuation and assay
+are complete and archived. No duplicate jobs, forced rollback or blind retry.
 
 **Current stage (2026-10-22):** all four foundation levels are certified by
 [two distinct consecutive complete physical passes](results/curriculum/foundation-certification/README.md).

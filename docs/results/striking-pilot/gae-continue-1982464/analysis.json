@@ -1,0 +1,242 @@
+{
+  "status": "reviewed",
+  "episodes": 96,
+  "main_adoption": false,
+  "promotion": false,
+  "diagnostic_ppo_total": 2065664,
+  "formal_world_controls_total": 1792372,
+  "actual_new_evaluation_world_controls": 46422,
+  "new_collection_world_controls": 16384,
+  "new_integrated_replay_presentations": 65536,
+  "cumulative_supervised_updates": 8000,
+  "native_error_logs_empty": true,
+  "source_fresh": {
+    "profiles": {
+      "neutral-0": {
+        "pair_survivors": 8,
+        "own_surviving_scoring_seeds": [
+          27000003,
+          27000004,
+          27000006
+        ],
+        "surviving_events_by_corner": [
+          8.0,
+          0.0
+        ],
+        "surviving_two_way_episodes": 0,
+        "passes_profile": true
+      },
+      "neutral-1": {
+        "pair_survivors": 8,
+        "own_surviving_scoring_seeds": [
+          27000003,
+          27000004,
+          27000005,
+          27000006
+        ],
+        "surviving_events_by_corner": [
+          0.0,
+          10.0
+        ],
+        "surviving_two_way_episodes": 0,
+        "passes_profile": true
+      },
+      "selfplay": {
+        "pair_survivors": 6,
+        "own_surviving_scoring_seeds": [
+          27000003,
+          27000004,
+          27000005,
+          27000006
+        ],
+        "surviving_events_by_corner": [
+          7.0,
+          8.0
+        ],
+        "surviving_two_way_episodes": 4,
+        "passes_profile": false
+      }
+    },
+    "passes_complete": false
+  },
+  "gates": [
+    {
+      "new_ppo_steps": 8192,
+      "sha256": "fa8080110edee9b73f2272f4a8d6f94bebc640a0fd56b04f2e66c8ce44c12548",
+      "screen": {
+        "profiles": {
+          "neutral-0": {
+            "pair_survivors": 8,
+            "own_surviving_scoring_seeds": [
+              7,
+              23,
+              47
+            ],
+            "surviving_events_by_corner": [
+              16.0,
+              0.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": true
+          },
+          "neutral-1": {
+            "pair_survivors": 8,
+            "own_surviving_scoring_seeds": [
+              7,
+              23,
+              31,
+              47
+            ],
+            "surviving_events_by_corner": [
+              0.0,
+              10.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": true
+          },
+          "selfplay": {
+            "pair_survivors": 8,
+            "own_surviving_scoring_seeds": [
+              7,
+              23,
+              31,
+              47
+            ],
+            "surviving_events_by_corner": [
+              9.0,
+              6.0
+            ],
+            "surviving_two_way_episodes": 3,
+            "passes_profile": true
+          }
+        },
+        "passes_complete": true
+      },
+      "mixed_credits_by_mode_and_corner": [
+        [
+          63031,
+          63945
+        ],
+        [
+          67302,
+          59674
+        ]
+      ]
+    },
+    {
+      "new_ppo_steps": 16384,
+      "sha256": "3052e0f69fcadc823be14069ed462ee3057ae75a8028cb2d8aa5bf3615aa48b5",
+      "screen": {
+        "profiles": {
+          "neutral-0": {
+            "pair_survivors": 4,
+            "own_surviving_scoring_seeds": [
+              7
+            ],
+            "surviving_events_by_corner": [
+              2.0,
+              0.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": false
+          },
+          "neutral-1": {
+            "pair_survivors": 5,
+            "own_surviving_scoring_seeds": [
+              31,
+              47
+            ],
+            "surviving_events_by_corner": [
+              0.0,
+              4.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": false
+          },
+          "selfplay": {
+            "pair_survivors": 8,
+            "own_surviving_scoring_seeds": [
+              7,
+              23,
+              47
+            ],
+            "surviving_events_by_corner": [
+              5.0,
+              5.0
+            ],
+            "surviving_two_way_episodes": 1,
+            "passes_profile": true
+          }
+        },
+        "passes_complete": false
+      },
+      "mixed_credits_by_mode_and_corner": [
+        [
+          65079,
+          65993
+        ],
+        [
+          69442,
+          61630
+        ]
+      ]
+    }
+  ],
+  "foundation_history_records": {
+    "balance": 29,
+    "walk_easy": 41,
+    "walk": 13,
+    "approach": 2
+  },
+  "final_fresh": {
+    "profiles": {
+      "neutral-0": {
+        "pair_survivors": 7,
+        "own_surviving_scoring_seeds": [
+          27000003,
+          27000004,
+          27000005,
+          27000006
+        ],
+        "surviving_events_by_corner": [
+          9.0,
+          0.0
+        ],
+        "surviving_two_way_episodes": 0,
+        "passes_profile": true
+      },
+      "neutral-1": {
+        "pair_survivors": 7,
+        "own_surviving_scoring_seeds": [
+          27000003,
+          27000005,
+          27000006
+        ],
+        "surviving_events_by_corner": [
+          1.0,
+          8.0
+        ],
+        "surviving_two_way_episodes": 1,
+        "passes_profile": false
+      },
+      "selfplay": {
+        "pair_survivors": 8,
+        "own_surviving_scoring_seeds": [
+          27000003,
+          27000004,
+          27000005,
+          27000006
+        ],
+        "surviving_events_by_corner": [
+          13.0,
+          14.0
+        ],
+        "surviving_two_way_episodes": 4,
+        "passes_profile": true
+      }
+    },
+    "passes_complete": false
+  },
+  "original_complete_pass_streak": 0,
+  "decision": "Do not extend unchanged PPO or restore the favorable intermediate actor. The version-12 history is fail/fail/pass/fail; the complete 24/24 intermediate pass regresses to 4/5/8 original survival and fresh 7/7/8, with neutral-1 failing. Preserve the latest 3052e0f6 endpoint and all sixteen consumed update blocks. Authorize a read-only matched gradient/critic diagnostic on source 95dbdff0, passing fa808011 and final 3052e0f6, using original rewards/physics/frozen opponent, sampled policy, common reset/noise seeds, eight worlds and four 128-control blocks per policy: at most 12288 new physical controls, zero optimizer or standalone supervised updates. Retain all source payload hashes and all actual batches; measure per-mode PPO/entropy/retention gradient scale/alignment and critic/return error before deciding a change. No short assay certifies survival or proves a causal remedy. Diagnostic PPO stays 2065664. Formal evaluation starts 1792372, bounded diagnostic ceiling 1804660. No masks, rollback, gate weakening, adoption or automatic further allocation."
+}

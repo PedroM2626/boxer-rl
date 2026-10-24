@@ -1,0 +1,583 @@
+{
+  "status": "completed",
+  "pid": 418,
+  "started_utc": "2026-10-24T13:45:07.051629+00:00",
+  "diagnostic_output": "/home/pedro/boxing-runs/striking-gae-gradient-1998848",
+  "maximum_world_controls": 12288,
+  "diagnostic_world_controls": 12288,
+  "new_optimizer_updates": 0,
+  "new_ppo_training_credits": 0,
+  "new_supervised_updates": 0,
+  "new_diagnostic_retention_rows": 3072,
+  "diagnostic_ppo_retained": 2065664,
+  "formal_world_controls_before_job": 1792372,
+  "formal_world_controls_ceiling": 1804660,
+  "main_consumed_retained": 1048576,
+  "main_project_consumed_retained": 476041216,
+  "assistance": false,
+  "policy_adoption": "none",
+  "promotion": false,
+  "worlds": 8,
+  "blocks": 4,
+  "unroll": 128,
+  "reset_seeds": [
+    28000003,
+    28000004,
+    28000005,
+    28000006,
+    28000007,
+    28000008,
+    28000009,
+    28000010
+  ],
+  "common_policy_noise_seed": 314159,
+  "common_retention_seed": 9091,
+  "frozen_normalizers": true,
+  "variants": [
+    {
+      "variant": "source",
+      "sha256": "95dbdff01def598cdc907e93f1dc7bceb2f1d6b58bc22f488a1936afa86553f9",
+      "blocks": [
+        {
+          "block": 0,
+          "batch_sha256": "c4ad9650f1f2c52b3c4257b6bfe8a925466f90c0a1e1509ea5c2d7acdfffa41c",
+          "measurements": {
+            "ppo": {
+              "loss": -4.330649971961975e-08,
+              "gradient_l2": 8.1814266346068
+            },
+            "entropy": {
+              "loss": 0.009315979667007923,
+              "gradient_l2": 0.004123105821454669
+            },
+            "retention": {
+              "loss": 0.04372904449701309,
+              "gradient_l2": 0.317610986861939
+            },
+            "critic": {
+              "loss": 0.2336229383945465,
+              "gradient_l2": 0.8047145736100636
+            },
+            "neutral": {
+              "loss": -0.16680176556110382,
+              "gradient_l2": 15.892246928914135,
+              "retention_cosine": 0.039553329072578705,
+              "mean_reward": 0.005184359848499298,
+              "value_mse": 1.7749965190887451
+            },
+            "active": {
+              "loss": 0.16680172085762024,
+              "gradient_l2": 4.4811449391645,
+              "retention_cosine": 0.10783908100165393,
+              "mean_reward": 0.007939131930470467,
+              "value_mse": 0.09398691356182098
+            }
+          },
+          "retention_ppo_cosine": 0.06794865514872335,
+          "joint_gradient_l2": 8.248463783725633,
+          "hypothetical_global_clip_scale": 0.12123469608644193,
+          "mean_return": 1.6630382537841797,
+          "return_std": 1.5019750595092773,
+          "value_mse": 0.9344916939735413
+        },
+        {
+          "block": 1,
+          "batch_sha256": "d3b0d68e9995dad030886d0cb83014fc70db141e32290940ff657a16e41df3b8",
+          "measurements": {
+            "ppo": {
+              "loss": -1.0780058801174164e-07,
+              "gradient_l2": 7.367101426434334
+            },
+            "entropy": {
+              "loss": 0.009315979667007923,
+              "gradient_l2": 0.004123105821454669
+            },
+            "retention": {
+              "loss": 0.042887553572654724,
+              "gradient_l2": 0.3249055160668494
+            },
+            "critic": {
+              "loss": 0.2818518280982971,
+              "gradient_l2": 0.9285704530627694
+            },
+            "neutral": {
+              "loss": 0.4909115433692932,
+              "gradient_l2": 11.294702163498448,
+              "retention_cosine": -0.07293104020462864,
+              "mean_reward": 0.008487096056342125,
+              "value_mse": 1.5131704807281494
+            },
+            "active": {
+              "loss": -0.49091172218322754,
+              "gradient_l2": 8.890162902332216,
+              "retention_cosine": 0.064578689282891,
+              "mean_reward": 0.012036812491714954,
+              "value_mse": 0.7416437864303589
+            }
+          },
+          "retention_ppo_cosine": -0.01694148360223433,
+          "joint_gradient_l2": 7.427037968401115,
+          "hypothetical_global_clip_scale": 0.13464317864733885,
+          "mean_return": 1.1974036693572998,
+          "return_std": 1.4050071239471436,
+          "value_mse": 1.1274070739746094
+        },
+        {
+          "block": 2,
+          "batch_sha256": "580b0d48411cb37d67d2859cf1dca45899cd10226306e126af655009a5a72d0c",
+          "measurements": {
+            "ppo": {
+              "loss": 6.705522537231445e-08,
+              "gradient_l2": 8.92069334438618
+            },
+            "entropy": {
+              "loss": 0.009315979667007923,
+              "gradient_l2": 0.004123105821454669
+            },
+            "retention": {
+              "loss": 0.038343656808137894,
+              "gradient_l2": 0.31542535628080787
+            },
+            "critic": {
+              "loss": 0.2130795270204544,
+              "gradient_l2": 2.0641964994281095
+            },
+            "neutral": {
+              "loss": -0.30321004986763,
+              "gradient_l2": 15.472760037080707,
+              "retention_cosine": -0.08259459465753315,
+              "mean_reward": 0.007030650041997433,
+              "value_mse": 1.4332857131958008
+            },
+            "active": {
+              "loss": 0.30321013927459717,
+              "gradient_l2": 6.073778858391628,
+              "retention_cosine": 0.011017334220401232,
+              "mean_reward": 0.003996467217803001,
+              "value_mse": 0.2713503837585449
+            }
+          },
+          "retention_ppo_cosine": -0.06787866425509888,
+          "joint_gradient_l2": 9.140926442436,
+          "hypothetical_global_clip_scale": 0.10939810163634861,
+          "mean_return": 1.5357152223587036,
+          "return_std": 1.2081066370010376,
+          "value_mse": 0.8523180484771729
+        },
+        {
+          "block": 3,
+          "batch_sha256": "073f27e398dcbcfd07214c249ee15a6926a8243c32a8bd934ee4de0de0abba93",
+          "measurements": {
+            "ppo": {
+              "loss": 3.166496753692627e-08,
+              "gradient_l2": 7.502109759052048
+            },
+            "entropy": {
+              "loss": 0.009315979667007923,
+              "gradient_l2": 0.004123105821454669
+            },
+            "retention": {
+              "loss": 0.05063182860612869,
+              "gradient_l2": 0.35211591626869443
+            },
+            "critic": {
+              "loss": 0.17422543466091156,
+              "gradient_l2": 0.6753248167980984
+            },
+            "neutral": {
+              "loss": -0.22312548756599426,
+              "gradient_l2": 10.971304389091767,
+              "retention_cosine": -0.12314635341259866,
+              "mean_reward": 0.008154048584401608,
+              "value_mse": 0.6064789891242981
+            },
+            "active": {
+              "loss": 0.2231256067752838,
+              "gradient_l2": 10.56314715129741,
+              "retention_cosine": -2.0777470506573496e-05,
+              "mean_reward": 0.004239358939230442,
+              "value_mse": 0.7873244285583496
+            }
+          },
+          "retention_ppo_cosine": -0.09006103732210186,
+          "joint_gradient_l2": 7.509016469096932,
+          "hypothetical_global_clip_scale": 0.1331732330213233,
+          "mean_return": 1.127410650253296,
+          "return_std": 0.9055903553962708,
+          "value_mse": 0.6969017386436462
+        }
+      ],
+      "scored_by_corner": [
+        7.0,
+        8.0
+      ],
+      "fall_rounds": 2,
+      "completed_rounds": 8
+    },
+    {
+      "variant": "passing",
+      "sha256": "fa8080110edee9b73f2272f4a8d6f94bebc640a0fd56b04f2e66c8ce44c12548",
+      "blocks": [
+        {
+          "block": 0,
+          "batch_sha256": "b6587f9f19ad750826b2f616ad4915783dd9f78e27ad33cf7335296e8ddac56d",
+          "measurements": {
+            "ppo": {
+              "loss": 6.007030606269836e-08,
+              "gradient_l2": 8.07996758607236
+            },
+            "entropy": {
+              "loss": 0.009328124113380909,
+              "gradient_l2": 0.004123105821454669
+            },
+            "retention": {
+              "loss": 0.043310392647981644,
+              "gradient_l2": 0.3170910723659364
+            },
+            "critic": {
+              "loss": 0.2644546926021576,
+              "gradient_l2": 0.5983008445560986
+            },
+            "neutral": {
+              "loss": -0.23089180886745453,
+              "gradient_l2": 11.6855037213608,
+              "retention_cosine": 0.0853969518282535,
+              "mean_reward": -0.0024311882443726063,
+              "value_mse": 1.0731197595596313
+            },
+            "active": {
+              "loss": 0.2308918982744217,
+              "gradient_l2": 10.091232145182142,
+              "retention_cosine": -0.1066255386298178,
+              "mean_reward": 0.008017214015126228,
+              "value_mse": 1.042518138885498
+            }
+          },
+          "retention_ppo_cosine": -0.004831496899091187,
+          "joint_gradient_l2": 8.10676855968984,
+          "hypothetical_global_clip_scale": 0.1233537127200606,
+          "mean_return": 1.1984822750091553,
+          "return_std": 1.671916127204895,
+          "value_mse": 1.05781888961792
+        },
+        {
+          "block": 1,
+          "batch_sha256": "050f38362925e4bdcc3c47ce747799b824b0322f3e5fb3960faad9a835d45cb0",
+          "measurements": {
+            "ppo": {
+              "loss": -6.984919309616089e-08,
+              "gradient_l2": 8.078840239307423
+            },
+            "entropy": {
+              "loss": 0.009328124113380909,
+              "gradient_l2": 0.004123105821454669
+            },
+            "retention": {
+              "loss": 0.042167503386735916,
+              "gradient_l2": 0.2945596271394113
+            },
+            "critic": {
+              "loss": 0.02897176332771778,
+              "gradient_l2": 0.5029706633835072
+            },
+            "neutral": {
+              "loss": -0.11492074280977249,
+              "gradient_l2": 5.350541940673664,
+              "retention_cosine": 0.06364469009942607,
+              "mean_reward": 0.004660841077566147,
+              "value_mse": 0.035588495433330536
+            },
+            "active": {
+              "loss": 0.11492060124874115,
+              "gradient_l2": 15.049556962329245,
+              "retention_cosine": 0.09850491174919077,
+              "mean_reward": -0.004886318929493427,
+              "value_mse": 0.1961856186389923
+            }
+          },
+          "retention_ppo_cosine": 0.11282491206876459,
+          "joint_gradient_l2": 8.132934497582362,
+          "hypothetical_global_clip_scale": 0.12295684912958112,
+          "mean_return": 1.3789368867874146,
+          "return_std": 0.8388770818710327,
+          "value_mse": 0.11588706076145172
+        },
+        {
+          "block": 2,
+          "batch_sha256": "af9419101ce4ea70678298a68419166aa3b46a2337c33cb6d7e11db7e4cac91f",
+          "measurements": {
+            "ppo": {
+              "loss": 6.239861249923706e-08,
+              "gradient_l2": 7.002967774991106
+            },
+            "entropy": {
+              "loss": 0.009328124113380909,
+              "gradient_l2": 0.004123105821454669
+            },
+            "retention": {
+              "loss": 0.03743438050150871,
+              "gradient_l2": 0.2691741700996624
+            },
+            "critic": {
+              "loss": 0.22038082778453827,
+              "gradient_l2": 1.7900816841049245
+            },
+            "neutral": {
+              "loss": -0.1460324227809906,
+              "gradient_l2": 9.661277894304392,
+              "retention_cosine": -0.06364029514451557,
+              "mean_reward": 0.016572900116443634,
+              "value_mse": 0.974597156047821
+            },
+            "active": {
+              "loss": 0.14603255689144135,
+              "gradient_l2": 10.488343795346573,
+              "retention_cosine": -0.006598283854693121,
+              "mean_reward": 0.012306797318160534,
+              "value_mse": 0.7884495258331299
+            }
+          },
+          "retention_ppo_cosine": -0.04884011597322825,
+          "joint_gradient_l2": 7.220449965556787,
+          "hypothetical_global_clip_scale": 0.13849552379287036,
+          "mean_return": 1.738896131515503,
+          "return_std": 0.822533369064331,
+          "value_mse": 0.8815233707427979
+        },
+        {
+          "block": 3,
+          "batch_sha256": "98098c2fb9089d987089b7583578bcf52f0ea3373b8b01bf6148fa7303ac5d8d",
+          "measurements": {
+            "ppo": {
+              "loss": -1.7229467630386353e-07,
+              "gradient_l2": 7.556528648249312
+            },
+            "entropy": {
+              "loss": 0.009328124113380909,
+              "gradient_l2": 0.004123105821454669
+            },
+            "retention": {
+              "loss": 0.05080227553844452,
+              "gradient_l2": 0.3293330036543414
+            },
+            "critic": {
+              "loss": 0.31060367822647095,
+              "gradient_l2": 1.7381349845792955
+            },
+            "neutral": {
+              "loss": 0.024397963657975197,
+              "gradient_l2": 5.098346934477012,
+              "retention_cosine": -0.09510565426640002,
+              "mean_reward": 0.004437745548784733,
+              "value_mse": 0.3669761121273041
+            },
+            "active": {
+              "loss": -0.024398304522037506,
+              "gradient_l2": 15.253171808240051,
+              "retention_cosine": -0.1027774891409557,
+              "mean_reward": -0.003194855060428381,
+              "value_mse": 2.1178531646728516
+            }
+          },
+          "retention_ppo_cosine": -0.13581396566937695,
+          "joint_gradient_l2": 7.717118078281749,
+          "hypothetical_global_clip_scale": 0.12958205250406826,
+          "mean_return": 0.8735137581825256,
+          "return_std": 1.0604565143585205,
+          "value_mse": 1.2424147129058838
+        }
+      ],
+      "scored_by_corner": [
+        6.0,
+        11.0
+      ],
+      "fall_rounds": 3,
+      "completed_rounds": 9
+    },
+    {
+      "variant": "final",
+      "sha256": "3052e0f69fcadc823be14069ed462ee3057ae75a8028cb2d8aa5bf3615aa48b5",
+      "blocks": [
+        {
+          "block": 0,
+          "batch_sha256": "2b04cd959824a22769ded2188e940e7382ffdf747be5409ef262c29b036d8ca8",
+          "measurements": {
+            "ppo": {
+              "loss": -4.470348358154297e-08,
+              "gradient_l2": 6.86545692248186
+            },
+            "entropy": {
+              "loss": 0.00933054555207491,
+              "gradient_l2": 0.004123105821454669
+            },
+            "retention": {
+              "loss": 0.043552838265895844,
+              "gradient_l2": 0.31750248849174234
+            },
+            "critic": {
+              "loss": 0.16692452132701874,
+              "gradient_l2": 0.716116710806366
+            },
+            "neutral": {
+              "loss": -0.003605765290558338,
+              "gradient_l2": 10.409990027678889,
+              "retention_cosine": -0.002070929508453996,
+              "mean_reward": 0.0013410355895757675,
+              "value_mse": 0.9325225949287415
+            },
+            "active": {
+              "loss": 0.003605665173381567,
+              "gradient_l2": 8.671363890456984,
+              "retention_cosine": 0.02517267913394441,
+              "mean_reward": 0.008111685514450073,
+              "value_mse": 0.4028734564781189
+            }
+          },
+          "retention_ppo_cosine": 0.014327015326096836,
+          "joint_gradient_l2": 6.914530258642385,
+          "hypothetical_global_clip_scale": 0.14462298414995184,
+          "mean_return": 1.696262240409851,
+          "return_std": 1.4174824953079224,
+          "value_mse": 0.6676980257034302
+        },
+        {
+          "block": 1,
+          "batch_sha256": "2e7ed864de06a30c97ea9ba2d1fc55cd7ceacf831e9a326300e4bc776f6657ca",
+          "measurements": {
+            "ppo": {
+              "loss": 1.1315569281578064e-07,
+              "gradient_l2": 6.78881864075898
+            },
+            "entropy": {
+              "loss": 0.00933054555207491,
+              "gradient_l2": 0.004123105821454669
+            },
+            "retention": {
+              "loss": 0.0419638492166996,
+              "gradient_l2": 0.2755155208200477
+            },
+            "critic": {
+              "loss": 0.03748353570699692,
+              "gradient_l2": 0.27430902722213674
+            },
+            "neutral": {
+              "loss": 0.08330776542425156,
+              "gradient_l2": 10.476197803458883,
+              "retention_cosine": -0.02463952450540071,
+              "mean_reward": 0.005080631002783775,
+              "value_mse": 0.2005085051059723
+            },
+            "active": {
+              "loss": -0.08330753445625305,
+              "gradient_l2": 8.58147946045198,
+              "retention_cosine": 0.1192400706152349,
+              "mean_reward": 0.004020911641418934,
+              "value_mse": 0.09935983270406723
+            }
+          },
+          "retention_ppo_cosine": 0.05635205103439048,
+          "joint_gradient_l2": 6.815440842494199,
+          "hypothetical_global_clip_scale": 0.1467256518118404,
+          "mean_return": 1.3721535205841064,
+          "return_std": 0.48542851209640503,
+          "value_mse": 0.14993417263031006
+        },
+        {
+          "block": 2,
+          "batch_sha256": "749f309a03ea88bb8ed601329c545d8a95c55bb5e55b77f47889480a74175a8d",
+          "measurements": {
+            "ppo": {
+              "loss": -1.5599653124809265e-08,
+              "gradient_l2": 7.167207649472039
+            },
+            "entropy": {
+              "loss": 0.00933054555207491,
+              "gradient_l2": 0.004123105821454669
+            },
+            "retention": {
+              "loss": 0.03756411373615265,
+              "gradient_l2": 0.27874236882818354
+            },
+            "critic": {
+              "loss": 0.15307140350341797,
+              "gradient_l2": 0.5717693588335417
+            },
+            "neutral": {
+              "loss": 0.06835856288671494,
+              "gradient_l2": 8.251610988471093,
+              "retention_cosine": 0.021064205620359242,
+              "mean_reward": -0.004930483642965555,
+              "value_mse": 0.39545437693595886
+            },
+            "active": {
+              "loss": -0.06835857778787613,
+              "gradient_l2": 11.722166687974415,
+              "retention_cosine": -0.005067877400849695,
+              "mean_reward": 0.00024734484031796455,
+              "value_mse": 0.8291167616844177
+            }
+          },
+          "retention_ppo_cosine": 0.007981286526282334,
+          "joint_gradient_l2": 7.197630965756648,
+          "hypothetical_global_clip_scale": 0.13893460289331122,
+          "mean_return": 1.1845017671585083,
+          "return_std": 1.3717743158340454,
+          "value_mse": 0.6122856140136719
+        },
+        {
+          "block": 3,
+          "batch_sha256": "832f8214a73468db26b85e13f2dface78ab2b313e67e1889e2d323f4b970072a",
+          "measurements": {
+            "ppo": {
+              "loss": 1.0337680578231812e-07,
+              "gradient_l2": 6.918513347275404
+            },
+            "entropy": {
+              "loss": 0.00933054555207491,
+              "gradient_l2": 0.004123105821454669
+            },
+            "retention": {
+              "loss": 0.050706230103969574,
+              "gradient_l2": 0.32158390389518776
+            },
+            "critic": {
+              "loss": 0.2665145695209503,
+              "gradient_l2": 0.7008971368723041
+            },
+            "neutral": {
+              "loss": -0.2825556695461273,
+              "gradient_l2": 8.960271153924966,
+              "retention_cosine": -0.02522172698247247,
+              "mean_reward": 0.012371188029646873,
+              "value_mse": 0.6756490468978882
+            },
+            "active": {
+              "loss": 0.28255584836006165,
+              "gradient_l2": 11.36575605199038,
+              "retention_cosine": 0.0595682956788559,
+              "mean_reward": -0.003352090250700712,
+              "value_mse": 1.456467628479004
+            }
+          },
+          "retention_ppo_cosine": 0.03259697103870664,
+          "joint_gradient_l2": 6.971718440859074,
+          "hypothetical_global_clip_scale": 0.14343665890740953,
+          "mean_return": 0.7994514107704163,
+          "return_std": 1.3023651838302612,
+          "value_mse": 1.0660582780838013
+        }
+      ],
+      "scored_by_corner": [
+        6.0,
+        6.0
+      ],
+      "fall_rounds": 2,
+      "completed_rounds": 8
+    }
+  ],
+  "active_variant": "final",
+  "active_block": 3,
+  "phase": "awaiting_review",
+  "updated_utc": "2026-10-24T13:47:38.849133+00:00",
+  "limitations": "Frozen normalizers and policies across four sequential blocks, unlike updating PPO. Each policy follows its own sampled trajectory under common exogenous seeds. Gradients are full-batch pre-update measurements, not the sixteen actual minibatch updates. Retention draws use a common independent copied-data sampler; saved sampler/RNG/Adam leaves are unchanged. Gradient scale/alignment and critic return error are descriptive, not a causal remedy or a survival gate."
+}

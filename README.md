@@ -23,7 +23,12 @@ completed with exact episode reproduction and mostly post-contact low-pelvis
 failures. A bounded [GAE trace-length comparison](docs/striking-gae-comparison.md)
 completed with fresh mirror pair survival 8/8 and six reciprocal episodes,
 but all complete physical sets still fail. One [bounded ordinary continuation](docs/striking-gae-continuation.md)
-now checks the latest longer-GAE endpoint without changing physical criteria. No policy is
+completed with a complete intermediate pass followed by regression. A bounded
+[frozen gradient/critic assay](docs/striking-gae-gradient-audit.md) investigated
+that regression without changing saved policies or adding PPO. It did not
+establish retention dominance or a larger final critic error. A bounded
+[unchanged consolidation](docs/striking-gae-consolidation.md) now checks whether
+the latest policy can sustain complete passes. No policy is
 certified as reliable boxing.
 See the [completion roadmap](docs/boxing-roadmap.md). The
 [verified selected source replay](fights/striking-pilot/first-full-screen-pass-1908736.mp4)

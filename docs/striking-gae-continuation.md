@@ -64,3 +64,20 @@ runner imports the existing tested progress-vector stop helper, retains the
 source payload bytes and rejects changed lambda/configuration or optimizer
 prefixes. Native source/final evaluation still determines physical outcomes;
 these software checks are not a phase pass.
+
+## Completed outcome and next investigation
+
+The [full independent review](results/striking-pilot/gae-continue-1982464/README.md)
+verifies 96 episodes / 46,422 evaluation controls, all sixteen finite PPO payloads,
+exact inherited profile/prefixes, source hash and empty native error logs. The
+first original complete gate passes at 24/24; the next fails at 4/5/8. Latest
+fresh survival 7/7/8 still fails neutral-1. Version-12 history is fail/fail/pass/fail,
+current streak zero. The intermediate is preserved as evidence, not restored.
+
+Do not extend unchanged PPO. Diagnostic PPO is 2,065,664; formal simulation
+1,792,372. Permit only a [frozen gradient/critic assay](striking-gae-gradient-audit.md)
+of source, passing and latest final policies: at most 12,288 diagnostic physical
+controls, no optimizer or standalone supervised updates, new formal diagnostic
+ceiling 1,804,660. Archive actual batches and investigate mode-specific gradient
+alignment/scales and critic error before a further change. No gate weakening,
+rollback, main adoption, promotion or automatic allocation.

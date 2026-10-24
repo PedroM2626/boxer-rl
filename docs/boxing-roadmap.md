@@ -19,7 +19,12 @@ A bounded [actor KL-guard comparison](striking-kl-guard-comparison.md) completed
 completed with exact source/endpoint reproduction. A bounded
 [GAE trace-length comparison](striking-gae-comparison.md) completed with 8/8 fresh mirror survival and six reciprocal episodes; neutral
 profiles still fail. One [bounded ordinary continuation](striking-gae-continuation.md)
-now checks the latest longer-GAE endpoint, retaining all complete criteria.
+completed with one complete pass followed by regression. A bounded
+[frozen gradient/critic assay](striking-gae-gradient-audit.md) reviewed
+the source, passing checkpoint and latest final without new PPO or adoption.
+It did not establish retention dominance or larger final critic error. One
+[bounded unchanged consolidation](striking-gae-consolidation.md) now checks
+whether the latest policy can sustain complete passes.
 See its contract for current accounting.
 
 1. Consolidate stable own strikes in both corners against a neutral partner.

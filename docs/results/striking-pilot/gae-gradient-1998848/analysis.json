@@ -1,0 +1,157 @@
+{
+  "status": "reviewed",
+  "diagnostic_ppo_total": 2065664,
+  "formal_world_controls_total": 1804660,
+  "new_diagnostic_collection_world_controls": 12288,
+  "new_optimizer_updates": 0,
+  "new_ppo_training_credits": 0,
+  "new_supervised_updates": 0,
+  "new_diagnostic_retention_rows": 3072,
+  "main_adoption": false,
+  "promotion": false,
+  "variants": [
+    {
+      "variant": "source",
+      "sha256": "95dbdff01def598cdc907e93f1dc7bceb2f1d6b58bc22f488a1936afa86553f9",
+      "blocks": [
+        {
+          "block": 0,
+          "ppo_l2": 8.1814266346068,
+          "retention_l2": 0.317610986861939,
+          "critic_l2": 0.8047145736100636,
+          "value_mse": 0.9344916939735413,
+          "retention_ppo_cosine": 0.06794865514872335,
+          "neutral_active_ppo_cosine": -0.03441110040655736
+        },
+        {
+          "block": 1,
+          "ppo_l2": 7.367101426434334,
+          "retention_l2": 0.3249055160668494,
+          "critic_l2": 0.9285704530627694,
+          "value_mse": 1.1274070739746094,
+          "retention_ppo_cosine": -0.01694148360223433,
+          "neutral_active_ppo_cosine": 0.05224208428086658
+        },
+        {
+          "block": 2,
+          "ppo_l2": 8.92069334438618,
+          "retention_l2": 0.31542535628080787,
+          "critic_l2": 2.0641964994281095,
+          "value_mse": 0.8523180484771729,
+          "retention_ppo_cosine": -0.06787866425509888,
+          "neutral_active_ppo_cosine": 0.22355194291880062
+        },
+        {
+          "block": 3,
+          "ppo_l2": 7.502109759052048,
+          "retention_l2": 0.35211591626869443,
+          "critic_l2": 0.6753248167980984,
+          "value_mse": 0.6969017386436462,
+          "retention_ppo_cosine": -0.09006103732210186,
+          "neutral_active_ppo_cosine": -0.029436999512690923
+        }
+      ],
+      "mean_ppo_l2": 7.99283279111984,
+      "mean_retention_l2": 0.3275144438695727,
+      "mean_value_mse": 0.9027796387672424,
+      "sampled_completed_rounds": 8,
+      "sampled_fall_rounds": 2
+    },
+    {
+      "variant": "passing",
+      "sha256": "fa8080110edee9b73f2272f4a8d6f94bebc640a0fd56b04f2e66c8ce44c12548",
+      "blocks": [
+        {
+          "block": 0,
+          "ppo_l2": 8.07996758607236,
+          "retention_l2": 0.3170910723659364,
+          "critic_l2": 0.5983008445560986,
+          "value_mse": 1.05781888961792,
+          "retention_ppo_cosine": -0.004831496899091187,
+          "neutral_active_ppo_cosine": 0.09650323723209824
+        },
+        {
+          "block": 1,
+          "ppo_l2": 8.078840239307423,
+          "retention_l2": 0.2945596271394113,
+          "critic_l2": 0.5029706633835072,
+          "value_mse": 0.11588706076145172,
+          "retention_ppo_cosine": 0.11282491206876459,
+          "neutral_active_ppo_cosine": 0.03696554259008037
+        },
+        {
+          "block": 2,
+          "ppo_l2": 7.002967774991106,
+          "retention_l2": 0.2691741700996624,
+          "critic_l2": 1.7900816841049245,
+          "value_mse": 0.8815233707427979,
+          "retention_ppo_cosine": -0.04884011597322825,
+          "neutral_active_ppo_cosine": -0.03542565043846353
+        },
+        {
+          "block": 3,
+          "ppo_l2": 7.556528648249312,
+          "retention_l2": 0.3293330036543414,
+          "critic_l2": 1.7381349845792955,
+          "value_mse": 1.2424147129058838,
+          "retention_ppo_cosine": -0.13581396566937695,
+          "neutral_active_ppo_cosine": -0.1944802829127007
+        }
+      ],
+      "mean_ppo_l2": 7.67957606215505,
+      "mean_retention_l2": 0.30253946831483786,
+      "mean_value_mse": 0.8244110085070133,
+      "sampled_completed_rounds": 9,
+      "sampled_fall_rounds": 3
+    },
+    {
+      "variant": "final",
+      "sha256": "3052e0f69fcadc823be14069ed462ee3057ae75a8028cb2d8aa5bf3615aa48b5",
+      "blocks": [
+        {
+          "block": 0,
+          "ppo_l2": 6.86545692248186,
+          "retention_l2": 0.31750248849174234,
+          "critic_l2": 0.716116710806366,
+          "value_mse": 0.6676980257034302,
+          "retention_ppo_cosine": 0.014327015326096836,
+          "neutral_active_ppo_cosine": 0.027570696760131644
+        },
+        {
+          "block": 1,
+          "ppo_l2": 6.78881864075898,
+          "retention_l2": 0.2755155208200477,
+          "critic_l2": 0.27430902722213674,
+          "value_mse": 0.14993417263031006,
+          "retention_ppo_cosine": 0.05635205103439048,
+          "neutral_active_ppo_cosine": 0.005337652901156145
+        },
+        {
+          "block": 2,
+          "ppo_l2": 7.167207649472039,
+          "retention_l2": 0.27874236882818354,
+          "critic_l2": 0.5717693588335417,
+          "value_mse": 0.6122856140136719,
+          "retention_ppo_cosine": 0.007981286526282334,
+          "neutral_active_ppo_cosine": -0.00011792543535521373
+        },
+        {
+          "block": 3,
+          "ppo_l2": 6.918513347275404,
+          "retention_l2": 0.32158390389518776,
+          "critic_l2": 0.7008971368723041,
+          "value_mse": 1.0660582780838013,
+          "retention_ppo_cosine": 0.03259697103870664,
+          "neutral_active_ppo_cosine": -0.08839118227783299
+        }
+      ],
+      "mean_ppo_l2": 6.934999139997071,
+      "mean_retention_l2": 0.29833607050879035,
+      "mean_value_mse": 0.6239940226078033,
+      "sampled_completed_rounds": 8,
+      "sampled_fall_rounds": 2
+    }
+  ],
+  "limitations": "Frozen normalizers and policies across four sequential blocks, unlike updating PPO. Each policy follows its own sampled trajectory under common exogenous seeds. Gradients are full-batch pre-update measurements, not the sixteen actual minibatch updates. Retention draws use a common independent copied-data sampler; saved sampler/RNG/Adam leaves are unchanged. Gradient scale/alignment and critic return error are descriptive, not a causal remedy or a survival gate.",
+  "decision": "The assay does not support retention-gradient dominance or a larger final critic/GAE error as an established cause of regression. Mean retention gradient is about .30-.33 versus PPO 6.93-7.99; final critic error is not larger than source/passing in these small frozen batches. This does not rule out long-run/minibatch/momentum effects. Do not tune another hyperparameter or restore the earlier passing actor. Permit one bounded patient consolidation of the latest final 3052e0f6 with unchanged version 12, lambda .99, original physics/rewards/frozen opponent and all learned/Adam/normalizer/sampler state: at most 65536 new learner/world credits, full gates every 16384, new 29M source/final full sets, at most 72000 evaluation controls. Stop on severe regression, three consecutive failed screens without a new best progress-vector component, or two distinct consecutive complete passes (then freeze latest and review fresh, never automatically adopt). Diagnostic PPO starts 2065664, ceiling 2131200; formal simulation starts 1804660, ceiling 1876660. This bounded consolidation is justified by repeatable active survival and intermittent complete passes, not by an identified causal cure. Preserve all failures and consumed compute; no rollback, gate weakening, main adoption or automatic further extension."
+}

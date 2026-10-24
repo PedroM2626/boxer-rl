@@ -5,8 +5,8 @@ conditional and why the next experiment was authorized. Detailed protocols,
 full physical results, limitations, checkpoints and accounting remain in the
 linked reports. This index does not replace those records or the live state.
 
-Last consolidated review: **2026-10-24**, through the completed GAE comparison
-and its authorized bounded continuation. Reliable general boxing is **not yet
+Last consolidated review: **2026-10-24**, through the completed GAE continuation
+and the completed frozen gradient/critic assay plus authorized consolidation. Reliable general boxing is **not yet
 certified**. The foundation is certified; paired physical exchanges exist.
 
 ## Historical corrections and retained capabilities
@@ -36,7 +36,9 @@ not change collision physics, training or scoring.
 | [Actor KL guard](striking-kl-guard-comparison.md) | Fresh pair survival 19/24 guarded, 18/24 control, 23/24 source; every complete set failed. | Fewer actor updates did not establish stability. No guarded policy adopted. |
 | [Exact failure replay and terminal-credit audit](results/striking-pilot/kl-failure-trace-1966080/README.md) | All 72 trials reproduced exactly; nine low-pelvis and three self-leg-contact failures. Eleven followed interbody contact. Direct GAE terminal-credit attenuation measured without new simulation. | Contact-before-fall is association, not causation. Direct terminal credit is not the entire critic-mediated credit horizon. |
 | [GAE lambda comparison](striking-gae-comparison.md) | Lambda .99: fresh mirror survival 8/8 with six reciprocal episodes; control 7/8 with four, source 6/8 with four. Neutral survival 6/8 and 7/8 still failed. Aggregate 21/24 only matched source. | Promising specific exchange improvement, not overall robustness or certification. Every complete set failed. |
-| [Latest ordinary GAE continuation](striking-gae-continuation.md) | Authorized from latest 95dbdff0, with unchanged lambda/profile/optimizer state and at most 16,384 new credits. | Pending complete review. Stop at the first screen on severe regression or no source-relative full-screen progress. Do not record a planned outcome as a result. |
+| [Ordinary GAE continuation](striking-gae-continuation.md) | The +8,192 full screen passed with 24/24 survivors, followed by a failure at +16,384 (4/5/8); final fresh survival 7/7/8 still failed neutral-1. | Stop unchanged PPO. Version-12 history fail/fail/pass/fail, streak zero. Archive the intermediate without restoring it. |
+| [Frozen gradient/critic assay](striking-gae-gradient-audit.md) | All 12,288 diagnostic controls and twelve batches reviewed; retention norm .30-.33 versus PPO 6.93-7.99, no larger final critic/GAE error. Zero optimizer updates. | No established retention-dominance/critic-error cause; small frozen batches do not rule out longer-run effects or certify survival. |
+| [Unchanged consolidation](striking-gae-consolidation.md) | Authorized latest 3052e0f6, up to 65,536 credits with full gates every 16,384 and new 29M source/final sets. | Pending review. Stop on severe regression, three failed plateau screens, two distinct consecutive complete passes, or the cap; no automatic adoption. |
 
 ## Where to check current facts
 
