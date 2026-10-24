@@ -148,7 +148,11 @@ def main(argv=None):
         if not all(np.isfinite(x).all() for x in jax.tree_util.tree_leaves(
                 tuple(saved[k] for k in ('actor','critic','optimizer','norm','key')))):
             raise FloatingPointError('non-finite striking checkpoint')
-        actor=Actor(action_size=actions)
+        from boxer.striking_sampling_profile import sampling_offset
+        offset=sampling_offset(saved)
+        if manifest.get('sampling_log_std_offset',0.)!=offset or manifest.get('reduced_noise_ppo',False)!=saved.get('reduced_noise_ppo',False):
+            raise ValueError('manifest and saved sampling profile disagree')
+        actor=Actor(action_size=actions,sampling_log_std_offset=offset)
         policy=jax.jit(lambda observation:jp.tanh(actor.apply(saved['actor'],observation)[0]))
         distribution=jax.jit(lambda observation:actor.apply(saved['actor'],observation))
         modes=['sampled' if args.sampled else 'trained']
@@ -259,6 +263,7 @@ def main(argv=None):
         engagement_distance=distance,engagement_reward_distance=reward_distance,
         actor_inputs=inputs,actions=actions,body_residual_radians=body_bound,contact_history=contact_history,
         sampled_policy=args.sampled,
+        policy_sampling_log_std_offset=offset if args.checkpoint else 0.,
         diagnostic_arm_noise_scale=args.arm_noise_scale,
         diagnostic_arm_noise_hold=args.arm_noise_hold,
         neutral_partner_learner_corner=args.neutral_partner,

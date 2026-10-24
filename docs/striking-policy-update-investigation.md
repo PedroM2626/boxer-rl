@@ -13,8 +13,10 @@ has completed at 31/32 motor-only pair survival. A bounded
 [training-only posture-cost comparison](striking-posture-cost-comparison.md)
 has completed; reject its extra cost after 15/24 fresh survivors versus 20/24
 control. All four newer complete screens fail. A read-only
-[objective audit](striking-objective-audit.md) measures own/partner-only fall
-reward alignment before further training. No main adoption or phase promotion.
+[objective audit](striking-objective-audit.md) measured terminal reward and a
+profile-dependent sampled/mean gap. A bounded [on-policy sampling-profile
+comparison](striking-sampling-comparison.md) now tests half Gaussian standard
+deviation against unchanged training. No main adoption or phase promotion.
 
 ## Complete physical outcome
 

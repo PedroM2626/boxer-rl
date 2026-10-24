@@ -31,13 +31,16 @@ from boxer.striking_env import StrikingEnv
 
 class Actor(nn.Module):
     action_size: int = 17
+    sampling_log_std_offset: float = 0.
     @nn.compact
     def __call__(self, obs):
         x=nn.tanh(nn.Dense(128)(obs))
         x=nn.tanh(nn.Dense(128)(x))
         mean=nn.Dense(self.action_size,kernel_init=nn.initializers.zeros)(x)
         log_std=self.param('log_std',nn.initializers.constant(-1.9),(self.action_size,))
-        return mean,jp.clip(log_std,-3.,-.5)
+        bounded=jp.clip(log_std,-3.,-.5)
+        if self.sampling_log_std_offset:bounded=bounded+self.sampling_log_std_offset
+        return mean,bounded
 
 
 class Critic(nn.Module):
@@ -114,6 +117,9 @@ def require_ppo_checkpoint(saved):
         if saved.get('posture_cost_ppo'):
             from boxer.striking_posture_cost import validate_posture_metadata
             validate_posture_metadata(saved)
+        if 'sampling_log_std_offset' in saved or saved.get('reduced_noise_ppo'):
+            from boxer.striking_sampling_profile import validate_sampling_metadata
+            validate_sampling_metadata(saved)
         if saved.get('conservative_actor_ppo'):
             from boxer.striking_conservative_actor import validate_conservative_metadata
             validate_conservative_metadata(saved)
@@ -170,6 +176,7 @@ def main(argv=None):
     parser.add_argument('--mixed-partner-ppo',action='store_true')
     parser.add_argument('--fixed-opponent-ppo',action='store_true')
     parser.add_argument('--posture-cost-ppo',action='store_true',help='explicit training-only posture margin cost')
+    parser.add_argument('--reduced-noise-ppo',action='store_true',help='explicit half-standard-deviation on-policy sampling profile')
     parser.add_argument('--conservative-actor-ppo',action='store_true')
     parser.add_argument('--actor-learning-rate',type=float,choices=(.0001,.00001),default=.0001)
     parser.add_argument('--update-audit-directory',type=Path,
@@ -203,6 +210,8 @@ def main(argv=None):
         raise ValueError('fixed opponent requires explicit original-rate mixed lineage')
     if args.posture_cost_ppo and not args.fixed_opponent_ppo:
         raise ValueError('posture cost requires the explicit inherited fixed-opponent path')
+    if args.reduced_noise_ppo and (not args.fixed_opponent_ppo or args.posture_cost_ppo):
+        raise ValueError('reduced noise requires the original fixed-opponent reward path')
     if args.conservative_actor_ppo and (not args.mixed_partner_ppo or args.actor_learning_rate!=.00001):
         raise ValueError('conservative actor requires explicit mixed lineage and actor rate 1e-5')
     if not args.conservative_actor_ppo and args.actor_learning_rate!=.0001:
@@ -251,6 +260,7 @@ def train(args):
     conservative_actor_ppo=getattr(args,'conservative_actor_ppo',False)
     fixed_opponent_ppo=getattr(args,'fixed_opponent_ppo',False)
     posture_cost_ppo=getattr(args,'posture_cost_ppo',False)
+    reduced_noise_ppo=getattr(args,'reduced_noise_ppo',False)
     env_class=StrikingEnv
     if contact_ppo:
         from boxer.striking_contact import ContactAwareStrikingEnv
@@ -309,13 +319,17 @@ def train(args):
                                 from boxer.striking_posture_cost import PROFILE
                                 interface_metadata.update(posture_cost_ppo=True,posture_cost_profile=PROFILE)
                                 config.update(interface_metadata,version=9)
+                            if reduced_noise_ppo:
+                                from boxer.striking_sampling_profile import OFFSET
+                                interface_metadata.update(reduced_noise_ppo=True,sampling_log_std_offset=OFFSET)
+                                config.update(interface_metadata,version=10)
     checkpoint_path=args.output/'checkpoint/latest.json'
     if previous:
         if not args.resume:
             raise ValueError('existing pilot requires --resume with the exact same configuration')
         validate_resume_config(previous,config,args.engagement_distance is not None)
     atomic_json(config_path,config)
-    actor,critic=Actor(action_size=action_size),Critic()
+    actor,critic=Actor(action_size=action_size,sampling_log_std_offset=interface_metadata.get('sampling_log_std_offset',0.)),Critic()
     key=jax.random.PRNGKey(args.seed)
     ap=actor.init(key,jp.zeros((1,observation_size)));vp=critic.init(jax.random.fold_in(key,1),jp.zeros((1,observation_size)))
     tx=optax.chain(optax.clip_by_global_norm(1.),optax.adam(.0001))
@@ -343,6 +357,8 @@ def train(args):
             raise ValueError('fixed opponent checkpoint and training path must agree')
         if posture_cost_ppo != saved.get('posture_cost_ppo',False):
             raise ValueError('posture-cost checkpoint and explicit training reward must agree')
+        if reduced_noise_ppo != saved.get('reduced_noise_ppo',False):
+            raise ValueError('sampling profile checkpoint and explicit on-policy distribution must agree')
         if conservative_actor_ppo != saved.get('conservative_actor_ppo',False):
             raise ValueError('explicit conservative checkpoint and training path must agree')
         if conservative_actor_ppo and saved['actor_learning_rate']!=args.actor_learning_rate:

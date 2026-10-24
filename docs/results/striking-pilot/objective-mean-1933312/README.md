@@ -16,3 +16,22 @@ seed, swap and learner role with the sampled audit; report unmatched/censored
 tails and mode/role outcomes. Do not substitute aggregate diagnostic counts for
 the unchanged complete physical gates. No automatic training, reward change,
 adoption, promotion or further allocation; preserve monitoring.
+
+## Complete independent action-mode review
+
+`completed-audit.json` retains all mean-mode rounds and partial tails;
+`analysis.json` records the independently matched comparison: 32 common round
+identities, one completed round unique to each mode and eight partial tails per
+mode. Neutral sampled/mean pair survival is 16/16 versus 12/16; active survival
+11/16 versus 14/16. Surviving active two-way episodes are seven versus three.
+Neither action mode dominates, and these diagnostics do not certify boxing.
+
+Formal total 1,487,326, diagnostic PPO still 1,950,976, no new training. Complete
+foundation histories/hashes, seven-record original boxing history (current
+streak zero) and main boxing hash are rechecked. Native host logs contain only
+the known WSL path-translation message, with no physics/overflow exception.
+
+The next concrete operation is the bounded on-policy half-standard-deviation
+versus unchanged training experiment in `docs/striking-sampling-comparison.md`.
+It retains latest c47edf0b learned state and all original physics/rewards/gates.
+No sampled-gate replacement, actor rollback or automatic promotion/adoption.

@@ -10,8 +10,9 @@ full groups fail, despite 12 surviving two-way active exchanges. A bounded
 pair survival. A [matched posture-cost comparison](docs/striking-posture-cost-comparison.md)
 is completed: its extra cost is rejected (15/24 fresh paired survivors versus
 20/24 control). All four new full screens fail. A read-only
-[objective audit](docs/striking-objective-audit.md) measures own/partner-only fall
-rewards before further training. No policy is
+[objective audit](docs/striking-objective-audit.md) found a profile-dependent
+sampled/mean action gap. A bounded [sampling-profile comparison](docs/striking-sampling-comparison.md)
+now tests half standard deviation against unchanged PPO. No policy is
 certified as reliable boxing.
 See the [completion roadmap](docs/boxing-roadmap.md). The
 [verified selected source replay](fights/striking-pilot/first-full-screen-pass-1908736.mp4)
@@ -109,9 +110,9 @@ valid strikes remain sparse. The neutral control severely regresses. The
 further 65,536-credit mixed continuation is now completed: neither generation
 passes, and matched fresh survival regresses 21/24 to 15/24. The [repeatability outcome and generalization audit](docs/striking-generalization-audit.md)
 retain the latest final and all prefixes. Inspect
-`/home/pedro/boxing-runs/striking-objective-mean-1933312/audit.json`
-and its process before any launch. Diagnostic PPO stays 1,950,976; reviewed
-formal evaluation is 1,470,942, matched mean-action ceiling 1,487,326. Main counters and complete
+`/home/pedro/boxing-runs/striking-sampling-1933312/comparison.json`
+and its process before any launch. Diagnostic PPO starts 1,950,976, ceiling
+1,983,744; reviewed formal evaluation is 1,487,326, ceiling 1,571,326. Main counters and complete
 physical criteria remain unchanged. No phase promotion or policy adoption.
 
 The [closed-fist replay repair](docs/closed-fist-rendering.md) restores the

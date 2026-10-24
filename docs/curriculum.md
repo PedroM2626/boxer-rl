@@ -12,9 +12,14 @@ are zero; the earlier version-8 two-pass interval remains in history.
 Formal evaluation is **1,454,558**, diagnostic PPO **1,950,976**. A read-only
 [training-distribution objective audit](striking-objective-audit.md) from latest
 control c47edf0b found four own-only and one partner-only fall in 33 completed
-sampled rounds. Formal total is now **1,470,942**. A matched mean-action rollout
-adds at most 16,384 evaluation controls (formal ceiling **1,487,326**), zero training. Main/BC and
-all physical criteria remain unchanged; no adoption or automatic extension.
+sampled rounds. The completed action-mode comparison has 32 matched rounds:
+neutral sampled/mean pair survival 16/16 vs 12/16, active 11/16 vs 14/16.
+Formal total **1,487,326**, diagnostic PPO **1,950,976**. A bounded
+[on-policy sampling-profile comparison](striking-sampling-comparison.md) now
+tests half standard deviation against unchanged training from latest c47edf0b.
+Maximum 32,768 new credits (PPO ceiling **1,983,744**) and 84,000 evaluation
+controls (formal ceiling **1,571,326**). All source leaves, physics, rewards,
+original mean-action gates and main/BC counters remain intact; no automatic adoption.
 
 **Current stage (2026-10-22):** all four foundation levels are certified by
 [two distinct consecutive complete physical passes](results/curriculum/foundation-certification/README.md).

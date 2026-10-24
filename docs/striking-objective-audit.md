@@ -94,3 +94,34 @@ retained. Stop/review rules above remain in force. Launch
 `/home/pedro/boxing-runs/striking-objective-mean-1933312/audit.json`. Inspect it and
 the process before another job. No automatic retry, reward change or further
 budget; archive and independently compare both action modes before deciding.
+
+## Completed matched action-mode review
+
+Both runs completed 16,384 controls each with unchanged source hash, finite
+observations/rewards and no native error/overflow. Each contains 33 completed
+rounds and eight partial tails. Independent matching finds **32 shared round
+identities**, one completed round unique to each mode, and all censored tails
+explicitly retained. Aggregating unequal episode sets is not used as paired evidence.
+
+| Shared condition | Sampled pair survival | Mean pair survival | Sampled / mean surviving two-way rounds |
+| --- | --- | --- | --- |
+| Neutral, 16 matched rounds | 16/16 | 12/16 | 0 / 0 |
+| Active frozen opponent, 16 matched rounds | 11/16 | 14/16 | 7 / 3 |
+
+Neutral surviving events red/blue are 12/9 sampled versus 5/4 mean. Active events
+are 9/13 sampled versus 7/6 mean. Thus changing action mode trades stability and
+strikes differently across conditions; it does not certify either policy. The
+four extra matched neutral mean failures are learner-blue failures. This does
+not isolate individual arm/command channels or demonstrate a general noise fix.
+
+Both original seven-record version-8 history (current streak zero) and all four
+foundation histories/hashes are rechecked, as is the stopped main boxing hash.
+Full raw mean audit, matched rows and unmatched complete tails are archived in
+`docs/results/striking-pilot/objective-mean-1933312/analysis.json`. Formal total
+is **1,487,326**, diagnostic PPO **1,950,976**, with zero new optimization.
+
+The next concrete intervention is the bounded [on-policy sampling comparison](striking-sampling-comparison.md):
+half Gaussian standard deviation versus unchanged training from latest c47edf0b,
+with exact distribution accounting and retained learned state. Original mean
+physical gates, rewards and motor remain unchanged; no sampled-gate replacement,
+shared-fall/posture penalty, actor rollback or automatic adoption.

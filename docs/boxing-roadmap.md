@@ -9,8 +9,10 @@ reviewed. The completed [motor-floor audit](striking-motor-floor-audit.md) found
 [bounded training-only posture-cost comparison](striking-posture-cost-comparison.md)
 is completed and its extra cost rejected. Four newer full screens fail; both
 current task pass streaks are zero. A read-only
-[objective audit](striking-objective-audit.md) now measures own/partner-only fall
-reward alignment before further training. See its contract for current accounting.
+[objective audit](striking-objective-audit.md) measured terminal reward and matched
+action-mode gaps. A bounded [on-policy sampling comparison](striking-sampling-comparison.md)
+now tests half Gaussian standard deviation against unchanged training with all
+original physical gates. See its contract for current accounting.
 
 1. Consolidate stable own strikes in both corners against a neutral partner.
    Preserve the existing independent complete physical gates and require two
