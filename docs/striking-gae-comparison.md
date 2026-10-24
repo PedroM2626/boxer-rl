@@ -82,3 +82,9 @@ retention and counters; software checks do not certify physical improvement.
 
 Python/Bash syntax and PowerShell parsing pass. Initial sampling fingerprints
 ignore intentionally different GAE targets while detecting changed raw actions.
+
+The [first native integration block](results/striking-pilot/gae-1966080/README.md)
+is verified: 1,024 included learner/world credits, sixteen actor/critic steps,
+finite state, version 12 / lambda .99 and unchanged frozen adversary. The first
+sampled-batch comparison remains pending until control runs. Source fresh 26M
+survival is 8/7/6, a complete failure. No improvement or promotion is inferred.

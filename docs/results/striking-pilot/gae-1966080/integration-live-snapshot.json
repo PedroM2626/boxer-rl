@@ -1,0 +1,130 @@
+{
+  "status": "running",
+  "pid": 1157,
+  "started_utc": "2026-10-24T11:39:42.031277+00:00",
+  "diagnostic_output": "/home/pedro/boxing-runs/striking-gae-1966080",
+  "source_sha256": "24e23288b073843637d5210a5a5d4a03f3383c47580fe004832cfd0d3a50d423",
+  "source_consumed_offset": 1966080,
+  "source_world_offset": 1343488,
+  "maximum_new_ppo_steps": 32768,
+  "new_ppo_steps_per_arm": 16384,
+  "maximum_evaluation_world_controls": 84000,
+  "diagnostic_consumed_steps": 1024,
+  "diagnostic_collection_world_controls": 1024,
+  "diagnostic_evaluation_world_controls": 11565,
+  "diagnostic_ppo_before_job": 2016512,
+  "formal_evaluation_world_controls_before_job": 1666653,
+  "main_consumed_retained": 1048576,
+  "main_project_consumed_retained": 476041216,
+  "new_separate_supervised_updates": 0,
+  "unchanged_physics": true,
+  "unchanged_rewards": true,
+  "on_policy_sampling": true,
+  "assistance": false,
+  "policy_adoption": "none",
+  "promotion": false,
+  "fresh_seeds": [
+    26000003,
+    26000004,
+    26000005,
+    26000006
+  ],
+  "arms": [
+    {
+      "arm": "long_gae",
+      "initial_all_source_leaves_retained": true,
+      "gates": [],
+      "integration_block_verified": true,
+      "initial_update_geometry": {
+        "epoch": 4,
+        "minibatch": -1,
+        "phase": "after_normalizer",
+        "loss": null,
+        "profiles": {
+          "all": {
+            "rows": 1024,
+            "exact_gaussian_kl_mean": 0.0262920230187704,
+            "exact_gaussian_kl_p95": 0.06354970411497633,
+            "command_kl_mean": 0.0067506883551317065,
+            "arm_kl_mean": 0.019541334663638693,
+            "sampled_approx_kl": 0.035956557234873565,
+            "ratio_clip_fraction": 0.40625
+          },
+          "neutral": {
+            "rows": 512,
+            "exact_gaussian_kl_mean": 0.024877097638277897,
+            "exact_gaussian_kl_p95": 0.061977692873542524,
+            "command_kl_mean": 0.006570239571675284,
+            "arm_kl_mean": 0.01830685806660261,
+            "sampled_approx_kl": 0.03794738585263889,
+            "ratio_clip_fraction": 0.41015625
+          },
+          "active": {
+            "rows": 512,
+            "exact_gaussian_kl_mean": 0.0277069483992629,
+            "exact_gaussian_kl_p95": 0.06513709201649433,
+            "command_kl_mean": 0.006931137138588128,
+            "arm_kl_mean": 0.02077581126067477,
+            "sampled_approx_kl": 0.03396572861710823,
+            "ratio_clip_fraction": 0.40234375
+          }
+        }
+      }
+    }
+  ],
+  "phase": "training",
+  "updated_utc": "2026-10-24T11:42:15.178357+00:00",
+  "active_evaluation": "/home/pedro/boxing-runs/striking-gae-1966080/source-fresh/selfplay",
+  "source_fresh": {
+    "profiles": {
+      "neutral-0": {
+        "pair_survivors": 8,
+        "own_surviving_scoring_seeds": [
+          26000003,
+          26000004,
+          26000005,
+          26000006
+        ],
+        "surviving_events_by_corner": [
+          8.0,
+          0.0
+        ],
+        "surviving_two_way_episodes": 0,
+        "passes_profile": true
+      },
+      "neutral-1": {
+        "pair_survivors": 7,
+        "own_surviving_scoring_seeds": [
+          26000003,
+          26000004,
+          26000005,
+          26000006
+        ],
+        "surviving_events_by_corner": [
+          0.0,
+          7.0
+        ],
+        "surviving_two_way_episodes": 0,
+        "passes_profile": false
+      },
+      "selfplay": {
+        "pair_survivors": 6,
+        "own_surviving_scoring_seeds": [
+          26000003,
+          26000004,
+          26000005,
+          26000006
+        ],
+        "surviving_events_by_corner": [
+          6.0,
+          8.0
+        ],
+        "surviving_two_way_episodes": 4,
+        "passes_profile": false
+      }
+    },
+    "passes_complete": false
+  },
+  "active_arm": "long_gae",
+  "active_training_output": "/home/pedro/boxing-runs/striking-gae-1966080/long_gae"
+}
