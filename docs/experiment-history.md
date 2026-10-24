@@ -59,7 +59,55 @@ is a causal or dynamic-feasibility proof. Eight focused tests pass. Keep v1
 rejected; next isolate motor-only versus guard-only before redesign or PPO.
 Formal physical diagnostic consumption is **2,034,975** at its ceiling; separately
 recorded cloned geometry is **4,339** evaluations. No learner updates, gate changes,
-policy adoption or new allocation. No job is active.
+policy adoption or new allocation from that completed review.
+
+The subsequent [reviewed guard-control comparison](results/striking-pilot/guard-control-v1/README.md)
+completed all sixteen episodes / 6,155 controls. Motor-only survives 8/8 versus
+static guard 0/8; only the acting body falls, with four low-pelvis and four
+self-leg predicates. Six guard cases have no scored contact. All approach
+prefixes match; native stderr is empty and nine focused tests pass. Static guard
+is sufficient to reproduce failure in this matched sample; a full jab cycle is
+not necessary. Reject this as a positive demonstration. The relative roles of
+entry transient, final geometry and motor coordination remain unisolated.
+Motor-only corner labels duplicate four unique reset conditions.
+
+The next [reviewed smooth guard-entry probe](results/striking-pilot/guard-ramp-v1/README.md)
+completed eight cases / 1,942 controls. All eight acting bodies fall again;
+the other bodies trigger no first-fall predicates. Median hand tracking improves
+from 5.0 to 0.99 cm, so better tracking and slower entry alone do not repair
+survival on this sample. Ten focused tests pass. A post-run assertion expected
+sixteen instead of eight episodes; preserve the failed state/traceback and correct
+the configured-count check. Independent verification recovered completion with
+zero new physical controls. No trial was discarded or repeated.
+
+Physical diagnostic total at that review is **2,043,072**, under completed ceiling 2,045,130;
+unused compute expires. No PPO/BC, rollback, gate changes, adoption or additional
+geometry queries. Reject all three failed guard/cycle controllers as positive
+demonstrations. Next inspect guard geometry and learned whole-body responses
+against the matched stable motor-only inputs/leg actions before proposing another
+bounded intervention; do not blindly unfreeze the motor or repeat failed body
+authority experiments.
+
+Source inspection then confirms that the foundation already trains with
+`GUARD_ARMS_BOXING`. A reproducible, hash-checked
+[array measurement](results/striking-pilot/guard-control-v1/learned-guard-offsets.json)
+finds the arbitrary scripted guard asks for 10.3–11.4 cm displacement from the
+learned hand position at activation; this is not an isolated causal proof.
+The separately declared [motor-guard cycle v2](results/striking-pilot/motor-guard-cycle-v2/README.md)
+completed all eight conditions / 4,000 controls. It applies corrections only
+during extension, preserving the learned motor guard and filtered return.
+**8/8 pairs survive**, versus 0/8 with either artificial guard, but **zero physical
+impacts, left-fist contact substeps or qualifying punches**. Twelve focused tests
+pass. Sixty-four extension pulses are archived; median extension tracking error
+is still 14.7 cm. This improves stability in the sample, not the boxing objective.
+
+Retain v2 as a stable scripted comparison control, without PPO/BC or demo adoption.
+Next prospectively compare extension timing/terminal-target dwell using the
+retained traces and unchanged full contact/motion/survival criteria. Wider
+holdouts remain necessary even if a later positive cycle is found. Diagnostic
+physical total is **2,047,072**, at its completed ceiling; PPO 2,163,968, cloned
+geometry 4,339, main/BC counters unchanged. Pure array measurements add no physical
+or cloned evaluation. No job is active and no new allocation is declared.
 
 ## Where to check current facts
 

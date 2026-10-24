@@ -3,7 +3,7 @@ import mujoco
 import numpy as np
 from scipy.optimize import least_squares
 
-from boxer.jab_feasibility import PROFILE,cycle_fraction
+from boxer.jab_feasibility import PROFILE
 
 PHASES={'approach':0,'guard':1,'extend':2,'retract':3,'rest':4}
 
@@ -34,9 +34,8 @@ def controller_measurements(env,controller,action,phase,motor_result):
             baseline_target=empty.copy(),desired_target=empty.copy(),filtered_target=empty.copy(),
             unbounded_request=empty.copy(),action_clipped=np.zeros(7,bool),target_error_m=0.)
     assert motor_result is not None
-    actual,fraction=cycle_fraction(p.elapsed-controller.started);assert actual==phase
-    site=p.data.site(m['side']+'imu_in_torso')
-    guard=site.xpos+site.xmat.reshape(3,3)@np.asarray(PROFILE['guard_local'])
+    actual,fraction=controller.phase_fraction(p.elapsed-controller.started);assert actual==phase
+    guard=controller.guard_target(env)
     foe=p.model.geom(p.maps[1-c]['side']+'torso_collision').id
     strike=p.data.geom_xpos[foe]+[0,0,PROFILE['target_torso_world_height_offset']]
     target=guard+fraction*(strike-guard);fist=int(p.fists[c,0])

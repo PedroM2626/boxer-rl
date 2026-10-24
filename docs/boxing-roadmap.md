@@ -46,7 +46,19 @@ reproduces all sixteen failures: only the acting body terminates. Static guard
 endpoints match, while early full-strike endpoints do not match in two local
 searches; this does not establish dynamic or global infeasibility. Next compare
 motor-only and guard-only behavior under a prospective bounded protocol to
-isolate posture versus cycle dynamics before redesign. These references do not define every
+isolate posture versus cycle dynamics before redesign. That
+[matched comparison](results/striking-pilot/guard-control-v1/README.md) now finds
+8/8 motor-only versus 0/8 static-guard survival, so extension/retraction is
+unnecessary to reproduce failure in these cases. A
+[reviewed smooth-entry probe](results/striking-pilot/guard-ramp-v1/README.md) also
+fails 0/8 despite improved hand tracking. Entry smoothing alone is insufficient.
+Source and saved-array inspection confirm the learned motor already carries a
+compact guard. The [reviewed motor-guard cycle v2](results/striking-pilot/motor-guard-cycle-v2/README.md)
+preserves it between extensions and survives 8/8, but produces zero physical
+impacts or qualifying punches. Retain this stable scripted control and next
+compare extension timing/terminal-target dwell under a prospective bounded
+protocol. No positive training target or general boxing certification follows.
+These references do not define every
 punch type or replace failed gates.
 
 The immediate prerequisite is distinguishing moving touches from purposeful

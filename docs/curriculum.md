@@ -60,15 +60,40 @@ self-leg contacts). Guard endpoints match in cloned static searches; early full
 strike endpoints do not match in the two local starts. This is not a global or
 dynamic impossibility proof, nor a test of the actual interpolated target at
 every instant. Arm action clipping is 19.6%; causal isolation is still pending.
-Eight focused tests pass. Next prepare a prospective matched motor-only versus
-guard-only comparison before redesigning the cycle. No job is active.
+Eight focused tests passed that audit. The subsequent
+[matched motor-only versus guard-only comparison](results/striking-pilot/guard-control-v1/README.md)
+is completed and independently reviewed: 8/8 motor-only survivors versus 0/8
+static-guard survivors. Four unique motor-only resets are duplicated by corner
+labels. Only the guard-acting body falls (four low pelvis, four self-leg contacts);
+six cases fall without scored contact. The full cycle is unnecessary to reproduce
+these failures; the static guard is rejected. Nine focused tests passed.
+The separately declared [two-second guard-entry probe](results/striking-pilot/guard-ramp-v1/README.md)
+is completed and independently reviewed: 0/8 survivors again, despite median
+hand tracking error improving from 5.0 to 0.99 cm. All cases reach the end of the
+command ramp before falling. Ten focused tests pass. A final assertion inherited
+the wrong episode count; its failed state/traceback are preserved and completion
+was recovered after checking all saved trials, with zero additional physics.
+Reject entry smoothing as a sufficient repair. Source/array review then confirms
+the foundation already carries a learned compact guard; the failed script asks
+for an additional 10.3–11.4 cm of hand displacement. The separately declared
+[motor-guard cycle v2](results/striking-pilot/motor-guard-cycle-v2/README.md)
+is now completed and independently reviewed: preserve that learned guard between
+extensions and return through the motor/filter. All eight pairs survive, but
+zero physical impacts, left-fist contact substeps or candidate punches occur.
+Twelve focused tests pass. Retain it only as a stable scripted control; the
+positive punch target is still missing. Next review extension timing/target lag
+and prospectively test a bounded terminal-target dwell before further training.
+No job is active; no PPO, imitation, automatic motor unfreezing or gate changes.
 
 Reviewed diagnostic PPO is **2,163,968**, at its ceiling. Formal diagnostic
-simulation is **2,034,975** after the reviewed exact replay, at its completed
-ceiling **2,034,975**. Another **4,339 cloned kinematic evaluations** are separately
+simulation is **2,047,072** after the reviewed guard comparison (6,155 controls),
+smooth-entry probe (1,942) and learned-guard cycle (4,000), at the latest completed
+ceiling **2,047,072**. Earlier unused controls expire at review; no new physical
+allocation is declared.
+Another **4,339 cloned kinematic evaluations** are separately
 recorded under a completed 20,000 ceiling; they add no physical controls.
-Unused compute expires at review and no additional PPO,
-supervised or physical replay allocation is declared by this decision.
+Unused compute expires at review. No additional PPO or supervised allocation;
+no current physical job or allocation remains.
 Unused historical comparison compute is not an automatic continuation allocation.
 The completed audit is `/home/pedro/boxing-runs/striking-punch-quality-2080768/audit.json`;
 the later demo-motion review accounts separately for its 7,500 additional controls.

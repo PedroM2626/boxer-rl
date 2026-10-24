@@ -25,7 +25,14 @@ also failed all sixteen conditions. An [exact full-body replay and workspace aud
 reproduced those failures: only the acting body terminates, with measured arm
 saturation and tracking errors. Static guard endpoints match, but dynamic
 stability remains unproven. Next isolate guard-only versus motor-only behavior
-before redesign or further PPO. General boxing remains
+before redesign or further PPO. The [reviewed motor/guard comparison](docs/results/striking-pilot/guard-control-v1/README.md)
+finds 8/8 motor-only survivors versus 0/8 static-guard survivors. A
+[reviewed two-second entry probe](docs/results/striking-pilot/guard-ramp-v1/README.md)
+also fails 0/8, despite better hand tracking. The
+[motor-guard cycle v2](docs/results/striking-pilot/motor-guard-cycle-v2/README.md)
+preserves the already-learned compact guard between extensions: 8/8 pairs survive,
+but zero physical impacts or candidate punches occur. Next investigate extension
+timing/target lag while retaining that stable control; no PPO job is active. General boxing remains
 uncertified, and the stopped main policy has not been replaced.
 
 An [earlier striking final](docs/striking-generalization-audit.md) passed two

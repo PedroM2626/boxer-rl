@@ -1,0 +1,1480 @@
+{
+  "status": "completed",
+  "phase": "independently_reviewed",
+  "controller_design_version": 2,
+  "pid": 396,
+  "started_utc": "2026-10-24T20:02:31.552365+00:00",
+  "diagnostic_output": "/home/pedro/boxing-runs/striking-motor-guard-cycle-v2",
+  "profile": {
+    "version": 1,
+    "guard_seconds": 0.35,
+    "extend_seconds": 0.18,
+    "retract_seconds": 0.25,
+    "rest_seconds": 0.3,
+    "engage_distance": 0.75,
+    "guard_local": [
+      0.16,
+      0.16,
+      0.12
+    ],
+    "target_torso_world_height_offset": 0.1,
+    "joint_correction_cap": 0.16,
+    "damping": 0.05,
+    "arm_residual_radians": 0.8,
+    "filter_old": 0.8,
+    "filter_new": 0.2
+  },
+  "prerequisites": {
+    "foundation": {
+      "balance": {
+        "records": 29,
+        "sha256": "8cea6a2f62ae68fd9a3118b881301785900df7d3af73322fccacfa0e2e3bc1f6"
+      },
+      "walk_easy": {
+        "records": 41,
+        "sha256": "f1e0e6f023ff4ac477171382069fe132af9180ae818b509a18c2572eca0200ee"
+      },
+      "walk": {
+        "records": 13,
+        "sha256": "d547d60455be5d8b6f9f49c7bec256cb0b0d6963e3345a7160a16f974d0c531c"
+      },
+      "approach": {
+        "records": 2,
+        "sha256": "b39b1990945e8a374802c3a190e5ac5e026ae39e7fd5ef61c5c2b01ad291c6fc"
+      }
+    },
+    "main_sha256": "efad0ccd1051ee5305d4ccf8ebbd7d0e402211f12ecd0cdf175b473b24a7b5b0"
+  },
+  "motor_sha256": "b39b1990945e8a374802c3a190e5ac5e026ae39e7fd5ef61c5c2b01ad291c6fc",
+  "source_review_sha256": "ba06b9c520f777f3379b036094508946f8a25a69b930d42bfe9c062672f17ae7",
+  "source_audit_sha256": "e7c9e94f14dd4782fc3e41428409ba589940afcb2b85847d3a88ca6cc535e998",
+  "formal_world_controls_before_job": 2043072,
+  "maximum_world_controls": 4000,
+  "formal_world_controls_ceiling": 2047072,
+  "diagnostic_world_controls": 4000,
+  "new_ppo_steps": 0,
+  "new_supervised_updates": 0,
+  "new_optimizer_updates": 0,
+  "diagnostic_ppo_retained": 2163968,
+  "main_project_consumed_retained": 476041216,
+  "main_boxing_retained": 1048576,
+  "cloned_forward_evaluations_retained": 4339,
+  "learned_controller": false,
+  "assistance": false,
+  "promotion": false,
+  "policy_adoption": "none",
+  "trials": [
+    {
+      "case": "motor_guard_jab-corner-0-seed-7-swap-0",
+      "mode": "motor_guard_jab",
+      "corner": 0,
+      "seed": 7,
+      "swap": false,
+      "controls": 500,
+      "elapsed": 10.000000000000009,
+      "survived": true,
+      "scores": [
+        0.0,
+        0.0
+      ],
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7537893075176175,
+            "upright": 0.998958751661349,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7560843721462375,
+            "upright": 0.9969801190191538,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ]
+        ]
+      },
+      "events": [],
+      "candidate_events": 0,
+      "feasible_episode": false,
+      "phase_controls": {
+        "approach": 100,
+        "guard": 137,
+        "extend": 67,
+        "retract": 91,
+        "rest": 105
+      },
+      "first_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 2.2599999999999727
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 2.275999999999971
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 4.705999999999704
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 5.749999999999589
+        },
+        {
+          "geoms": [
+            "red/right_wrist_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 8.591999999999539
+        }
+      ],
+      "matched_approach_controls": 100,
+      "reference_full_trace_sha256": "281e2e22ac4abc5fcf589cc63857fe0b0af5c3019d14990ec8310eca1215071e",
+      "full_trace_file": "/home/pedro/boxing-runs/striking-motor-guard-cycle-v2/full/motor_guard_jab-corner-0-seed-7-swap-0.npz",
+      "full_trace_sha256": "2ab43a8192b343088259994048fbe7873ea502f59da3ada08f92c9d8da3e465f",
+      "native_trace_file": "/home/pedro/boxing-runs/striking-motor-guard-cycle-v2/native/motor_guard_jab-corner-0-seed-7-swap-0.npz",
+      "native_trace_sha256": "cb59e67aadf0a7e220d40a47820295e864ae2a5fc79d6f09b80bee1a82e5a3bb"
+    },
+    {
+      "case": "motor_guard_jab-corner-0-seed-7-swap-1",
+      "mode": "motor_guard_jab",
+      "corner": 0,
+      "seed": 7,
+      "swap": true,
+      "controls": 500,
+      "elapsed": 10.000000000000009,
+      "survived": true,
+      "scores": [
+        0.0,
+        0.0
+      ],
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7546987175011466,
+            "upright": 0.9942145434696651,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.756505324176984,
+            "upright": 0.9996287992643553,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ]
+        ]
+      },
+      "events": [],
+      "candidate_events": 0,
+      "feasible_episode": false,
+      "phase_controls": {
+        "approach": 79,
+        "guard": 137,
+        "extend": 72,
+        "retract": 104,
+        "rest": 108
+      },
+      "first_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 1.8300000000000014
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 1.8420000000000014
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 4.28799999999975
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 6.379999999999519
+        },
+        {
+          "geoms": [
+            "red/right_wrist_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 7.093999999999441
+        }
+      ],
+      "matched_approach_controls": 79,
+      "reference_full_trace_sha256": "3c0d84e5eae7ad09678d4f73f6d2c79931d851ce4faadae30fd0816838c5fab5",
+      "full_trace_file": "/home/pedro/boxing-runs/striking-motor-guard-cycle-v2/full/motor_guard_jab-corner-0-seed-7-swap-1.npz",
+      "full_trace_sha256": "55476f55bb9f6736c3386f64e5004b26dd8b54b14060166308effaa94a35ad2b",
+      "native_trace_file": "/home/pedro/boxing-runs/striking-motor-guard-cycle-v2/native/motor_guard_jab-corner-0-seed-7-swap-1.npz",
+      "native_trace_sha256": "9cb41bd81c2798f7c9ecd5e3f7d3f7649805604f8d8bab41cab501d9119bcf95"
+    },
+    {
+      "case": "motor_guard_jab-corner-0-seed-23-swap-0",
+      "mode": "motor_guard_jab",
+      "corner": 0,
+      "seed": 23,
+      "swap": false,
+      "controls": 500,
+      "elapsed": 10.000000000000009,
+      "survived": true,
+      "scores": [
+        0.0,
+        0.0
+      ],
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7545084629237953,
+            "upright": 0.9895388476468893,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7561297520469279,
+            "upright": 0.9999140589248307,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ]
+        ]
+      },
+      "events": [],
+      "candidate_events": 0,
+      "feasible_episode": false,
+      "phase_controls": {
+        "approach": 83,
+        "guard": 137,
+        "extend": 72,
+        "retract": 103,
+        "rest": 105
+      },
+      "first_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.04200000000000002
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 1.9220000000000015
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 1.9380000000000015
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 4.359999999999742
+        },
+        {
+          "geoms": [
+            "red/right_wrist_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 6.217999999999537
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 6.439999999999513
+        }
+      ],
+      "matched_approach_controls": 83,
+      "reference_full_trace_sha256": "ae453f0447fc338beb46608d0520ab7a231d2addcb144031bbe2652995d8330f",
+      "full_trace_file": "/home/pedro/boxing-runs/striking-motor-guard-cycle-v2/full/motor_guard_jab-corner-0-seed-23-swap-0.npz",
+      "full_trace_sha256": "b1b93f8a5a4c275bd0cb6a06db40454a211f79be4d48594ea8e7ded0efdc35be",
+      "native_trace_file": "/home/pedro/boxing-runs/striking-motor-guard-cycle-v2/native/motor_guard_jab-corner-0-seed-23-swap-0.npz",
+      "native_trace_sha256": "2c9d6d5e4720cdc89465fcc908059891027a5ae973fdd4d6e43788171e18f4e0"
+    },
+    {
+      "case": "motor_guard_jab-corner-0-seed-23-swap-1",
+      "mode": "motor_guard_jab",
+      "corner": 0,
+      "seed": 23,
+      "swap": true,
+      "controls": 500,
+      "elapsed": 10.000000000000009,
+      "survived": true,
+      "scores": [
+        0.0,
+        0.0
+      ],
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7495195106494807,
+            "upright": 0.9940320133775571,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7569069997083533,
+            "upright": 0.9985392101733939,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ]
+        ]
+      },
+      "events": [],
+      "candidate_events": 0,
+      "feasible_episode": false,
+      "phase_controls": {
+        "approach": 89,
+        "guard": 137,
+        "extend": 72,
+        "retract": 97,
+        "rest": 105
+      },
+      "first_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.19600000000000015
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 2.0519999999999956
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 2.055999999999995
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 4.367999999999741
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/left_shin"
+          ],
+          "elapsed": 5.121999999999658
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 5.175999999999652
+        },
+        {
+          "geoms": [
+            "red/left_wrist_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 5.539999999999612
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/torso_collision"
+          ],
+          "elapsed": 5.723999999999592
+        },
+        {
+          "geoms": [
+            "red/right_wrist_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 6.1519999999995445
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 6.64399999999949
+        }
+      ],
+      "matched_approach_controls": 89,
+      "reference_full_trace_sha256": "a4f9f865e983091afccb4d7950fba4460bc93937f18e55f261a8094bf99e70ce",
+      "full_trace_file": "/home/pedro/boxing-runs/striking-motor-guard-cycle-v2/full/motor_guard_jab-corner-0-seed-23-swap-1.npz",
+      "full_trace_sha256": "be4ef0ea5759de70898ab6ba367384d25801577379671470f58f621fab05b8d1",
+      "native_trace_file": "/home/pedro/boxing-runs/striking-motor-guard-cycle-v2/native/motor_guard_jab-corner-0-seed-23-swap-1.npz",
+      "native_trace_sha256": "45a78782109542dcda1dcb778353c4ad027bdd66dc68b77237eead7caa1e4939"
+    },
+    {
+      "case": "motor_guard_jab-corner-1-seed-7-swap-0",
+      "mode": "motor_guard_jab",
+      "corner": 1,
+      "seed": 7,
+      "swap": false,
+      "controls": 500,
+      "elapsed": 10.000000000000009,
+      "survived": true,
+      "scores": [
+        0.0,
+        0.0
+      ],
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7556682840413277,
+            "upright": 0.997052812472146,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7560074784064297,
+            "upright": 0.9998211800302158,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ]
+        ]
+      },
+      "events": [],
+      "candidate_events": 0,
+      "feasible_episode": false,
+      "phase_controls": {
+        "approach": 100,
+        "guard": 137,
+        "extend": 67,
+        "retract": 91,
+        "rest": 105
+      },
+      "first_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 2.2599999999999727
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 2.275999999999971
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 4.713999999999703
+        },
+        {
+          "geoms": [
+            "red/right_wrist_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 6.8239999999994705
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 8.755999999999593
+        }
+      ],
+      "matched_approach_controls": 100,
+      "reference_full_trace_sha256": "42a51b2454e867b62625a4409c9f50e6912f3508efe2af80c186379c8e5d9310",
+      "full_trace_file": "/home/pedro/boxing-runs/striking-motor-guard-cycle-v2/full/motor_guard_jab-corner-1-seed-7-swap-0.npz",
+      "full_trace_sha256": "50ed18b7f31868840a92d29719099aa751db42353e49efb7dafed9f309351472",
+      "native_trace_file": "/home/pedro/boxing-runs/striking-motor-guard-cycle-v2/native/motor_guard_jab-corner-1-seed-7-swap-0.npz",
+      "native_trace_sha256": "211cc225c14b6369f24acd29f076bd38ac342a3db3cea0318b8bfbe45d52b71a"
+    },
+    {
+      "case": "motor_guard_jab-corner-1-seed-7-swap-1",
+      "mode": "motor_guard_jab",
+      "corner": 1,
+      "seed": 7,
+      "swap": true,
+      "controls": 500,
+      "elapsed": 10.000000000000009,
+      "survived": true,
+      "scores": [
+        0.0,
+        0.0
+      ],
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7556020248597871,
+            "upright": 0.9990514975895176,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.765821277027043,
+            "upright": 0.9907633967610128,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ]
+        ]
+      },
+      "events": [],
+      "candidate_events": 0,
+      "feasible_episode": false,
+      "phase_controls": {
+        "approach": 79,
+        "guard": 137,
+        "extend": 72,
+        "retract": 104,
+        "rest": 108
+      },
+      "first_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 1.8300000000000014
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 1.8420000000000014
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 4.277999999999751
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 6.129999999999547
+        },
+        {
+          "geoms": [
+            "red/right_wrist_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 6.345999999999523
+        }
+      ],
+      "matched_approach_controls": 79,
+      "reference_full_trace_sha256": "bc26c0d7bb157f700ff4cdfd1f388400326954489ced9537cef82ccea804a9a9",
+      "full_trace_file": "/home/pedro/boxing-runs/striking-motor-guard-cycle-v2/full/motor_guard_jab-corner-1-seed-7-swap-1.npz",
+      "full_trace_sha256": "d839975699e80a4cd8d152cb75423cd7176c92a16de66eccb16b9b2c41464dea",
+      "native_trace_file": "/home/pedro/boxing-runs/striking-motor-guard-cycle-v2/native/motor_guard_jab-corner-1-seed-7-swap-1.npz",
+      "native_trace_sha256": "1cf4ab52cf26b3dd2e02cd3b014453e5ab95eb28bcac320441aa747f23378439"
+    },
+    {
+      "case": "motor_guard_jab-corner-1-seed-23-swap-0",
+      "mode": "motor_guard_jab",
+      "corner": 1,
+      "seed": 23,
+      "swap": false,
+      "controls": 500,
+      "elapsed": 10.000000000000009,
+      "survived": true,
+      "scores": [
+        0.0,
+        0.0
+      ],
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7555537027136359,
+            "upright": 0.9978080645532205,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7571410263285182,
+            "upright": 0.9936824675539578,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ]
+        ]
+      },
+      "events": [],
+      "candidate_events": 0,
+      "feasible_episode": false,
+      "phase_controls": {
+        "approach": 83,
+        "guard": 137,
+        "extend": 72,
+        "retract": 103,
+        "rest": 105
+      },
+      "first_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.04200000000000002
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 1.9220000000000015
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 1.9380000000000015
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 4.3539999999997425
+        },
+        {
+          "geoms": [
+            "red/right_wrist_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 5.363999999999631
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 6.1339999999995465
+        }
+      ],
+      "matched_approach_controls": 83,
+      "reference_full_trace_sha256": "bb06d89532d4f9b72f02262834326044ebde940387b443f7bc3ca51c376ba61b",
+      "full_trace_file": "/home/pedro/boxing-runs/striking-motor-guard-cycle-v2/full/motor_guard_jab-corner-1-seed-23-swap-0.npz",
+      "full_trace_sha256": "fc6887fa97d799b28b595c2cec16d11377379907fc431b8bea614d43c245693d",
+      "native_trace_file": "/home/pedro/boxing-runs/striking-motor-guard-cycle-v2/native/motor_guard_jab-corner-1-seed-23-swap-0.npz",
+      "native_trace_sha256": "858a8fb9fe3ff9ac2de4c38179d3143a4e9232fe69f007eaea7f1b987e0d6456"
+    },
+    {
+      "case": "motor_guard_jab-corner-1-seed-23-swap-1",
+      "mode": "motor_guard_jab",
+      "corner": 1,
+      "seed": 23,
+      "swap": true,
+      "controls": 500,
+      "elapsed": 10.000000000000009,
+      "survived": true,
+      "scores": [
+        0.0,
+        0.0
+      ],
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7558907665566658,
+            "upright": 0.9994891919603636,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.749764737181523,
+            "upright": 0.9946375502468051,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ]
+        ]
+      },
+      "events": [],
+      "candidate_events": 0,
+      "feasible_episode": false,
+      "phase_controls": {
+        "approach": 89,
+        "guard": 137,
+        "extend": 72,
+        "retract": 97,
+        "rest": 105
+      },
+      "first_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.19600000000000015
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 2.0519999999999956
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 2.055999999999995
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 4.46399999999973
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 5.355999999999632
+        },
+        {
+          "geoms": [
+            "red/right_wrist_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 5.455999999999621
+        }
+      ],
+      "matched_approach_controls": 89,
+      "reference_full_trace_sha256": "051434170694ccdf8f649df7c6e8211af566917eac3c9532b5537b138e4798ce",
+      "full_trace_file": "/home/pedro/boxing-runs/striking-motor-guard-cycle-v2/full/motor_guard_jab-corner-1-seed-23-swap-1.npz",
+      "full_trace_sha256": "7e391cef2330346fea764922e1445757d0fccbfa86a9ef45cf69ec1f78bff1d0",
+      "native_trace_file": "/home/pedro/boxing-runs/striking-motor-guard-cycle-v2/native/motor_guard_jab-corner-1-seed-23-swap-1.npz",
+      "native_trace_sha256": "f799bd5575d4435a586c3e22bbfbaa413314df17430fd375673f9a23ab1b89b4"
+    }
+  ],
+  "active_case": "motor_guard_jab-corner-1-seed-23-swap-1",
+  "updated_utc": "2026-10-24T20:03:14.387650+00:00",
+  "formal_world_controls_total": 2047072,
+  "reviewed_utc": "2026-10-24T20:03:43.074849+00:00"
+}
