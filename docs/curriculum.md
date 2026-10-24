@@ -25,7 +25,11 @@ Adam/normalizer/samplers and consumed prefixes. Three hashed archived opponents
 retain independent normalization and exact per-opponent/corner physical credits.
 Both first 1,024-credit blocks passed native integrity checks; the pool's ordinary
 resume to +8,192 has also collected against all three archived policies.
-The complete independent physical gates are pending and remain unchanged.
+The pool arm completed both allocated blocks: original survival profiles were
+8/7/7 and 6/8/8 (neutral-0/neutral-1/mirror), so neither complete gate passes.
+Its fresh profiles are 8/6/5, versus source 8/6/7. The control arm remains active;
+do not infer a matched comparison result before its final independent evaluation.
+The complete physical gates remain unchanged; no new allocation is granted.
 See the [integration evidence](results/striking-pilot/pool-2064384/README.md).
 No earlier actor restoration or automatic adoption.
 

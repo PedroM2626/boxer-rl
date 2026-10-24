@@ -116,8 +116,18 @@ The next ordinary pool resume reached +8,192 with actor/critic counts
 Its 4,096 new active credits cover all three archived opponents, by corner:
 [[756,875], [1461,877], [0,127]]. This verifies native diversity and warm-resume
 accounting; uneven coverage in this small allocation is retained rather than
-reseeded. The corresponding complete screen remains pending. Initial evidence
+reseeded. Initial evidence
 is [archived here](results/striking-pilot/pool-2064384/README.md).
+
+The 2026-10-24 15:44 UTC [partial review](results/striking-pilot/pool-2064384/monitor-20261024T1544.json)
+checks both completed pool screens (8/7/7, then 6/8/8) and fresh 8/6/5 survival.
+Every complete set fails; no promotion or adoption. The matched control remains
+active within its original ceiling. Keep it running, then review both actual
+finals before any new allocation; do not restore the source or earlier pool actor.
+The read-only monitor consumed zero new physics/optimization. Its initial missing
+CPU backend produced GPU allocation diagnostics; explicit CPU revalidation passed,
+and native job logs remain empty. The completion reviewer now selects CPU by
+default and rejects other explicit backends before loading JAX.
 
 Main boxing 1,048,576, foundation 474,992,640, combined main 476,041,216 and
 standalone BC 8,000 remain unchanged. This experiment cannot certify sustained

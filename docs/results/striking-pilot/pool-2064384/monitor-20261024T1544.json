@@ -1,0 +1,191 @@
+{
+  "status": "partial_monitor_review_control_still_active",
+  "reviewed_utc": "2026-10-24T15:45:00.760056+00:00",
+  "comparison_status": "running",
+  "main_adoption": false,
+  "promotion": false,
+  "new_physical_controls_for_monitor": 0,
+  "new_optimizer_updates_for_monitor": 0,
+  "review_backend": "cpu",
+  "native_training_and_evaluation_error_logs_empty": true,
+  "arms": [
+    {
+      "arm": "pool",
+      "sha256": "d93a000802e111a8c2a7c0a2902c9612add2edca57ec8a3d9e77b90ee785def5",
+      "new_completed_ppo_steps": 16384,
+      "finite_checkpoint": true,
+      "gates": [
+        {
+          "new_ppo_steps": 8192,
+          "sha256": "5e6a6ba7b8ea71f63e5bc7f9847c408f977df53d968c0c1517f1808431d1c5ae",
+          "screen": {
+            "profiles": {
+              "neutral-0": {
+                "pair_survivors": 8,
+                "own_surviving_scoring_seeds": [
+                  7,
+                  23,
+                  31,
+                  47
+                ],
+                "surviving_events_by_corner": [
+                  11.0,
+                  0.0
+                ],
+                "surviving_two_way_episodes": 0,
+                "passes_profile": true
+              },
+              "neutral-1": {
+                "pair_survivors": 7,
+                "own_surviving_scoring_seeds": [
+                  7,
+                  31,
+                  47
+                ],
+                "surviving_events_by_corner": [
+                  0.0,
+                  9.0
+                ],
+                "surviving_two_way_episodes": 0,
+                "passes_profile": false
+              },
+              "selfplay": {
+                "pair_survivors": 7,
+                "own_surviving_scoring_seeds": [
+                  7,
+                  23,
+                  31
+                ],
+                "surviving_events_by_corner": [
+                  3.0,
+                  5.0
+                ],
+                "surviving_two_way_episodes": 2,
+                "passes_profile": true
+              }
+            },
+            "passes_complete": false
+          }
+        },
+        {
+          "new_ppo_steps": 16384,
+          "sha256": "d93a000802e111a8c2a7c0a2902c9612add2edca57ec8a3d9e77b90ee785def5",
+          "screen": {
+            "profiles": {
+              "neutral-0": {
+                "pair_survivors": 6,
+                "own_surviving_scoring_seeds": [
+                  23,
+                  31,
+                  47
+                ],
+                "surviving_events_by_corner": [
+                  9.0,
+                  0.0
+                ],
+                "surviving_two_way_episodes": 0,
+                "passes_profile": false
+              },
+              "neutral-1": {
+                "pair_survivors": 8,
+                "own_surviving_scoring_seeds": [
+                  7,
+                  23,
+                  31,
+                  47
+                ],
+                "surviving_events_by_corner": [
+                  0.0,
+                  9.0
+                ],
+                "surviving_two_way_episodes": 0,
+                "passes_profile": true
+              },
+              "selfplay": {
+                "pair_survivors": 8,
+                "own_surviving_scoring_seeds": [
+                  7,
+                  23,
+                  31,
+                  47
+                ],
+                "surviving_events_by_corner": [
+                  5.0,
+                  6.0
+                ],
+                "surviving_two_way_episodes": 1,
+                "passes_profile": true
+              }
+            },
+            "passes_complete": false
+          }
+        }
+      ],
+      "fresh": {
+        "profiles": {
+          "neutral-0": {
+            "pair_survivors": 8,
+            "own_surviving_scoring_seeds": [
+              32000003,
+              32000004,
+              32000005,
+              32000006
+            ],
+            "surviving_events_by_corner": [
+              7.0,
+              0.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": true
+          },
+          "neutral-1": {
+            "pair_survivors": 6,
+            "own_surviving_scoring_seeds": [
+              32000003,
+              32000004,
+              32000005,
+              32000006
+            ],
+            "surviving_events_by_corner": [
+              0.0,
+              10.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": false
+          },
+          "selfplay": {
+            "pair_survivors": 5,
+            "own_surviving_scoring_seeds": [
+              32000003,
+              32000004,
+              32000006
+            ],
+            "surviving_events_by_corner": [
+              4.0,
+              4.0
+            ],
+            "surviving_two_way_episodes": 1,
+            "passes_profile": false
+          }
+        },
+        "passes_complete": false
+      }
+    },
+    {
+      "arm": "control",
+      "sha256": "89becbecf99c299f1952f2c05ef20e555b7d8eceab4b1b247376e6158e165db4",
+      "new_completed_ppo_steps": 8192,
+      "finite_checkpoint": true,
+      "gates": []
+    }
+  ],
+  "diagnostic_ppo_consumed_before_monitor": 2155776,
+  "formal_controls_consumed_before_monitor": 1987413,
+  "decision": "Keep the authorized control arm and full evaluations running. Pool final fails both original screens and fresh full gate; do not promote, adopt, extend or restore an earlier policy. Compare both actual finals after completion.",
+  "monitor_environment_incident": {
+    "description": "An initial read-only checker omitted JAX_PLATFORMS=cpu and emitted CUDA allocation OOM diagnostics before completing. The check was repeated on explicit CPU. The persistent learner/evaluator retain their inherited CPU environment; their native error logs remain empty.",
+    "training_intervention": false,
+    "new_physical_controls": 0,
+    "new_optimizer_updates": 0
+  }
+}

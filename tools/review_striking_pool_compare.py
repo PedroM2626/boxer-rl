@@ -2,9 +2,15 @@
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 import pickle
 import shutil
+
+# Read-only validation must not reserve GPU memory beside persistent CPU jobs.
+if os.environ.get('JAX_PLATFORMS','cpu')!='cpu':
+    raise ValueError('opponent-pool checkpoint review requires JAX_PLATFORMS=cpu')
+os.environ.setdefault('JAX_PLATFORMS','cpu')
 
 import jax
 import numpy as np
