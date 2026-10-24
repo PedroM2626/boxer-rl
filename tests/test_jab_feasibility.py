@@ -3,7 +3,7 @@ import jax.numpy as jp
 import numpy as np
 import pytest
 
-from boxer.jab_feasibility import JabFeasibility,GuardOnly,GuardRamp,MotorGuardJab,cycle_fraction
+from boxer.jab_feasibility import JabFeasibility,GuardOnly,GuardRamp,MotorGuardJab,MotorGuardDwell,cycle_fraction
 from boxer.striking_env import StrikingEnv
 from test_paired_foundation import foundation
 
@@ -80,3 +80,19 @@ def test_guard_ramp_starts_at_actual_fist_and_ends_at_original_guard(foundation)
     np.testing.assert_allclose(middle,(start+end)/2,atol=1e-14)
     env.pair.elapsed=9.;np.testing.assert_allclose(ramp.guard_target(env),end,atol=1e-14)
     np.testing.assert_array_equal(env.pair.data.qpos,before)
+
+
+def test_terminal_dwell_preserves_outbound_motion_and_releases_to_motor(foundation):
+    original=MotorGuardJab(0);dwell=MotorGuardDwell(0)
+    for t in (0.,.1,.36,.44,.52):assert dwell.phase_fraction(t)==original.phase_fraction(t)
+    for t in (.54,.60,.64):assert dwell.phase_fraction(t)==('extend',1.)
+    assert dwell.phase_fraction(.66)[0]=='retract'
+    assert dwell.phase_fraction(.95)==('rest',0.)
+    np.testing.assert_allclose(dwell.cycle_duration(),1.2)
+    env=StrikingEnv(foundation,None,motor=lambda obs,key:(jp.zeros((2,29)),{}))
+    env.reset(7);original.started=dwell.started=0.;env.pair.elapsed=.44
+    a,_=original.action(env);b,_=dwell.action(env);np.testing.assert_array_equal(a,b)
+    entry=dwell.entry_local.copy();env.pair.elapsed=.60
+    b,phase=dwell.action(env);assert phase=='extend';np.testing.assert_array_equal(dwell.entry_local,entry)
+    env.pair.elapsed=.66;b,phase=dwell.action(env);assert phase=='retract';np.testing.assert_array_equal(b,0.)
+    env.pair.elapsed=1.64;dwell.action(env);assert dwell.extension_cycle==1

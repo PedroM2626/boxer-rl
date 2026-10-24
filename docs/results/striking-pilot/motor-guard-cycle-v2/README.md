@@ -65,3 +65,9 @@ optimizer updates. No further allocation follows automatically.
 candidate criterion. [audit.json](audit.json), progress, `full/` and `native/`
 retain every trajectory and hash; `native-errors.log` is intentionally empty.
 The protocol/source implementations and all prior rejected results remain.
+
+Follow-up: the [reviewed terminal dwell](../terminal-dwell-v3/README.md) adds
+120 ms at full target and still records 8/8 survival with zero strikes. The
+[static workspace review](../terminal-workspace-v1/README.md) distinguishes
+remaining endpoint errors from the still-unmeasured legal surface gap. No
+unchanged PPO extension or positive-demo adoption is justified.

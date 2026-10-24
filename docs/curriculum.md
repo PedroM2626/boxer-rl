@@ -83,17 +83,27 @@ zero physical impacts, left-fist contact substeps or candidate punches occur.
 Twelve focused tests pass. Retain it only as a stable scripted control; the
 positive punch target is still missing. Next review extension timing/target lag
 and prospectively test a bounded terminal-target dwell before further training.
-No job is active; no PPO, imitation, automatic motor unfreezing or gate changes.
+The [terminal-target dwell comparison](striking-terminal-dwell.md) is completed
+and independently reviewed: all eight pairs survive, but zero impacts/candidate
+punches again. Thirteen focused tests pass and every original outbound prefix
+matches exactly through the first changed dwell. Reject 120 ms dwell as a
+sufficient repair. The separately declared
+[cloned terminal-workspace audit](results/striking-pilot/terminal-workspace-v1/README.md)
+is completed and independently reviewed: 24 snapshots, actual median endpoint
+error 34.9 cm versus best local static median 22.9 cm. Two starts do not prove
+global impossibility; endpoint error is not a collision-surface gap. Next inspect
+legal fist/target surface distances and blocking contacts at the recorded/best
+poses before selecting a bounded target/authority change. No job is active;
+no PPO, imitation, motor unfreezing or gate changes.
 
 Reviewed diagnostic PPO is **2,163,968**, at its ceiling. Formal diagnostic
-simulation is **2,047,072** after the reviewed guard comparison (6,155 controls),
-smooth-entry probe (1,942) and learned-guard cycle (4,000), at the latest completed
-ceiling **2,047,072**. Earlier unused controls expire at review; no new physical
-allocation is declared.
-Another **4,339 cloned kinematic evaluations** are separately
-recorded under a completed 20,000 ceiling; they add no physical controls.
+simulation is **2,051,072** after the reviewed terminal dwell adds 4,000 controls,
+at its completed physical ceiling **2,051,072**. No new physical allocation.
+Cloned kinematic evaluations are now **6,253**: prior 4,339 plus terminal-workspace
+producer 1,890 and independent review 24. Its explicit cumulative ceiling was
+**10,339**; unused compute expires at review. No new cloned allocation.
 Unused compute expires at review. No additional PPO or supervised allocation;
-no current physical job or allocation remains.
+there is no current physical or cloned job/allocation.
 Unused historical comparison compute is not an automatic continuation allocation.
 The completed audit is `/home/pedro/boxing-runs/striking-punch-quality-2080768/audit.json`;
 the later demo-motion review accounts separately for its 7,500 additional controls.

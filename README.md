@@ -32,7 +32,12 @@ also fails 0/8, despite better hand tracking. The
 [motor-guard cycle v2](docs/results/striking-pilot/motor-guard-cycle-v2/README.md)
 preserves the already-learned compact guard between extensions: 8/8 pairs survive,
 but zero physical impacts or candidate punches occur. Next investigate extension
-timing/target lag while retaining that stable control; no PPO job is active. General boxing remains
+timing/target lag while retaining that stable control. The
+[reviewed 120 ms dwell](docs/results/striking-pilot/terminal-dwell-v3/README.md)
+also survives 8/8 without physical strikes. A
+[cloned terminal-workspace review](docs/results/striking-pilot/terminal-workspace-v1/README.md)
+finds unmatched endpoints in bounded local searches; next distinguish collision
+surface reach from the commanded point before changing authority. No PPO job is active. General boxing remains
 uncertified, and the stopped main policy has not been replaced.
 
 An [earlier striking final](docs/striking-generalization-audit.md) passed two

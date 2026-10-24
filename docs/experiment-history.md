@@ -107,7 +107,33 @@ retained traces and unchanged full contact/motion/survival criteria. Wider
 holdouts remain necessary even if a later positive cycle is found. Diagnostic
 physical total is **2,047,072**, at its completed ceiling; PPO 2,163,968, cloned
 geometry 4,339, main/BC counters unchanged. Pure array measurements add no physical
-or cloned evaluation. No job is active and no new allocation is declared.
+or cloned evaluation.
+
+The subsequent [prospective terminal-dwell comparison](striking-terminal-dwell.md)
+completed all eight cases / 4,000 controls. Add 120 ms at the unchanged full-extension target, retaining the
+original outbound motion and motor-guard return. Eight matched cases, maximum
+4,000 new controls, new ceiling 2,051,072 from reviewed total 2,047,072. Thirteen
+focused tests pass. Exact full-state agreement with v2 holds through the first
+extension before the changed dwell; all complete punch criteria remain unchanged.
+All eight pairs survive, but no impacts or candidate punches occur. Reject dwell
+as a sufficient repair; no positive-demo adoption or training extension.
+
+The [reviewed terminal-workspace audit](results/striking-pilot/terminal-workspace-v1/README.md)
+completed all 24 saved snapshots with zero new physical controls. Actual median
+endpoint error is 34.9 cm; the best of two bounded local static starts has median
+22.9 cm (range 11.6–52.9). The sampled endpoint is not matched in these searches;
+two starts are not a global impossibility or dynamic reachability proof. The
+endpoint near the torso center is not its collision surface, so do not infer that
+every legal contact is unreachable from endpoint error alone.
+
+Consume 1,890 producer + 24 independent review forwards, cumulative cloned total
+**6,253**, under explicit 10,339 ceiling. Durable progress, all source snapshots,
+both solver attempts and bounds remain archived. No native errors/nonfinite
+values. Physical total **2,051,072**, PPO/main/BC counters fixed; unused budgets
+expire. Next measure legal fist/target surface gaps and blocking/inter-arm
+contacts at recorded/best poses before a prospective surface-target or authority
+intervention. Do not repeat unchanged dwell, enlarge authority blindly or resume
+training from these non-contact motions. No job or new allocation is active.
 
 ## Where to check current facts
 

@@ -57,7 +57,13 @@ compact guard. The [reviewed motor-guard cycle v2](results/striking-pilot/motor-
 preserves it between extensions and survives 8/8, but produces zero physical
 impacts or qualifying punches. Retain this stable scripted control and next
 compare extension timing/terminal-target dwell under a prospective bounded
-protocol. No positive training target or general boxing certification follows.
+protocol. The [reviewed terminal dwell](results/striking-pilot/terminal-dwell-v3/README.md)
+now retains 8/8 survival but no strikes. The
+[terminal workspace review](results/striking-pilot/terminal-workspace-v1/README.md)
+finds persistent endpoint errors in two local searches; this is not proof of
+collision-surface infeasibility. Next measure actual legal surface gaps and
+blocking contacts before another bounded target/authority intervention.
+No positive training target or general boxing certification follows.
 These references do not define every
 punch type or replace failed gates.
 

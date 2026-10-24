@@ -95,6 +95,9 @@ class MotorGuardJab(JabFeasibility):
     def __init__(self,corner):
         super().__init__(corner);self.entry_local=None;self.extension_cycle=None
 
+    def cycle_duration(self):
+        return sum(PROFILE[k] for k in ('guard_seconds','extend_seconds','retract_seconds','rest_seconds'))
+
     def action(self,env):
         pair=env.pair
         if self.started is None:
@@ -104,8 +107,7 @@ class MotorGuardJab(JabFeasibility):
             self.started=pair.elapsed
         elapsed=pair.elapsed-self.started;phase,_=self.phase_fraction(elapsed)
         if phase!='extend':return np.zeros((2,17)),phase
-        duration=sum(PROFILE[k] for k in ('guard_seconds','extend_seconds','retract_seconds','rest_seconds'))
-        cycle=int(elapsed//duration)
+        cycle=int(elapsed//self.cycle_duration())
         if self.extension_cycle!=cycle:
             self.extension_cycle=cycle
             site=pair.data.site(pair.maps[self.corner]['side']+'imu_in_torso')
@@ -116,3 +118,20 @@ class MotorGuardJab(JabFeasibility):
         if self.entry_local is None:raise ValueError('capture the learned guard before extension')
         site=env.pair.data.site(env.pair.maps[self.corner]['side']+'imu_in_torso')
         return site.xpos+site.xmat.reshape(3,3)@self.entry_local
+
+
+class MotorGuardDwell(MotorGuardJab):
+    """Diagnostic: retain the terminal extension target for another 120 ms."""
+    dwell_seconds=.12
+
+    def cycle_duration(self):return super().cycle_duration()+self.dwell_seconds
+
+    def phase_fraction(self,elapsed):
+        if not np.isfinite(elapsed) or elapsed<0:raise ValueError('nonnegative finite elapsed time required')
+        t=elapsed%self.cycle_duration();g=PROFILE['guard_seconds'];e=PROFILE['extend_seconds'];r=PROFILE['retract_seconds']
+        if t<g:return 'guard',0.
+        if t<g+e:return 'extend',float((1-np.cos(np.pi*(t-g)/e))/2)
+        if t<g+e+self.dwell_seconds:return 'extend',1.
+        if t<g+e+self.dwell_seconds+r:
+            return 'retract',float((1+np.cos(np.pi*(t-g-e-self.dwell_seconds)/r))/2)
+        return 'rest',0.
