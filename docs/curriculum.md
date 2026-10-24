@@ -1,5 +1,8 @@
 # Adaptive unassisted G1 curriculum
 
+Maintain the [trajectory and decision record](experiment-history.md) at every
+reviewed intervention, including failed results, accounting and pending evidence.
+
 **Latest reviewed outcome (2026-10-24):** the [complete GAE comparison](striking-gae-comparison.md)
 finished 168 episodes / 79,297 evaluation controls / 32,768 diagnostic PPO credits.
 Lambda .99 has fresh mirror pair survival 8/8 with six reciprocal episodes,

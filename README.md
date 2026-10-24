@@ -2,6 +2,9 @@
 
 ## Current experiment: unassisted paired boxing diagnostics
 
+See the [project trajectory and experiment index](docs/experiment-history.md)
+for reviewed successes, failed approaches, limitations and pending decisions.
+
 An [earlier striking final](docs/striking-generalization-audit.md) passed two
 distinct consecutive original complete screens, with all 24 pairs surviving in
 each. The complete 128-episode reset/opponent audit is reviewed: all four fresh

@@ -1,5 +1,8 @@
 # Learned boxing completion roadmap
 
+The [trajectory and experiment index](experiment-history.md) records reviewed
+successes, failed approaches and the documentation protocol for every continuation.
+
 Current status: the foundation is certified; paired physical boxing exists,
 but reliable reciprocal combat is not certified. Two distinct consecutive
 original ten-second full screens passed earlier; independent reset generalization
