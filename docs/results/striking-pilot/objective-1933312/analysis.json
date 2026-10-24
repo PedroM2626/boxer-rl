@@ -1,0 +1,61 @@
+{
+  "status": "reviewed",
+  "source_sha256": "c47edf0bb3abf0ad56259269d255a33fd100709f39a3abe79f314b0f49fc6be2",
+  "diagnostic_ppo_total": 1950976,
+  "formal_world_controls_total": 1470942,
+  "actual_new_evaluation_world_controls": 16384,
+  "completed_rounds": 33,
+  "open_rounds": 8,
+  "own_only_falls": 4,
+  "partner_only_falls": 1,
+  "simultaneous_falls": 0,
+  "uncharged_pair_fall_cost": 5.0,
+  "groups": [
+    {
+      "active_opponent": false,
+      "learner_corner": 0,
+      "rounds": 8,
+      "own_only_falls": 0,
+      "partner_only_falls": 0,
+      "simultaneous_falls": 0,
+      "timeouts": 8,
+      "partner_only_without_valid_strikes": 0
+    },
+    {
+      "active_opponent": false,
+      "learner_corner": 1,
+      "rounds": 8,
+      "own_only_falls": 0,
+      "partner_only_falls": 0,
+      "simultaneous_falls": 0,
+      "timeouts": 8,
+      "partner_only_without_valid_strikes": 0
+    },
+    {
+      "active_opponent": true,
+      "learner_corner": 0,
+      "rounds": 8,
+      "own_only_falls": 1,
+      "partner_only_falls": 1,
+      "simultaneous_falls": 0,
+      "timeouts": 6,
+      "partner_only_without_valid_strikes": 0
+    },
+    {
+      "active_opponent": true,
+      "learner_corner": 1,
+      "rounds": 9,
+      "own_only_falls": 3,
+      "partner_only_falls": 0,
+      "simultaneous_falls": 0,
+      "timeouts": 6,
+      "partner_only_without_valid_strikes": 0
+    }
+  ],
+  "new_optimizer_updates": 0,
+  "new_collection_world_controls": 0,
+  "main_adoption": false,
+  "promotion": false,
+  "source_checkpoint_unchanged": true,
+  "decision": "One partner-only fall confirms the objective mismatch, but four own falls dominate and neutral sampled rounds all survive; no shared-fall reward change or PPO extension follows this small frozen-policy sample. Run one matched mean-action rollout on the same latest control, immutable opponent, eight worlds and identical initial reset schedule, at most 16384 evaluation controls and zero updates. Match complete rounds by world/seed/swap, report censored unmatched tails, and separate action sampling from seed/opponent coverage before another training intervention. Retain all source and accounting state; no original-gate replacement or promotion."
+}

@@ -19,6 +19,7 @@ SHA='c47edf0bb3abf0ad56259269d255a33fd100709f39a3abe79f314b0f49fc6be2'
 def main():
     import fcntl
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--output',type=Path,required=True)
+    parser.add_argument('--mean-policy',action='store_true',help='read-only matched deterministic continuation of the reviewed sampled audit')
     args=parser.parse_args();args.output.mkdir(parents=True,exist_ok=True)
     with ExitStack() as stack:
         for p in (args.output/'.supervisor.lock',Path('runs/unassisted_boxing.lock')):
@@ -27,12 +28,18 @@ def main():
         if path.exists():raise ValueError('Objective audit exists; inspect before recovery')
         review=json.loads(Path('docs/results/striking-pilot/posture-1916928/analysis.json').read_text())
         assert review['status']=='reviewed' and review['diagnostic_ppo_total']==1950976 and review['formal_world_controls_total']==1454558
+        formal_offset=1454558
+        if args.mean_policy:
+            previous=json.loads(Path('docs/results/striking-pilot/objective-1933312/analysis.json').read_text())
+            assert previous['status']=='reviewed' and previous['formal_world_controls_total']==1470942
+            formal_offset=1470942
         saved,manifest=load_checked(SOURCE,SHA);require_ppo_checkpoint(saved)
         assert saved['consumed_steps']==saved['optimized_steps']==1933312 and not saved.get('posture_cost_ppo')
         assert fingerprint(saved['frozen_opponent'])==FROZEN_FINGERPRINT
         assert all(np.isfinite(x).all() for x in jax.tree_util.tree_leaves(tuple(saved[k] for k in ('actor','critic','optimizer','norm','key'))))
         state=dict(status='running',pid=os.getpid(),started_utc=utc(),diagnostic_output=str(args.output),source_sha256=SHA,
-            maximum_evaluation_world_controls=16384,simulated_world_transitions=0,formal_evaluation_world_controls_before_job=1454558,
+            maximum_evaluation_world_controls=16384,simulated_world_transitions=0,formal_evaluation_world_controls_before_job=formal_offset,
+            sampled_learner=not args.mean_policy,
             diagnostic_ppo_retained=1950976,new_optimizer_updates=0,new_collection_world_controls=0,new_replay_presentations=0,
             normalizer_updated=False,assistance=False,unchanged_actions_physics_rewards=True,policy_adoption='none',promotion=False,
             main_consumed_retained=1048576,main_project_consumed_retained=476041216,
@@ -48,6 +55,7 @@ def main():
             @jax.jit
             def sample(obs,key):
                 mean,std=actor.apply(saved['actor'],obs)
+                if args.mean_policy:return jp.tanh(mean)
                 return jp.tanh(mean+jp.exp(std)*jax.random.normal(key,mean.shape))
             @jax.jit
             def other_action(obs):return jp.tanh(actor.apply(other_params,obs)[0])

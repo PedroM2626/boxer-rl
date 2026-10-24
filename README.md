@@ -109,9 +109,9 @@ valid strikes remain sparse. The neutral control severely regresses. The
 further 65,536-credit mixed continuation is now completed: neither generation
 passes, and matched fresh survival regresses 21/24 to 15/24. The [repeatability outcome and generalization audit](docs/striking-generalization-audit.md)
 retain the latest final and all prefixes. Inspect
-`/home/pedro/boxing-runs/striking-objective-1933312/audit.json`
+`/home/pedro/boxing-runs/striking-objective-mean-1933312/audit.json`
 and its process before any launch. Diagnostic PPO stays 1,950,976; reviewed
-formal evaluation is 1,454,558, read-only ceiling 1,470,942. Main counters and complete
+formal evaluation is 1,470,942, matched mean-action ceiling 1,487,326. Main counters and complete
 physical criteria remain unchanged. No phase promotion or policy adoption.
 
 The [closed-fist replay repair](docs/closed-fist-rendering.md) restores the

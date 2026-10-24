@@ -11,8 +11,9 @@ All four new full screens fail, so current version-8 and version-9 pass streaks
 are zero; the earlier version-8 two-pass interval remains in history.
 Formal evaluation is **1,454,558**, diagnostic PPO **1,950,976**. A read-only
 [training-distribution objective audit](striking-objective-audit.md) from latest
-control c47edf0b measures own/partner-only fall rewards. Maximum 16,384 additional
-evaluation controls (formal ceiling **1,470,942**), zero training. Main/BC and
+control c47edf0b found four own-only and one partner-only fall in 33 completed
+sampled rounds. Formal total is now **1,470,942**. A matched mean-action rollout
+adds at most 16,384 evaluation controls (formal ceiling **1,487,326**), zero training. Main/BC and
 all physical criteria remain unchanged; no adoption or automatic extension.
 
 **Current stage (2026-10-22):** all four foundation levels are certified by
