@@ -80,3 +80,20 @@ Launch `tools/start_striking_posture_compare.ps1`, hidden persistent WSL.
 Read `/home/pedro/boxing-runs/striking-posture-1916928/comparison.json` and its
 process before any new job. Preserve the monitoring schedule; independently
 archive all arms, checkpoints, metrics, complete screens and fresh trials.
+
+## Native integration verified
+
+Twenty-one focused tests pass, including lossless source-leaf preservation,
+strict task/resume provenance, finite bounded dt-scaled cost, native state/force
+invariance while reading cost, original fixed-opponent behavior and independent
+gate rejection of masked or cross-policy diagnostic reports. Python/Bash syntax
+and PowerShell parsing pass.
+
+All 24 initial fresh source episodes completed (11,429 controls). The first
+included 1,024-credit cost-arm block completed with finite learned state, empty
+native logs, immutable frozen adversary and exact Adam/consumed prefixes. Its
+short trajectory accumulated zero cost; this demonstrates native integration,
+not an effect of the penalty or physical improvement. Original full screens and
+matched control/fresh finals are still required. Checkpoint, metric, reports and
+historical state are archived under `posture-1916928`; live state supersedes
+these snapshots. Main adoption and promotion remain false.
