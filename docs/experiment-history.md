@@ -6,7 +6,8 @@ full physical results, limitations, checkpoints and accounting remain in the
 linked reports. This index does not replace those records or the live state.
 
 Last consolidated review: **2026-10-24**, through completed consolidation, limited
-ten-second readiness verification and the authorized broader frozen audit. Reliable general boxing is **not yet
+ten-second readiness verification, reviewed broader frozen audit and planned
+opponent-pool integration. Reliable general boxing is **not yet
 certified**. The foundation is certified; paired physical exchanges exist.
 
 ## Historical corrections and retained capabilities
@@ -39,7 +40,8 @@ not change collision physics, training or scoring.
 | [Ordinary GAE continuation](striking-gae-continuation.md) | The +8,192 full screen passed with 24/24 survivors, followed by a failure at +16,384 (4/5/8); final fresh survival 7/7/8 still failed neutral-1. | Stop unchanged PPO. Version-12 history fail/fail/pass/fail, streak zero. Archive the intermediate without restoring it. |
 | [Frozen gradient/critic assay](striking-gae-gradient-audit.md) | All 12,288 diagnostic controls and twelve batches reviewed; retention norm .30-.33 versus PPO 6.93-7.99, no larger final critic/GAE error. Zero optimizer updates. | No established retention-dominance/critic-error cause; small frozen batches do not rule out longer-run effects or certify survival. |
 | [Unchanged consolidation](striking-gae-consolidation.md) | All 65,536 credits / 144 episodes reviewed; four original gates pass/fail/pass/pass, final fresh 29M complete pass (23/24 pairs). | Freeze latest bea8147f. Version-12 streak two plus one fresh group verifies limited ten-second readiness, not general boxing or main adoption. |
-| [Broader frozen audit](striking-gae-generalization.md) | Authorized four untouched full reset groups, two archived opponents/both corners and a known 29M replay illustration, maximum 65,000 controls and no optimization. | Pending complete review. All four ordinary groups and prospective cross-policy diagnostics remain separate; no automatic adoption or new training. |
+| [Broader frozen audit](striking-gae-generalization.md) | All 130 episodes / 61,934 controls reviewed. Neutral profiles all pass, active mirror 23/32 fails three full groups; three of four cross-policy diagnostics pass. | Broader boxing remains uncertified. Completed-renderer notice recovered without repeated physics; original failed state/logs and validated video retained. |
+| [Opponent-pool integration](striking-opponent-pool-plan.md) | Next authorized engineering work from latest bea8147f; source/optimizer/normalizer/sampler and per-opponent credits must be validated before a bounded comparison. | Planned implementation, no new PPO allocation or running training job claimed. Diversity is a hypothesis, not a demonstrated cure. |
 
 ## Where to check current facts
 

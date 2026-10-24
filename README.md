@@ -9,7 +9,9 @@ Latest milestone (2026-10-24): the longer-GAE candidate passed two distinct
 consecutive complete original ten-second gates and a complete fresh set (23/24
 paired survivors). Its [scope-limited readiness record](docs/results/striking-pilot/gae-readiness-certification/README.md)
 freezes latest bea8147f. A [broader frozen audit](docs/striking-gae-generalization.md)
-now tests new reset groups and archived opponents. General boxing remains
+completed new reset/opponent checks: neutral profiles pass, but three of four
+full groups fail active combat. The next work is [opponent-pool integration](docs/striking-opponent-pool-plan.md);
+no training job or new PPO allocation is active during that engineering work. General boxing remains
 uncertified, and the stopped main policy has not been replaced.
 
 An [earlier striking final](docs/striking-generalization-audit.md) passed two

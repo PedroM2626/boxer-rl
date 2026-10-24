@@ -70,3 +70,26 @@ unchanged original full gates, GAE profile and consolidation-stop behavior.
 Python/Bash syntax and PowerShell parsing pass. The candidate and both adversary
 payload hashes/interfaces are checked before native execution. These checks do
 not replace the broader physical results or certify the project complete.
+
+## Reviewed outcome and technical recovery
+
+The [full review](results/striking-pilot/gae-generalization-2064384/README.md)
+verifies 130 episodes / 61,934 controls. All neutral profiles pass; three of four
+complete new groups fail active mirror survival. Cross-policy diagnostics pass
+three of four matchups. The prior limited readiness milestone remains valid;
+general boxing and main adoption remain unapproved.
+
+The supervisor initially stopped its bookkeeping on the completed renderer's
+specific Python fork/JAX warning. Exact replay fields and all 250 decoded MP4
+frames are verified; the original failed state/notice are preserved. Recovery
+uses zero additional physics and rejects unknown/native warnings. Formal
+simulation is 1,936,816, diagnostic PPO 2,131,200. No job is currently active.
+
+Next: [implement/test explicit opponent-pool integration](striking-opponent-pool-plan.md)
+before declaring a new bounded training budget. Do not extend unchanged training
+or restore favorable earlier actors. Preserve all counters and full gate failures.
+
+Twelve focused checks pass after the notice-handling fix, including rejection of
+unknown/native warnings and warning text with appended physics errors. The
+completed replay reports and fully decoded video remain independently required;
+recognizing the notice alone never establishes successful execution.

@@ -25,8 +25,10 @@ the source, passing checkpoint and latest final without new PPO or adoption.
 It did not establish retention dominance or larger final critic error. One
 [bounded unchanged consolidation](striking-gae-consolidation.md) completed with two distinct consecutive original complete passes and a complete
 fresh 29M pass. The [readiness scope](results/striking-pilot/gae-readiness-certification/README.md)
-is limited; a [broader frozen audit](striking-gae-generalization.md) now tests
-new full reset groups and archived opponents before any adoption or new training.
+is limited; a [broader frozen audit](striking-gae-generalization.md) completed
+new reset/opponent checks. Neutral profiles pass, but active combat fails three
+of four full groups. Next is [opponent-pool integration](striking-opponent-pool-plan.md)
+before any new bounded training allocation; no main adoption.
 See its contract for current accounting.
 
 1. Consolidate stable own strikes in both corners against a neutral partner.

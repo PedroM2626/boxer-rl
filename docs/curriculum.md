@@ -3,31 +3,34 @@
 Maintain the [trajectory and decision record](experiment-history.md) at every
 reviewed intervention, including failed results, accounting and pending evidence.
 
-**Latest verified milestone (2026-10-24):** the [unchanged consolidation](striking-gae-consolidation.md)
-completed 144 episodes / 70,222 evaluation controls / 65,536 diagnostic PPO credits.
-The last two distinct original complete gates pass, followed by a complete fresh
-29M pass (23/24 surviving pairs). All 64 update payloads are finite with exact
-prefixes and empty native error logs. Version-12 history is
-fail/fail/pass/fail/pass/fail/pass/pass, streak two. The
-[readiness record](results/striking-pilot/gae-readiness-certification/README.md)
-is limited to original ten-second repeatability plus this one fresh group.
-General boxing, broader opponents, longer rounds and unseen conditions remain
-uncertified; final mirror reciprocal episodes are only one original / three fresh.
+**Latest reviewed outcome (2026-10-24):** the
+[broader frozen audit](striking-gae-generalization.md) completed 130 episodes /
+61,934 controls with no optimization. All new neutral profiles pass (31/32 and
+32/32 pair survivors), but mirror survival 23/32 fails three of four complete
+reset groups. Three of four cross-policy diagnostics pass; training-snapshot
+corner 1 fails at 5/8. General boxing and main adoption remain unapproved.
+The earlier two distinct original complete passes plus fresh 29M pass remain a
+[limited readiness milestone](results/striking-pilot/gae-readiness-certification/README.md),
+not broader certification. Version-12 original history retains eight records/streak two.
 
-**Current operation:** freeze latest **bea8147f**, no further PPO or main adoption.
-Run the [broader frozen audit](striking-gae-generalization.md): four untouched 30M
-complete reset groups, two archived opponents / both evaluated corners on new
-31M seeds, and an exact known first-29M-seed replay illustration. All original
-full criteria stay unchanged; prospective cross-policy criteria are separate.
-No automatic promotion, opponent-pool training or further allocation.
+The supervisor's completed-renderer process notice was independently reviewed:
+replay fields match, all 250 MP4 frames decode, original failed state and warning
+are preserved. Bookkeeping recovery repeated zero physical controls. No native
+physics failure or policy corruption was found; unknown warnings remain rejected.
+
+**Current work:** [implement/test explicit opponent-pool training integration](striking-opponent-pool-plan.md)
+from latest frozen bea8147f, retaining all learned/Adam/normalizer/sampler and
+consumed prefixes. No training job is active, no new PPO budget is declared, and
+no unchanged single-opponent extension is authorized. Validate pool provenance,
+independent opponent normalization, corner-credit accounting and ordinary resume
+before defining a bounded matched comparison. Do not restore an earlier actor.
 
 Diagnostic PPO is **2,131,200**, at its ceiling. Reviewed formal diagnostic
-simulation is **1,874,882**, audit ceiling **1,939,882** (at most 65,000 controls /
-130 episodes including replay). Main boxing **1,048,576**, foundation
-**474,992,640**, combined main **476,041,216**, BC 8,000 remain unchanged.
-Inspect `/home/pedro/boxing-runs/striking-gae-generalization-2064384/audit.json`,
-processes and child logs before any launch. Consolidation is complete and
-archived. No duplicate jobs, forced rollback, blind retry or gate weakening.
+simulation is **1,936,816**, under the completed audit ceiling **1,939,882**.
+Main boxing **1,048,576**, foundation **474,992,640**, combined main **476,041,216**,
+BC 8,000 remain unchanged. Completed live audit and explicit recovery are at
+`/home/pedro/boxing-runs/striking-gae-generalization-2064384/audit.json`.
+No duplicate jobs, blind retries, weakened gates, main adoption or automatic allocation.
 
 **Current stage (2026-10-22):** all four foundation levels are certified by
 [two distinct consecutive complete physical passes](results/curriculum/foundation-certification/README.md).

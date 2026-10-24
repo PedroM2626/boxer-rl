@@ -1,5 +1,5 @@
 """Bounded unseen-reset full groups and independent learned-opponent diagnostics."""
-import argparse,json,os,subprocess,sys
+import argparse,json,os,re,subprocess,sys
 from pathlib import Path
 from boxer.checkpoint_io import atomic_json
 from boxer.curriculum_train import utc
@@ -14,6 +14,16 @@ OPPONENTS=[
     ('training_snapshot',Path('checkpoints/striking-validation/mixed-confirm-1851392/gate-8192'),'6bf3273ab5cd83e42b588403a7361140e4ee42afe0fbec20732e0a010bb34e7a'),
     ('prior_long_gae',Path('checkpoints/striking-validation/gae-1966080/long_gae/gate-16384'),'95dbdff01def598cdc907e93f1dc7bceb2f1d6b58bc22f488a1936afa86553f9')]
 VIDEO=Path('fights/striking-pilot/gae-readiness-2064384.mp4')
+
+
+def render_notice_only(text):
+    """Recognize only the exact fork/JAX process notice, never native warnings.
+
+    Callers must separately verify successful child completion, full replay
+    reports, unchanged physical results and the completed video.
+    """
+    if not text.strip():return True
+    return re.fullmatch(r"[^\n]+/subprocess\.py:\d+: RuntimeWarning: os\.fork\(\) was called\. os\.fork\(\) is incompatible with multithreaded code, and JAX is multithreaded, so this will likely lead to a deadlock\.\n  self\.pid = _fork_exec\(\n?",text) is not None
 
 
 def cross_policy_summary(rows,corner):
@@ -72,7 +82,7 @@ def main():
             cmd=[sys.executable,'-u','tools/evaluate_striking.py','--checkpoint',str(SOURCE),'--seeds','29000003',
                 '--output',str(folder/'evaluation.json'),'--progress',str(folder/'evaluation-progress.json'),'--video',str(VIDEO)]
             with (folder/'evaluation.log').open('w') as out,(folder/'errors.log').open('w') as err:subprocess.run(cmd,stdout=out,stderr=err,check=True)
-            assert not (folder/'errors.log').read_text().strip()
+            assert render_notice_only((folder/'errors.log').read_text())
             r=json.loads((folder/'evaluation.json').read_text());original=json.loads(Path('docs/results/striking-pilot/gae-consolidate-1998848/final-fresh/selfplay.json').read_text())
             expected={(t['seed'],t['swap']):t for t in original['trials'] if t['seed']==29000003}
             assert len(r['trials'])==2 and r['striking_sha256']==SHA and VIDEO.is_file()
