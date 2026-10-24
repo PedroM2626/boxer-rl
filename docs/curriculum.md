@@ -1,14 +1,15 @@
 # Adaptive unassisted G1 curriculum
 
-**Latest striking operation (2026-10-24):** the completed fixed-opponent trial
-has 23/24 fresh surviving pairs versus 12/24 current-opponent control and 20/24
-source. No complete original/fresh set passes; original-screen stability still
-regresses. One bounded [ordinary version-8 continuation](striking-fixed-opponent-comparison.md)
-uses the latest candidate final and retains its original frozen adversary and
-all optimizer prefixes. At most 32,768 new learner controls; full gates at
-+16,384/+32,768, early stops and matched fresh 19M source/final tests are required.
-Before this job: **1,877,248 diagnostic PPO / 1,217,525 evaluation controls**;
-new ceilings **1,910,016 / 1,265,525**. No main adoption or phase promotion.
+**Latest striking operation (2026-10-24):** the latest fixed-opponent final
+achieves its first complete original-screen pass: 24/24 surviving pairs, valid
+neutral-role strikes and four two-way active episodes. Fresh 19M survival is
+only 18/24, so there is no promotion or reliable-boxing claim. Full original
+history is fail/fail/fail/pass; two consecutive passes are still required.
+A [short repeatability/generalization check](striking-first-complete-pass.md)
+allocates at most 8,192 ordinary warm-start learner controls, one full original
+gate, matched source/final fresh 20M tests and an exact selected source video.
+Before this job: **1,910,016 diagnostic PPO / 1,260,949 evaluation controls**;
+new ceilings **1,918,208 / 1,297,949**. Main and all certifications stay unchanged.
 
 **Current stage (2026-10-22):** all four foundation levels are certified by
 [two distinct consecutive complete physical passes](results/curriculum/foundation-certification/README.md).

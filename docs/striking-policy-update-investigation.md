@@ -5,11 +5,10 @@ active survival regresses in both samples. See the [full result and next bounded
 fixed-opponent contract](striking-fixed-opponent-comparison.md). No modified
 yaw controller is adopted and the original physical profile remains in use.
 
-**Current decision:** the completed fixed-opponent trial improves matched fresh
-survival but passes no complete gate. One bounded ordinary version-8 confirmation
-continues its latest final with the original frozen adversary and learned prefixes
-intact. Read the [review and current contract](striking-fixed-opponent-comparison.md).
-No main adoption or promotion; all full gates and early stops remain unchanged.
+**Current decision:** the latest ordinary continuation achieves one complete
+original-screen pass but still fails independent holdouts. The
+[current short repeatability/generalization contract](striking-first-complete-pass.md)
+retains the exact final and all prefixes. No phase promotion or main adoption.
 
 ## Complete physical outcome
 

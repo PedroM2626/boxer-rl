@@ -1,9 +1,9 @@
 # Completed yaw review and bounded stationary-opponent training comparison
 
-**Current decision:** the completed matched review supports one bounded ordinary
-version-8 continuation from the latest fixed-opponent final. No complete gate
-passes. Keep the original frozen adversary, original physics and all optimizer
-prefixes; the completed outcome and new exact cap are documented below.
+**Current decision:** the latest ordinary continuation achieves one complete
+original-screen pass but still fails independent holdouts. The
+[current short repeatability/generalization contract](striking-first-complete-pass.md)
+retains the exact final and all prefixes. No phase promotion or main adoption.
 
 ## Completed controller comparison
 

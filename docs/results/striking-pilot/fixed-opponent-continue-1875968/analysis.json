@@ -1,0 +1,238 @@
+{
+  "status": "reviewed",
+  "main_adoption": false,
+  "promotion": false,
+  "diagnostic_ppo_total": 1910016,
+  "formal_world_controls_total": 1260949,
+  "actual_new_evaluation_world_controls": 43424,
+  "new_collection_world_controls": 32768,
+  "new_integrated_replay_presentations": 131072,
+  "cumulative_supervised_updates": 8000,
+  "native_error_logs_empty": true,
+  "source_fresh": {
+    "profiles": {
+      "neutral-0": {
+        "pair_survivors": 6,
+        "own_surviving_scoring_seeds": [
+          19000004,
+          19000005,
+          19000006
+        ],
+        "surviving_events_by_corner": [
+          7.0,
+          2.0
+        ],
+        "surviving_two_way_episodes": 1,
+        "passes_profile": false
+      },
+      "neutral-1": {
+        "pair_survivors": 5,
+        "own_surviving_scoring_seeds": [
+          19000006
+        ],
+        "surviving_events_by_corner": [
+          0.0,
+          2.0
+        ],
+        "surviving_two_way_episodes": 0,
+        "passes_profile": false
+      },
+      "selfplay": {
+        "pair_survivors": 6,
+        "own_surviving_scoring_seeds": [
+          19000003,
+          19000005,
+          19000006
+        ],
+        "surviving_events_by_corner": [
+          6.0,
+          4.0
+        ],
+        "surviving_two_way_episodes": 2,
+        "passes_profile": false
+      }
+    },
+    "passes_complete": false
+  },
+  "gates": [
+    {
+      "new_ppo_steps": 16384,
+      "sha256": "72090182ac18c2f489e5afc2e0d1580e963db9cdb1f96fce8ac3d2d356423d9c",
+      "screen": {
+        "profiles": {
+          "neutral-0": {
+            "pair_survivors": 5,
+            "own_surviving_scoring_seeds": [
+              23,
+              31,
+              47
+            ],
+            "surviving_events_by_corner": [
+              3.0,
+              0.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": false
+          },
+          "neutral-1": {
+            "pair_survivors": 8,
+            "own_surviving_scoring_seeds": [
+              7,
+              31
+            ],
+            "surviving_events_by_corner": [
+              0.0,
+              2.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": true
+          },
+          "selfplay": {
+            "pair_survivors": 8,
+            "own_surviving_scoring_seeds": [
+              7,
+              23,
+              31,
+              47
+            ],
+            "surviving_events_by_corner": [
+              6.0,
+              6.0
+            ],
+            "surviving_two_way_episodes": 3,
+            "passes_profile": true
+          }
+        },
+        "passes_complete": false
+      },
+      "mixed_credits_by_mode_and_corner": [
+        [
+          38297,
+          39527
+        ],
+        [
+          41169,
+          36655
+        ]
+      ]
+    },
+    {
+      "new_ppo_steps": 32768,
+      "sha256": "8003a7bfdf829141634ce63019dea82a700db79613d78afaae0974346130053b",
+      "screen": {
+        "profiles": {
+          "neutral-0": {
+            "pair_survivors": 8,
+            "own_surviving_scoring_seeds": [
+              23,
+              31,
+              47
+            ],
+            "surviving_events_by_corner": [
+              9.0,
+              0.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": true
+          },
+          "neutral-1": {
+            "pair_survivors": 8,
+            "own_surviving_scoring_seeds": [
+              7,
+              23,
+              31,
+              47
+            ],
+            "surviving_events_by_corner": [
+              0.0,
+              11.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": true
+          },
+          "selfplay": {
+            "pair_survivors": 8,
+            "own_surviving_scoring_seeds": [
+              7,
+              23,
+              31,
+              47
+            ],
+            "surviving_events_by_corner": [
+              8.0,
+              5.0
+            ],
+            "surviving_two_way_episodes": 4,
+            "passes_profile": true
+          }
+        },
+        "passes_complete": true
+      },
+      "mixed_credits_by_mode_and_corner": [
+        [
+          42393,
+          43623
+        ],
+        [
+          45702,
+          40314
+        ]
+      ]
+    }
+  ],
+  "foundation_history_records": {
+    "balance": 29,
+    "walk_easy": 41,
+    "walk": 13,
+    "approach": 2
+  },
+  "final_fresh": {
+    "profiles": {
+      "neutral-0": {
+        "pair_survivors": 5,
+        "own_surviving_scoring_seeds": [
+          19000003,
+          19000006
+        ],
+        "surviving_events_by_corner": [
+          3.0,
+          0.0
+        ],
+        "surviving_two_way_episodes": 0,
+        "passes_profile": false
+      },
+      "neutral-1": {
+        "pair_survivors": 7,
+        "own_surviving_scoring_seeds": [
+          19000004,
+          19000005,
+          19000006
+        ],
+        "surviving_events_by_corner": [
+          0.0,
+          6.0
+        ],
+        "surviving_two_way_episodes": 0,
+        "passes_profile": false
+      },
+      "selfplay": {
+        "pair_survivors": 6,
+        "own_surviving_scoring_seeds": [
+          19000003,
+          19000004,
+          19000005,
+          19000006
+        ],
+        "surviving_events_by_corner": [
+          11.0,
+          11.0
+        ],
+        "surviving_two_way_episodes": 2,
+        "passes_profile": false
+      }
+    },
+    "passes_complete": false
+  },
+  "original_complete_pass_streak": 1,
+  "decision": "The latest final achieves its first complete original-screen pass (24/24 surviving pairs), but has only one consecutive pass and fresh 19M survival is 18/24 versus 17/24 source. No phase promotion or main adoption. Permit one 8192-credit ordinary version-8 confirmation from this exact latest final, retain the original frozen adversary and every prefix. One full original gate at +8192 and source/final fresh 20M complete sets, plus a checked two-episode video replay of seed 7 at the source. Maximum 37000 evaluation controls; no automatic further allocation. Original-screen repeatability and independent generalization must both be reviewed before certification."
+}

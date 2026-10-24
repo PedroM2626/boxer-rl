@@ -26,3 +26,15 @@ and launch snapshots record this proof. The existing source certification is
 not upgraded; no optimizer reset, forced rollback or task transition is applied.
 Launch files are historical: use the actual process, child progress, logs and
 all complete gates for ongoing decisions and consumed-step accounting.
+
+## Completed independent review
+
+All 96 episodes / 43,424 evaluation controls, two exact gate payloads, 32 finite
+PPO blocks and empty native logs are verified. Frozen opponent, main hash and
+complete foundation histories remain intact. +16,384 fails; +32,768 achieves the
+first complete original-screen pass, with all 24 pairs surviving and active
+red/blue impacts 8/5 in four two-way episodes. Original full history is
+fail/fail/fail/pass, so only one consecutive pass. Fresh source/final survival
+17/24 / 18/24 still fails. No promotion or main adoption. Global diagnostic totals
+1,910,016 PPO / 1,260,949 formal controls. New collection/replay 32,768 / 131,072
+are separate. See `docs/striking-first-complete-pass.md` for the short next cap.
