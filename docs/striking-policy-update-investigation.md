@@ -6,9 +6,11 @@ fixed-opponent contract](striking-fixed-opponent-comparison.md). No modified
 yaw controller is adopted and the original physical profile remains in use.
 
 **Current decision:** two original complete screens now pass consecutively,
-but fresh 20M neutral-0 still fails. The [larger independent reset/opponent
-audit](striking-generalization-audit.md) measures remaining generalization
-with zero optimization. No main adoption or phase promotion.
+but independent generalization still fails. The complete [128-episode
+reset/opponent audit](striking-generalization-audit.md) is reviewed; all four
+new full groups fail. A [matched motor-floor diagnostic](striking-motor-floor-audit.md)
+now separates inherited motor/reset failures from head/contact failures with
+zero optimization. No main adoption or phase promotion.
 
 ## Complete physical outcome
 

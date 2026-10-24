@@ -96,3 +96,39 @@ Reports and historical launch/validation state are archived under
 `generalization-1916928`. All remaining opponents and four independent full
 groups must finish before a training-coverage decision. Live progress supersedes
 those snapshots; no new optimizer or collection transitions are counted.
+
+## Complete independent review and continuation decision
+
+The complete audit finished normally. `tools/review_striking_generalization.py`
+independently rechecks all 128 episodes, exact source/opponent hashes, complete
+seed/swap coverage, controller markers, finite learned state, empty native logs,
+four foundation histories and payloads, main boxing hash and the unchanged
+five-record original history. All raw JSON reports and the independent analysis
+are archived in [generalization-1916928](results/striking-pilot/generalization-1916928/analysis.json).
+
+| Fresh group | Neutral-0 survival | Neutral-1 survival | Mirror survival | Complete pass |
+| --- | --- | --- | --- | --- |
+| 0 | 7/8 | 6/8 | 7/8 | No |
+| 1 | 5/8 | 8/8 | 5/8 | No |
+| 2 | 7/8 | 7/8 | 5/8 | No |
+| 3 | 6/8 | 5/8 | 7/8 | No |
+
+The descriptive totals are 25/32, 26/32 and 24/32; they do not replace the
+unchanged full criteria. Surviving mirror rounds contain 23 red / 29 blue valid
+impacts and 12 two-way exchanges. Neutral-0 first falls are learner five / partner
+two; neutral-1 learner five / partner one. Some failures occur early at large
+separation, so contact cannot be assumed to explain every fall.
+
+Cross-policy pair survival is 24/32. The latest evaluated policy first falls
+three times and the archived opponents five times. Against the training snapshot,
+latest-corner-0/1 pair survival is 6/8 and 7/8; against the prior learner it is
+4/8 and 7/8. These limited matches expose instability and do not establish a
+general opponent league or certify ordinary mirrored gates.
+
+Actual cost is **55,067** evaluation controls, formal total **1,351,541**;
+unused capacity is unused. PPO **1,918,208**, BC 8,000, latest lineage 1,916,928,
+main boxing 1,048,576 and combined main 476,041,216 are unchanged. Preserve the
+latest 670bed08 actor and original frozen 6bf3273a opponent. No promotion,
+main adoption or identical PPO extension is justified. The next concrete step is
+the [matched motor-floor diagnostic](striking-motor-floor-audit.md), with zero
+training and explicit limits, before choosing motor versus head/opponent coverage.

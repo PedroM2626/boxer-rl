@@ -24,3 +24,19 @@ are independently checked across both corner assignments, with exact source/
 opponent hashes, finite states, original controller markers and empty native
 logs. They are archived with validation and a historical running snapshot.
 These partial integration results do not replace the full remaining audit.
+
+## Completed independent review
+
+`analysis.json` and `audit.json` now archive the full 128-episode result.
+All four disjoint full groups fail; neutral-0 / neutral-1 / mirror totals are
+25/32 / 26/32 / 24/32. Surviving mirror episodes have 23 red and 29 blue valid
+events and 12 two-way exchanges. Cross-policy pair survival is 24/32, with three
+evaluated-policy and five opposing-policy first falls. Original repeatability
+remains two distinct passes; there is no promotion or main adoption.
+
+Actual evaluation is 55,067 controls, bringing formal evaluation to 1,351,541.
+All 16 native error logs are verified empty; reports retain every failed trial.
+Foundation histories/payloads, main hash, latest/frozen hashes and finite learned
+state are independently rechecked. `validation.json` and `launch-state.json`
+above are historical integration snapshots, not current job status. The next
+bounded operation is documented in `docs/striking-motor-floor-audit.md`.
