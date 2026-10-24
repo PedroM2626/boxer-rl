@@ -1,13 +1,13 @@
 # Adaptive unassisted G1 curriculum
 
-**Latest striking operation (2026-10-23):** the confirmation stopped correctly
-at +8,192 for complete-screen stagnation. Fresh survival changes 19/24 to 18/24;
-no full gate passes. No unchanged PPO extension is allocated. A passive matched
-failure trace compares source/final, all three profiles and the same 16M seeds,
-without changing actions, physics or rewards. Read the
-[evidence and exact contract](striking-policy-update-investigation.md).
-Diagnostic totals **1,844,480 PPO / 1,084,975 formal controls**; tracing adds at
-most 24,000 evaluation controls (ceiling **1,108,975**) and zero optimization.
+**Latest striking operation (2026-10-24):** all 48 passive failure replays
+exactly match original physical outcomes. Of 11 falls, ten involve low pelvis,
+one tilt, none self-leg contact; two precede any opponent contact. A bounded
+[evaluation-only automatic-yaw comparison](striking-approach-yaw-review.md)
+tests base yaw scale 0.5 against 1.0 with unchanged learned actions, physics,
+rewards and thresholds. Modified-controller reports cannot promote a stage.
+No PPO allocation; diagnostic PPO stays **1,844,480**, formal evaluation is
+**1,106,474**, new evaluation ceiling **1,142,474** (at most 36,000 new controls).
 Main stays stopped; latest final and all consumed prefixes are retained.
 
 **Current stage (2026-10-22):** all four foundation levels are certified by

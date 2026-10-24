@@ -2,12 +2,12 @@
 
 ## Current experiment: unassisted paired boxing diagnostics
 
-The latest [policy-update investigation](docs/striking-policy-update-investigation.md)
-finds the confirmation stagnant at +8,192; no full gate passes. No further
-unchanged PPO allocation is granted. A bounded passive source/final trace now
-investigates falls, contacts and reward components without changing physics or
-actions. No current policy is certified as reliable boxing. See the
-[completion roadmap](docs/boxing-roadmap.md).
+The [completed passive failure review](docs/striking-approach-yaw-review.md)
+verifies all 48 original outcomes exactly: 11 falls, including two before contact.
+A bounded evaluation-only comparison tests smaller automatic approach yaw with
+all learned action channels and unassisted physics retained. No PPO extension
+or diagnostic controller adoption is granted. No current policy is certified
+as reliable boxing. See the [completion roadmap](docs/boxing-roadmap.md).
 
 All four [foundation stages](docs/curriculum.md) passed their unchanged complete
 physical gates twice on distinct checkpoints. Foundation learning finished at
@@ -99,14 +99,13 @@ is completed and independently reviewed: mixed fresh survival is 24/24 versus
 18/24 neutral control and 22/24 source. Neither arm passes complete criteria;
 valid strikes remain sparse. The neutral control severely regresses. The
 further 65,536-credit mixed continuation is now completed: neither generation
-passes, and matched fresh survival regresses 21/24 to 15/24. The [completed reviews](docs/striking-policy-update-investigation.md) reject the
-lower-rate branch and stop the subsequent confirmation at +8,192 for stagnation.
-A passive failure trace now compares source/final on all three profiles and
-identical 16M seeds. Inspect
-`/home/pedro/boxing-runs/striking-mixed-failure-trace-1859584/trace-review.json`
-and its process before another launch. Diagnostic totals are 1,844,480 PPO and
-1,084,975 evaluation controls; tracing adds at most 24,000 controls and no
-optimization. Main counters, physics and full gates are unchanged. No promotion.
+passes, and matched fresh survival regresses 21/24 to 15/24. The [completed failure traces and current comparison](docs/striking-approach-yaw-review.md)
+inspect instability after the stopped confirmation. All 48 passive replays are
+exact; the next diagnostic changes only base approach yaw before learned offsets.
+Inspect `/home/pedro/boxing-runs/striking-base-yaw-1859584/comparison.json`
+and its process before another launch. Diagnostic PPO stays 1,844,480; formal
+evaluation is 1,106,474 with a 1,142,474 ceiling. Main counters and physical
+criteria remain unchanged; modified reports cannot certify promotion.
 
 The [closed-fist replay repair](docs/closed-fist-rendering.md) restores the
 original visual feature without changing learning or physics. Historical videos

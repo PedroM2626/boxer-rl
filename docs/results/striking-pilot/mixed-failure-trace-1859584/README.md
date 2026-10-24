@@ -30,3 +30,16 @@ preserves the 4,000 consumed controls; it does not rerun that physics. A partial
 report is rejected rather than silently replayed. The resumed process continues
 remaining profiles with unchanged policies and the same 24,000-control total cap.
 No training, optimizer reset or physical change was introduced by this repair.
+
+## Completed independent review
+
+All six full profiles / 48 episodes are verified exact to the original fields,
+with finite checked trajectories and empty native logs. Actual consumption is
+21,499 controls, including the reused 4,000 once. There are 11 falls: ten low
+pelvis, one tilted torso, none self-leg contact; two precede interbody contact.
+`analysis.json` and `completed-trace-review.json` retain independent accounting,
+per-trial temporal/reward evidence, full history/hash checks and the bounded
+base-yaw hypothesis decision. All raw traces and six complete reports are archived.
+Global formal evaluation is now 1,106,474; diagnostic PPO remains 1,844,480.
+The next diagnostic is documented in `docs/striking-approach-yaw-review.md`;
+no unchanged optimization or policy adoption is granted by these associations.

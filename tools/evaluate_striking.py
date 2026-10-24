@@ -40,6 +40,7 @@ def main():
     parser.add_argument('--video',type=Path)
     parser.add_argument('--progress',type=Path,help='durable attempted controls for diagnostic recovery')
     parser.add_argument('--trace-directory',type=Path,help='passive observations/actions and first-contact timing')
+    parser.add_argument('--base-yaw-scale',type=float,choices=(1.,.5),default=1.,help='diagnostic-only scale of automatic approach yaw; learned offsets remain intact')
     parser.add_argument('--sampled',action='store_true',
                         help='diagnostic saved-Gaussian policy; does not replace deterministic screening')
     parser.add_argument('--arm-noise-scale',type=float,default=1.,
@@ -94,6 +95,8 @@ def main():
     contact_history=config.get('contact_history',(manifest or {}).get('contact_history',False))
     if contact_history != ((inputs,actions)==(148,17)):
         raise ValueError('contact history and interface dimensions disagree')
+    if args.base_yaw_scale!=1. and ((inputs,actions)!=(148,17) or args.checkpoint is None or args.sampled or args.zero_command_offsets or args.zero_arm_residuals):
+        raise ValueError('base-yaw probe requires deterministic contact checkpoint and no other controller ablation')
     if (inputs,actions)==(146,17):
         if body_bound!=0.:raise ValueError('legacy interface cannot carry body residual authority')
         env=StrikingEnv(foundation,params,engagement_distance=distance,
@@ -101,8 +104,13 @@ def main():
     elif (inputs,actions)==(148,17):
         if body_bound!=0.:raise ValueError('contact interface cannot carry body residual authority')
         from boxer.striking_contact import ContactAwareStrikingEnv
-        env=ContactAwareStrikingEnv(foundation,params,engagement_distance=distance,
-            engagement_reward_distance=reward_distance)
+        if args.base_yaw_scale==1.:
+            env=ContactAwareStrikingEnv(foundation,params,engagement_distance=distance,
+                engagement_reward_distance=reward_distance)
+        else:
+            from boxer.striking_yaw_diagnostic import BaseYawDiagnosticEnv
+            env=BaseYawDiagnosticEnv(foundation,params,engagement_distance=distance,
+                engagement_reward_distance=reward_distance,base_yaw_scale=args.base_yaw_scale)
     elif (inputs,actions)==(161,32):
         from boxer.striking_body import WholeBodyStrikingEnv
         env=WholeBodyStrikingEnv(foundation,params,engagement_distance=distance,
@@ -221,6 +229,7 @@ def main():
                impact_events=results[0]['impact_events'])
     atomic_json(args.output,dict(kind='striking_interface_evaluation',updated_utc=utc(),
         assistance=False,source_sha256=source['sha256'],striking_sha256=residual_hash,
+        diagnostic_base_yaw_scale=args.base_yaw_scale,
         simulated_world_transitions=transitions,optimization_transitions=0,
         scorecard_version=1,episode_seconds=args.seconds,trials=results,
         engagement_distance=distance,engagement_reward_distance=reward_distance,

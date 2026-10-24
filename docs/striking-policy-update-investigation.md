@@ -1,9 +1,9 @@
 # Mixed continuation regression and policy-update investigation
 
-**Current decision:** the confirmation stopped at +8,192 for complete-screen
-stagnation. No unchanged PPO extension is allocated. Retain its latest final and
-all consumed work. A bounded passive source/final failure trace below investigates
-timing, contacts and reward components without optimization or control changes.
+**Current decision:** the passive source/final trace completed with exact
+agreement on all 48 trials. No unchanged PPO extension is allocated. The
+[current outcome and bounded automatic-yaw probe](striking-approach-yaw-review.md)
+tests one controller-path hypothesis with fresh holdouts and zero optimization.
 No main adoption, rollback or phase promotion.
 
 ## Complete physical outcome
