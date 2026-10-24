@@ -1,0 +1,639 @@
+{
+  "read_only": true,
+  "changes_training_objective": false,
+  "rollout_rows": 1024,
+  "collection_sha256": "11ce05f2d9e1aa5b67666131ac92621aa3f5c616bd7d28ba33b0d51961194892",
+  "records": [
+    {
+      "epoch": -1,
+      "minibatch": -1,
+      "phase": "baseline",
+      "loss": null,
+      "profiles": {
+        "all": {
+          "rows": 1024,
+          "exact_gaussian_kl_mean": 0.0,
+          "exact_gaussian_kl_p95": 0.0,
+          "command_kl_mean": 0.0,
+          "arm_kl_mean": 0.0,
+          "sampled_approx_kl": 1.8573698351911916e-12,
+          "ratio_clip_fraction": 0.0
+        },
+        "neutral": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.0,
+          "exact_gaussian_kl_p95": 0.0,
+          "command_kl_mean": 0.0,
+          "arm_kl_mean": 0.0,
+          "sampled_approx_kl": 1.961985912277142e-12,
+          "ratio_clip_fraction": 0.0
+        },
+        "active": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.0,
+          "exact_gaussian_kl_p95": 0.0,
+          "command_kl_mean": 0.0,
+          "arm_kl_mean": 0.0,
+          "sampled_approx_kl": 1.752753758105241e-12,
+          "ratio_clip_fraction": 0.0
+        }
+      }
+    },
+    {
+      "epoch": 0,
+      "minibatch": 0,
+      "phase": "optimizer",
+      "loss": 0.025297701358795166,
+      "profiles": {
+        "all": {
+          "rows": 1024,
+          "exact_gaussian_kl_mean": 0.00047839130556949077,
+          "exact_gaussian_kl_p95": 0.0007563054644299099,
+          "command_kl_mean": 7.290076441550283e-05,
+          "arm_kl_mean": 0.00040549054115398794,
+          "sampled_approx_kl": 0.000540398161092871,
+          "ratio_clip_fraction": 0.0
+        },
+        "neutral": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.00048315868187012636,
+          "exact_gaussian_kl_p95": 0.0007639712391707353,
+          "command_kl_mean": 7.366673955052706e-05,
+          "arm_kl_mean": 0.0004094919423195993,
+          "sampled_approx_kl": 0.0005570680590106718,
+          "ratio_clip_fraction": 0.0
+        },
+        "active": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.00047362392926885517,
+          "exact_gaussian_kl_p95": 0.0007497149983732882,
+          "command_kl_mean": 7.21347892804786e-05,
+          "arm_kl_mean": 0.00040148913998837657,
+          "sampled_approx_kl": 0.0005237282631750703,
+          "ratio_clip_fraction": 0.0
+        }
+      }
+    },
+    {
+      "epoch": 0,
+      "minibatch": 1,
+      "phase": "optimizer",
+      "loss": 0.040813665837049484,
+      "profiles": {
+        "all": {
+          "rows": 1024,
+          "exact_gaussian_kl_mean": 0.002740683202881095,
+          "exact_gaussian_kl_p95": 0.004491584210207194,
+          "command_kl_mean": 0.00048790792692717,
+          "arm_kl_mean": 0.002252775275953925,
+          "sampled_approx_kl": 0.0030355002296835066,
+          "ratio_clip_fraction": 0.021484375
+        },
+        "neutral": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.0027265549231234192,
+          "exact_gaussian_kl_p95": 0.004500434770312178,
+          "command_kl_mean": 0.00047989032173195766,
+          "arm_kl_mean": 0.0022466646013914616,
+          "sampled_approx_kl": 0.0030959296238341526,
+          "ratio_clip_fraction": 0.0234375
+        },
+        "active": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.002754811482638771,
+          "exact_gaussian_kl_p95": 0.004485898282285694,
+          "command_kl_mean": 0.0004959255321223823,
+          "arm_kl_mean": 0.0022588859505163887,
+          "sampled_approx_kl": 0.0029750708355328614,
+          "ratio_clip_fraction": 0.01953125
+        }
+      }
+    },
+    {
+      "epoch": 0,
+      "minibatch": 2,
+      "phase": "optimizer",
+      "loss": 0.09053228795528412,
+      "profiles": {
+        "all": {
+          "rows": 1024,
+          "exact_gaussian_kl_mean": 0.006836753350525143,
+          "exact_gaussian_kl_p95": 0.011323862327707867,
+          "command_kl_mean": 0.0010524325355442503,
+          "arm_kl_mean": 0.005784320814980892,
+          "sampled_approx_kl": 0.007709927341223289,
+          "ratio_clip_fraction": 0.0986328125
+        },
+        "neutral": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.006772349690479078,
+          "exact_gaussian_kl_p95": 0.011362383772690601,
+          "command_kl_mean": 0.001033790199915245,
+          "arm_kl_mean": 0.0057385594905638325,
+          "sampled_approx_kl": 0.007846140428228142,
+          "ratio_clip_fraction": 0.103515625
+        },
+        "active": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.006901157010571207,
+          "exact_gaussian_kl_p95": 0.011254947560168867,
+          "command_kl_mean": 0.0010710748711732555,
+          "arm_kl_mean": 0.005830082139397952,
+          "sampled_approx_kl": 0.0075737142542184385,
+          "ratio_clip_fraction": 0.09375
+        }
+      }
+    },
+    {
+      "epoch": 0,
+      "minibatch": 3,
+      "phase": "optimizer",
+      "loss": 0.10030397027730942,
+      "profiles": {
+        "all": {
+          "rows": 1024,
+          "exact_gaussian_kl_mean": 0.011984491957548051,
+          "exact_gaussian_kl_p95": 0.019790752961364663,
+          "command_kl_mean": 0.0018195347562653158,
+          "arm_kl_mean": 0.010164957201282732,
+          "sampled_approx_kl": 0.014079910134137341,
+          "ratio_clip_fraction": 0.203125
+        },
+        "neutral": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.011871295577590387,
+          "exact_gaussian_kl_p95": 0.019783207403713185,
+          "command_kl_mean": 0.0017946153009381323,
+          "arm_kl_mean": 0.010076680276652254,
+          "sampled_approx_kl": 0.014065240598513065,
+          "ratio_clip_fraction": 0.2109375
+        },
+        "active": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.01209768833750571,
+          "exact_gaussian_kl_p95": 0.019764920419174232,
+          "command_kl_mean": 0.0018444542115924993,
+          "arm_kl_mean": 0.01025323412591321,
+          "sampled_approx_kl": 0.01409457966976162,
+          "ratio_clip_fraction": 0.1953125
+        }
+      }
+    },
+    {
+      "epoch": 1,
+      "minibatch": 0,
+      "phase": "optimizer",
+      "loss": -0.07563751935958862,
+      "profiles": {
+        "all": {
+          "rows": 1024,
+          "exact_gaussian_kl_mean": 0.018983574295311202,
+          "exact_gaussian_kl_p95": 0.031176998532041963,
+          "command_kl_mean": 0.0032915931533167198,
+          "arm_kl_mean": 0.015691981141994483,
+          "sampled_approx_kl": 0.02330208149468714,
+          "ratio_clip_fraction": 0.30078125
+        },
+        "neutral": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.01880690097669621,
+          "exact_gaussian_kl_p95": 0.031046475616975853,
+          "command_kl_mean": 0.003262344871549988,
+          "arm_kl_mean": 0.015544556105146223,
+          "sampled_approx_kl": 0.02281065914528422,
+          "ratio_clip_fraction": 0.3046875
+        },
+        "active": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.019160247613926196,
+          "exact_gaussian_kl_p95": 0.03126991453796151,
+          "command_kl_mean": 0.0033208414350834525,
+          "arm_kl_mean": 0.015839406178842743,
+          "sampled_approx_kl": 0.023793503844090055,
+          "ratio_clip_fraction": 0.296875
+        }
+      }
+    },
+    {
+      "epoch": 1,
+      "minibatch": 1,
+      "phase": "optimizer",
+      "loss": -0.011423945426940918,
+      "profiles": {
+        "all": {
+          "rows": 1024,
+          "exact_gaussian_kl_mean": 0.025732291939014613,
+          "exact_gaussian_kl_p95": 0.041767530710071124,
+          "command_kl_mean": 0.005072228919607784,
+          "arm_kl_mean": 0.02066006301940683,
+          "sampled_approx_kl": 0.03226821977042657,
+          "ratio_clip_fraction": 0.3837890625
+        },
+        "neutral": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.02552305386574212,
+          "exact_gaussian_kl_p95": 0.04177784712933805,
+          "command_kl_mean": 0.005029549437130708,
+          "arm_kl_mean": 0.020493504428611413,
+          "sampled_approx_kl": 0.03128926083116138,
+          "ratio_clip_fraction": 0.3671875
+        },
+        "active": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.0259415300122871,
+          "exact_gaussian_kl_p95": 0.04174975317691893,
+          "command_kl_mean": 0.00511490840208486,
+          "arm_kl_mean": 0.020826621610202243,
+          "sampled_approx_kl": 0.03324717870969175,
+          "ratio_clip_fraction": 0.400390625
+        }
+      }
+    },
+    {
+      "epoch": 1,
+      "minibatch": 2,
+      "phase": "optimizer",
+      "loss": 0.18955767154693604,
+      "profiles": {
+        "all": {
+          "rows": 1024,
+          "exact_gaussian_kl_mean": 0.02968648714590169,
+          "exact_gaussian_kl_p95": 0.04867237703348002,
+          "command_kl_mean": 0.006051275740470145,
+          "arm_kl_mean": 0.023635211405431542,
+          "sampled_approx_kl": 0.037746088694317455,
+          "ratio_clip_fraction": 0.4130859375
+        },
+        "neutral": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.029477860739963013,
+          "exact_gaussian_kl_p95": 0.047806506624713606,
+          "command_kl_mean": 0.00600315135201644,
+          "arm_kl_mean": 0.023474709387946574,
+          "sampled_approx_kl": 0.036013370850436335,
+          "ratio_clip_fraction": 0.384765625
+        },
+        "active": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.029895113551840366,
+          "exact_gaussian_kl_p95": 0.04870307120376374,
+          "command_kl_mean": 0.006099400128923852,
+          "arm_kl_mean": 0.02379571342291651,
+          "sampled_approx_kl": 0.03947880653819857,
+          "ratio_clip_fraction": 0.44140625
+        }
+      }
+    },
+    {
+      "epoch": 1,
+      "minibatch": 3,
+      "phase": "optimizer",
+      "loss": 0.06515975296497345,
+      "profiles": {
+        "all": {
+          "rows": 1024,
+          "exact_gaussian_kl_mean": 0.031835497413855586,
+          "exact_gaussian_kl_p95": 0.052084160587834355,
+          "command_kl_mean": 0.006236904219835259,
+          "arm_kl_mean": 0.025598593194020327,
+          "sampled_approx_kl": 0.040492754406728906,
+          "ratio_clip_fraction": 0.4287109375
+        },
+        "neutral": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.03164096444687092,
+          "exact_gaussian_kl_p95": 0.05247722168815243,
+          "command_kl_mean": 0.006200008942128013,
+          "arm_kl_mean": 0.025440955504742915,
+          "sampled_approx_kl": 0.037591087618620796,
+          "ratio_clip_fraction": 0.40234375
+        },
+        "active": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.03203003038084024,
+          "exact_gaussian_kl_p95": 0.05207903405802874,
+          "command_kl_mean": 0.006273799497542504,
+          "arm_kl_mean": 0.025756230883297735,
+          "sampled_approx_kl": 0.043394421194837024,
+          "ratio_clip_fraction": 0.455078125
+        }
+      }
+    },
+    {
+      "epoch": 2,
+      "minibatch": 0,
+      "phase": "optimizer",
+      "loss": 0.02748161554336548,
+      "profiles": {
+        "all": {
+          "rows": 1024,
+          "exact_gaussian_kl_mean": 0.03152299135605521,
+          "exact_gaussian_kl_p95": 0.05254877126435926,
+          "command_kl_mean": 0.006287709789157419,
+          "arm_kl_mean": 0.025235281566897794,
+          "sampled_approx_kl": 0.03991387565028961,
+          "ratio_clip_fraction": 0.4287109375
+        },
+        "neutral": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.03130875199571212,
+          "exact_gaussian_kl_p95": 0.05244293725344315,
+          "command_kl_mean": 0.006243013538550361,
+          "arm_kl_mean": 0.025065738457161764,
+          "sampled_approx_kl": 0.03566259022200725,
+          "ratio_clip_fraction": 0.396484375
+        },
+        "active": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.03173723071639831,
+          "exact_gaussian_kl_p95": 0.052526884389525186,
+          "command_kl_mean": 0.006332406039764478,
+          "arm_kl_mean": 0.025404824676633825,
+          "sampled_approx_kl": 0.04416516107857196,
+          "ratio_clip_fraction": 0.4609375
+        }
+      }
+    },
+    {
+      "epoch": 2,
+      "minibatch": 1,
+      "phase": "optimizer",
+      "loss": 0.03669320419430733,
+      "profiles": {
+        "all": {
+          "rows": 1024,
+          "exact_gaussian_kl_mean": 0.03018380996426097,
+          "exact_gaussian_kl_p95": 0.049234717325697286,
+          "command_kl_mean": 0.00588854324250357,
+          "arm_kl_mean": 0.0242952667217574,
+          "sampled_approx_kl": 0.03826953730515214,
+          "ratio_clip_fraction": 0.4189453125
+        },
+        "neutral": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.029968418318477744,
+          "exact_gaussian_kl_p95": 0.04760697561364713,
+          "command_kl_mean": 0.00582419684438671,
+          "arm_kl_mean": 0.02414422147409103,
+          "sampled_approx_kl": 0.03244634811804764,
+          "ratio_clip_fraction": 0.384765625
+        },
+        "active": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.030399201610044196,
+          "exact_gaussian_kl_p95": 0.049983717862457866,
+          "command_kl_mean": 0.0059528896406204285,
+          "arm_kl_mean": 0.02444631196942377,
+          "sampled_approx_kl": 0.04409272649225664,
+          "ratio_clip_fraction": 0.453125
+        }
+      }
+    },
+    {
+      "epoch": 2,
+      "minibatch": 2,
+      "phase": "optimizer",
+      "loss": -0.02733607217669487,
+      "profiles": {
+        "all": {
+          "rows": 1024,
+          "exact_gaussian_kl_mean": 0.028763744888040472,
+          "exact_gaussian_kl_p95": 0.044803154952233394,
+          "command_kl_mean": 0.005662935173571462,
+          "arm_kl_mean": 0.02310080971446901,
+          "sampled_approx_kl": 0.036610391689056394,
+          "ratio_clip_fraction": 0.4169921875
+        },
+        "neutral": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.028532400746854134,
+          "exact_gaussian_kl_p95": 0.04358308585924937,
+          "command_kl_mean": 0.005558528434674432,
+          "arm_kl_mean": 0.022973872312179705,
+          "sampled_approx_kl": 0.029374995276633516,
+          "ratio_clip_fraction": 0.3671875
+        },
+        "active": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.02899508902922681,
+          "exact_gaussian_kl_p95": 0.046810814859817335,
+          "command_kl_mean": 0.005767341912468493,
+          "arm_kl_mean": 0.02322774711675832,
+          "sampled_approx_kl": 0.043845788101479266,
+          "ratio_clip_fraction": 0.466796875
+        }
+      }
+    },
+    {
+      "epoch": 2,
+      "minibatch": 3,
+      "phase": "optimizer",
+      "loss": 0.06995805352926254,
+      "profiles": {
+        "all": {
+          "rows": 1024,
+          "exact_gaussian_kl_mean": 0.027085583935580228,
+          "exact_gaussian_kl_p95": 0.044443300929896935,
+          "command_kl_mean": 0.005509329186845935,
+          "arm_kl_mean": 0.021576254748734296,
+          "sampled_approx_kl": 0.03500859835455587,
+          "ratio_clip_fraction": 0.4072265625
+        },
+        "neutral": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.02689090131293321,
+          "exact_gaussian_kl_p95": 0.04306273333768611,
+          "command_kl_mean": 0.005376728642028048,
+          "arm_kl_mean": 0.021514172670905163,
+          "sampled_approx_kl": 0.027032322235221215,
+          "ratio_clip_fraction": 0.359375
+        },
+        "active": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.02728026655822725,
+          "exact_gaussian_kl_p95": 0.046454447632237085,
+          "command_kl_mean": 0.005641929731663824,
+          "arm_kl_mean": 0.021638336826563426,
+          "sampled_approx_kl": 0.04298487447389054,
+          "ratio_clip_fraction": 0.455078125
+        }
+      }
+    },
+    {
+      "epoch": 3,
+      "minibatch": 0,
+      "phase": "optimizer",
+      "loss": 0.0428149551153183,
+      "profiles": {
+        "all": {
+          "rows": 1024,
+          "exact_gaussian_kl_mean": 0.026415257194023798,
+          "exact_gaussian_kl_p95": 0.045660130867868395,
+          "command_kl_mean": 0.006007114461079776,
+          "arm_kl_mean": 0.020408142732944026,
+          "sampled_approx_kl": 0.03498139617780714,
+          "ratio_clip_fraction": 0.3955078125
+        },
+        "neutral": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.026228260584135223,
+          "exact_gaussian_kl_p95": 0.04467998541188002,
+          "command_kl_mean": 0.005842669324749736,
+          "arm_kl_mean": 0.020385591259385487,
+          "sampled_approx_kl": 0.026590217551264346,
+          "ratio_clip_fraction": 0.35546875
+        },
+        "active": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.02660225380391238,
+          "exact_gaussian_kl_p95": 0.04689217990482613,
+          "command_kl_mean": 0.006171559597409816,
+          "arm_kl_mean": 0.02043069420650256,
+          "sampled_approx_kl": 0.043372574804349945,
+          "ratio_clip_fraction": 0.435546875
+        }
+      }
+    },
+    {
+      "epoch": 3,
+      "minibatch": 1,
+      "phase": "optimizer",
+      "loss": -0.005052462220191956,
+      "profiles": {
+        "all": {
+          "rows": 1024,
+          "exact_gaussian_kl_mean": 0.026257504888511952,
+          "exact_gaussian_kl_p95": 0.046754522429942796,
+          "command_kl_mean": 0.006256935068016792,
+          "arm_kl_mean": 0.020000569820495157,
+          "sampled_approx_kl": 0.03577531734412508,
+          "ratio_clip_fraction": 0.40234375
+        },
+        "neutral": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.026119346297769803,
+          "exact_gaussian_kl_p95": 0.0468896742966331,
+          "command_kl_mean": 0.006092109843848052,
+          "arm_kl_mean": 0.020027236453921755,
+          "sampled_approx_kl": 0.02732140835164846,
+          "ratio_clip_fraction": 0.369140625
+        },
+        "active": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.02639566347925409,
+          "exact_gaussian_kl_p95": 0.04669120417686295,
+          "command_kl_mean": 0.00642176029218553,
+          "arm_kl_mean": 0.019973903187068563,
+          "sampled_approx_kl": 0.0442292263366017,
+          "ratio_clip_fraction": 0.435546875
+        }
+      }
+    },
+    {
+      "epoch": 3,
+      "minibatch": 2,
+      "phase": "optimizer",
+      "loss": 0.037910256534814835,
+      "profiles": {
+        "all": {
+          "rows": 1024,
+          "exact_gaussian_kl_mean": 0.026718418286539945,
+          "exact_gaussian_kl_p95": 0.049449654061020934,
+          "command_kl_mean": 0.0062531424875558045,
+          "arm_kl_mean": 0.02046527579898414,
+          "sampled_approx_kl": 0.03705807364902278,
+          "ratio_clip_fraction": 0.41015625
+        },
+        "neutral": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.02663360341315186,
+          "exact_gaussian_kl_p95": 0.04838399941005384,
+          "command_kl_mean": 0.006115863367212471,
+          "arm_kl_mean": 0.020517740045939387,
+          "sampled_approx_kl": 0.02868515260116962,
+          "ratio_clip_fraction": 0.376953125
+        },
+        "active": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.026803233159928035,
+          "exact_gaussian_kl_p95": 0.04950562746873283,
+          "command_kl_mean": 0.006390421607899138,
+          "arm_kl_mean": 0.020412811552028898,
+          "sampled_approx_kl": 0.045430994696875934,
+          "ratio_clip_fraction": 0.443359375
+        }
+      }
+    },
+    {
+      "epoch": 3,
+      "minibatch": 3,
+      "phase": "optimizer",
+      "loss": -0.07787379622459412,
+      "profiles": {
+        "all": {
+          "rows": 1024,
+          "exact_gaussian_kl_mean": 0.026942137936272495,
+          "exact_gaussian_kl_p95": 0.05233202989383945,
+          "command_kl_mean": 0.0063616891103507964,
+          "arm_kl_mean": 0.0205804488259217,
+          "sampled_approx_kl": 0.03807643939721154,
+          "ratio_clip_fraction": 0.4287109375
+        },
+        "neutral": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.026968361630231065,
+          "exact_gaussian_kl_p95": 0.051835080874853695,
+          "command_kl_mean": 0.006245865398800627,
+          "arm_kl_mean": 0.02072249623143044,
+          "sampled_approx_kl": 0.029661964108804825,
+          "ratio_clip_fraction": 0.388671875
+        },
+        "active": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.026915914242313918,
+          "exact_gaussian_kl_p95": 0.05247721475122755,
+          "command_kl_mean": 0.006477512821900967,
+          "arm_kl_mean": 0.020438401420412953,
+          "sampled_approx_kl": 0.04649091468561824,
+          "ratio_clip_fraction": 0.46875
+        }
+      }
+    },
+    {
+      "epoch": 4,
+      "minibatch": -1,
+      "phase": "after_normalizer",
+      "loss": null,
+      "profiles": {
+        "all": {
+          "rows": 1024,
+          "exact_gaussian_kl_mean": 0.02692903066341728,
+          "exact_gaussian_kl_p95": 0.05197835896885893,
+          "command_kl_mean": 0.006340888086603777,
+          "arm_kl_mean": 0.020588142576813503,
+          "sampled_approx_kl": 0.03807121029543184,
+          "ratio_clip_fraction": 0.427734375
+        },
+        "neutral": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.02696800282899291,
+          "exact_gaussian_kl_p95": 0.05190348586724255,
+          "command_kl_mean": 0.006228369495906725,
+          "arm_kl_mean": 0.020739633333086184,
+          "sampled_approx_kl": 0.029656454379147178,
+          "ratio_clip_fraction": 0.384765625
+        },
+        "active": {
+          "rows": 512,
+          "exact_gaussian_kl_mean": 0.026890058497841648,
+          "exact_gaussian_kl_p95": 0.052045855776159666,
+          "command_kl_mean": 0.00645340667730083,
+          "arm_kl_mean": 0.02043665182054082,
+          "sampled_approx_kl": 0.04648596621171651,
+          "ratio_clip_fraction": 0.470703125
+        }
+      }
+    }
+  ],
+  "note": "Passive measurements on collected learner observations. This observer never stops or changes an optimizer; an explicit training profile may independently limit actor updates."
+}

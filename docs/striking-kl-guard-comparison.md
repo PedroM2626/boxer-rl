@@ -121,3 +121,23 @@ The first guarded +8,192 complete screen fails with paired survival 6/8/6 and
 four reciprocal mirror episodes. The source's untouched fresh set also fails
 (8/7/8). These intermediate observations establish no improvement. Finish the
 bounded comparison and review both final fresh sets before a continuation decision.
+
+## Completed outcome and decision
+
+The [independent full review](results/striking-pilot/kl-guard-1949696/README.md)
+verifies all 32 training block payloads, complete gates, matching initial batches,
+168 evaluation episodes / 74,819 controls, and empty native error logs. Guarded
+fresh survival is 19/24 versus 18/24 control and 23/24 source on the same resets;
+all full fresh gates fail. The guarded original screens both fail; control passes
+then regresses to 4/5/3 paired survival. No second consecutive pass or promotion.
+The guard applies 104 actor Adam steps versus 256 control, with 256 critic steps
+each. Lower update count is not evidence of robust physical progress.
+
+Reject this target as a validated stability remedy and stop PPO at its 2,016,512
+diagnostic ceiling. Do not select an older favorable actor or try another target
+blindly. Formal evaluation is 1,633,434. Permit only the bounded
+[matched passive failure replay](striking-kl-failure-trace.md): three policies,
+72 episodes / 36,000 controls maximum, zero optimizer updates. New formal ceiling
+1,669,434; this is diagnostic physics compute, not a PPO extension. Preserve all
+latest payloads and main counters, and use the replay evidence before deciding
+another training intervention.

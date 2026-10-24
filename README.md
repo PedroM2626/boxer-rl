@@ -13,8 +13,10 @@ is completed: its extra cost is rejected (15/24 fresh paired survivors versus
 [objective audit](docs/striking-objective-audit.md) found a profile-dependent
 sampled/mean action gap. A bounded [sampling-profile comparison](docs/striking-sampling-comparison.md)
 found no sustained benefit from half standard deviation. A bounded
-[actor KL-guard comparison](docs/striking-kl-guard-comparison.md) now tests
-limiting actor changes while retaining the critic schedule. No policy is
+[actor KL-guard comparison](docs/striking-kl-guard-comparison.md) completed without
+robust stability (19/24 fresh paired survivors versus 18/24 control and 23/24
+source). A bounded [passive failure replay](docs/striking-kl-failure-trace.md)
+now investigates the new falls before another training intervention. No policy is
 certified as reliable boxing.
 See the [completion roadmap](docs/boxing-roadmap.md). The
 [verified selected source replay](fights/striking-pilot/first-full-screen-pass-1908736.mp4)

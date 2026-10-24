@@ -16,9 +16,8 @@ control. All four newer complete screens fail. A read-only
 [objective audit](striking-objective-audit.md) measured terminal reward and a
 profile-dependent sampled/mean gap. A bounded [on-policy sampling-profile
 comparison](striking-sampling-comparison.md) finished without sustained benefit.
-A bounded [actor KL-guard comparison](striking-kl-guard-comparison.md) now limits
-actor update drift while preserving covariance, critic schedule and physical
-criteria. No main adoption or phase promotion.
+A bounded [actor KL-guard comparison](striking-kl-guard-comparison.md) completed without robust stability. A bounded [passive failure replay](striking-kl-failure-trace.md)
+now compares source and both latest endpoints before another training change. No main adoption or phase promotion.
 
 ## Complete physical outcome
 

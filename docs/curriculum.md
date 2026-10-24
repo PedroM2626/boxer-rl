@@ -1,27 +1,26 @@
 # Adaptive unassisted G1 curriculum
 
 **Latest reviewed outcome (2026-10-24):** the complete
-[sampling comparison](striking-sampling-comparison.md) finished 168 episodes /
-71,289 evaluation controls / 32,768 diagnostic PPO credits. Both final fresh
-policies have 17/24 paired survivors and all complete final sets fail. The
-half-noise original pass was followed by regression; narrower covariance is
-not adopted. Version-8 original history has nine records and streak zero;
-version 10 retains pass/fail, also zero. All foundation certifications remain.
+[actor KL-guard comparison](striking-kl-guard-comparison.md) finished 168 episodes /
+74,819 evaluation controls / 32,768 diagnostic PPO credits. The guarded actor
+has 19/24 fresh paired survivors versus 18/24 control and 23/24 source on identical
+resets. Both final full sets fail. Version-11 original screens both fail; version-8
+control passes then fails severely. Its complete history now has eleven distinct
+records and current streak zero. All foundation certifications remain valid.
 
-**Current operation:** one bounded [actor KL-guard comparison](striking-kl-guard-comparison.md)
-from latest control **97af5783**, retaining its full learned/Adam/normalizer/RNG
-state, original covariance, frozen adversary, rewards and all independent physical
-gates. Stop further actor updates within a rollout once its measured KL exceeds
-.02; keep all sixteen critic updates and exact per-rollout actor-step accounting.
-No source/intermediate restoration, assistance, main adoption or stage promotion.
+**Current operation:** a bounded [passive regression replay](striking-kl-failure-trace.md)
+of the source and both latest endpoints, on the same 25M seeds and unchanged
+full physical profiles. Classify fall timing/mechanisms relative to contact and
+scoring; require every old trial field to reproduce exactly. No PPO extension,
+actor restoration, parameter changes, assistance, main adoption or promotion.
 
-Reviewed diagnostic PPO is **1,983,744**, new ceiling **2,016,512** (at most
-16,384 credits per arm / 32,768 total). Reviewed formal evaluation is
-**1,558,615**, new ceiling **1,642,615** (at most 84,000 controls). Main boxing
-**1,048,576**, foundation **474,992,640**, combined main **476,041,216** and BC
-8,000 remain unchanged. Inspect the live comparison and both child outputs at
-`/home/pedro/boxing-runs/striking-kl-guard-1949696` before any launch. No duplicate
-jobs, forced rollback, blind retry or automatic further extension.
+Diagnostic PPO is **2,016,512**, at its ceiling. Formal evaluation is **1,633,434**;
+the passive replay adds at most 36,000 controls / 72 episodes, ceiling **1,669,434**.
+Main boxing **1,048,576**, foundation **474,992,640**, combined main **476,041,216**
+and BC 8,000 remain unchanged. Inspect the replay state and processes at
+`/home/pedro/boxing-runs/striking-kl-failure-trace-1966080` before any launch.
+The prior KL comparison is completed and archived. No duplicate jobs, forced
+rollback, blind retry or automatic further extension.
 
 **Current stage (2026-10-22):** all four foundation levels are certified by
 [two distinct consecutive complete physical passes](results/curriculum/foundation-certification/README.md).
