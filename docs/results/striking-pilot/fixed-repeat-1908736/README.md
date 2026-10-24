@@ -29,3 +29,18 @@ video and warning-hash verification; no simulation is repeated or erased.
 No numerical, overflow or training-warning exemption is introduced. The original
 37,000-control cap and all 1,000 consumed controls are retained. Launch records
 are historical; inspect live resumed state and child progress before decisions.
+
+## Completed independent review
+
+All 74 episodes / 35,525 evaluation controls (including the already verified
+1,000-control replay once), eight finite PPO blocks, exact gate payload and
+retained frozen opponent are verified. Native physics/training logs are empty;
+only the previously reviewed renderer warning remains. Main/foundation hashes
+and complete histories are intact. Latest 670bed08 repeats the full original
+pass: 24/24 pairs survive, active red/blue impacts 11/7, five two-way episodes.
+Original full history is fail/fail/fail/pass/pass across distinct hashes, with
+repeatability met. Fresh 20M source/final survival is 21/24 / 22/24, but final
+neutral-0 has 6/8 and the complete set fails. No promotion or main adoption.
+Diagnostic totals: 1,918,208 PPO / 1,296,474 formal controls. Next decision is
+zero-optimization generalization/cross-policy evaluation, not another automatic
+training extension. See `docs/striking-generalization-audit.md` and `analysis.json`.

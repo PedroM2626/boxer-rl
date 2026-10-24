@@ -2,15 +2,14 @@
 
 ## Current experiment: unassisted paired boxing diagnostics
 
-The [latest striking final](docs/striking-first-complete-pass.md) achieves its
-first complete original-screen pass: 24/24 surviving pairs and four two-way
-active episodes. Fresh 19M survival remains only 18/24; there is one consecutive
-pass and no phase promotion. A bounded 8,192-credit repeatability/generalization
-check keeps all original physics, controller and frozen-adversary state.
-No policy is certified as reliable boxing. See the [completion roadmap](docs/boxing-roadmap.md).
-The [complete selected source replay](fights/striking-pilot/first-full-screen-pass-1908736.mp4)
-shows one verified ten-second exchange with both robots standing; it is not a
-generalization result.
+The [latest striking final](docs/striking-generalization-audit.md) passes two
+distinct consecutive original complete screens, with all 24 pairs surviving in
+each. Independent fresh 20M trials still fail in one neutral role (22/24 total).
+A bounded larger reset and independent-opponent audit measures generalization
+before another training decision. No policy is certified as reliable boxing.
+See the [completion roadmap](docs/boxing-roadmap.md). The
+[verified selected source replay](fights/striking-pilot/first-full-screen-pass-1908736.mp4)
+illustrates an earlier ten-second exchange; it is not a generalization result.
 
 All four [foundation stages](docs/curriculum.md) passed their unchanged complete
 physical gates twice on distinct checkpoints. Foundation learning finished at
@@ -102,12 +101,12 @@ is completed and independently reviewed: mixed fresh survival is 24/24 versus
 18/24 neutral control and 22/24 source. Neither arm passes complete criteria;
 valid strikes remain sparse. The neutral control severely regresses. The
 further 65,536-credit mixed continuation is now completed: neither generation
-passes, and matched fresh survival regresses 21/24 to 15/24. The [first complete original pass and next bounded check](docs/striking-first-complete-pass.md)
-retain the latest candidate, with no rollback or opponent replacement. Inspect
-`/home/pedro/boxing-runs/striking-fixed-repeat-1908736/continuation.json`
-and its process before any launch. Pre-job diagnostic totals are 1,910,016 PPO
-and 1,260,949 evaluation controls; ceilings are 1,918,208 / 1,297,949. Main counters
-and full physical criteria remain unchanged; no adoption or promotion.
+passes, and matched fresh survival regresses 21/24 to 15/24. The [repeatability outcome and generalization audit](docs/striking-generalization-audit.md)
+retain the latest final and all prefixes. Inspect
+`/home/pedro/boxing-runs/striking-generalization-1916928/audit.json`
+and its process before any launch. Diagnostic PPO stays 1,918,208; formal
+evaluation is 1,296,474 with a 1,360,474 ceiling. Main counters and complete
+physical criteria remain unchanged. No phase promotion or policy adoption.
 
 The [closed-fist replay repair](docs/closed-fist-rendering.md) restores the
 original visual feature without changing learning or physics. Historical videos

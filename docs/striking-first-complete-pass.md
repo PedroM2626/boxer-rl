@@ -1,5 +1,9 @@
 # First complete original-screen pass and short repeatability check
 
+**Current outcome:** two original complete screens pass, but the fresh set
+still fails. See the [completed outcome and bounded generalization audit](striking-generalization-audit.md).
+No phase promotion or main adoption is declared.
+
 ## Completed ordinary version-8 confirmation
 
 Independent review `tools/review_striking_fixed_continuation.py` verifies all

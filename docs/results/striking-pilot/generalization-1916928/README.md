@@ -1,0 +1,26 @@
+# Bounded independent reset and cross-policy audit
+
+See `docs/striking-generalization-audit.md` for reviewed evidence and exact cap.
+Latest source 670bed08 has two original complete passes but fails fresh 20M
+neutral-0. No training/promotion is allocated. Four disjoint 21M full groups
+(16 seeds, both swaps, all three profiles) plus two saved opposing policies
+6bf3273a/8003a7bf on 22M seeds with both evaluated-corner assignments produce
+128 episodes / maximum 64,000 evaluation controls. Each actor uses its own
+weights/normalizer over unchanged unassisted physics. Mixed-policy reports
+cannot certify ordinary mirror gates. All group outcomes must be archived.
+Diagnostic PPO stays 1,918,208; formal evaluation ceiling 1,360,474.
+
+Live state: `/home/pedro/boxing-runs/striking-generalization-1916928/audit.json`.
+Launcher: `tools/start_striking_generalization_audit.ps1`. Preserve monitoring.
+
+## Native evaluation integration
+
+Fourteen tests and Python/Bash/PowerShell syntax checks pass. Same-policy
+opponent routing preserves native observations, actions, rewards, qpos/qvel and
+scores exactly; the evaluated corner's own action remains intact. Nonfinite or
+incompatible policies are rejected, and mixed-policy reports cannot certify
+ordinary mirror gates. Two initial complete cross-policy reports (16 episodes)
+are independently checked across both corner assignments, with exact source/
+opponent hashes, finite states, original controller markers and empty native
+logs. They are archived with validation and a historical running snapshot.
+These partial integration results do not replace the full remaining audit.

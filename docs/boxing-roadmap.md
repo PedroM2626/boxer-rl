@@ -1,7 +1,9 @@
 # Learned boxing completion roadmap
 
 Current status: the foundation is certified; paired physical boxing exists,
-but reliable reciprocal combat is not certified. See the policy-update
+but reliable reciprocal combat is not certified. Two distinct consecutive
+original ten-second full screens now pass; independent reset generalization
+still fails and cross-policy coverage is being audited. See the policy-update
 investigation for the current bounded operation and exact accounting.
 
 1. Consolidate stable own strikes in both corners against a neutral partner.

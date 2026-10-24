@@ -31,9 +31,11 @@ def ablate_action(action,zero_commands=False,zero_arms=False):
     return result
 
 
-def main():
+def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--checkpoint',type=Path)
+    parser.add_argument('--opponent-checkpoint',type=Path,help='diagnostic learned opposing policy, independently normalized')
+    parser.add_argument('--evaluated-corner',type=int,choices=(0,1),help='corner controlled by the main checkpoint in mixed-policy diagnostics')
     parser.add_argument('--output',type=Path,default=Path('runs/striking-validation/evaluation.json'))
     parser.add_argument('--seeds',type=int,nargs='+',default=[7,23,31,47])
     parser.add_argument('--seconds',type=float,default=10.)
@@ -57,7 +59,11 @@ def main():
                         help='diagnostic navigation proportional gain; original default is 0.8')
     parser.add_argument('--engagement-distance',type=float,
                         help='explicit diagnostic profile override; impact criteria remain fixed')
-    args=parser.parse_args()
+    args=parser.parse_args(argv)
+    if (args.opponent_checkpoint is None)!=(args.evaluated_corner is None):
+        raise ValueError('mixed-policy diagnostics require both opposing checkpoint and evaluated corner')
+    if args.opponent_checkpoint is not None and (args.checkpoint is None or args.sampled or args.neutral_partner is not None or args.zero_command_offsets or args.zero_arm_residuals or args.base_yaw_scale!=1. or args.approach_gain is not None or args.engagement_distance is not None):
+        raise ValueError('mixed-policy diagnostics require deterministic unchanged contact control with no ablation')
     if args.progress and args.progress.exists():raise ValueError('evaluation progress exists; inspect before rerun')
     if args.trace_directory:args.trace_directory.mkdir(parents=True,exist_ok=False)
     if args.sampled and not args.checkpoint:
@@ -148,6 +154,19 @@ def main():
         modes=['sampled' if args.sampled else 'trained']
     else:
         modes=['neutral','exploration']
+    opponent_hash=None
+    if args.opponent_checkpoint is not None:
+        if (inputs,actions)!=(148,17):raise ValueError('compatible contact-policy interface required')
+        from boxer.striking_train import require_ppo_checkpoint
+        from tools.striking_contact_compare import load_checked
+        from boxer.striking_opponent_evaluation import route_opponent_action
+        other_manifest=json.loads((args.opponent_checkpoint/'latest.json').read_text())
+        opponent_hash=other_manifest['sha256'];opponent_saved,_=load_checked(args.opponent_checkpoint,opponent_hash)
+        require_ppo_checkpoint(saved);require_ppo_checkpoint(opponent_saved)
+        if opponent_saved['foundation_sha256']!=saved['foundation_sha256']:raise ValueError('opposing motor provenance mismatch')
+        if not all(np.isfinite(x).all() for x in jax.tree_util.tree_leaves(tuple(opponent_saved[k] for k in ('actor','critic','optimizer','norm','key')))):
+            raise FloatingPointError('nonfinite opposing checkpoint')
+        opponent_policy=jax.jit(lambda observation:jp.tanh(actor.apply(opponent_saved['actor'],observation)[0]))
     results=[];transitions=0;frames=[];frame_times=[]
     for mode in modes:
         for seed in args.seeds:
@@ -176,6 +195,10 @@ def main():
                         action=np.tanh(mean+np.exp(log_std)*noise)
                     elif mode=='exploration':action=np.tanh(rng.normal(0.,np.exp(-1.9),(2,actions)))
                     else:action=np.zeros((2,actions))
+                    if opponent_hash is not None:
+                        other=1-args.evaluated_corner
+                        opposing_action=np.asarray(opponent_policy(jp.array(normalize(obs,opponent_saved['norm']))))[other]
+                        action=route_opponent_action(action,opposing_action,args.evaluated_corner)
                     if args.neutral_partner is not None:
                         action=action.copy()
                         action[1-args.neutral_partner]=0.
@@ -229,6 +252,7 @@ def main():
                impact_events=results[0]['impact_events'])
     atomic_json(args.output,dict(kind='striking_interface_evaluation',updated_utc=utc(),
         assistance=False,source_sha256=source['sha256'],striking_sha256=residual_hash,
+        opponent_sha256=opponent_hash,evaluated_corner=args.evaluated_corner,
         diagnostic_base_yaw_scale=args.base_yaw_scale,
         simulated_world_transitions=transitions,optimization_transitions=0,
         scorecard_version=1,episode_seconds=args.seconds,trials=results,

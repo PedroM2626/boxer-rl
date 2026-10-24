@@ -28,6 +28,7 @@ def full_profiles(folder, seeds, sha):
         assert len(rows) == 8 and {(r['seed'], r['swap']) for r in rows} == {(s, w) for s in seeds for w in (False, True)}
         assert not report['assistance'] and not report['sampled_policy']
         assert report.get('diagnostic_base_yaw_scale',1.)==1., 'Modified automatic controller is diagnostic, not a promotable full gate'
+        assert report.get('opponent_sha256') is None, 'Mixed-policy diagnostic cannot replace an ordinary complete mirror gate'
         assert all(r['finite'] for r in rows)
         assert report['simulated_world_transitions'] == progress['simulated_world_transitions']
         controls += report['simulated_world_transitions']

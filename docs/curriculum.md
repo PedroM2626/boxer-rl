@@ -1,15 +1,15 @@
 # Adaptive unassisted G1 curriculum
 
-**Latest striking operation (2026-10-24):** the latest fixed-opponent final
-achieves its first complete original-screen pass: 24/24 surviving pairs, valid
-neutral-role strikes and four two-way active episodes. Fresh 19M survival is
-only 18/24, so there is no promotion or reliable-boxing claim. Full original
-history is fail/fail/fail/pass; two consecutive passes are still required.
-A [short repeatability/generalization check](striking-first-complete-pass.md)
-allocates at most 8,192 ordinary warm-start learner controls, one full original
-gate, matched source/final fresh 20M tests and an exact selected source video.
-Before this job: **1,910,016 diagnostic PPO / 1,260,949 evaluation controls**;
-new ceilings **1,918,208 / 1,297,949**. Main and all certifications stay unchanged.
+**Latest striking operation (2026-10-24):** two distinct consecutive original
+complete screens pass (24/24 paired survivors each), but fresh 20M neutral-0
+survival remains 6/8 and the full independent set fails (22/24 total). Original
+repeatability is met; no phase promotion or reliable-boxing claim follows yet.
+A bounded [larger generalization/cross-policy audit](striking-generalization-audit.md)
+uses four disjoint 21M full groups and two archived opposing policies across both
+corner assignments on 22M seeds. Zero optimization or collection is allocated.
+Diagnostic PPO stays **1,918,208**, formal evaluation is **1,296,474**, audit
+ceiling **1,360,474** (at most 64,000 new controls). Main/BC and original history
+remain intact; no gate weakening, actor rollback or automatic further allocation.
 
 **Current stage (2026-10-22):** all four foundation levels are certified by
 [two distinct consecutive complete physical passes](results/curriculum/foundation-certification/README.md).

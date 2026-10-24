@@ -5,10 +5,10 @@ active survival regresses in both samples. See the [full result and next bounded
 fixed-opponent contract](striking-fixed-opponent-comparison.md). No modified
 yaw controller is adopted and the original physical profile remains in use.
 
-**Current decision:** the latest ordinary continuation achieves one complete
-original-screen pass but still fails independent holdouts. The
-[current short repeatability/generalization contract](striking-first-complete-pass.md)
-retains the exact final and all prefixes. No phase promotion or main adoption.
+**Current decision:** two original complete screens now pass consecutively,
+but fresh 20M neutral-0 still fails. The [larger independent reset/opponent
+audit](striking-generalization-audit.md) measures remaining generalization
+with zero optimization. No main adoption or phase promotion.
 
 ## Complete physical outcome
 
