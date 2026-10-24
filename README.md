@@ -11,9 +11,11 @@ paired survivors). Its [scope-limited readiness record](docs/results/striking-pi
 freezes latest bea8147f. A [broader frozen audit](docs/striking-gae-generalization.md)
 completed new reset/opponent checks: neutral profiles pass, but three of four
 full groups fail active combat. Opponent-pool integration now passes 41 focused
-tests; a [bounded matched comparison](docs/striking-opponent-pool-comparison.md)
-is running with three immutable archived adversaries, 16,384 credits per arm
-and unchanged independent gates. General boxing remains
+tests; the [completed matched comparison](docs/results/striking-pilot/pool-2064384/README.md)
+found no demonstrated improvement and both final full gates fail. A
+[visual and objective audit](docs/striking-punch-quality-audit.md) also confirms
+that qualifying contacts do not establish recognizable punches. Next is passive
+punch-quality measurement before further PPO. General boxing remains
 uncertified, and the stopped main policy has not been replaced.
 
 An [earlier striking final](docs/striking-generalization-audit.md) passed two

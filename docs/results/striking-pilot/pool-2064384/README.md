@@ -1,4 +1,37 @@
-# Opponent-pool comparison: verified integration, outcome pending
+# Opponent-pool comparison: completed, no demonstrated improvement
+
+The [independent review](analysis.json) accounts for both full 16,384-credit arms,
+all 168 episodes / 78,563 evaluation controls, every block hash, finite checkpoint,
+optimizer count, immutable opponent fingerprint, credit ledger and complete gate.
+Native training/evaluation error logs are empty; foundation and main policies are
+unchanged. No policy is adopted or promoted.
+
+| Policy | Original +8,192 | Original +16,384 | Fresh neutral-0 / neutral-1 / mirror | Fresh surviving reciprocal mirror episodes |
+| --- | --- | --- | --- | --- |
+| Source bea8147f | historical source milestone | historical source milestone | 8 / 6 / 7, fail | 4 |
+| Pool d93a0008 | 8 / 7 / 7, fail | 6 / 8 / 8, fail | 8 / 6 / 5, fail | 1 |
+| Fixed control 3a34aa85 | 7 / 8 / 7, pass | 7 / 8 / 6, fail | 8 / 6 / 6, fail | 2 |
+
+All original/fresh figures use the unchanged full profiles and both spawn swaps.
+The pool has one fewer fresh paired survivor than control and two fewer than
+source; this run does not demonstrate a diversity benefit. It is not proof that
+all opponent pools fail. Exposure was uneven: the newest-source adversary received
+839 / 8,192 active credits, all in learner corner 1. Keep that limitation visible.
+Version-13 history contains fail/fail, streak zero. The version-12 canonical history
+now appends the control's pass/fail to the previous eight records: ten records,
+current streak zero. The earlier frozen-source readiness milestone is preserved.
+
+The [continuation decision](decision.json) freezes both actual finals and grants
+zero additional PPO or physical controls. The user's visual observation also
+exposed a separate [contact-versus-punch objective gap](../../../striking-punch-quality-audit.md).
+Measure punch mechanics before another objective/compute allocation. Qualifying
+contact counters must not be presented as proof of recognizable boxing punches.
+
+Diagnostic PPO is 2,163,968, formal physical simulation 2,015,379. Main boxing
+1,048,576, foundation 474,992,640, combined main 476,041,216 and standalone BC
+8,000 remain unchanged. No training job is active and unused evaluation allowance
+is not automatically resumed. The following integration/monitoring notes preserve
+the earlier trajectory rather than describe a currently running job.
 
 See the [prospective contract](../../../striking-opponent-pool-comparison.md)
 for the hypothesis, bounded compute, unchanged physical gates and stop rules.

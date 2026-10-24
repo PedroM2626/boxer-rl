@@ -11,37 +11,37 @@ reset groups. Three of four cross-policy diagnostics pass; training-snapshot
 corner 1 fails at 5/8. General boxing and main adoption remain unapproved.
 The earlier two distinct original complete passes plus fresh 29M pass remain a
 [limited readiness milestone](results/striking-pilot/gae-readiness-certification/README.md),
-not broader certification. Version-12 original history retains eight records/streak two.
+not broader certification. Its source milestone is retained; after the new
+control's pass/fail screens, version-12 history has ten records and current streak
+zero. Version 13 has two failed screens and streak zero.
 
 The supervisor's completed-renderer process notice was independently reviewed:
 replay fields match, all 250 MP4 frames decode, original failed state and warning
 are preserved. Bookkeeping recovery repeated zero physical controls. No native
 physics failure or policy corruption was found; unknown warnings remain rejected.
 
-**Current work:** the explicit version-13 opponent-pool integration passed
-41 focused checks. A [bounded matched pool-versus-fixed comparison](striking-opponent-pool-comparison.md)
-is now running from latest frozen bea8147f, preserving learned parameters,
-Adam/normalizer/samplers and consumed prefixes. Three hashed archived opponents
-retain independent normalization and exact per-opponent/corner physical credits.
-Both first 1,024-credit blocks passed native integrity checks; the pool's ordinary
-resume to +8,192 has also collected against all three archived policies.
-The pool arm completed both allocated blocks: original survival profiles were
-8/7/7 and 6/8/8 (neutral-0/neutral-1/mirror), so neither complete gate passes.
-Its fresh profiles are 8/6/5, versus source 8/6/7. The control arm remains active;
-do not infer a matched comparison result before its final independent evaluation.
-The complete physical gates remain unchanged; no new allocation is granted.
-See the [integration evidence](results/striking-pilot/pool-2064384/README.md).
-No earlier actor restoration or automatic adoption.
+**Current work:** the [pool-versus-fixed comparison](results/striking-pilot/pool-2064384/README.md)
+is completed and independently reviewed: all 32,768 PPO credits, 168 physical
+episodes and 78,563 evaluation controls are accounted for. Pool fresh survival
+is 8/6/5 versus control 8/6/6 and source 8/6/7. Both final complete gates fail;
+there is no demonstrated pool benefit. Freeze both actual finals, without rollback,
+adoption, promotion or unchanged PPO extension. No training job is active.
 
-Reviewed diagnostic PPO before this job is **2,131,200**, with a new explicit
-ceiling **2,163,968** (+16,384 per arm). Reviewed formal diagnostic simulation
-is **1,936,816**, with a comparison ceiling **2,020,816** (+84,000 controls).
-These are ceilings, not already consumed totals; inspect both arm progress files
-and comparison accounting for current attempted consumption.
+The user correctly questioned whether the videos show punches rather than touches.
+The [visual and objective audit](striking-punch-quality-audit.md) finds that the
+current low-speed contact criteria do not certify punch mechanics; richer older
+motion checks were not fully retained. Seven scorecard tests pass, including a
+synthetic low-speed qualifying contact example. Next is passive punch-quality
+measurement before a prospective versioned objective comparison. No new physical
+or PPO allocation is declared by that static audit.
+
+Reviewed diagnostic PPO is **2,163,968**, at its ceiling. Formal diagnostic
+simulation is **2,015,379**, below the completed comparison ceiling **2,020,816**;
+unused compute is not an automatic continuation allocation.
 Main boxing **1,048,576**, foundation **474,992,640**, combined main **476,041,216**,
 BC 8,000 remain unchanged. Completed live audit and explicit recovery are at
 `/home/pedro/boxing-runs/striking-gae-generalization-2064384/audit.json`.
-The current job is `/home/pedro/boxing-runs/striking-pool-2064384/comparison.json`.
+The completed job is `/home/pedro/boxing-runs/striking-pool-2064384/comparison.json`.
 No duplicate jobs, blind retries, weakened gates, main adoption or unlimited allocation.
 
 **Current stage (2026-10-22):** all four foundation levels are certified by

@@ -1,0 +1,521 @@
+{
+  "status": "completed",
+  "phase": "awaiting_review",
+  "pid": 448,
+  "started_utc": "2026-10-24T15:31:07.722940+00:00",
+  "diagnostic_output": "/home/pedro/boxing-runs/striking-pool-2064384",
+  "source_sha256": "bea8147f6a13dd2d473a558f2e2ac68d3492e3136d2899e2d9daf139364bb870",
+  "source_consumed_offset": 2064384,
+  "source_world_offset": 1441792,
+  "maximum_new_ppo_steps": 32768,
+  "new_ppo_steps_per_arm": 16384,
+  "maximum_evaluation_world_controls": 84000,
+  "diagnostic_consumed_steps": 32768,
+  "diagnostic_collection_world_controls": 32768,
+  "diagnostic_evaluation_world_controls": 78563,
+  "diagnostic_ppo_before_job": 2131200,
+  "formal_evaluation_world_controls_before_job": 1936816,
+  "diagnostic_ppo_ceiling": 2163968,
+  "formal_evaluation_world_controls_ceiling": 2020816,
+  "main_consumed_retained": 1048576,
+  "main_project_consumed_retained": 476041216,
+  "cumulative_supervised_updates_retained": 8000,
+  "new_separate_supervised_updates": 0,
+  "unchanged_physics": true,
+  "unchanged_rewards": true,
+  "on_policy_sampling": true,
+  "assistance": false,
+  "policy_adoption": "none",
+  "promotion": false,
+  "fresh_seeds": [
+    32000003,
+    32000004,
+    32000005,
+    32000006
+  ],
+  "pool_original_complete_pass_streak": 0,
+  "prerequisites": {
+    "foundation": {
+      "balance": {
+        "records": 29,
+        "sha256": "8cea6a2f62ae68fd9a3118b881301785900df7d3af73322fccacfa0e2e3bc1f6"
+      },
+      "walk_easy": {
+        "records": 41,
+        "sha256": "f1e0e6f023ff4ac477171382069fe132af9180ae818b509a18c2572eca0200ee"
+      },
+      "walk": {
+        "records": 13,
+        "sha256": "d547d60455be5d8b6f9f49c7bec256cb0b0d6963e3345a7160a16f974d0c531c"
+      },
+      "approach": {
+        "records": 2,
+        "sha256": "b39b1990945e8a374802c3a190e5ac5e026ae39e7fd5ef61c5c2b01ad291c6fc"
+      }
+    },
+    "main_sha256": "efad0ccd1051ee5305d4ccf8ebbd7d0e402211f12ecd0cdf175b473b24a7b5b0"
+  },
+  "arms": [
+    {
+      "arm": "pool",
+      "initial_all_learned_source_leaves_retained": true,
+      "gates": [
+        {
+          "new_ppo_steps": 8192,
+          "sha256": "5e6a6ba7b8ea71f63e5bc7f9847c408f977df53d968c0c1517f1808431d1c5ae",
+          "screen": {
+            "profiles": {
+              "neutral-0": {
+                "pair_survivors": 8,
+                "own_surviving_scoring_seeds": [
+                  7,
+                  23,
+                  31,
+                  47
+                ],
+                "surviving_events_by_corner": [
+                  11.0,
+                  0.0
+                ],
+                "surviving_two_way_episodes": 0,
+                "passes_profile": true
+              },
+              "neutral-1": {
+                "pair_survivors": 7,
+                "own_surviving_scoring_seeds": [
+                  7,
+                  31,
+                  47
+                ],
+                "surviving_events_by_corner": [
+                  0.0,
+                  9.0
+                ],
+                "surviving_two_way_episodes": 0,
+                "passes_profile": false
+              },
+              "selfplay": {
+                "pair_survivors": 7,
+                "own_surviving_scoring_seeds": [
+                  7,
+                  23,
+                  31
+                ],
+                "surviving_events_by_corner": [
+                  3.0,
+                  5.0
+                ],
+                "surviving_two_way_episodes": 2,
+                "passes_profile": true
+              }
+            },
+            "passes_complete": false
+          }
+        },
+        {
+          "new_ppo_steps": 16384,
+          "sha256": "d93a000802e111a8c2a7c0a2902c9612add2edca57ec8a3d9e77b90ee785def5",
+          "screen": {
+            "profiles": {
+              "neutral-0": {
+                "pair_survivors": 6,
+                "own_surviving_scoring_seeds": [
+                  23,
+                  31,
+                  47
+                ],
+                "surviving_events_by_corner": [
+                  9.0,
+                  0.0
+                ],
+                "surviving_two_way_episodes": 0,
+                "passes_profile": false
+              },
+              "neutral-1": {
+                "pair_survivors": 8,
+                "own_surviving_scoring_seeds": [
+                  7,
+                  23,
+                  31,
+                  47
+                ],
+                "surviving_events_by_corner": [
+                  0.0,
+                  9.0
+                ],
+                "surviving_two_way_episodes": 0,
+                "passes_profile": true
+              },
+              "selfplay": {
+                "pair_survivors": 8,
+                "own_surviving_scoring_seeds": [
+                  7,
+                  23,
+                  31,
+                  47
+                ],
+                "surviving_events_by_corner": [
+                  5.0,
+                  6.0
+                ],
+                "surviving_two_way_episodes": 1,
+                "passes_profile": true
+              }
+            },
+            "passes_complete": false
+          }
+        }
+      ],
+      "integration_block_verified": true,
+      "initial_update_geometry": {
+        "epoch": 4,
+        "minibatch": -1,
+        "phase": "after_normalizer",
+        "loss": null,
+        "profiles": {
+          "all": {
+            "rows": 1024,
+            "exact_gaussian_kl_mean": 0.029559426806052717,
+            "exact_gaussian_kl_p95": 0.06749715518640902,
+            "command_kl_mean": 0.003399695489324016,
+            "arm_kl_mean": 0.0261597313167287,
+            "sampled_approx_kl": 0.04138851250350513,
+            "ratio_clip_fraction": 0.4599609375
+          },
+          "neutral": {
+            "rows": 512,
+            "exact_gaussian_kl_mean": 0.030657316536246544,
+            "exact_gaussian_kl_p95": 0.06789634109207301,
+            "command_kl_mean": 0.003627028899912549,
+            "arm_kl_mean": 0.027030287636333993,
+            "sampled_approx_kl": 0.040451216098320114,
+            "ratio_clip_fraction": 0.470703125
+          },
+          "active": {
+            "rows": 512,
+            "exact_gaussian_kl_mean": 0.028461537075858898,
+            "exact_gaussian_kl_p95": 0.06556896203855565,
+            "command_kl_mean": 0.003172362078735483,
+            "arm_kl_mean": 0.02528917499712341,
+            "sampled_approx_kl": 0.04232580890869013,
+            "ratio_clip_fraction": 0.44921875
+          }
+        }
+      },
+      "initial_sampling_sha256": "1e3d8c25e1d605f7d1fc259fec46d85068f15091cd2514c09fe16af624a9b0ee",
+      "initial_pool_credits": [
+        [
+          256,
+          256
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "latest_sha256": "d93a000802e111a8c2a7c0a2902c9612add2edca57ec8a3d9e77b90ee785def5",
+      "new_ppo_steps": 16384,
+      "final_sha256": "d93a000802e111a8c2a7c0a2902c9612add2edca57ec8a3d9e77b90ee785def5",
+      "fresh": {
+        "profiles": {
+          "neutral-0": {
+            "pair_survivors": 8,
+            "own_surviving_scoring_seeds": [
+              32000003,
+              32000004,
+              32000005,
+              32000006
+            ],
+            "surviving_events_by_corner": [
+              7.0,
+              0.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": true
+          },
+          "neutral-1": {
+            "pair_survivors": 6,
+            "own_surviving_scoring_seeds": [
+              32000003,
+              32000004,
+              32000005,
+              32000006
+            ],
+            "surviving_events_by_corner": [
+              0.0,
+              10.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": false
+          },
+          "selfplay": {
+            "pair_survivors": 5,
+            "own_surviving_scoring_seeds": [
+              32000003,
+              32000004,
+              32000006
+            ],
+            "surviving_events_by_corner": [
+              4.0,
+              4.0
+            ],
+            "surviving_two_way_episodes": 1,
+            "passes_profile": false
+          }
+        },
+        "passes_complete": false
+      }
+    },
+    {
+      "arm": "control",
+      "initial_all_learned_source_leaves_retained": true,
+      "gates": [
+        {
+          "new_ppo_steps": 8192,
+          "sha256": "89becbecf99c299f1952f2c05ef20e555b7d8eceab4b1b247376e6158e165db4",
+          "screen": {
+            "profiles": {
+              "neutral-0": {
+                "pair_survivors": 7,
+                "own_surviving_scoring_seeds": [
+                  7,
+                  23,
+                  31,
+                  47
+                ],
+                "surviving_events_by_corner": [
+                  5.0,
+                  0.0
+                ],
+                "surviving_two_way_episodes": 0,
+                "passes_profile": true
+              },
+              "neutral-1": {
+                "pair_survivors": 8,
+                "own_surviving_scoring_seeds": [
+                  7,
+                  23,
+                  31,
+                  47
+                ],
+                "surviving_events_by_corner": [
+                  0.0,
+                  14.0
+                ],
+                "surviving_two_way_episodes": 0,
+                "passes_profile": true
+              },
+              "selfplay": {
+                "pair_survivors": 7,
+                "own_surviving_scoring_seeds": [
+                  7,
+                  23,
+                  31,
+                  47
+                ],
+                "surviving_events_by_corner": [
+                  6.0,
+                  3.0
+                ],
+                "surviving_two_way_episodes": 2,
+                "passes_profile": true
+              }
+            },
+            "passes_complete": true
+          }
+        },
+        {
+          "new_ppo_steps": 16384,
+          "sha256": "3a34aa85f0e9cf1ecb178c02f5fe945f8dd17f45dc1b323208b6083e2091b501",
+          "screen": {
+            "profiles": {
+              "neutral-0": {
+                "pair_survivors": 7,
+                "own_surviving_scoring_seeds": [
+                  7,
+                  47
+                ],
+                "surviving_events_by_corner": [
+                  4.0,
+                  0.0
+                ],
+                "surviving_two_way_episodes": 0,
+                "passes_profile": true
+              },
+              "neutral-1": {
+                "pair_survivors": 8,
+                "own_surviving_scoring_seeds": [
+                  7,
+                  23,
+                  31,
+                  47
+                ],
+                "surviving_events_by_corner": [
+                  0.0,
+                  9.0
+                ],
+                "surviving_two_way_episodes": 0,
+                "passes_profile": true
+              },
+              "selfplay": {
+                "pair_survivors": 6,
+                "own_surviving_scoring_seeds": [
+                  7,
+                  23,
+                  47
+                ],
+                "surviving_events_by_corner": [
+                  1.0,
+                  3.0
+                ],
+                "surviving_two_way_episodes": 1,
+                "passes_profile": false
+              }
+            },
+            "passes_complete": false
+          }
+        }
+      ],
+      "integration_block_verified": true,
+      "initial_update_geometry": {
+        "epoch": 4,
+        "minibatch": -1,
+        "phase": "after_normalizer",
+        "loss": null,
+        "profiles": {
+          "all": {
+            "rows": 1024,
+            "exact_gaussian_kl_mean": 0.03285027592965056,
+            "exact_gaussian_kl_p95": 0.07789615274411624,
+            "command_kl_mean": 0.0038250873327391206,
+            "arm_kl_mean": 0.029025188596911444,
+            "sampled_approx_kl": 0.04550829155878103,
+            "ratio_clip_fraction": 0.466796875
+          },
+          "neutral": {
+            "rows": 512,
+            "exact_gaussian_kl_mean": 0.03413044064324313,
+            "exact_gaussian_kl_p95": 0.07718798730187416,
+            "command_kl_mean": 0.0039940166677336665,
+            "arm_kl_mean": 0.03013642397550946,
+            "sampled_approx_kl": 0.04479774690155541,
+            "ratio_clip_fraction": 0.466796875
+          },
+          "active": {
+            "rows": 512,
+            "exact_gaussian_kl_mean": 0.031570111216058,
+            "exact_gaussian_kl_p95": 0.07829541459792617,
+            "command_kl_mean": 0.0036561579977445737,
+            "arm_kl_mean": 0.027913953218313428,
+            "sampled_approx_kl": 0.04621883621600664,
+            "ratio_clip_fraction": 0.466796875
+          }
+        }
+      },
+      "initial_sampling_sha256": "548b19037f6cacc0add18ea4178e8c723b5a6f36ad9f1666e486e82dd70af7a6",
+      "latest_sha256": "3a34aa85f0e9cf1ecb178c02f5fe945f8dd17f45dc1b323208b6083e2091b501",
+      "new_ppo_steps": 16384,
+      "final_sha256": "3a34aa85f0e9cf1ecb178c02f5fe945f8dd17f45dc1b323208b6083e2091b501",
+      "fresh": {
+        "profiles": {
+          "neutral-0": {
+            "pair_survivors": 8,
+            "own_surviving_scoring_seeds": [
+              32000003,
+              32000006
+            ],
+            "surviving_events_by_corner": [
+              4.0,
+              0.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": true
+          },
+          "neutral-1": {
+            "pair_survivors": 6,
+            "own_surviving_scoring_seeds": [
+              32000004
+            ],
+            "surviving_events_by_corner": [
+              0.0,
+              1.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": false
+          },
+          "selfplay": {
+            "pair_survivors": 6,
+            "own_surviving_scoring_seeds": [
+              32000003,
+              32000005
+            ],
+            "surviving_events_by_corner": [
+              4.0,
+              4.0
+            ],
+            "surviving_two_way_episodes": 2,
+            "passes_profile": false
+          }
+        },
+        "passes_complete": false
+      }
+    }
+  ],
+  "active_arm": "control",
+  "active_training_output": "/home/pedro/boxing-runs/striking-pool-2064384/control",
+  "updated_utc": "2026-10-24T15:51:06.230208+00:00",
+  "active_evaluation": "/home/pedro/boxing-runs/striking-pool-2064384/control/fresh/selfplay",
+  "source_fresh": {
+    "profiles": {
+      "neutral-0": {
+        "pair_survivors": 8,
+        "own_surviving_scoring_seeds": [
+          32000003,
+          32000004,
+          32000005,
+          32000006
+        ],
+        "surviving_events_by_corner": [
+          12.0,
+          0.0
+        ],
+        "surviving_two_way_episodes": 0,
+        "passes_profile": true
+      },
+      "neutral-1": {
+        "pair_survivors": 6,
+        "own_surviving_scoring_seeds": [
+          32000003,
+          32000004,
+          32000006
+        ],
+        "surviving_events_by_corner": [
+          0.0,
+          10.0
+        ],
+        "surviving_two_way_episodes": 0,
+        "passes_profile": false
+      },
+      "selfplay": {
+        "pair_survivors": 7,
+        "own_surviving_scoring_seeds": [
+          32000003,
+          32000004,
+          32000005,
+          32000006
+        ],
+        "surviving_events_by_corner": [
+          9.0,
+          5.0
+        ],
+        "surviving_two_way_episodes": 4,
+        "passes_profile": true
+      }
+    },
+    "passes_complete": false
+  }
+}

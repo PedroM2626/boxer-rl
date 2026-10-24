@@ -1,5 +1,15 @@
 # Bounded archived-opponent pool versus fixed-adversary comparison
 
+**Completed review:** both 16,384-credit arms and all 168 episodes / 78,563
+evaluation controls are [archived and independently checked](results/striking-pilot/pool-2064384/README.md).
+Pool fresh survival is 8/6/5 versus fixed control 8/6/6 and source 8/6/7.
+Both final full gates fail. Freeze both actual finals without adoption, rollback,
+promotion or further unchanged PPO. Diagnostic PPO is 2,163,968 and formal
+simulation 2,015,379; no job is active. The next prerequisite is the
+[punch-quality audit](striking-punch-quality-audit.md), prompted by the user's
+observation that contact events look like touching. The prospective contract
+below remains the original allocation, not new authorization to rerun it.
+
 Declared on 2026-10-24 before new physical collection. This implements the
 [pool integration plan](striking-opponent-pool-plan.md), following the reviewed
 [broader frozen audit](striking-gae-generalization.md): neutral profiles pass,

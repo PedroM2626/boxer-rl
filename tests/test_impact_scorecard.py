@@ -38,3 +38,13 @@ def test_weak_contact_does_not_accumulate_forever_or_rearm_on_chatter():
 def test_nonfinite_input_is_invalid():
     with pytest.raises(FloatingPointError):
         sample(ImpactScorecard(),0.,closing=np.nan)
+
+
+def test_qualifying_contact_does_not_certify_a_boxing_punch():
+    # A low-speed contact can meet the legacy contract over its 80 ms window.
+    # No arm travel, extension/retraction or guard recovery is represented here.
+    # This is a synthetic contract example, not a measured physical trajectory.
+    card=ImpactScorecard();events=[]
+    for step in range(40):
+        events.append(sample(card,step*.002,impulse=.0128,closing=.31,extension=.21))
+    np.testing.assert_array_equal(np.sum(events,axis=0),[1,0])
