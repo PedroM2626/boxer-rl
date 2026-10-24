@@ -21,8 +21,11 @@ old speed/direction references. Versioned motion evidence and the
 [complete retained-demo audit](docs/results/striking-pilot/demo-motion-2080768/README.md)
 also find no validated positive strike-cycle target. A
 [bounded scripted jab-cycle feasibility probe](docs/results/striking-pilot/jab-cycle-v1/README.md)
-also failed all sixteen conditions. Guard/strike reachability and first-fall
-tracking need investigation before redesign or further PPO. General boxing remains
+also failed all sixteen conditions. An [exact full-body replay and workspace audit](docs/results/striking-pilot/jab-failure-workspace-v1/README.md)
+reproduced those failures: only the acting body terminates, with measured arm
+saturation and tracking errors. Static guard endpoints match, but dynamic
+stability remains unproven. Next isolate guard-only versus motor-only behavior
+before redesign or further PPO. General boxing remains
 uncertified, and the stopped main policy has not been replaced.
 
 An [earlier striking final](docs/striking-generalization-audit.md) passed two

@@ -6,8 +6,8 @@ full physical results, limitations, checkpoints and accounting remain in the
 linked reports. This index does not replace those records or the live state.
 
 Last consolidated review: **2026-10-24**, through completed consolidation, limited
-ten-second readiness verification, reviewed broader frozen audit and planned
-opponent-pool integration. Reliable general boxing is **not yet
+ten-second readiness verification, reviewed broader/pool audits, failed jab-cycle
+prototype and exact full-body/workspace review. Reliable general boxing is **not yet
 certified**. The foundation is certified; paired physical exchanges exist.
 
 ## Historical corrections and retained capabilities
@@ -46,6 +46,20 @@ not change collision physics, training or scoring.
 | [Passive punch-motion replays](results/striking-pilot/punch-quality-2080768/README.md) | All eight selected episodes / 4,000 controls reproduce every original trial field. Fifteen focused tests pass. At contact onset, 0/19 legacy events meet both old speed/forward references; video-source pre-window hand excursion is 5.3–9.1 cm. | Measured small motions support the user's concern, without classifying every punch type. Five recovery windows are censored. No unchanged PPO extension; next implement independent strike-motion evaluation and audit positive demonstrations before a versioned objective/budget. |
 | [Versioned evidence and all retained demonstrations](results/striking-pilot/demo-motion-2080768/README.md) | Version 1 records per-hand motion components without punch certification. Twenty-one focused tests pass. All fifteen retention trajectories / 7,500 controls replay exactly; all fifteen acting-hand events are below both old speed and forward references. The old generator exits after its first contact. | No validated positive strike-cycle target; stop unchanged imitation/retention/PPO extensions. This target mismatch is established, while its causal contribution to learned failures remains unisolated. |
 | [Jab-cycle feasibility v1](results/striking-pilot/jab-cycle-v1/README.md) | All sixteen conditions and 4,048 controls reviewed. All pairs fell at 4.152–7.238 s; zero complete candidates. Of seventeen acting-hand contact events, thirteen meet the forward reference but only one the speed reference; none meets all prospective requirements. Nine focused controller/motion tests pass. | Reject v1 as a positive training target without threshold relaxation. Next audit guard/strike reachability and first-fall/phase tracking before a bounded redesign. No PPO, imitation, adoption or automatic use of the unused allocation. |
+
+## Latest first-fall and workspace review
+
+Latest reviewed continuation: [exact jab first-fall replay and workspace](results/striking-pilot/jab-failure-workspace-v1/README.md).
+All sixteen native trajectories reproduced exactly in 4,048 additional controls.
+The acting body alone triggers first fall: eleven low pelvis, one tilt and four
+self-leg contacts. Arm requests clip in 19.6% of active channel values; guard endpoints match
+in sampled static boxes, whereas early full-strike endpoints do not match in
+two local solver starts. Neither static geometry nor these fall predicates
+is a causal or dynamic-feasibility proof. Eight focused tests pass. Keep v1
+rejected; next isolate motor-only versus guard-only before redesign or PPO.
+Formal physical diagnostic consumption is **2,034,975** at its ceiling; separately
+recorded cloned geometry is **4,339** evaluations. No learner updates, gate changes,
+policy adoption or new allocation. No job is active.
 
 ## Where to check current facts
 

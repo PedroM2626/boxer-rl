@@ -1,0 +1,867 @@
+{
+  "status": "reviewed",
+  "episodes": 16,
+  "all_original_native_arrays_reproduced": true,
+  "native_errors_empty": true,
+  "new_physical_controls": 4048,
+  "formal_world_controls_total": 2034975,
+  "diagnostic_ppo_total": 2163968,
+  "cloned_forward_evaluations_producer": 4275,
+  "cloned_forward_evaluations_review": 64,
+  "cloned_forward_evaluations_total": 4339,
+  "new_optimizer_updates": 0,
+  "main_adoption": false,
+  "promotion": false,
+  "first_fall_flags": {
+    "acting": {
+      "low_pelvis": 11,
+      "tilted": 1,
+      "self_leg_contact": 4
+    },
+    "other": {
+      "low_pelvis": 0,
+      "tilted": 0,
+      "self_leg_contact": 0
+    }
+  },
+  "active_arm_channel_values": 17542,
+  "action_clipped_fraction": 0.19558773229962376,
+  "desired_outside_static_target_envelope_fraction": 0.05712005472580094,
+  "absolute_filtered_target_request_error_rad": {
+    "median": 0.0,
+    "maximum": 0.8283440170085902
+  },
+  "phase_tracking_error_m": {
+    "1": {
+      "median": 0.07016279436041345,
+      "maximum": 0.16859161645334247
+    },
+    "2": {
+      "median": 0.14164079876606772,
+      "maximum": 0.6198834886397565
+    },
+    "3": {
+      "median": 0.12696470989162167,
+      "maximum": 0.521901683662839
+    },
+    "4": {
+      "median": 0.09529411052583141,
+      "maximum": 0.18607657415259202
+    }
+  },
+  "static_geometry": {
+    "guard/guard": {
+      "count": 16,
+      "minimum_m": 1.2126341805564227e-11,
+      "median_m": 5.3443936370152135e-09,
+      "maximum_m": 1.5772043179268592e-08
+    },
+    "guard/strike": {
+      "count": 16,
+      "minimum_m": 0.3406511211509612,
+      "median_m": 0.3654777455177284,
+      "maximum_m": 0.375770301045049
+    },
+    "extend_mid/guard": {
+      "count": 16,
+      "minimum_m": 2.1704858862544756e-12,
+      "median_m": 1.156360748967064e-08,
+      "maximum_m": 2.8861774857835123e-08
+    },
+    "extend_mid/strike": {
+      "count": 16,
+      "minimum_m": 0.09330632227704956,
+      "median_m": 0.10991534626021851,
+      "maximum_m": 0.12002661730846914
+    }
+  },
+  "trials": [
+    {
+      "case": "corner-0-seed-7-swap-0",
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.548905267811403,
+            "upright": 0.7039188295963321,
+            "low_pelvis": true,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7514685704311698,
+            "upright": 0.9983757360359764,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ]
+        ]
+      },
+      "elapsed": 4.46999999999973,
+      "controls": 224
+    },
+    {
+      "case": "corner-0-seed-7-swap-1",
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.5825653067929861,
+            "upright": 0.5973792928023915,
+            "low_pelvis": false,
+            "tilted": true,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7531273946157241,
+            "upright": 0.9912459424261113,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ]
+        ]
+      },
+      "elapsed": 4.151999999999765,
+      "controls": 208
+    },
+    {
+      "case": "corner-0-seed-23-swap-0",
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.5499585457736095,
+            "upright": 0.708102294720469,
+            "low_pelvis": true,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7589522501732279,
+            "upright": 0.9976967907461594,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ]
+        ]
+      },
+      "elapsed": 4.319999999999746,
+      "controls": 216
+    },
+    {
+      "case": "corner-0-seed-23-swap-1",
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7495832088282063,
+            "upright": 0.9695507334188107,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": true
+          },
+          {
+            "pelvis_height": 0.7560707046358417,
+            "upright": 0.9999957645738544,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "red/left_foot",
+            "red/right_foot"
+          ],
+          [
+            "red/left_foot",
+            "red/right_foot"
+          ]
+        ]
+      },
+      "elapsed": 4.157999999999764,
+      "controls": 208
+    },
+    {
+      "case": "corner-0-seed-31-swap-0",
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.5497154954914693,
+            "upright": 0.8854228649023819,
+            "low_pelvis": true,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7407924901753302,
+            "upright": 0.9675241808729954,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "red/torso_collision",
+            "blue/left_thigh"
+          ]
+        ]
+      },
+      "elapsed": 5.029999999999668,
+      "controls": 252
+    },
+    {
+      "case": "corner-0-seed-31-swap-1",
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.5495680011443005,
+            "upright": 0.7384825906102175,
+            "low_pelvis": true,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7656080367040748,
+            "upright": 0.991673036686555,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ]
+        ]
+      },
+      "elapsed": 4.341999999999744,
+      "controls": 218
+    },
+    {
+      "case": "corner-0-seed-47-swap-0",
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.5483631637205313,
+            "upright": 0.8094868630803429,
+            "low_pelvis": true,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7585203199298193,
+            "upright": 0.9988649795370408,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ]
+        ]
+      },
+      "elapsed": 5.673999999999597,
+      "controls": 284
+    },
+    {
+      "case": "corner-0-seed-47-swap-1",
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.5482181620703501,
+            "upright": 0.8840571731945202,
+            "low_pelvis": true,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7546431008648552,
+            "upright": 0.9987651389134162,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ]
+        ]
+      },
+      "elapsed": 4.5359999999997225,
+      "controls": 227
+    },
+    {
+      "case": "corner-1-seed-7-swap-0",
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7559311869009078,
+            "upright": 0.993261698308789,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.5490434901505732,
+            "upright": 0.9332946858801124,
+            "low_pelvis": true,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ]
+        ]
+      },
+      "elapsed": 5.077999999999663,
+      "controls": 254
+    },
+    {
+      "case": "corner-1-seed-7-swap-1",
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7456700911313663,
+            "upright": 0.9968136091905523,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.5481010334591754,
+            "upright": 0.892416018220386,
+            "low_pelvis": true,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ]
+        ]
+      },
+      "elapsed": 4.579999999999718,
+      "controls": 229
+    },
+    {
+      "case": "corner-1-seed-23-swap-0",
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7439499714411587,
+            "upright": 0.9884346542949406,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.548923474339791,
+            "upright": 0.6915180869459604,
+            "low_pelvis": true,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ]
+        ]
+      },
+      "elapsed": 7.237999999999425,
+      "controls": 362
+    },
+    {
+      "case": "corner-1-seed-23-swap-1",
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7564805069591728,
+            "upright": 0.9886380507120107,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7665726436414307,
+            "upright": 0.9859238633995946,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": true
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "red/left_wrist_collision",
+            "blue/left_hand_collision"
+          ],
+          [
+            "red/left_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          [
+            "blue/left_foot",
+            "blue/right_foot"
+          ],
+          [
+            "blue/left_foot",
+            "blue/right_foot"
+          ]
+        ]
+      },
+      "elapsed": 7.233999999999425,
+      "controls": 362
+    },
+    {
+      "case": "corner-1-seed-31-swap-0",
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7558165143852048,
+            "upright": 0.996923249470575,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.6500720968611774,
+            "upright": 0.7400747650685112,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": true
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "blue/left_foot",
+            "blue/right_foot"
+          ]
+        ]
+      },
+      "elapsed": 5.299999999999638,
+      "controls": 265
+    },
+    {
+      "case": "corner-1-seed-31-swap-1",
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7513395849115739,
+            "upright": 0.9995152754210638,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.548730712145974,
+            "upright": 0.6939625549333092,
+            "low_pelvis": true,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ]
+        ]
+      },
+      "elapsed": 4.433999999999734,
+      "controls": 222
+    },
+    {
+      "case": "corner-1-seed-47-swap-0",
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.755822716085344,
+            "upright": 0.9993557492984865,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.548431876988338,
+            "upright": 0.8505844818602324,
+            "low_pelvis": true,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ]
+        ]
+      },
+      "elapsed": 5.151999999999655,
+      "controls": 258
+    },
+    {
+      "case": "corner-1-seed-47-swap-1",
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7552373569363705,
+            "upright": 0.9787137434151312,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7516517163655047,
+            "upright": 0.9488934306574536,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": true
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "blue/left_foot",
+            "blue/right_foot"
+          ]
+        ]
+      },
+      "elapsed": 5.1799999999996515,
+      "controls": 259
+    }
+  ],
+  "decision": "Do not repeat v1 or train on it. Guard endpoints are geometrically matched in the sampled target boxes; early full-extension endpoints are not matched by this local search. Only the acting body triggers first-fall predicates. Isolate static guard versus cycle dynamics with a prospective matched control before assigning causality or redesigning the target.",
+  "limitations": [
+    "Two local static solver starts do not prove global or dynamic reachability/infeasibility.",
+    "Full-extension geometry at early guard/mid-extension snapshots is not the commanded interpolated target at every instant.",
+    "Static geometry ignores collision safety, balance, moving motor baselines and velocity/torque limits.",
+    "First-fall flags and saturation are observations, not a causal isolation of every failure."
+  ]
+}

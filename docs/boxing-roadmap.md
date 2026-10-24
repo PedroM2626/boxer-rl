@@ -41,8 +41,12 @@ and [complete demo audit](results/striking-pilot/demo-motion-2080768/README.md) 
 now implemented/reviewed: fifteen retained targets also fail both references.
 The [bounded explicit jab-cycle prototype](results/striking-pilot/jab-cycle-v1/README.md)
 failed all sixteen conditions under the same motor/authority. It is not a learned
-policy or a usable positive target. Next audit guard/strike reachability and
-first-fall/phase tracking before redesign. These references do not define every
+policy or a usable positive target. The [exact full-body/workspace review](results/striking-pilot/jab-failure-workspace-v1/README.md)
+reproduces all sixteen failures: only the acting body terminates. Static guard
+endpoints match, while early full-strike endpoints do not match in two local
+searches; this does not establish dynamic or global infeasibility. Next compare
+motor-only and guard-only behavior under a prospective bounded protocol to
+isolate posture versus cycle dynamics before redesign. These references do not define every
 punch type or replace failed gates.
 
 The immediate prerequisite is distinguishing moving touches from purposeful

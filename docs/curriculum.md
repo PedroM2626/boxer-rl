@@ -53,12 +53,21 @@ zero complete candidate episodes passed the unchanged prospective criterion.
 The job consumed 4,048 of its at most 8,000 controls; no learner updates.
 Nine focused controller/motion tests pass, but the scripted positive-target
 hypothesis failed. Reject v1 without imitation, threshold changes or PPO extension.
-Next check guard/strike reachability inside the real residual box and isolate
-first-fall/phase-tracking behavior before a bounded redesign. No job is active.
+The [exact full-body replay and workspace review](results/striking-pilot/jab-failure-workspace-v1/README.md)
+then reproduced every original native array in another 4,048 controls. Only the
+acting body triggered first-fall predicates (eleven low pelvis, one tilt, four
+self-leg contacts). Guard endpoints match in cloned static searches; early full
+strike endpoints do not match in the two local starts. This is not a global or
+dynamic impossibility proof, nor a test of the actual interpolated target at
+every instant. Arm action clipping is 19.6%; causal isolation is still pending.
+Eight focused tests pass. Next prepare a prospective matched motor-only versus
+guard-only comparison before redesigning the cycle. No job is active.
 
 Reviewed diagnostic PPO is **2,163,968**, at its ceiling. Formal diagnostic
-simulation is **2,030,927** after the reviewed prototype, under its completed
-ceiling **2,034,879**. Unused compute expires at review and no additional PPO,
+simulation is **2,034,975** after the reviewed exact replay, at its completed
+ceiling **2,034,975**. Another **4,339 cloned kinematic evaluations** are separately
+recorded under a completed 20,000 ceiling; they add no physical controls.
+Unused compute expires at review and no additional PPO,
 supervised or physical replay allocation is declared by this decision.
 Unused historical comparison compute is not an automatic continuation allocation.
 The completed audit is `/home/pedro/boxing-runs/striking-punch-quality-2080768/audit.json`;
