@@ -93,8 +93,8 @@ def main():
     folder=Path('checkpoints/striking-pilot/step-1048576'); m=json.loads((folder/'latest.json').read_text())
     assert hashlib.sha256((folder/m['file']).read_bytes()).hexdigest() == m['sha256'] == 'efad0ccd1051ee5305d4ccf8ebbd7d0e402211f12ecd0cdf175b473b24a7b5b0'
     history=json.loads(Path('docs/results/striking-pilot/fixed-opponent-original-gate-history.json').read_text())
-    assert len(history['records']) == 5 and len({r['sha256'] for r in history['records']}) == 5
-    assert [r['screen']['passes_complete'] for r in history['records']] == [False,False,False,True,True]
+    assert len(history['records']) >= 5 and len({r['sha256'] for r in history['records']}) == len(history['records'])
+    assert [r['screen']['passes_complete'] for r in history['records'][:5]] == [False,False,False,True,True]
     result['decision'] = ('All four independent full groups fail. Preserve the latest actor and frozen adversary; no PPO extension, main adoption or promotion. Neutral failures include ten learner and three motor-only partner falls; some occur early at large separation. Before any further training change, run a bounded matched motor-floor diagnostic on all 16 existing fresh seeds (32 both-head-zero trials), plus exact passive full-head replays on four preselected failure seeds across all three profiles (24 trials). Maximum 28000 additional evaluation controls, zero training. Trace actual interbody contact and first-fall conditions; head masking is diagnostic only and must never replace original gates. Decide motor versus head/opponent coverage from the complete matched evidence, not favorable episodes.')
     out=Path('docs/results/striking-pilot/generalization-1916928')
     for path in live.rglob('*'):

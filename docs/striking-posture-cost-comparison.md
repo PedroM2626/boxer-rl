@@ -97,3 +97,49 @@ not an effect of the penalty or physical improvement. Original full screens and
 matched control/fresh finals are still required. Checkpoint, metric, reports and
 historical state are archived under `posture-1916928`; live state supersedes
 these snapshots. Main adoption and promotion remain false.
+
+## Complete independent outcome and decision
+
+All **168 episodes / 79,084 evaluation controls** and **32,768 diagnostic PPO
+credits** completed normally. All 32 saved update payloads are finite with exact
+Adam/learner/world/mode prefixes; source leaves are preserved at both starts.
+The first included 1,024-credit block has identical learned state in both arms
+(its cost was zero), confirming the matched integration. All 27 native error
+logs are empty. Foundation histories/payloads and main boxing hash are rechecked.
+
+| Profile | Source fresh | Control final fresh | Cost final fresh |
+| --- | --- | --- | --- |
+| Neutral-0 pair survival | 7/8 | 6/8 | 4/8 |
+| Neutral-1 pair survival | 7/8 | 7/8 | 5/8 |
+| Mirror pair survival | 6/8 | 7/8 | 6/8 |
+| Surviving mirror events red / blue | 7 / 8 | 6 / 4 | 15 / 9 |
+| Surviving mirror two-way episodes | 2 | 1 | 3 |
+
+No complete fresh set passes. Original full screen survival at +8,192 / +16,384
+is **7/7/8 -> 5/5/8** for cost, **8/7/8 -> 6/8/7** for control, ordered
+neutral-0/neutral-1/mirror. All four full screens fail unchanged criteria.
+The cost produces more valid strikes in some conditions but regresses stability;
+it is rejected, with no coefficient increase or identical PPO extension.
+Its cumulative training cost is only about .193 across 16,384 credits; this
+does not establish a universal causal explanation for regression or justify
+blindly making the penalty larger.
+
+Exact final SHA cost **babf855c670f6d6d50f1f7d5af87d0122d8f9095b112c3df394443dea9f77101**,
+control **c47edf0bb3abf0ad56259269d255a33fd100709f39a3abe79f314b0f49fc6be2**.
+Both end at 1,933,312 learner / 1,310,720 world, Adam 12,680 / 36,352;
+different policies and failed generations are retained. Continue investigation
+from the latest control, without restoring the earlier favorable source.
+Version-8 history is now **fail/fail/fail/pass/pass/fail/fail**, current streak
+zero. Version-9 history has two failures; it does not inherit version-8 passes.
+
+Archive: `docs/results/striking-pilot/posture-1916928/analysis.json`, both arms'
+complete raw screens/fresh trials, metrics and all four gate models. Actual
+formal total **1,454,558**, diagnostic PPO **1,950,976**, new world collection
+32,768 and retention presentations 131,072 recorded separately. Main/BC stay
+unchanged and unused evaluation capacity is unused. No promotion or main adoption.
+
+The next bounded step is a [read-only training-distribution objective audit](striking-objective-audit.md):
+measure the frequency of partner-only falls that terminate training without an
+own-fall penalty, despite the independent pair-survival criterion. Zero training,
+maximum 16,384 new controls. A counterfactual penalty is logged, not applied.
+Any later reward or training allocation requires the completed physical evidence.

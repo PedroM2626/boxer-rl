@@ -2,13 +2,15 @@
 
 Current status: the foundation is certified; paired physical boxing exists,
 but reliable reciprocal combat is not certified. Two distinct consecutive
-original ten-second full screens now pass; independent reset generalization
+original ten-second full screens passed earlier; independent reset generalization
 still fails across all four new full groups. The complete cross-policy audit is
 reviewed. The completed [motor-floor audit](striking-motor-floor-audit.md) found
 31/32 motor-only pair survival and additional head-dependent failures. A
 [bounded training-only posture-cost comparison](striking-posture-cost-comparison.md)
-now tests a learner reward change against unchanged training, with all original
-physical gates. See that contract for the current operation and exact accounting.
+is completed and its extra cost rejected. Four newer full screens fail; both
+current task pass streaks are zero. A read-only
+[objective audit](striking-objective-audit.md) now measures own/partner-only fall
+reward alignment before further training. See its contract for current accounting.
 
 1. Consolidate stable own strikes in both corners against a neutral partner.
    Preserve the existing independent complete physical gates and require two

@@ -5,14 +5,16 @@ active survival regresses in both samples. See the [full result and next bounded
 fixed-opponent contract](striking-fixed-opponent-comparison.md). No modified
 yaw controller is adopted and the original physical profile remains in use.
 
-**Current decision:** two original complete screens now pass consecutively,
+**Current decision:** two earlier original complete screens passed consecutively,
 but independent generalization still fails. The complete [128-episode
 reset/opponent audit](striking-generalization-audit.md) is reviewed; all four
 new full groups fail. A [matched motor-floor diagnostic](striking-motor-floor-audit.md)
 has completed at 31/32 motor-only pair survival. A bounded
 [training-only posture-cost comparison](striking-posture-cost-comparison.md)
-tests a learner reward change against unchanged training. No main adoption or
-phase promotion.
+has completed; reject its extra cost after 15/24 fresh survivors versus 20/24
+control. All four newer complete screens fail. A read-only
+[objective audit](striking-objective-audit.md) measures own/partner-only fall
+reward alignment before further training. No main adoption or phase promotion.
 
 ## Complete physical outcome
 

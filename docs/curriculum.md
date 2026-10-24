@@ -4,13 +4,16 @@
 [generalization audit](striking-generalization-audit.md) and 56-episode
 [motor-floor comparison](striking-motor-floor-audit.md) are independently reviewed.
 Motor-only pair survival is 31/32; full-head fresh groups still fail. The original
-version-8 pass streak remains two, without main adoption or phase promotion.
-Formal evaluation is **1,375,474**, diagnostic PPO **1,918,208**. The next bounded
-[training-only posture-cost comparison](striking-posture-cost-comparison.md)
-retains all learned state and physics: at most 16,384 new credits per arm,
-32,768 total (diagnostic PPO ceiling **1,950,976**), maximum 84,000 evaluation
-controls (formal ceiling **1,459,474**). The unchanged original physical gates
-decide results; no automatic extension or adoption.
+version-8 two-pass interval is historical, without main adoption or phase promotion.
+The [posture-cost comparison](striking-posture-cost-comparison.md) is completed:
+fresh source/control/cost survival is 20/24 / 20/24 / 15/24; reject the cost.
+All four new full screens fail, so current version-8 and version-9 pass streaks
+are zero; the earlier version-8 two-pass interval remains in history.
+Formal evaluation is **1,454,558**, diagnostic PPO **1,950,976**. A read-only
+[training-distribution objective audit](striking-objective-audit.md) from latest
+control c47edf0b measures own/partner-only fall rewards. Maximum 16,384 additional
+evaluation controls (formal ceiling **1,470,942**), zero training. Main/BC and
+all physical criteria remain unchanged; no adoption or automatic extension.
 
 **Current stage (2026-10-22):** all four foundation levels are certified by
 [two distinct consecutive complete physical passes](results/curriculum/foundation-certification/README.md).

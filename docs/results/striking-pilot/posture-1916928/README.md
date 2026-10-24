@@ -24,3 +24,23 @@ and both arm progress/checkpoints before intervening. `launch-state.json` is a
 historical running snapshot. Do not adopt the intermediate model or infer a
 comparison result before full original screens and matched fresh finals are
 reviewed. Main counters, original histories and monitoring schedule are intact.
+
+## Completed comparison
+
+`analysis.json` and `completed-comparison.json` now archive all 168 physical
+episodes / 79,084 controls and 32,768 PPO credits. All 32 saved update payloads
+are independently verified finite with retained prefixes; all 27 native error
+logs are empty. All original source leaves match at both starts, and first-block
+learned states match between arms. Foundation/main provenance remains intact.
+
+Fresh source/control/cost survival is 20/24 / 20/24 / 15/24. All four new original
+full screens fail. Reject the posture cost and retain latest control c47edf0b
+for investigation; no earlier-actor restoration, adoption or promotion. Full
+version-8 history includes the two new control failures, current streak zero;
+version-9 history is separately archived with two failures. Both arms' complete
+gate/fresh reports and metrics plus all four gate checkpoint models are retained.
+
+Formal total 1,454,558, diagnostic PPO 1,950,976. World collection 32,768 and
+131,072 retention presentations are separate. The next operation is documented
+in `docs/striking-objective-audit.md`; historical launch/integration snapshots
+above do not describe its current state.
