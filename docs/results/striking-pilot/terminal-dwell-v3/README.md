@@ -46,3 +46,24 @@ Next distinguish the commanded point from actual legal collision-surface reach
 before changing target, authority or motor coordination. Endpoint error alone
 does not prove physical fist contact is impossible. No new physical or training
 allocation follows from this failed dwell comparison.
+
+## Recorded-state video
+
+[Watch the latest diagnostic](../../../../fights/striking-pilot/terminal-dwell-v3-recorded.mp4):
+20 seconds, seed 7 without swap, ten seconds per acting corner in fixed order.
+The caption identifies a scripted diagnostic and zero valid impacts. It does
+not present the motions as successful boxing. The original closed-fist visual
+graft is used; the recorded free-root/leg coordinates are unchanged.
+
+The renderer reads saved qpos/qvel and runs only visual forward calculations;
+it never calls physical stepping or the policy. All 500 frames decode at 25 fps,
+640x480. [video.json](video.json) retains full source/video SHA-256 values,
+selected control indices and validation. Two preview frames are retained beside
+it. The closed-fist/physics-coordinate regression test passes.
+
+This adds zero physical controls, optimizer steps or diagnostic geometry queries;
+500 rendering-only forward calculations are recorded separately. Main/diagnostic
+counters and all physical outcomes remain unchanged. The host emitted a Python
+subprocess `os.fork`/multithreaded-JAX warning while starting FFmpeg;
+`video-render-stderr.log` preserves it. Encoding and full decoding completed,
+with no observed deadlock or physical-policy failure. No simulation was rerun.

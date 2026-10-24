@@ -64,6 +64,11 @@ that regression without changing saved policies or adding PPO. It did not
 establish retention dominance or a larger final critic error. A bounded
 [unchanged consolidation](docs/striking-gae-consolidation.md) completed with the verified limited milestone above. No policy is
 certified as reliable boxing.
+The [latest recorded diagnostic video](fights/striking-pilot/terminal-dwell-v3-recorded.mp4)
+shows both acting corners, seed 7, closed fists and free bodies over 20 seconds.
+It reuses saved trajectories with zero valid impacts and no new physical steps;
+it is not successful learned boxing. All 500 frames decode and source hashes are
+retained in the [video record](docs/results/striking-pilot/terminal-dwell-v3/video.json).
 See the [completion roadmap](docs/boxing-roadmap.md). The
 [verified selected source replay](fights/striking-pilot/first-full-screen-pass-1908736.mp4)
 illustrates an earlier ten-second exchange; it is not a generalization result.

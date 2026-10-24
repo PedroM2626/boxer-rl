@@ -137,6 +137,16 @@ training from these non-contact motions. No job or new allocation is active.
 
 ## Where to check current facts
 
+The user requested the current video after confirming no active training job.
+The [recorded terminal-dwell video](../fights/striking-pilot/terminal-dwell-v3-recorded.mp4)
+now shows seed 7 without swap, both acting corners in fixed order, 20 seconds
+total. All 500 frames decode; source/video hashes and selected indices are in
+`results/striking-pilot/terminal-dwell-v3/video.json`. This is saved-state visual
+playback with closed fists, zero impacts, zero new physical/optimizer steps and
+500 separately recorded rendering forwards, not a new successful boxing result.
+The renderer warning log is preserved; full encode/decode completed. The
+closed-fist replay coordinate/physics regression passes. No job remains active.
+
 - [Current curriculum status and approved ceilings](curriculum.md).
 - [Remaining work and completion criteria](boxing-roadmap.md).
 - `docs/results/curriculum/`: full foundation gate histories and certifications.
