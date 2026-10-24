@@ -1,0 +1,87 @@
+{
+  "status": "integration_verified_physical_outcome_pending",
+  "source_sha256": "bea8147f6a13dd2d473a558f2e2ac68d3492e3136d2899e2d9daf139364bb870",
+  "tests_passed": 41,
+  "new_ppo_credits": 2048,
+  "new_ppo_collection_world_controls": 2048,
+  "main_adoption": false,
+  "promotion": false,
+  "pool_transition": {
+    "source_sha256": "bea8147f6a13dd2d473a558f2e2ac68d3492e3136d2899e2d9daf139364bb870",
+    "consumed_steps": 2064384,
+    "world_control_steps": 1441792,
+    "actor_count": 14728,
+    "critic_count": 38400,
+    "optimizer_reset": false,
+    "sampler_seed": 32000053,
+    "sampling": "uniform_per_active_episode",
+    "active_credit_prefix": 163840,
+    "opponents": [
+      {
+        "path": "checkpoints/striking-validation/mixed-confirm-1851392/gate-8192",
+        "sha256": "6bf3273ab5cd83e42b588403a7361140e4ee42afe0fbec20732e0a010bb34e7a",
+        "fingerprint": "158d7b3dbdccc0a0aadec27d7d39b714677191d35b1d8a68759f12e5472873b0"
+      },
+      {
+        "path": "checkpoints/striking-validation/gae-1966080/long_gae/gate-16384",
+        "sha256": "95dbdff01def598cdc907e93f1dc7bceb2f1d6b58bc22f488a1936afa86553f9",
+        "fingerprint": "0938b48ad5a635b8ae8fe2050581ac145ab50764f408a586dbeaf50e1665d214"
+      },
+      {
+        "path": "checkpoints/striking-validation/gae-consolidate-1998848/gate-65536",
+        "sha256": "bea8147f6a13dd2d473a558f2e2ac68d3492e3136d2899e2d9daf139364bb870",
+        "fingerprint": "fd982c1683940bda4e98da3dfb1a50f3712429d9c8d6b70e7d2bef4b78ebcad8"
+      }
+    ]
+  },
+  "arms": [
+    {
+      "arm": "pool",
+      "sha256": "538e6a3fb166cf62193cf3d571bf904e3e8906590a71242f7d3e6bc5b7d36d25",
+      "actor_adam_count": 14744,
+      "critic_adam_count": 38416,
+      "finite_state": true,
+      "empty_native_stderr": true,
+      "initial_source_leaves_retained": true,
+      "new_ppo_steps": 1024,
+      "pool_credits": [
+        [
+          256,
+          256
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "pool_assignments": [
+        -1,
+        0,
+        0,
+        -1,
+        -1,
+        0,
+        0,
+        -1
+      ],
+      "initial_sampling_sha256": "1e3d8c25e1d605f7d1fc259fec46d85068f15091cd2514c09fe16af624a9b0ee"
+    },
+    {
+      "arm": "control",
+      "sha256": "b77898bc92271ca212ccff112bd3d3aa93997f83b346f0455985202a882652ad",
+      "actor_adam_count": 14744,
+      "critic_adam_count": 38416,
+      "finite_state": true,
+      "empty_native_stderr": true,
+      "initial_source_leaves_retained": true,
+      "new_ppo_steps": 1024,
+      "pool_credits": null,
+      "pool_assignments": null,
+      "initial_sampling_sha256": "548b19037f6cacc0add18ea4178e8c723b5a6f36ad9f1666e486e82dd70af7a6"
+    }
+  ]
+}

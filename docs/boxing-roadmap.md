@@ -27,9 +27,10 @@ It did not establish retention dominance or larger final critic error. One
 fresh 29M pass. The [readiness scope](results/striking-pilot/gae-readiness-certification/README.md)
 is limited; a [broader frozen audit](striking-gae-generalization.md) completed
 new reset/opponent checks. Neutral profiles pass, but active combat fails three
-of four full groups. Next is [opponent-pool integration](striking-opponent-pool-plan.md)
-before any new bounded training allocation; no main adoption.
-See its contract for current accounting.
+of four full groups. The explicit pool integration now passes 41 focused tests;
+a [bounded pool-versus-fixed comparison](striking-opponent-pool-comparison.md)
+is running from the latest source with unchanged full gates and no main adoption.
+See that contract and live progress for current accounting and ceilings.
 
 1. Consolidate stable own strikes in both corners against a neutral partner.
    Preserve the existing independent complete physical gates and require two
@@ -38,7 +39,8 @@ See its contract for current accounting.
 2. Consolidate reciprocal exchanges: approach from separated spawns, initiate
    real strikes, recover guard and continue after receiving contact. Evaluate
    across saved opponents, both corners and fresh conditions to detect brittle
-   exploitation. This broader opponent coverage is planned, not already trained.
+   exploitation. Archived-opponent training is now under a bounded comparison;
+   broader robust combat remains unverified.
 3. Investigate coordination limits if measured falls justify it. The current
    learned motor is frozen and the boxing head controls commands/arm residuals.
    Any motor adaptation needs a bounded controlled comparison preserving the

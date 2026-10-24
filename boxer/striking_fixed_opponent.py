@@ -23,7 +23,7 @@ def fingerprint(frozen):
 def validate_fixed_metadata(saved):
     transition=dict(source_sha256=SOURCE_SHA,consumed_steps=1859584,world_control_steps=1236992,actor_count=11528,critic_count=35200,optimizer_reset=False,opponent_policy='frozen_source_mean')
     if (saved.get('fixed_opponent_ppo') is not True or not saved.get('mixed_partner_ppo') or saved.get('conservative_actor_ppo')
-            or saved.get('opponent_mode')!='mixed_frozen_mean' or saved.get('fixed_opponent_transition')!=transition
+            or saved.get('opponent_mode')!=('mixed_pool_mean' if saved.get('pool_opponent_ppo') else 'mixed_frozen_mean') or saved.get('fixed_opponent_transition')!=transition
             or saved['consumed_steps']<1859584 or saved['optimized_steps']<1859584
             or saved.get('fixed_opponent_fingerprint')!=FROZEN_FINGERPRINT
             or fingerprint(saved.get('frozen_opponent',{}))!=FROZEN_FINGERPRINT):

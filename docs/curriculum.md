@@ -18,19 +18,27 @@ replay fields match, all 250 MP4 frames decode, original failed state and warnin
 are preserved. Bookkeeping recovery repeated zero physical controls. No native
 physics failure or policy corruption was found; unknown warnings remain rejected.
 
-**Current work:** [implement/test explicit opponent-pool training integration](striking-opponent-pool-plan.md)
-from latest frozen bea8147f, retaining all learned/Adam/normalizer/sampler and
-consumed prefixes. No training job is active, no new PPO budget is declared, and
-no unchanged single-opponent extension is authorized. Validate pool provenance,
-independent opponent normalization, corner-credit accounting and ordinary resume
-before defining a bounded matched comparison. Do not restore an earlier actor.
+**Current work:** the explicit version-13 opponent-pool integration passed
+41 focused checks. A [bounded matched pool-versus-fixed comparison](striking-opponent-pool-comparison.md)
+is now running from latest frozen bea8147f, preserving learned parameters,
+Adam/normalizer/samplers and consumed prefixes. Three hashed archived opponents
+retain independent normalization and exact per-opponent/corner physical credits.
+Both first 1,024-credit blocks passed native integrity checks; the pool's ordinary
+resume to +8,192 has also collected against all three archived policies.
+The complete independent physical gates are pending and remain unchanged.
+See the [integration evidence](results/striking-pilot/pool-2064384/README.md).
+No earlier actor restoration or automatic adoption.
 
-Diagnostic PPO is **2,131,200**, at its ceiling. Reviewed formal diagnostic
-simulation is **1,936,816**, under the completed audit ceiling **1,939,882**.
+Reviewed diagnostic PPO before this job is **2,131,200**, with a new explicit
+ceiling **2,163,968** (+16,384 per arm). Reviewed formal diagnostic simulation
+is **1,936,816**, with a comparison ceiling **2,020,816** (+84,000 controls).
+These are ceilings, not already consumed totals; inspect both arm progress files
+and comparison accounting for current attempted consumption.
 Main boxing **1,048,576**, foundation **474,992,640**, combined main **476,041,216**,
 BC 8,000 remain unchanged. Completed live audit and explicit recovery are at
 `/home/pedro/boxing-runs/striking-gae-generalization-2064384/audit.json`.
-No duplicate jobs, blind retries, weakened gates, main adoption or automatic allocation.
+The current job is `/home/pedro/boxing-runs/striking-pool-2064384/comparison.json`.
+No duplicate jobs, blind retries, weakened gates, main adoption or unlimited allocation.
 
 **Current stage (2026-10-22):** all four foundation levels are certified by
 [two distinct consecutive complete physical passes](results/curriculum/foundation-certification/README.md).

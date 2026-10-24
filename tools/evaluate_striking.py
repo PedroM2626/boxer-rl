@@ -149,6 +149,11 @@ def main(argv=None):
             raise ValueError('manifest and saved KL guard profile disagree')
         if manifest.get('long_gae_ppo',False)!=saved.get('long_gae_ppo',False) or manifest.get('training_gae_lambda')!=saved.get('training_gae_lambda'):
             raise ValueError('manifest and saved GAE profile disagree')
+        if (manifest.get('pool_opponent_ppo',False)!=saved.get('pool_opponent_ppo',False)
+                or (saved.get('pool_opponent_ppo') and (manifest.get('opponent_mode')!='mixed_pool_mean'
+                    or config.get('version')!=13 or config.get('pool_opponent_ppo') is not True
+                    or config.get('opponent_mode')!='mixed_pool_mean'))):
+            raise ValueError('manifest, configuration and saved opponent pool disagree')
         for key,expected in (('actor_inputs',inputs),('actions',actions),('contact_history',contact_history)):
             if key in saved and saved[key]!=expected:raise ValueError('payload and declared interface disagree')
         if saved['foundation_sha256']!=source['sha256']:raise ValueError('striking motor mismatch')

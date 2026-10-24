@@ -10,8 +10,10 @@ consecutive complete original ten-second gates and a complete fresh set (23/24
 paired survivors). Its [scope-limited readiness record](docs/results/striking-pilot/gae-readiness-certification/README.md)
 freezes latest bea8147f. A [broader frozen audit](docs/striking-gae-generalization.md)
 completed new reset/opponent checks: neutral profiles pass, but three of four
-full groups fail active combat. The next work is [opponent-pool integration](docs/striking-opponent-pool-plan.md);
-no training job or new PPO allocation is active during that engineering work. General boxing remains
+full groups fail active combat. Opponent-pool integration now passes 41 focused
+tests; a [bounded matched comparison](docs/striking-opponent-pool-comparison.md)
+is running with three immutable archived adversaries, 16,384 credits per arm
+and unchanged independent gates. General boxing remains
 uncertified, and the stopped main policy has not been replaced.
 
 An [earlier striking final](docs/striking-generalization-audit.md) passed two

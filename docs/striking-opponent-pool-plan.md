@@ -1,5 +1,11 @@
 # Next engineering work: explicit opponent-pool training integration
 
+**Implementation update (2026-10-24):** the following is the preserved engineering
+plan before implementation. Version 13 now passes 41 focused checks and the
+[explicit bounded comparison](striking-opponent-pool-comparison.md) is running.
+That later contract declares the new allocation and live output; the historical
+no-allocation statements below describe the state when this plan was written.
+
 The [broader frozen audit](results/striking-pilot/gae-generalization-2064384/README.md)
 passes every new neutral-role profile but fails three of four complete groups
 because active mirror survival is insufficient (23/32). One archived-adversary

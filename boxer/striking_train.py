@@ -126,6 +126,10 @@ def require_ppo_checkpoint(saved):
         if 'training_gae_lambda' in saved or 'long_gae_transition' in saved or saved.get('long_gae_ppo'):
             from boxer.striking_gae_profile import validate_gae_metadata
             validate_gae_metadata(saved)
+        if ('opponent_pool' in saved or 'opponent_pool_transition' in saved
+                or saved.get('pool_opponent_ppo') or saved.get('opponent_mode')=='mixed_pool_mean'):
+            from boxer.striking_opponent_pool import validate_pool_metadata
+            validate_pool_metadata(saved)
         if saved.get('conservative_actor_ppo'):
             from boxer.striking_conservative_actor import validate_conservative_metadata
             validate_conservative_metadata(saved)
@@ -188,6 +192,7 @@ def main(argv=None):
     parser.add_argument('--reduced-noise-ppo',action='store_true',help='explicit half-standard-deviation on-policy sampling profile')
     parser.add_argument('--kl-guard-ppo',action='store_true',help='explicit actor-only full-rollout KL stop, critic keeps all updates')
     parser.add_argument('--long-gae-ppo',action='store_true',help='explicit lambda .99 over latest original fixed-opponent control')
+    parser.add_argument('--pool-opponent-ppo',action='store_true',help='explicit immutable archived opponent pool over the latest long-GAE source')
     parser.add_argument('--conservative-actor-ppo',action='store_true')
     parser.add_argument('--actor-learning-rate',type=float,choices=(.0001,.00001),default=.0001)
     parser.add_argument('--update-audit-directory',type=Path,
@@ -227,6 +232,8 @@ def main(argv=None):
         raise ValueError('KL guard requires original covariance and fixed-opponent rewards')
     if args.long_gae_ppo and (not args.fixed_opponent_ppo or args.kl_guard_ppo or args.reduced_noise_ppo or args.posture_cost_ppo):
         raise ValueError('long GAE requires the original fixed-opponent update and reward path')
+    if args.pool_opponent_ppo and not args.long_gae_ppo:
+        raise ValueError('opponent pool requires the explicit inherited long-GAE profile')
     if args.conservative_actor_ppo and (not args.mixed_partner_ppo or args.actor_learning_rate!=.00001):
         raise ValueError('conservative actor requires explicit mixed lineage and actor rate 1e-5')
     if not args.conservative_actor_ppo and args.actor_learning_rate!=.0001:
@@ -278,6 +285,7 @@ def train(args):
     reduced_noise_ppo=getattr(args,'reduced_noise_ppo',False)
     kl_guard_ppo=getattr(args,'kl_guard_ppo',False)
     long_gae_ppo=getattr(args,'long_gae_ppo',False)
+    pool_opponent_ppo=getattr(args,'pool_opponent_ppo',False)
     env_class=StrikingEnv
     if contact_ppo:
         from boxer.striking_contact import ContactAwareStrikingEnv
@@ -291,6 +299,9 @@ def train(args):
             if fixed_opponent_ppo:
                 from boxer.striking_fixed_opponent import ContactFixedMixedStrikingEnv
                 env_class=ContactFixedMixedStrikingEnv
+                if pool_opponent_ppo:
+                    from boxer.striking_opponent_pool import ContactPoolMixedStrikingEnv
+                    env_class=ContactPoolMixedStrikingEnv
     observation_size, action_size = env_class.observation_size, env_class.action_size
     learners_per_world = getattr(env_class, 'learners_per_world', 2)
     if learners_per_world not in (1, 2):
@@ -347,6 +358,9 @@ def train(args):
                             if long_gae_ppo:
                                 interface_metadata.update(long_gae_ppo=True,training_gae_lambda=.99)
                                 config.update(interface_metadata,version=12,gae_lambda=.99)
+                                if pool_opponent_ppo:
+                                    interface_metadata.update(pool_opponent_ppo=True)
+                                    config.update(interface_metadata,version=13)
     checkpoint_path=args.output/'checkpoint/latest.json'
     if previous:
         if not args.resume:
@@ -387,6 +401,8 @@ def train(args):
             raise ValueError('KL guard checkpoint and explicit update protocol must agree')
         if long_gae_ppo != saved.get('long_gae_ppo',False):
             raise ValueError('long GAE checkpoint and explicit advantage profile must agree')
+        if pool_opponent_ppo != saved.get('pool_opponent_ppo',False):
+            raise ValueError('opponent pool checkpoint and explicit training task must agree')
         if conservative_actor_ppo != saved.get('conservative_actor_ppo',False):
             raise ValueError('explicit conservative checkpoint and training path must agree')
         if conservative_actor_ppo and saved['actor_learning_rate']!=args.actor_learning_rate:
@@ -475,6 +491,17 @@ def train(args):
     for env in envs[1:]:env.motor=envs[0].motor
     episode=np.full(args.worlds,consumed//rows,dtype=np.int64)
     obs=np.stack([env.reset(args.seed+1009*i+int(episode[i]),swap=bool(i%2)) for i,env in enumerate(envs)]).reshape(rows,observation_size)
+    if pool_opponent_ppo:
+        from boxer.striking_opponent_pool import (restore_sampler, draw_opponent,
+            validate_pool_ledger, pool_predictor, OFFSET)
+        pool_frontier=progress if progress.get('consumed_steps',0)>continuation['consumed_steps'] else continuation
+        pool_credits=validate_pool_ledger(pool_frontier['pool_credits_by_opponent_and_corner'],
+                                        pool_frontier['mixed_credits_by_mode_and_corner']).copy()
+        pool_rng=restore_sampler(pool_frontier['pool_sampler_state'])
+        pool_assignments=np.asarray(pool_frontier['pool_assignments'],dtype=np.int64).copy()
+        if consumed>OFFSET:
+            pool_assignments=np.asarray([draw_opponent(pool_rng,env.active_opponent) for env in envs])
+        predict_pool=pool_predictor(actor,continuation['opponent_pool'])
     state=dict(status='running',pid=os.getpid(),started_utc=utc(),ceiling=args.ceiling,
         foundation_steps=metadata['total_steps'],foundation_sha256=metadata['sha256'],
         assistance=False,optimizer_saved=True,physics_state_saved=False,
@@ -503,6 +530,10 @@ def train(args):
                 critic_adam_count=int(optimizer['critic_adam'][0].count))
         if neutral_contact_ppo:progress['neutral_credits_by_corner']=neutral_credits.tolist()
         if mixed_partner_ppo:progress['mixed_credits_by_mode_and_corner']=mixed_credits.tolist()
+        if pool_opponent_ppo:
+            validate_pool_ledger(pool_credits,mixed_credits)
+            progress.update(pool_credits_by_opponent_and_corner=pool_credits.tolist(),
+                pool_sampler_state=pool_rng.bit_generator.state,pool_assignments=pool_assignments.tolist())
         if posture_cost_ppo:progress['session_posture_cost']=posture_cost_sum
         if kl_guard_ppo:progress.update(kl_guard_actor_steps_total=sum(guard_steps),last_kl_guard=last_guard)
         atomic_json(args.output/'progress.json',progress)
@@ -532,15 +563,20 @@ def train(args):
             actions=np.asarray(action).reshape(args.worlds,learners_per_world,action_size)
             if mixed_partner_ppo:
                 other_obs=np.stack([env.opponent_observation for env in envs])
-                from boxer.striking_fixed_opponent import opponent_state
-                opponent_params,opponent_norm=opponent_state(continuation,ap,norm)
-                opponent_actions=np.asarray(mean_action(opponent_params,jp.array(normalize(other_obs,opponent_norm))))
+                if pool_opponent_ppo:
+                    opponent_actions=np.asarray(predict_pool(jp.asarray(other_obs),jp.asarray(pool_assignments)))
+                else:
+                    from boxer.striking_fixed_opponent import opponent_state
+                    opponent_params,opponent_norm=opponent_state(continuation,ap,norm)
+                    opponent_actions=np.asarray(mean_action(opponent_params,jp.array(normalize(other_obs,opponent_norm))))
             rewards=[];dones=[];following=[]
             for i,env in enumerate(envs):
                 consumed+=learners_per_world
                 world_controls+=1
                 if mixed_partner_ppo:mixed_credits[int(env.active_opponent),env.learner_corner]+=1
                 elif neutral_contact_ppo:neutral_credits[env.learner_corner]+=1
+                if pool_opponent_ppo and env.active_opponent:
+                    pool_credits[pool_assignments[i],env.learner_corner]+=1
                 # Count attempted physics even if a later world/update fails.
                 record(phase='collecting')
                 if mixed_partner_ppo:
@@ -557,6 +593,7 @@ def train(args):
                     completed_rounds+=1;falls+=int(outcome['done'])
                     episode[i]+=1
                     next_obs=env.reset(args.seed+1009*i+int(episode[i]),swap=bool(episode[i]%2))
+                    if pool_opponent_ppo:pool_assignments[i]=draw_opponent(pool_rng,env.active_opponent)
                 following.append(next_obs)
             for k,v in dict(obs=obs.copy(),raw=np.asarray(raw),logp=np.asarray(logp),
                 reward=np.asarray(rewards),done=np.asarray(dones,dtype=np.float32),value=predicted).items():
@@ -615,6 +652,9 @@ def train(args):
             saved['aux_sampler_state']=aux_rng.bit_generator.state
             if neutral_contact_ppo:saved['neutral_credits_by_corner']=neutral_credits.tolist()
             if mixed_partner_ppo:saved['mixed_credits_by_mode_and_corner']=mixed_credits.tolist()
+            if pool_opponent_ppo:
+                saved.update(pool_credits_by_opponent_and_corner=pool_credits.tolist(),
+                    pool_sampler_state=pool_rng.bit_generator.state,pool_assignments=pool_assignments.tolist())
             if demonstration_ppo:
                 saved['retention_sampler_state']=retention_rng.bit_generator.state
                 validate_retention_state(saved,retention_provenance)

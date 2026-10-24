@@ -36,7 +36,7 @@ def anchor_loss(actor,params,obs,labels):
 def validate_split_checkpoint(saved):
     neutral=saved.get('neutral_contact_ppo') is True
     mixed=saved.get('mixed_partner_ppo') is True
-    expected=(1,'mixed_frozen_mean' if saved.get('fixed_opponent_ppo') else 'mixed_current_mean') if mixed else (1,'neutral_motor') if neutral else (2,'active_selfplay')
+    expected=(1,'mixed_pool_mean' if saved.get('pool_opponent_ppo') else 'mixed_frozen_mean' if saved.get('fixed_opponent_ppo') else 'mixed_current_mean') if mixed else (1,'neutral_motor') if neutral else (2,'active_selfplay')
     if (saved.get('training_kind')!='ppo' or saved.get('ppo_optimizer_compatible') is not True or
             saved.get('optimizer_kind')!=OPTIMIZER_KIND or saved.get('migration_version')!=1 or
             (saved.get('actor_inputs'),saved.get('actions'))!=(148,17) or not saved.get('contact_history') or
