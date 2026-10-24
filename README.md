@@ -6,8 +6,9 @@ The [latest striking final](docs/striking-generalization-audit.md) passes two
 distinct consecutive original complete screens, with all 24 pairs surviving in
 each. The complete 128-episode reset/opponent audit is reviewed: all four new
 full groups fail, despite 12 surviving two-way active exchanges. A bounded
-[motor-floor diagnostic](docs/striking-motor-floor-audit.md) now separates motor
-reset failures from head/contact failures before more PPO. No policy is
+[motor-floor diagnostic](docs/striking-motor-floor-audit.md) found 31/32 motor-only
+pair survival. A [matched posture-cost comparison](docs/striking-posture-cost-comparison.md)
+now tests a training reward change with the original physical gates. No policy is
 certified as reliable boxing.
 See the [completion roadmap](docs/boxing-roadmap.md). The
 [verified selected source replay](fights/striking-pilot/first-full-screen-pass-1908736.mp4)
@@ -105,9 +106,9 @@ valid strikes remain sparse. The neutral control severely regresses. The
 further 65,536-credit mixed continuation is now completed: neither generation
 passes, and matched fresh survival regresses 21/24 to 15/24. The [repeatability outcome and generalization audit](docs/striking-generalization-audit.md)
 retain the latest final and all prefixes. Inspect
-`/home/pedro/boxing-runs/striking-motor-floor-1916928/audit.json`
-and its process before any launch. Diagnostic PPO stays 1,918,208; reviewed formal
-evaluation is 1,351,541 with a new diagnostic ceiling of 1,379,541. Main counters and complete
+`/home/pedro/boxing-runs/striking-posture-1916928/comparison.json`
+and its process before any launch. Diagnostic PPO starts at 1,918,208, ceiling
+1,950,976; reviewed formal evaluation is 1,375,474, ceiling 1,459,474. Main counters and complete
 physical criteria remain unchanged. No phase promotion or policy adoption.
 
 The [closed-fist replay repair](docs/closed-fist-rendering.md) restores the

@@ -47,3 +47,34 @@ Inspect that state and process before launching anything else; do not duplicate
 or restart completed jobs. On completion independently review/archive all trials,
 then choose a concrete bounded intervention from the evidence. No automatic
 promotion, main adoption or unlimited PPO; keep the existing monitoring schedule.
+
+## Completed review and next intervention
+
+All 56 episodes completed normally: **23,933** actual controls, formal total
+**1,375,474**. Diagnostic PPO is still **1,918,208**. Exact passive replay fields
+match the earlier reports; every trace is finite and hash checked, all four
+native error logs empty. Raw reports, complete summaries, a 56-file trace hash
+manifest and every failed trajectory are archived under
+[motor-floor-1916928](results/striking-pilot/motor-floor-1916928/analysis.json).
+Full surviving trajectories remain at the manifest's durable WSL paths (84.7 MB
+all traces); they are not duplicated into Git. Failed trajectories are copied
+into the repository for independent inspection.
+
+Motor-only pair survival is **31/32**, with one precontact blue self-leg collision
+at seed 21,000,009 without swap, 0.286 s. Matched full-head survival is 25/32,
+26/32 and 24/32. Masking removes six, six and eight full-head failed trajectories
+respectively, but worsens the motor-only failed reset that the original neutral-1
+and mirror heads survived. It is not a universally safer controller and cannot
+be adopted or treated as boxing.
+
+The exact eight-reset full-head replays survive 6/8, 5/8 and 4/8. Precontact
+falls are two, one and two; remaining falls follow real interbody contact.
+Terminal conditions include self-leg collision and low pelvis, without numeric
+errors. This supports a head-dependent posture-control problem in addition to
+an inherited motor limit; it does not isolate an individual action channel.
+
+The concrete continuation is one [training-only posture-cost comparison](striking-posture-cost-comparison.md):
+cost versus unchanged control from the latest full learned state, bounded
+16,384 credits per arm / 32,768 total, original screens and fresh 23M tests.
+No action masks, automatic-yaw modification, motor replacement or gate changes.
+No promotion or main adoption; continued training depends on physical evidence.

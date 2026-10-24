@@ -1,15 +1,16 @@
 # Adaptive unassisted G1 curriculum
 
 **Latest striking operation (2026-10-24):** the complete 128-episode
-[generalization audit](striking-generalization-audit.md) is independently reviewed.
-All four fresh full groups fail despite 12 surviving two-way active exchanges.
-The original distinct-checkpoint pass streak remains two; no main adoption or
-phase promotion. Diagnostic PPO stays **1,918,208** and formal evaluation is
-**1,351,541** after 55,067 actual new controls. A bounded
-[motor-floor comparison](striking-motor-floor-audit.md) now separates frozen-motor
-reset failures from head-induced/contact failures: 56 episodes, maximum 28,000
-additional evaluation controls, zero training; formal ceiling **1,379,541**.
-All consumed history, original gates and latest learned state remain intact.
+[generalization audit](striking-generalization-audit.md) and 56-episode
+[motor-floor comparison](striking-motor-floor-audit.md) are independently reviewed.
+Motor-only pair survival is 31/32; full-head fresh groups still fail. The original
+version-8 pass streak remains two, without main adoption or phase promotion.
+Formal evaluation is **1,375,474**, diagnostic PPO **1,918,208**. The next bounded
+[training-only posture-cost comparison](striking-posture-cost-comparison.md)
+retains all learned state and physics: at most 16,384 new credits per arm,
+32,768 total (diagnostic PPO ceiling **1,950,976**), maximum 84,000 evaluation
+controls (formal ceiling **1,459,474**). The unchanged original physical gates
+decide results; no automatic extension or adoption.
 
 **Current stage (2026-10-22):** all four foundation levels are certified by
 [two distinct consecutive complete physical passes](results/curriculum/foundation-certification/README.md).

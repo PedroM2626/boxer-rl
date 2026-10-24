@@ -111,6 +111,9 @@ def require_ppo_checkpoint(saved):
         if saved.get('fixed_opponent_ppo'):
             from boxer.striking_fixed_opponent import validate_fixed_metadata
             validate_fixed_metadata(saved)
+        if saved.get('posture_cost_ppo'):
+            from boxer.striking_posture_cost import validate_posture_metadata
+            validate_posture_metadata(saved)
         if saved.get('conservative_actor_ppo'):
             from boxer.striking_conservative_actor import validate_conservative_metadata
             validate_conservative_metadata(saved)
@@ -166,6 +169,7 @@ def main(argv=None):
     parser.add_argument('--credit-horizon-ppo',action='store_true')
     parser.add_argument('--mixed-partner-ppo',action='store_true')
     parser.add_argument('--fixed-opponent-ppo',action='store_true')
+    parser.add_argument('--posture-cost-ppo',action='store_true',help='explicit training-only posture margin cost')
     parser.add_argument('--conservative-actor-ppo',action='store_true')
     parser.add_argument('--actor-learning-rate',type=float,choices=(.0001,.00001),default=.0001)
     parser.add_argument('--update-audit-directory',type=Path,
@@ -197,6 +201,8 @@ def main(argv=None):
         raise ValueError('update audit requires the explicit mixed diagnostic path')
     if args.fixed_opponent_ppo and (not args.mixed_partner_ppo or args.conservative_actor_ppo):
         raise ValueError('fixed opponent requires explicit original-rate mixed lineage')
+    if args.posture_cost_ppo and not args.fixed_opponent_ppo:
+        raise ValueError('posture cost requires the explicit inherited fixed-opponent path')
     if args.conservative_actor_ppo and (not args.mixed_partner_ppo or args.actor_learning_rate!=.00001):
         raise ValueError('conservative actor requires explicit mixed lineage and actor rate 1e-5')
     if not args.conservative_actor_ppo and args.actor_learning_rate!=.0001:
@@ -244,6 +250,7 @@ def train(args):
     mixed_partner_ppo=getattr(args,'mixed_partner_ppo',False)
     conservative_actor_ppo=getattr(args,'conservative_actor_ppo',False)
     fixed_opponent_ppo=getattr(args,'fixed_opponent_ppo',False)
+    posture_cost_ppo=getattr(args,'posture_cost_ppo',False)
     env_class=StrikingEnv
     if contact_ppo:
         from boxer.striking_contact import ContactAwareStrikingEnv
@@ -298,6 +305,10 @@ def train(args):
                             from boxer.striking_fixed_opponent import FROZEN_FINGERPRINT
                             interface_metadata.update(fixed_opponent_ppo=True,fixed_opponent_fingerprint=FROZEN_FINGERPRINT)
                             config.update(interface_metadata,version=8)
+                            if posture_cost_ppo:
+                                from boxer.striking_posture_cost import PROFILE
+                                interface_metadata.update(posture_cost_ppo=True,posture_cost_profile=PROFILE)
+                                config.update(interface_metadata,version=9)
     checkpoint_path=args.output/'checkpoint/latest.json'
     if previous:
         if not args.resume:
@@ -330,6 +341,8 @@ def train(args):
             raise ValueError('explicit mixed checkpoint and training task must agree')
         if fixed_opponent_ppo != saved.get('fixed_opponent_ppo',False):
             raise ValueError('fixed opponent checkpoint and training path must agree')
+        if posture_cost_ppo != saved.get('posture_cost_ppo',False):
+            raise ValueError('posture-cost checkpoint and explicit training reward must agree')
         if conservative_actor_ppo != saved.get('conservative_actor_ppo',False):
             raise ValueError('explicit conservative checkpoint and training path must agree')
         if conservative_actor_ppo and saved['actor_learning_rate']!=args.actor_learning_rate:
@@ -428,6 +441,7 @@ def train(args):
         mixed_credits=np.maximum(np.asarray(continuation['mixed_credits_by_mode_and_corner'],dtype=np.int64),
             np.asarray(progress.get('mixed_credits_by_mode_and_corner',[[0,0],[0,0]]),dtype=np.int64))
     scored=np.zeros(2)
+    posture_cost_sum=0.
     def record(status='running',**extra):
         progress=dict(consumed_steps=consumed,optimized_steps=optimized,
             world_control_steps=world_controls,combined_project_consumed_steps=metadata['total_steps']+consumed,
@@ -439,6 +453,7 @@ def train(args):
                 critic_adam_count=int(optimizer['critic_adam'][0].count))
         if neutral_contact_ppo:progress['neutral_credits_by_corner']=neutral_credits.tolist()
         if mixed_partner_ppo:progress['mixed_credits_by_mode_and_corner']=mixed_credits.tolist()
+        if posture_cost_ppo:progress['session_posture_cost']=posture_cost_sum
         atomic_json(args.output/'progress.json',progress)
         atomic_json(args.output/'state.json',dict(state,status=status,**progress))
     def publish():
@@ -481,6 +496,10 @@ def train(args):
                     next_obs,reward,done,outcome=env.step(actions[i],
                         opponent_actions[i] if env.active_opponent else None)
                 else:next_obs,reward,done,outcome=env.step(actions[i])
+                if posture_cost_ppo:
+                    from boxer.striking_posture_cost import learner_cost
+                    cost=learner_cost(env);posture_cost_sum+=cost
+                    reward=reward-cost
                 rewards.extend(reward);dones.extend([done]*learners_per_world)
                 scored+=outcome['scored']
                 if done:
