@@ -24,8 +24,10 @@ completed with one complete pass followed by regression. A bounded
 [frozen gradient/critic assay](striking-gae-gradient-audit.md) reviewed
 the source, passing checkpoint and latest final without new PPO or adoption.
 It did not establish retention dominance or larger final critic error. One
-[bounded unchanged consolidation](striking-gae-consolidation.md) now checks
-whether the latest policy can sustain complete passes. No main adoption or phase promotion.
+[bounded unchanged consolidation](striking-gae-consolidation.md) completed with two distinct consecutive original complete passes and a complete
+fresh 29M pass. The [readiness scope](results/striking-pilot/gae-readiness-certification/README.md)
+is limited; a [broader frozen audit](striking-gae-generalization.md) now tests
+new full reset groups and archived opponents before any adoption or new training. No main adoption or phase promotion.
 
 ## Complete physical outcome
 

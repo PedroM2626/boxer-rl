@@ -69,3 +69,21 @@ fixed-opponent compatibility. Python/Bash syntax and PowerShell parsing pass.
 The completed assay was independently recomputed from all twelve saved batches;
 no checkpoint was rewritten. Native continuation source-byte/configuration and
 per-block checks remain mandatory and do not imply any physical gate pass.
+
+## Completed verified milestone and next audit
+
+The [full review](results/striking-pilot/gae-consolidate-1998848/README.md) verifies
+all 64 finite PPO payloads, 144 episodes / 70,222 controls, all complete gates,
+checkpoint hashes, source retention, optimizer/corner prefixes and empty native
+error logs. Four original gates are pass/fail/pass/pass. Latest bea8147f also
+passes all fresh 29M profiles (8/8, 8/8, 7/8). Version-12 history now has eight
+distinct records and streak two; failures remain intact.
+
+Freeze latest and record the [limited readiness scope](results/striking-pilot/gae-readiness-certification/README.md),
+without main adoption or general boxing certification. Diagnostic PPO is
+2,131,200; formal simulation 1,874,882. Authorize only the
+[broader frozen audit](striking-gae-generalization.md): four new full reset groups,
+two archived opponents in both evaluated corners, and an exact known 29M replay
+illustration. At most 65,000 evaluation controls / 130 episodes, no optimization;
+new formal diagnostic ceiling 1,939,882. Broader acceptance criteria are declared
+before results. No automatic adoption, promotion, new training or further budget.

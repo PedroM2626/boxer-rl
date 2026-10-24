@@ -5,6 +5,13 @@
 See the [project trajectory and experiment index](docs/experiment-history.md)
 for reviewed successes, failed approaches, limitations and pending decisions.
 
+Latest milestone (2026-10-24): the longer-GAE candidate passed two distinct
+consecutive complete original ten-second gates and a complete fresh set (23/24
+paired survivors). Its [scope-limited readiness record](docs/results/striking-pilot/gae-readiness-certification/README.md)
+freezes latest bea8147f. A [broader frozen audit](docs/striking-gae-generalization.md)
+now tests new reset groups and archived opponents. General boxing remains
+uncertified, and the stopped main policy has not been replaced.
+
 An [earlier striking final](docs/striking-generalization-audit.md) passed two
 distinct consecutive original complete screens, with all 24 pairs surviving in
 each. The complete 128-episode reset/opponent audit is reviewed: all four fresh
@@ -27,8 +34,7 @@ completed with a complete intermediate pass followed by regression. A bounded
 [frozen gradient/critic assay](docs/striking-gae-gradient-audit.md) investigated
 that regression without changing saved policies or adding PPO. It did not
 establish retention dominance or a larger final critic error. A bounded
-[unchanged consolidation](docs/striking-gae-consolidation.md) now checks whether
-the latest policy can sustain complete passes. No policy is
+[unchanged consolidation](docs/striking-gae-consolidation.md) completed with the verified limited milestone above. No policy is
 certified as reliable boxing.
 See the [completion roadmap](docs/boxing-roadmap.md). The
 [verified selected source replay](fights/striking-pilot/first-full-screen-pass-1908736.mp4)

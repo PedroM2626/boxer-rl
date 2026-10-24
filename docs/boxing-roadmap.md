@@ -10,8 +10,8 @@ still fails across all four new full groups. The complete cross-policy audit is
 reviewed. The completed [motor-floor audit](striking-motor-floor-audit.md) found
 31/32 motor-only pair survival and additional head-dependent failures. A
 [bounded training-only posture-cost comparison](striking-posture-cost-comparison.md)
-is completed and its extra cost rejected. Four newer full screens fail; both
-current task pass streaks are zero. A read-only
+is completed and its extra cost rejected. Those posture-comparison full screens fail; both associated
+profile families retain zero pass streaks. A read-only
 [objective audit](striking-objective-audit.md) measured terminal reward and matched
 action-mode gaps. A bounded [on-policy sampling comparison](striking-sampling-comparison.md)
 completed without a sustained benefit from half Gaussian standard deviation.
@@ -23,8 +23,10 @@ completed with one complete pass followed by regression. A bounded
 [frozen gradient/critic assay](striking-gae-gradient-audit.md) reviewed
 the source, passing checkpoint and latest final without new PPO or adoption.
 It did not establish retention dominance or larger final critic error. One
-[bounded unchanged consolidation](striking-gae-consolidation.md) now checks
-whether the latest policy can sustain complete passes.
+[bounded unchanged consolidation](striking-gae-consolidation.md) completed with two distinct consecutive original complete passes and a complete
+fresh 29M pass. The [readiness scope](results/striking-pilot/gae-readiness-certification/README.md)
+is limited; a [broader frozen audit](striking-gae-generalization.md) now tests
+new full reset groups and archived opponents before any adoption or new training.
 See its contract for current accounting.
 
 1. Consolidate stable own strikes in both corners against a neutral partner.
