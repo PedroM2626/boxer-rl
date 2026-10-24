@@ -18,7 +18,9 @@ robust stability (19/24 fresh paired survivors versus 18/24 control and 23/24
 source). A bounded [passive failure replay](docs/striking-kl-failure-trace.md)
 completed with exact episode reproduction and mostly post-contact low-pelvis
 failures. A bounded [GAE trace-length comparison](docs/striking-gae-comparison.md)
-now tests longer direct terminal credit while retaining the latest control. No policy is
+completed with fresh mirror pair survival 8/8 and six reciprocal episodes,
+but all complete physical sets still fail. One [bounded ordinary continuation](docs/striking-gae-continuation.md)
+now checks the latest longer-GAE endpoint without changing physical criteria. No policy is
 certified as reliable boxing.
 See the [completion roadmap](docs/boxing-roadmap.md). The
 [verified selected source replay](fights/striking-pilot/first-full-screen-pass-1908736.mp4)

@@ -88,3 +88,21 @@ is verified: 1,024 included learner/world credits, sixteen actor/critic steps,
 finite state, version 12 / lambda .99 and unchanged frozen adversary. The first
 sampled-batch comparison remains pending until control runs. Source fresh 26M
 survival is 8/7/6, a complete failure. No improvement or promotion is inferred.
+
+## Completed comparison and bounded decision
+
+The [full independent review](results/striking-pilot/gae-1966080/README.md)
+verifies all 32 finite update payloads, matching initial sampling hash and 168
+episodes / 79,297 evaluation controls. Lambda .99 has original mirror survival
+7/8 then 8/8 with six reciprocal episodes each, and fresh mirror 8/8 with six,
+versus 7/8 with four control and 6/8 with four source. Neutral fresh survival
+6/8 and 7/8 still fails; aggregate 21/24 only matches source (control 20/24).
+Both original complete screens fail, and every full fresh set fails. No adoption.
+
+These active-exchange results justify only one [bounded ordinary continuation](striking-gae-continuation.md)
+from latest 95dbdff0, retaining version 12 and all learned/optimizer/sampler state.
+At most 16,384 new credits, full screens at 8,192/16,384 and new 27M source/final
+sets, at most 48,000 evaluation controls. Stop at the first screen if severe
+regression or no source-relative full-screen measurement improves. New diagnostic
+PPO ceiling 2,065,664; formal evaluation ceiling 1,793,950. No rollback, weaker
+neutral criteria, automatic promotion or further allocation.

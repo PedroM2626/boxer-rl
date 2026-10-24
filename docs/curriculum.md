@@ -1,28 +1,30 @@
 # Adaptive unassisted G1 curriculum
 
-**Latest reviewed outcome (2026-10-24):** the
-[exact passive replay](results/striking-pilot/kl-failure-trace-1966080/README.md)
-completed 72 episodes / 33,219 controls. All original trial fields reproduce.
-There are twelve failures (nine low-pelvis, three self-leg contact), eleven after
-interbody contact. All three complete sets fail; temporal association is not
-contact causation. Foundation certifications and main boxing remain unchanged.
+**Latest reviewed outcome (2026-10-24):** the [complete GAE comparison](striking-gae-comparison.md)
+finished 168 episodes / 79,297 evaluation controls / 32,768 diagnostic PPO credits.
+Lambda .99 has fresh mirror pair survival 8/8 with six reciprocal episodes,
+versus control 7/8 with four and source 6/8 with four. Both distinct original
+mirror checkpoints also have six reciprocal episodes. Neutral fresh survival
+6/8 and 7/8 fails: every complete set fails and aggregate 21/24 only matches
+source. Version-8 history has thirteen records, current streak zero; version 12
+has two failures, also zero. All foundation certifications remain intact.
 
-**Current operation:** one bounded [GAE trace-length comparison](striking-gae-comparison.md)
-from latest original control **24e23288**, retaining every learned, optimizer,
-normalizer and sampler leaf. Compare training lambda .99 versus original .95;
-gamma .999, original rewards/covariance/physics, critic schedule and all gates
-stay unchanged. The zero-simulation terminal-credit audit motivates testing
-longer direct terminal credit; it proves no physical benefit. No earlier actor
-restoration, assistance, main adoption or stage promotion.
+**Current operation:** one [bounded ordinary longer-GAE continuation](striking-gae-continuation.md)
+from latest **95dbdff0**, retaining version 12 / lambda .99 and every learned,
+Adam, normalizer and sampler leaf. No new transition, earlier actor restoration,
+changed rewards/covariance/physics, main adoption or stage promotion. Complete
+screens at +8,192/+16,384; stop after the first if severe regression or no
+source-relative full-screen measure improves. Source/final new 27M full sets.
 
-Reviewed diagnostic PPO is **2,016,512**, new ceiling **2,049,280** (at most
-16,384 credits per arm / 32,768 total). Reviewed formal evaluation is **1,666,653**,
-new ceiling **1,750,653** (at most 84,000 controls). Main boxing **1,048,576**,
-foundation **474,992,640**, combined main **476,041,216** and BC 8,000 are unchanged.
-Inspect `/home/pedro/boxing-runs/striking-gae-1966080/comparison.json` and both
-child outputs/processes before any launch. Prior KL comparison and matched
-replay are completed and archived. No duplicate jobs, forced rollback, blind
-retry or automatic further extension. Preserve all failed gate history.
+Reviewed diagnostic PPO is **2,049,280**, new ceiling **2,065,664** (at most
+16,384 additional learner/world credits). Reviewed formal evaluation is
+**1,745,950**, new ceiling **1,793,950** (at most 48,000 controls). Main boxing
+**1,048,576**, foundation **474,992,640**, combined main **476,041,216**, BC 8,000
+remain unchanged. Inspect the live state and child processes at
+`/home/pedro/boxing-runs/striking-gae-continue-1982464/continuation.json` before
+any launch. Prior comparisons and replay are completed and archived. Preserve
+all failed histories and unused allocation. No duplicate jobs, forced rollback,
+blind retry, automatic promotion or further extension.
 
 **Current stage (2026-10-22):** all four foundation levels are certified by
 [two distinct consecutive complete physical passes](results/curriculum/foundation-certification/README.md).
