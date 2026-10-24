@@ -139,3 +139,27 @@ passes. The +16,384 generation, fresh final and matched control remain pending;
 complete all bounded checks before an adoption or extension decision. A favorable
 intermediate checkpoint cannot replace later failures or fresh-set evidence.
 No stage promotion, main adoption or reliable-boxing claim is made.
+
+## Later distinct generation fails; finish matched control
+
+The following +16,384 half-noise generation
+**185e93e0d32a9543360908611a9a948c9d4f20e9a55e50499b9d719b5642ff32**
+fails the unchanged original screen: neutral-0 / neutral-1 / mirror survival
+**7/8 / 7/8 / 4/8**, total 18/24 and no surviving two-way mirror episode. Fresh
+24M final survival is **6/8 / 6/8 / 5/8**, total **17/24**, two surviving two-way
+mirror episodes; the complete fresh set also fails (source was 16/24).
+
+Independent verification checks the exact final hash, sampling metadata,
+immutable adversary, finite learned state and all 16 finite training metrics,
+Adam 12,936 / 36,608 and lineage 1,949,696 learner / 1,327,104 world. Original
+screen cost 10,318 and fresh cost 9,175 controls are already included in live
+accounting. Both raw full sets, final model, metrics and validation are archived.
+The version-10 original history now retains **pass/fail**, current streak zero.
+The earlier first-pass validation above is a historical snapshot, not current
+certification or permission to restore that intermediate actor.
+
+No further half-noise credits, actor adoption, rollback or phase promotion are
+allocated. Finish the already bounded matched control and independently review
+both complete arms before any continuation decision. Relative benefit versus
+control remains unresolved; software/probability correctness does not establish
+physically robust boxing.

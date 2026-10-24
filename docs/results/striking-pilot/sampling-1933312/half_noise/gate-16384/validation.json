@@ -1,0 +1,112 @@
+{
+  "status": "half_noise_arm_independently_reviewed_control_pending",
+  "sha256": "185e93e0d32a9543360908611a9a948c9d4f20e9a55e50499b9d719b5642ff32",
+  "screen": {
+    "profiles": {
+      "neutral-0": {
+        "pair_survivors": 7,
+        "own_surviving_scoring_seeds": [
+          7,
+          23,
+          31,
+          47
+        ],
+        "surviving_events_by_corner": [
+          6.0,
+          0.0
+        ],
+        "surviving_two_way_episodes": 0,
+        "passes_profile": true
+      },
+      "neutral-1": {
+        "pair_survivors": 7,
+        "own_surviving_scoring_seeds": [
+          23,
+          31,
+          47
+        ],
+        "surviving_events_by_corner": [
+          0.0,
+          7.0
+        ],
+        "surviving_two_way_episodes": 0,
+        "passes_profile": false
+      },
+      "selfplay": {
+        "pair_survivors": 4,
+        "own_surviving_scoring_seeds": [
+          23,
+          31,
+          47
+        ],
+        "surviving_events_by_corner": [
+          1.0,
+          4.0
+        ],
+        "surviving_two_way_episodes": 0,
+        "passes_profile": false
+      }
+    },
+    "passes_complete": false
+  },
+  "fresh": {
+    "profiles": {
+      "neutral-0": {
+        "pair_survivors": 6,
+        "own_surviving_scoring_seeds": [
+          24000003,
+          24000005,
+          24000006
+        ],
+        "surviving_events_by_corner": [
+          11.0,
+          0.0
+        ],
+        "surviving_two_way_episodes": 0,
+        "passes_profile": false
+      },
+      "neutral-1": {
+        "pair_survivors": 6,
+        "own_surviving_scoring_seeds": [
+          24000003,
+          24000004,
+          24000006
+        ],
+        "surviving_events_by_corner": [
+          0.0,
+          5.0
+        ],
+        "surviving_two_way_episodes": 0,
+        "passes_profile": false
+      },
+      "selfplay": {
+        "pair_survivors": 5,
+        "own_surviving_scoring_seeds": [
+          24000004,
+          24000005,
+          24000006
+        ],
+        "surviving_events_by_corner": [
+          4.0,
+          5.0
+        ],
+        "surviving_two_way_episodes": 2,
+        "passes_profile": false
+      }
+    },
+    "passes_complete": false
+  },
+  "screen_evaluation_world_controls": 10318,
+  "fresh_evaluation_world_controls": 9175,
+  "new_ppo_steps_included": 16384,
+  "all_learned_state_finite": true,
+  "native_error_logs_empty": true,
+  "actor_adam_count": 12936,
+  "critic_adam_count": 36608,
+  "original_screen_pass_streak": 0,
+  "required_distinct_consecutive_passes": 2,
+  "main_adoption": false,
+  "promotion": false,
+  "full_comparison_complete": false,
+  "decision": "The intermediate original pass is followed by a failed distinct generation and failed fresh final. Retain both; do not restore/adopt the intermediate actor or extend this arm. Finish the already bounded matched control and review all evidence before any continuation allocation."
+}

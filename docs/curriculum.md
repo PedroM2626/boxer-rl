@@ -21,11 +21,13 @@ Maximum 32,768 new credits (PPO ceiling **1,983,744**) and 84,000 evaluation
 controls (formal ceiling **1,571,326**). All source leaves, physics, rewards,
 original mean-action gates and main/BC counters remain intact; no automatic adoption.
 
-**Interim physical result:** the version-10 +8,192 checkpoint c61f6e46 passes
-its first complete original screen (22/24 paired survivors, neutral own-impact
-breadth and two surviving two-way mirror episodes), independently verified and
-archived. Its new task streak is one; the distinct second checkpoint, full
-fresh finals and matched control remain pending. No promotion or main adoption.
+**Interim physical result:** version 10 passed at +8,192 (c61f6e46, 22/24 paired
+survivors, two surviving two-way mirror episodes), but failed at +16,384
+(185e93e0, 18/24 original and 17/24 fresh survivors). Both generations and the
+fresh final are independently checked/archived; current version-10 streak is
+zero. No intermediate-actor restoration, extension, promotion or main adoption.
+The already bounded matched control is still running and must finish before
+the complete comparison decision.
 
 **Current stage (2026-10-22):** all four foundation levels are certified by
 [two distinct consecutive complete physical passes](results/curriculum/foundation-certification/README.md).

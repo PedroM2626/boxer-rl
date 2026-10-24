@@ -44,3 +44,17 @@ The second distinct checkpoint, matched control and independent fresh final
 remain pending. Do not adopt the intermediate model, skip later failed gates or
 extend the budget from this result. Live comparison supersedes this snapshot;
 no stage promotion or boxing completion is claimed.
+
+## Subsequent failure retained
+
+The distinct +16,384 185e93e0 generation fails: original survival 7/8 / 7/8 /
+4/8 (18/24), fresh 24M survival 6/8 / 6/8 / 5/8 (17/24). Its exact model,
+complete reports, all 16 finite metrics and independent validation are archived
+under `half_noise/gate-16384` and `half_noise/fresh`. Original/fresh controls
+10,318 / 9,175 are included in live consumption, not added again.
+
+The new-family history is pass/fail and current streak zero. Both generations
+remain retained; the earlier one-pass snapshot above must not override the
+later failure. No intermediate-actor restoration, extension or adoption.
+The matched control is still running within the existing cap; finish and review
+both arms before any next allocation or claim of relative improvement.
