@@ -1,14 +1,14 @@
 # Adaptive unassisted G1 curriculum
 
-**Latest striking operation (2026-10-24):** all 48 passive failure replays
-exactly match original physical outcomes. Of 11 falls, ten involve low pelvis,
-one tilt, none self-leg contact; two precede any opponent contact. A bounded
-[evaluation-only automatic-yaw comparison](striking-approach-yaw-review.md)
-tests base yaw scale 0.5 against 1.0 with unchanged learned actions, physics,
-rewards and thresholds. Modified-controller reports cannot promote a stage.
-No PPO allocation; diagnostic PPO stays **1,844,480**, formal evaluation is
-**1,106,474**, new evaluation ceiling **1,142,474** (at most 36,000 new controls).
-Main stays stopped; latest final and all consumed prefixes are retained.
+**Latest striking operation (2026-10-24):** global base-yaw scaling is rejected:
+neutral survival improves, active survival regresses in both 16M/17M samples.
+The original controller/physics remain intact. A bounded [fixed-opponent versus
+current-opponent training comparison](striking-fixed-opponent-comparison.md)
+starts from the latest original-profile final, preserving all learned optimizer
+prefixes. At most 16,384 learner controls per arm, full unchanged gates and early
+stops, followed by matched fresh 18M evaluations. No main adoption or promotion.
+Before this comparison: **1,844,480 PPO / 1,139,761 formal controls**; new ceilings
+**1,877,248 / 1,223,761**. Main and all four certifications remain unchanged.
 
 **Current stage (2026-10-22):** all four foundation levels are certified by
 [two distinct consecutive complete physical passes](results/curriculum/foundation-certification/README.md).

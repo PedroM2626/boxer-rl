@@ -108,6 +108,9 @@ def require_ppo_checkpoint(saved):
         if saved.get('credit_horizon_ppo'):
             from boxer.striking_credit_horizon import validate_horizon_state
             validate_horizon_state(saved)
+        if saved.get('fixed_opponent_ppo'):
+            from boxer.striking_fixed_opponent import validate_fixed_metadata
+            validate_fixed_metadata(saved)
         if saved.get('conservative_actor_ppo'):
             from boxer.striking_conservative_actor import validate_conservative_metadata
             validate_conservative_metadata(saved)
@@ -162,6 +165,7 @@ def main(argv=None):
     parser.add_argument('--neutral-contact-ppo',action='store_true')
     parser.add_argument('--credit-horizon-ppo',action='store_true')
     parser.add_argument('--mixed-partner-ppo',action='store_true')
+    parser.add_argument('--fixed-opponent-ppo',action='store_true')
     parser.add_argument('--conservative-actor-ppo',action='store_true')
     parser.add_argument('--actor-learning-rate',type=float,choices=(.0001,.00001),default=.0001)
     parser.add_argument('--update-audit-directory',type=Path,
@@ -191,6 +195,8 @@ def main(argv=None):
         raise ValueError('mixed partner requires explicit gamma-0.999 lineage and eight 128-step worlds')
     if args.update_audit_directory is not None and not args.mixed_partner_ppo:
         raise ValueError('update audit requires the explicit mixed diagnostic path')
+    if args.fixed_opponent_ppo and (not args.mixed_partner_ppo or args.conservative_actor_ppo):
+        raise ValueError('fixed opponent requires explicit original-rate mixed lineage')
     if args.conservative_actor_ppo and (not args.mixed_partner_ppo or args.actor_learning_rate!=.00001):
         raise ValueError('conservative actor requires explicit mixed lineage and actor rate 1e-5')
     if not args.conservative_actor_ppo and args.actor_learning_rate!=.0001:
@@ -237,6 +243,7 @@ def train(args):
     credit_horizon_ppo=getattr(args,'credit_horizon_ppo',False)
     mixed_partner_ppo=getattr(args,'mixed_partner_ppo',False)
     conservative_actor_ppo=getattr(args,'conservative_actor_ppo',False)
+    fixed_opponent_ppo=getattr(args,'fixed_opponent_ppo',False)
     env_class=StrikingEnv
     if contact_ppo:
         from boxer.striking_contact import ContactAwareStrikingEnv
@@ -247,6 +254,9 @@ def train(args):
         if mixed_partner_ppo:
             from boxer.striking_mixed_partner import ContactMixedStrikingEnv,MIXED_ACTIVE_WORLDS
             env_class=ContactMixedStrikingEnv
+            if fixed_opponent_ppo:
+                from boxer.striking_fixed_opponent import ContactFixedMixedStrikingEnv
+                env_class=ContactFixedMixedStrikingEnv
     observation_size, action_size = env_class.observation_size, env_class.action_size
     learners_per_world = getattr(env_class, 'learners_per_world', 2)
     if learners_per_world not in (1, 2):
@@ -284,6 +294,10 @@ def train(args):
                         if conservative_actor_ppo:
                             interface_metadata.update(conservative_actor_ppo=True,actor_learning_rate=args.actor_learning_rate)
                             config.update(interface_metadata,version=7)
+                        if fixed_opponent_ppo:
+                            from boxer.striking_fixed_opponent import FROZEN_FINGERPRINT
+                            interface_metadata.update(fixed_opponent_ppo=True,fixed_opponent_fingerprint=FROZEN_FINGERPRINT)
+                            config.update(interface_metadata,version=8)
     checkpoint_path=args.output/'checkpoint/latest.json'
     if previous:
         if not args.resume:
@@ -314,6 +328,8 @@ def train(args):
             raise ValueError('explicit credit-horizon checkpoint and training path must agree')
         if mixed_partner_ppo != saved.get('mixed_partner_ppo',False):
             raise ValueError('explicit mixed checkpoint and training task must agree')
+        if fixed_opponent_ppo != saved.get('fixed_opponent_ppo',False):
+            raise ValueError('fixed opponent checkpoint and training path must agree')
         if conservative_actor_ppo != saved.get('conservative_actor_ppo',False):
             raise ValueError('explicit conservative checkpoint and training path must agree')
         if conservative_actor_ppo and saved['actor_learning_rate']!=args.actor_learning_rate:
@@ -450,7 +466,9 @@ def train(args):
             actions=np.asarray(action).reshape(args.worlds,learners_per_world,action_size)
             if mixed_partner_ppo:
                 other_obs=np.stack([env.opponent_observation for env in envs])
-                opponent_actions=np.asarray(mean_action(ap,jp.array(normalize(other_obs,norm))))
+                from boxer.striking_fixed_opponent import opponent_state
+                opponent_params,opponent_norm=opponent_state(continuation,ap,norm)
+                opponent_actions=np.asarray(mean_action(opponent_params,jp.array(normalize(other_obs,opponent_norm))))
             rewards=[];dones=[];following=[]
             for i,env in enumerate(envs):
                 consumed+=learners_per_world

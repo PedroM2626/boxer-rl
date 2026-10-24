@@ -2,12 +2,12 @@
 
 ## Current experiment: unassisted paired boxing diagnostics
 
-The [completed passive failure review](docs/striking-approach-yaw-review.md)
-verifies all 48 original outcomes exactly: 11 falls, including two before contact.
-A bounded evaluation-only comparison tests smaller automatic approach yaw with
-all learned action channels and unassisted physics retained. No PPO extension
-or diagnostic controller adoption is granted. No current policy is certified
-as reliable boxing. See the [completion roadmap](docs/boxing-roadmap.md).
+The [completed yaw review and next matched experiment](docs/striking-fixed-opponent-comparison.md)
+reject global yaw scaling because active stability regresses in both samples.
+The original physics/controller are retained. A bounded training comparison now
+tests a frozen adversary against the current evolving adversary, with full
+physical evaluations and all learned optimizer prefixes preserved. No policy
+is certified as reliable boxing. See the [completion roadmap](docs/boxing-roadmap.md).
 
 All four [foundation stages](docs/curriculum.md) passed their unchanged complete
 physical gates twice on distinct checkpoints. Foundation learning finished at
@@ -99,13 +99,12 @@ is completed and independently reviewed: mixed fresh survival is 24/24 versus
 18/24 neutral control and 22/24 source. Neither arm passes complete criteria;
 valid strikes remain sparse. The neutral control severely regresses. The
 further 65,536-credit mixed continuation is now completed: neither generation
-passes, and matched fresh survival regresses 21/24 to 15/24. The [completed failure traces and current comparison](docs/striking-approach-yaw-review.md)
-inspect instability after the stopped confirmation. All 48 passive replays are
-exact; the next diagnostic changes only base approach yaw before learned offsets.
-Inspect `/home/pedro/boxing-runs/striking-base-yaw-1859584/comparison.json`
-and its process before another launch. Diagnostic PPO stays 1,844,480; formal
-evaluation is 1,106,474 with a 1,142,474 ceiling. Main counters and physical
-criteria remain unchanged; modified reports cannot certify promotion.
+passes, and matched fresh survival regresses 21/24 to 15/24. The [complete yaw results and fixed-opponent comparison](docs/striking-fixed-opponent-comparison.md)
+retain the original controller after mixed yaw results. Inspect
+`/home/pedro/boxing-runs/striking-fixed-opponent-1859584/comparison.json`
+and its process before another launch. Diagnostic totals are 1,844,480 PPO and
+1,139,761 evaluation controls; ceilings are 1,877,248 / 1,223,761. Main counters
+and complete physical criteria remain unchanged. No adoption or promotion.
 
 The [closed-fist replay repair](docs/closed-fist-rendering.md) restores the
 original visual feature without changing learning or physics. Historical videos

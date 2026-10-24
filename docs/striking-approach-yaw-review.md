@@ -1,5 +1,10 @@
 # Passive failure outcome and bounded automatic-yaw probe
 
+**Current outcome:** yaw scaling is rejected after the complete comparison:
+active survival regresses in both samples. See the [full result and next bounded
+fixed-opponent contract](striking-fixed-opponent-comparison.md). No modified
+yaw controller is adopted and the original physical profile remains in use.
+
 ## Completed exact replay
 
 All **48 complete episodes / 21,499 world controls** reproduce every original

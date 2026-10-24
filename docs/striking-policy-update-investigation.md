@@ -1,10 +1,14 @@
 # Mixed continuation regression and policy-update investigation
 
-**Current decision:** the passive source/final trace completed with exact
-agreement on all 48 trials. No unchanged PPO extension is allocated. The
-[current outcome and bounded automatic-yaw probe](striking-approach-yaw-review.md)
-tests one controller-path hypothesis with fresh holdouts and zero optimization.
-No main adoption, rollback or phase promotion.
+**Current outcome:** yaw scaling is rejected after the complete comparison:
+active survival regresses in both samples. See the [full result and next bounded
+fixed-opponent contract](striking-fixed-opponent-comparison.md). No modified
+yaw controller is adopted and the original physical profile remains in use.
+
+**Current decision:** global yaw scaling is rejected after both complete samples.
+The [fixed-opponent matched training comparison](striking-fixed-opponent-comparison.md)
+retains the latest original physical profile and all learned prefixes. No main
+adoption or promotion; full gates, bounded compute and early stops apply.
 
 ## Complete physical outcome
 

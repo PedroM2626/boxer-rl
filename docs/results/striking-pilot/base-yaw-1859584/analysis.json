@@ -1,0 +1,195 @@
+{
+  "status": "reviewed",
+  "diagnostic_ppo_total": 1844480,
+  "formal_world_controls_total": 1139761,
+  "new_evaluation_world_controls": 33287,
+  "new_optimizer_updates": 0,
+  "main_adoption": false,
+  "promotion": false,
+  "native_error_logs_empty": true,
+  "foundation_history_records": {
+    "balance": 29,
+    "walk_easy": 41,
+    "walk": 13,
+    "approach": 2
+  },
+  "samples": {
+    "control-16m": {
+      "neutral-0": {
+        "pair_survivors": 7,
+        "own_surviving_scoring_seeds": [
+          16000003,
+          16000004,
+          16000006
+        ],
+        "surviving_events_by_corner": [
+          5.0,
+          1.0
+        ],
+        "surviving_two_way_episodes": 1,
+        "meets_numeric_profile_thresholds": true
+      },
+      "neutral-1": {
+        "pair_survivors": 5,
+        "own_surviving_scoring_seeds": [
+          16000006
+        ],
+        "surviving_events_by_corner": [
+          0.0,
+          1.0
+        ],
+        "surviving_two_way_episodes": 0,
+        "meets_numeric_profile_thresholds": false
+      },
+      "selfplay": {
+        "pair_survivors": 6,
+        "own_surviving_scoring_seeds": [
+          16000003,
+          16000004,
+          16000005,
+          16000006
+        ],
+        "surviving_events_by_corner": [
+          9.0,
+          8.0
+        ],
+        "surviving_two_way_episodes": 2,
+        "meets_numeric_profile_thresholds": false
+      }
+    },
+    "modified-16m": {
+      "neutral-0": {
+        "pair_survivors": 8,
+        "own_surviving_scoring_seeds": [
+          16000003,
+          16000004,
+          16000005,
+          16000006
+        ],
+        "surviving_events_by_corner": [
+          11.0,
+          0.0
+        ],
+        "surviving_two_way_episodes": 0,
+        "meets_numeric_profile_thresholds": true
+      },
+      "neutral-1": {
+        "pair_survivors": 7,
+        "own_surviving_scoring_seeds": [
+          16000004,
+          16000005,
+          16000006
+        ],
+        "surviving_events_by_corner": [
+          0.0,
+          5.0
+        ],
+        "surviving_two_way_episodes": 0,
+        "meets_numeric_profile_thresholds": false
+      },
+      "selfplay": {
+        "pair_survivors": 5,
+        "own_surviving_scoring_seeds": [
+          16000003,
+          16000005,
+          16000006
+        ],
+        "surviving_events_by_corner": [
+          6.0,
+          5.0
+        ],
+        "surviving_two_way_episodes": 3,
+        "meets_numeric_profile_thresholds": false
+      }
+    },
+    "control-17m": {
+      "neutral-0": {
+        "pair_survivors": 5,
+        "own_surviving_scoring_seeds": [
+          17000003,
+          17000005
+        ],
+        "surviving_events_by_corner": [
+          2.0,
+          0.0
+        ],
+        "surviving_two_way_episodes": 0,
+        "meets_numeric_profile_thresholds": false
+      },
+      "neutral-1": {
+        "pair_survivors": 6,
+        "own_surviving_scoring_seeds": [
+          17000003,
+          17000004,
+          17000006
+        ],
+        "surviving_events_by_corner": [
+          0.0,
+          3.0
+        ],
+        "surviving_two_way_episodes": 0,
+        "meets_numeric_profile_thresholds": false
+      },
+      "selfplay": {
+        "pair_survivors": 7,
+        "own_surviving_scoring_seeds": [
+          17000003,
+          17000005,
+          17000006
+        ],
+        "surviving_events_by_corner": [
+          3.0,
+          2.0
+        ],
+        "surviving_two_way_episodes": 0,
+        "meets_numeric_profile_thresholds": true
+      }
+    },
+    "modified-17m": {
+      "neutral-0": {
+        "pair_survivors": 8,
+        "own_surviving_scoring_seeds": [
+          17000003,
+          17000005,
+          17000006
+        ],
+        "surviving_events_by_corner": [
+          5.0,
+          0.0
+        ],
+        "surviving_two_way_episodes": 0,
+        "meets_numeric_profile_thresholds": true
+      },
+      "neutral-1": {
+        "pair_survivors": 8,
+        "own_surviving_scoring_seeds": [
+          17000003,
+          17000004,
+          17000005,
+          17000006
+        ],
+        "surviving_events_by_corner": [
+          1.0,
+          13.0
+        ],
+        "surviving_two_way_episodes": 1,
+        "meets_numeric_profile_thresholds": true
+      },
+      "selfplay": {
+        "pair_survivors": 5,
+        "own_surviving_scoring_seeds": [
+          17000003,
+          17000004,
+          17000006
+        ],
+        "surviving_events_by_corner": [
+          3.0,
+          4.0
+        ],
+        "surviving_two_way_episodes": 1,
+        "meets_numeric_profile_thresholds": false
+      }
+    }
+  },
+  "decision": "Reject global base-yaw scaling: neutral survival improves in both samples, but active survival regresses 6/8 to 5/8 on 16M and 7/8 to 5/8 on fresh 17M. Do not adopt controller or allocate training for it. Return to the unchanged version-6 latest final. Permit one matched bounded fixed-opponent versus current-opponent training comparison, 16384 learner controls per arm, preserving physics/actions/gates and every learned optimizer prefix. This tests a stationary opponent hypothesis, not a proven cause of instability. No automatic further allocation or promotion."
+}

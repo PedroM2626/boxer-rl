@@ -1,0 +1,106 @@
+# Completed yaw review and bounded stationary-opponent training comparison
+
+## Completed controller comparison
+
+The complete yaw diagnostic consumes **72 new episodes / 33,287 controls**,
+with zero optimization. All reports, finite states, sample/side coverage,
+source hash and empty native logs are independently verified by
+`tools/review_striking_base_yaw.py`. Complete foundation histories 29/41/13/2,
+finite motor payload hashes and stopped main boxing hash remain intact.
+
+| Sample / base yaw | Neutral 0 survival / own events | Neutral 1 survival / own events | Active survival / red-blue events | Active two-way episodes |
+| --- | --- | --- | --- | --- |
+| Existing 16M / original | 7/8 / 5 | 5/8 / 1 | 6/8 / 9-8 | 2 |
+| Same 16M / half | 8/8 / 11 | 7/8 / 5 | 5/8 / 6-5 | 3 |
+| Fresh 17M / original | 5/8 / 2 | 6/8 / 3 | 7/8 / 3-2 | 0 |
+| Same fresh 17M / half | 8/8 / 5 | 8/8 / 13 | 5/8 / 3-4 | 1 |
+
+Reject global yaw scaling: neutral survival improves consistently, while active
+survival regresses in both samples. No complete set meets even unchanged numeric
+thresholds; modified reports remain ineligible for ordinary promotion. Do not
+adopt or train this controller, sweep more yaw settings or infer a need for leg
+assistance. The original physical/controller profile remains authoritative.
+
+Diagnostic PPO stays **1,844,480**, formal evaluation becomes **1,139,761**.
+Yaw collection/optimization/supervised counts are zero. All previous allocations
+are retained evidence; unused reserved steps are not consumed compute. Main
+boxing 1,048,576, combined main 476,041,216 and BC 8,000 updates stay unchanged.
+
+## Next hypothesis and exact matched contract
+
+The version-6 active adversary uses the learner's evolving deterministic mean;
+its parameters and normalizer change after every PPO block. A stationary
+opponent may make initial contact exchanges easier to learn. This is an
+algorithmic hypothesis, **not a demonstrated cause** of collapse. It implements
+a bounded first step toward the roadmap's opponent coverage, without new reward,
+physical assistance, pose teacher or action-authority changes.
+
+Both arms start from the latest fully evaluated original-profile final SHA
+`6bf3273ab5cd83e42b588403a7361140e4ee42afe0fbec20732e0a010bb34e7a`,
+lineage 1,859,584 learner / 1,236,992 world, Adam 11,528 / 35,200. Control keeps
+version 6. Candidate version 8 freezes only the **active opposing policy and
+its normalizer** to that same source; the learner/critic and learner normalizer
+continue ordinary PPO. Store the exact frozen arrays and checked fingerprint
+`158d7b3dbdccc0a0aadec27d7d39b714677191d35b1d8a68759f12e5472873b0`.
+Retain all pre-existing learned parameters, Adam/RNG/sampler states and credits;
+only explicit task/provenance fields change at the candidate transition.
+
+Both retain four neutral/four active worlds, both learner corners, 148 inputs,
+17 actions, original approach yaw, inherited engagement distances, gamma 0.999,
+retention coefficient 1, actor/critic rate 0.0001, motor freeze, free roots/legs,
+2 m nominal separated spawns, first-fall/impact criteria and every score threshold.
+Neutral worlds still use zero opposing head action, and the opposing body's
+physics is fully simulated. Its actions are never counted as extra PPO rows.
+
+Allocate **16,384 learner/world controls per arm**, **32,768 maximum total**.
+The included first 1,024-credit blocks verify finite payloads, source/frozen
+fingerprints, exact optimizer/mode prefixes and passive update metrics. Because
+the opposing policy is initially identical, their first-block learner/critic/
+normalizer/optimizer/RNG/sampler leaves must match exactly before later rollouts
+can diverge. No reset or discarded-block accounting shortcut is allowed.
+
+Evaluate all three original complete profiles at +8,192/+16,384 on original
+seeds, both swaps. Stop an arm if any profile has at most 3/8 survivors, or at
+its first gate if no survival/scoring-breadth/two-way component improves over
+the source original screen. These are stop rules, not relaxed pass criteria.
+Evaluate source and both finals on identical fresh **18,000,003..18,000,006**,
+all profiles and both swaps. Maximum **168 episodes / 84,000 evaluation controls**.
+Independent evaluation still uses the learned controller against its own current
+policy, not the frozen training adversary. One frozen opponent can be exploited;
+no claim about unseen opponents or reliable boxing follows from training reward.
+Two distinct consecutive complete passes remain necessary for phase promotion.
+No main adoption, automatic next allocation or controller migration is granted.
+
+Global diagnostic PPO ceiling **1,877,248**, formal evaluation ceiling
+**1,223,761**. New collection maximum 32,768 and integrated replay 131,072
+presentations are separate; standalone BC unchanged. Each full branch reaches
+lineage **1,875,968 learner / 1,253,376 world**, Adam **11,784 / 35,456**,
+mixed-mode totals **69,632 / 69,632**, historical neutral 50,229/48,075 unchanged.
+
+Hidden launcher: `tools/start_striking_fixed_opponent_compare.ps1`; live state:
+`/home/pedro/boxing-runs/striking-fixed-opponent-1859584/comparison.json`.
+Inspect this diagnostic process and output before any launch. Preserve monitoring;
+archive all complete results and actual consumption before making another decision.
+
+## Candidate native integration verified
+
+Thirty-five focused tests pass across fixed-state provenance/routing, legacy
+split-Adam/mixed behavior, previous actor-rate and passive-audit paths and stop
+rules. Python/Bash syntax and PowerShell parsing pass. The included native
+1,024-credit candidate block completes with finite actor/critic/normalizer/Adam,
+empty native error log and unchanged frozen-opponent fingerprint. All old source
+leaves except the explicit task mode are verified equal at transition.
+
+First updated payload SHA:
+`4a49ae4624c1bb71d17d2c0b8e602b499f28f1b64aabe3a29fdba2d31e4ac01a`;
+lineage **1,860,608 learner / 1,238,016 world**, Adam **11,544 / 35,216**,
+mixed-mode totals **61,952 / 61,952**, historical neutral prefix unchanged.
+Exact initial and first native payloads, config, observer measurements and
+prefix proof are archived under `fixed-opponent-1859584`. This verifies native
+integration only. Cross-arm first-block equality awaits the control arm; no
+physical phase pass or effectiveness conclusion follows from this guard.
+
+The source fresh 18M full set is independently archived and consumes **11,234**
+evaluation controls. Live child progress may advance past these historical
+launch/guard snapshots; total actual PPO/collection must be computed from both
+child progress files and the retained global prefix before any next decision.
