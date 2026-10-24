@@ -1,0 +1,1462 @@
+{
+  "status": "completed",
+  "phase": "independently_reviewed",
+  "pid": 821,
+  "started_utc": "2026-10-24T17:49:28.215274+00:00",
+  "diagnostic_output": "/home/pedro/boxing-runs/striking-demo-motion-2080768",
+  "source_sha256": "87eb01ff6392b592395b64fc6f6a29f78e35fd1c1ad2941fafbcc8001146f5d8",
+  "current_retention_checkpoint_sha256": "3a34aa85f0e9cf1ecb178c02f5fe945f8dd17f45dc1b323208b6083e2091b501",
+  "demonstration_files": {
+    "head-advance-1-role-0-seed-2000003-swap-0.npz": "0981b54ec9611488a1e51a1dde9a4ce12e6291f2a642b36db6c7947bb9a3af1f",
+    "head-advance-1-role-0-seed-2000004-swap-1.npz": "afaa07df857888fd545ed6f2d534fe26b1c864cba21640d1498187009108f758",
+    "head-advance-1-role-0-seed-2000005-swap-0.npz": "fe2afd12e2c03053330c6bf4330b338154a003e4826be479bedeb380cf274c21",
+    "head-advance-1-role-0-seed-2000007-swap-0.npz": "92d6a796fa456796ac285421259bec05016e655986e89e94ad39aa68bdb1fde9",
+    "head-advance-1-role-0-seed-2000008-swap-0.npz": "3b41ed347d0a7231fbebb81061785e0b8a3d55d4e838758c53edb8fc7aabbcfb",
+    "head-advance-1-role-0-seed-2000009-swap-0.npz": "77ce811997b4a0884cad068e47db6e160ec013f4faa58eca03fb8bbdf44cc8c3",
+    "head-advance-1-role-0-seed-2000010-swap-1.npz": "19a70b3311624fd0e5c45369bcdf155849fcf469524cd60d3713a2df264ec8bb",
+    "head-advance-1-role-0-seed-2000012-swap-0.npz": "ebfbf28e01e1eba7e24e482bb86f991968d7fa139f2e5b58440540399bbbf95e",
+    "head-advance-1-role-0-seed-2000014-swap-1.npz": "6677302796fac7d094fdfe91294848ca17dfd312b4975be2d9ba73c5b28954d4",
+    "head-advance-1-role-1-seed-2000006-swap-0.npz": "95fbb4d67dfee5d789ae5cb003d315d3d70416ad4cd21766e95c3eb739a6d9ab",
+    "head-advance-1-role-1-seed-2000008-swap-0.npz": "0a0a9b7c5d1b4f09f8a2d45d816ea8e00e3b64e9d709a70a4e41ce050abd6373",
+    "head-advance-1-role-1-seed-2000014-swap-0.npz": "37fbdf27772950e8b9703cf353198d3a6173bb684cff427c9e103c602ca6dfc6",
+    "head-advance-1-role-1-seed-2000016-swap-1.npz": "8867d61493d2eea9bb79439d62ff6b48da001f847eaf81bd5658f38a28a77004",
+    "head-advance-1-role-1-seed-2000017-swap-0.npz": "7f0290fafe27790221529464237a25d02d5edf44acb734939f362d1840bf56f4",
+    "head-advance-1-role-1-seed-2000017-swap-1.npz": "96943753094f1e5c114a60f707c38d6ab621a658d76cc9360d516a061f82d273"
+  },
+  "replay_manifest_sha256": "69ae8dc9f3d0ef6bc8305b7e1acf42d441acfe4f19176e4e1111d34fd59c40b6",
+  "feasibility_manifest_sha256": "145853162016137d02b9b973f0da2eba6c7711941995e0d5e49195e6555d820d",
+  "formal_world_controls_before_job": 2019379,
+  "maximum_world_controls": 7500,
+  "formal_world_controls_ceiling": 2026879,
+  "diagnostic_world_controls": 7500,
+  "new_optimizer_updates": 0,
+  "new_ppo_steps": 0,
+  "new_supervised_updates": 0,
+  "diagnostic_ppo_retained": 2163968,
+  "main_consumed_retained": 1048576,
+  "main_project_consumed_retained": 476041216,
+  "assistance": false,
+  "policy_adoption": "none",
+  "promotion": false,
+  "motion_profile": {
+    "version": 1,
+    "kind": "strike_motion_reference_evidence",
+    "measurement_only": true,
+    "speed_reference_m_s": 1.0,
+    "forward_cosine_reference": 0.7,
+    "pre_window_seconds": 0.25,
+    "post_window_seconds": 0.5,
+    "legacy_scorecard_unchanged": true,
+    "punch_certification_supported": false
+  },
+  "prerequisites": {
+    "foundation": {
+      "balance": {
+        "records": 29,
+        "sha256": "8cea6a2f62ae68fd9a3118b881301785900df7d3af73322fccacfa0e2e3bc1f6"
+      },
+      "walk_easy": {
+        "records": 41,
+        "sha256": "f1e0e6f023ff4ac477171382069fe132af9180ae818b509a18c2572eca0200ee"
+      },
+      "walk": {
+        "records": 13,
+        "sha256": "d547d60455be5d8b6f9f49c7bec256cb0b0d6963e3345a7160a16f974d0c531c"
+      },
+      "approach": {
+        "records": 2,
+        "sha256": "b39b1990945e8a374802c3a190e5ac5e026ae39e7fd5ef61c5c2b01ad291c6fc"
+      }
+    },
+    "main_sha256": "efad0ccd1051ee5305d4ccf8ebbd7d0e402211f12ecd0cdf175b473b24a7b5b0"
+  },
+  "trials": [
+    {
+      "trajectory": "head-advance-1-role-0-seed-2000003-swap-0.npz",
+      "demonstration_sha256": "0981b54ec9611488a1e51a1dde9a4ce12e6291f2a642b36db6c7947bb9a3af1f",
+      "learner_corner": 0,
+      "seed": 2000003,
+      "swap": false,
+      "survived": true,
+      "observations_match_exactly": true,
+      "events_match_exactly": true,
+      "scored_by_corner": [
+        1.0,
+        0.0
+      ],
+      "impact_events": [
+        {
+          "elapsed": 2.439999999999953,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 0,
+              "time": 2.437999999999953,
+              "contact_window_impulse": 0.652644677957314
+            }
+          ]
+        }
+      ],
+      "native_trace_file": "/home/pedro/boxing-runs/striking-demo-motion-2080768/native/head-advance-1-role-0-seed-2000003-swap-0.npz",
+      "native_trace_sha256": "236df6631b5128a7fa7834879aa2aa07131d1c4402a75e5aee3d8eb2962c7fc1",
+      "all_hand_measurements": [
+        {
+          "corner": 0,
+          "hand": 0,
+          "onset_time": 2.4319999999999538,
+          "event_time": 2.437999999999953,
+          "onset_relative_speed": 0.2630182516434055,
+          "onset_forward_cosine": 0.6904075111114879,
+          "onset_contact_closing": 0.526171120439063,
+          "onset_contact_advancing": 0.2370315404189337,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 0.5910070694180071,
+          "pre_max_displacement_m": 0.08408103323064282,
+          "pre_path_length_m": 0.10007183327119819,
+          "pre_elbow_excursion_rad": 0.29210605031831255,
+          "event_window_impulse_ns": 0.5102988522918316,
+          "native_contact_window_impulse_ns": 0.5102988522918316,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.046,
+          "return_toward_pre_window_position_m": 0.07333509641824182,
+          "post_window_complete": true
+        }
+      ],
+      "learner_motion_evidence": {
+        "profile": {
+          "version": 1,
+          "kind": "strike_motion_reference_evidence",
+          "measurement_only": true,
+          "speed_reference_m_s": 1.0,
+          "forward_cosine_reference": 0.7,
+          "pre_window_seconds": 0.25,
+          "post_window_seconds": 0.5,
+          "legacy_scorecard_unchanged": true,
+          "punch_certification_supported": false
+        },
+        "events": [
+          {
+            "profile_version": 1,
+            "corner": 0,
+            "hand": 0,
+            "speed_reference_met": false,
+            "forward_reference_met": false,
+            "both_reference_components_met": false,
+            "pre_max_displacement_m": 0.08408103323064282,
+            "pre_path_length_m": 0.10007183327119819,
+            "pre_elbow_excursion_rad": 0.29210605031831255,
+            "event_window_impulse_ns": 0.5102988522918316,
+            "recovery_observation_complete": true,
+            "return_toward_reference_m": 0.07333509641824182,
+            "guard_recovery_certified": false,
+            "punch_certified": false
+          }
+        ],
+        "legacy_event_count": 1,
+        "both_reference_components_count": 0,
+        "censored_recovery_count": 0,
+        "certified_punch_count": null,
+        "certification": false
+      }
+    },
+    {
+      "trajectory": "head-advance-1-role-0-seed-2000004-swap-1.npz",
+      "demonstration_sha256": "afaa07df857888fd545ed6f2d534fe26b1c864cba21640d1498187009108f758",
+      "learner_corner": 0,
+      "seed": 2000004,
+      "swap": true,
+      "survived": true,
+      "observations_match_exactly": true,
+      "events_match_exactly": true,
+      "scored_by_corner": [
+        1.0,
+        0.0
+      ],
+      "impact_events": [
+        {
+          "elapsed": 1.8400000000000014,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 0,
+              "time": 1.8220000000000014,
+              "contact_window_impulse": 1.9286875150497145
+            }
+          ]
+        }
+      ],
+      "native_trace_file": "/home/pedro/boxing-runs/striking-demo-motion-2080768/native/head-advance-1-role-0-seed-2000004-swap-1.npz",
+      "native_trace_sha256": "23ce8f392d694db8790c32bcfa0bcdc1919ee5c3f97057b095488add610cfe5c",
+      "all_hand_measurements": [
+        {
+          "corner": 0,
+          "hand": 0,
+          "onset_time": 1.8180000000000014,
+          "event_time": 1.8220000000000014,
+          "onset_relative_speed": 0.629369835278444,
+          "onset_forward_cosine": 0.6147931066035172,
+          "onset_contact_closing": 0.8662510197120304,
+          "onset_contact_advancing": 0.4774605794564665,
+          "pre_window_seconds": 0.24800000000000022,
+          "pre_peak_relative_speed": 0.6335575451800086,
+          "pre_max_displacement_m": 0.09297078563082785,
+          "pre_path_length_m": 0.11498092318405403,
+          "pre_elbow_excursion_rad": 0.3436733644379861,
+          "event_window_impulse_ns": 0.5080672816843101,
+          "native_contact_window_impulse_ns": 0.5080672816843101,
+          "post_window_seconds": 0.4999999999999645,
+          "post_contact_seconds": 0.062,
+          "return_toward_pre_window_position_m": 0.06024295996793189,
+          "post_window_complete": true
+        }
+      ],
+      "learner_motion_evidence": {
+        "profile": {
+          "version": 1,
+          "kind": "strike_motion_reference_evidence",
+          "measurement_only": true,
+          "speed_reference_m_s": 1.0,
+          "forward_cosine_reference": 0.7,
+          "pre_window_seconds": 0.25,
+          "post_window_seconds": 0.5,
+          "legacy_scorecard_unchanged": true,
+          "punch_certification_supported": false
+        },
+        "events": [
+          {
+            "profile_version": 1,
+            "corner": 0,
+            "hand": 0,
+            "speed_reference_met": false,
+            "forward_reference_met": false,
+            "both_reference_components_met": false,
+            "pre_max_displacement_m": 0.09297078563082785,
+            "pre_path_length_m": 0.11498092318405403,
+            "pre_elbow_excursion_rad": 0.3436733644379861,
+            "event_window_impulse_ns": 0.5080672816843101,
+            "recovery_observation_complete": true,
+            "return_toward_reference_m": 0.06024295996793189,
+            "guard_recovery_certified": false,
+            "punch_certified": false
+          }
+        ],
+        "legacy_event_count": 1,
+        "both_reference_components_count": 0,
+        "censored_recovery_count": 0,
+        "certified_punch_count": null,
+        "certification": false
+      }
+    },
+    {
+      "trajectory": "head-advance-1-role-0-seed-2000005-swap-0.npz",
+      "demonstration_sha256": "fe2afd12e2c03053330c6bf4330b338154a003e4826be479bedeb380cf274c21",
+      "learner_corner": 0,
+      "seed": 2000005,
+      "swap": false,
+      "survived": true,
+      "observations_match_exactly": true,
+      "events_match_exactly": true,
+      "scored_by_corner": [
+        1.0,
+        0.0
+      ],
+      "impact_events": [
+        {
+          "elapsed": 2.0799999999999925,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 0,
+              "time": 2.073999999999993,
+              "contact_window_impulse": 0.928791811063879
+            }
+          ]
+        }
+      ],
+      "native_trace_file": "/home/pedro/boxing-runs/striking-demo-motion-2080768/native/head-advance-1-role-0-seed-2000005-swap-0.npz",
+      "native_trace_sha256": "def021dd714a871fc03b5a03abfa372f1f52db963208590e110d15f97617981f",
+      "all_hand_measurements": [
+        {
+          "corner": 0,
+          "hand": 0,
+          "onset_time": 2.065999999999994,
+          "event_time": 2.073999999999993,
+          "onset_relative_speed": 0.5404588191729621,
+          "onset_forward_cosine": 0.3668776082445938,
+          "onset_contact_closing": 0.5042131431340505,
+          "onset_contact_advancing": 0.37705907310623865,
+          "pre_window_seconds": 0.24999999999999267,
+          "pre_peak_relative_speed": 0.6143363255362426,
+          "pre_max_displacement_m": 0.0958464743123673,
+          "pre_path_length_m": 0.11685756767502406,
+          "pre_elbow_excursion_rad": 0.2774600516122979,
+          "event_window_impulse_ns": 0.6185666422786686,
+          "native_contact_window_impulse_ns": 0.6185666422786686,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.044,
+          "return_toward_pre_window_position_m": 0.06365097834558574,
+          "post_window_complete": true
+        }
+      ],
+      "learner_motion_evidence": {
+        "profile": {
+          "version": 1,
+          "kind": "strike_motion_reference_evidence",
+          "measurement_only": true,
+          "speed_reference_m_s": 1.0,
+          "forward_cosine_reference": 0.7,
+          "pre_window_seconds": 0.25,
+          "post_window_seconds": 0.5,
+          "legacy_scorecard_unchanged": true,
+          "punch_certification_supported": false
+        },
+        "events": [
+          {
+            "profile_version": 1,
+            "corner": 0,
+            "hand": 0,
+            "speed_reference_met": false,
+            "forward_reference_met": false,
+            "both_reference_components_met": false,
+            "pre_max_displacement_m": 0.0958464743123673,
+            "pre_path_length_m": 0.11685756767502406,
+            "pre_elbow_excursion_rad": 0.2774600516122979,
+            "event_window_impulse_ns": 0.6185666422786686,
+            "recovery_observation_complete": true,
+            "return_toward_reference_m": 0.06365097834558574,
+            "guard_recovery_certified": false,
+            "punch_certified": false
+          }
+        ],
+        "legacy_event_count": 1,
+        "both_reference_components_count": 0,
+        "censored_recovery_count": 0,
+        "certified_punch_count": null,
+        "certification": false
+      }
+    },
+    {
+      "trajectory": "head-advance-1-role-0-seed-2000007-swap-0.npz",
+      "demonstration_sha256": "92d6a796fa456796ac285421259bec05016e655986e89e94ad39aa68bdb1fde9",
+      "learner_corner": 0,
+      "seed": 2000007,
+      "swap": false,
+      "survived": true,
+      "observations_match_exactly": true,
+      "events_match_exactly": true,
+      "scored_by_corner": [
+        1.0,
+        0.0
+      ],
+      "impact_events": [
+        {
+          "elapsed": 2.039999999999997,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 0,
+              "time": 2.0339999999999976,
+              "contact_window_impulse": 1.1951582271387162
+            }
+          ]
+        }
+      ],
+      "native_trace_file": "/home/pedro/boxing-runs/striking-demo-motion-2080768/native/head-advance-1-role-0-seed-2000007-swap-0.npz",
+      "native_trace_sha256": "8a2fca8553783c9f9191be907f2fcde0d28229307cd0bbe5f3ee527b25db4485",
+      "all_hand_measurements": [
+        {
+          "corner": 0,
+          "hand": 0,
+          "onset_time": 2.0279999999999982,
+          "event_time": 2.0339999999999976,
+          "onset_relative_speed": 0.6224306153300768,
+          "onset_forward_cosine": 0.3714099448437353,
+          "onset_contact_closing": 0.5814376300602293,
+          "onset_contact_advancing": 0.20593820988070607,
+          "pre_window_seconds": 0.2499999999999969,
+          "pre_peak_relative_speed": 0.7627681001663358,
+          "pre_max_displacement_m": 0.1062871603957945,
+          "pre_path_length_m": 0.13139573668197657,
+          "pre_elbow_excursion_rad": 0.3410337513039703,
+          "event_window_impulse_ns": 0.6261081210139836,
+          "native_contact_window_impulse_ns": 0.6261081210139836,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.076,
+          "return_toward_pre_window_position_m": 0.10228572550153538,
+          "post_window_complete": true
+        }
+      ],
+      "learner_motion_evidence": {
+        "profile": {
+          "version": 1,
+          "kind": "strike_motion_reference_evidence",
+          "measurement_only": true,
+          "speed_reference_m_s": 1.0,
+          "forward_cosine_reference": 0.7,
+          "pre_window_seconds": 0.25,
+          "post_window_seconds": 0.5,
+          "legacy_scorecard_unchanged": true,
+          "punch_certification_supported": false
+        },
+        "events": [
+          {
+            "profile_version": 1,
+            "corner": 0,
+            "hand": 0,
+            "speed_reference_met": false,
+            "forward_reference_met": false,
+            "both_reference_components_met": false,
+            "pre_max_displacement_m": 0.1062871603957945,
+            "pre_path_length_m": 0.13139573668197657,
+            "pre_elbow_excursion_rad": 0.3410337513039703,
+            "event_window_impulse_ns": 0.6261081210139836,
+            "recovery_observation_complete": true,
+            "return_toward_reference_m": 0.10228572550153538,
+            "guard_recovery_certified": false,
+            "punch_certified": false
+          }
+        ],
+        "legacy_event_count": 1,
+        "both_reference_components_count": 0,
+        "censored_recovery_count": 0,
+        "certified_punch_count": null,
+        "certification": false
+      }
+    },
+    {
+      "trajectory": "head-advance-1-role-0-seed-2000008-swap-0.npz",
+      "demonstration_sha256": "3b41ed347d0a7231fbebb81061785e0b8a3d55d4e838758c53edb8fc7aabbcfb",
+      "learner_corner": 0,
+      "seed": 2000008,
+      "swap": false,
+      "survived": true,
+      "observations_match_exactly": true,
+      "events_match_exactly": true,
+      "scored_by_corner": [
+        1.0,
+        0.0
+      ],
+      "impact_events": [
+        {
+          "elapsed": 2.0799999999999925,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 0,
+              "time": 2.0639999999999943,
+              "contact_window_impulse": 1.0834849827686477
+            }
+          ]
+        }
+      ],
+      "native_trace_file": "/home/pedro/boxing-runs/striking-demo-motion-2080768/native/head-advance-1-role-0-seed-2000008-swap-0.npz",
+      "native_trace_sha256": "ef32df4f20afa67d0b098edb28b03202b6453d1687e461a27c7c2d1d2e37d428",
+      "all_hand_measurements": [
+        {
+          "corner": 0,
+          "hand": 0,
+          "onset_time": 2.0539999999999954,
+          "event_time": 2.0639999999999943,
+          "onset_relative_speed": 0.4571899050379495,
+          "onset_forward_cosine": 0.43184132320111285,
+          "onset_contact_closing": 0.3726934946247467,
+          "onset_contact_advancing": 0.3171074697013113,
+          "pre_window_seconds": 0.249999999999994,
+          "pre_peak_relative_speed": 0.625104998426783,
+          "pre_max_displacement_m": 0.09192565049020052,
+          "pre_path_length_m": 0.11383701052955145,
+          "pre_elbow_excursion_rad": 0.3151353656505502,
+          "event_window_impulse_ns": 0.5091492454173421,
+          "native_contact_window_impulse_ns": 0.5091492454173421,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.038,
+          "return_toward_pre_window_position_m": 0.05741630253850082,
+          "post_window_complete": true
+        }
+      ],
+      "learner_motion_evidence": {
+        "profile": {
+          "version": 1,
+          "kind": "strike_motion_reference_evidence",
+          "measurement_only": true,
+          "speed_reference_m_s": 1.0,
+          "forward_cosine_reference": 0.7,
+          "pre_window_seconds": 0.25,
+          "post_window_seconds": 0.5,
+          "legacy_scorecard_unchanged": true,
+          "punch_certification_supported": false
+        },
+        "events": [
+          {
+            "profile_version": 1,
+            "corner": 0,
+            "hand": 0,
+            "speed_reference_met": false,
+            "forward_reference_met": false,
+            "both_reference_components_met": false,
+            "pre_max_displacement_m": 0.09192565049020052,
+            "pre_path_length_m": 0.11383701052955145,
+            "pre_elbow_excursion_rad": 0.3151353656505502,
+            "event_window_impulse_ns": 0.5091492454173421,
+            "recovery_observation_complete": true,
+            "return_toward_reference_m": 0.05741630253850082,
+            "guard_recovery_certified": false,
+            "punch_certified": false
+          }
+        ],
+        "legacy_event_count": 1,
+        "both_reference_components_count": 0,
+        "censored_recovery_count": 0,
+        "certified_punch_count": null,
+        "certification": false
+      }
+    },
+    {
+      "trajectory": "head-advance-1-role-0-seed-2000009-swap-0.npz",
+      "demonstration_sha256": "77ce811997b4a0884cad068e47db6e160ec013f4faa58eca03fb8bbdf44cc8c3",
+      "learner_corner": 0,
+      "seed": 2000009,
+      "swap": false,
+      "survived": true,
+      "observations_match_exactly": true,
+      "events_match_exactly": true,
+      "scored_by_corner": [
+        1.0,
+        0.0
+      ],
+      "impact_events": [
+        {
+          "elapsed": 1.9800000000000015,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 0,
+              "time": 1.9640000000000015,
+              "contact_window_impulse": 1.1431056409015468
+            }
+          ]
+        }
+      ],
+      "native_trace_file": "/home/pedro/boxing-runs/striking-demo-motion-2080768/native/head-advance-1-role-0-seed-2000009-swap-0.npz",
+      "native_trace_sha256": "eded06accc3ca1f474b566273622ddf98d3e8c1ff8df3e98bf45397729c30e75",
+      "all_hand_measurements": [
+        {
+          "corner": 0,
+          "hand": 0,
+          "onset_time": 1.9540000000000015,
+          "event_time": 1.9640000000000015,
+          "onset_relative_speed": 0.3664947346903149,
+          "onset_forward_cosine": 0.43207677779102444,
+          "onset_contact_closing": 0.34109965474646814,
+          "onset_contact_advancing": 0.26350393872143635,
+          "pre_window_seconds": 0.24800000000000022,
+          "pre_peak_relative_speed": 0.6652318653550212,
+          "pre_max_displacement_m": 0.08570036120274557,
+          "pre_path_length_m": 0.11215026163991806,
+          "pre_elbow_excursion_rad": 0.30646603288265223,
+          "event_window_impulse_ns": 0.5249050617722324,
+          "native_contact_window_impulse_ns": 0.5249050617722324,
+          "post_window_seconds": 0.4999999999999487,
+          "post_contact_seconds": 0.032,
+          "return_toward_pre_window_position_m": 0.05026146948555385,
+          "post_window_complete": true
+        }
+      ],
+      "learner_motion_evidence": {
+        "profile": {
+          "version": 1,
+          "kind": "strike_motion_reference_evidence",
+          "measurement_only": true,
+          "speed_reference_m_s": 1.0,
+          "forward_cosine_reference": 0.7,
+          "pre_window_seconds": 0.25,
+          "post_window_seconds": 0.5,
+          "legacy_scorecard_unchanged": true,
+          "punch_certification_supported": false
+        },
+        "events": [
+          {
+            "profile_version": 1,
+            "corner": 0,
+            "hand": 0,
+            "speed_reference_met": false,
+            "forward_reference_met": false,
+            "both_reference_components_met": false,
+            "pre_max_displacement_m": 0.08570036120274557,
+            "pre_path_length_m": 0.11215026163991806,
+            "pre_elbow_excursion_rad": 0.30646603288265223,
+            "event_window_impulse_ns": 0.5249050617722324,
+            "recovery_observation_complete": true,
+            "return_toward_reference_m": 0.05026146948555385,
+            "guard_recovery_certified": false,
+            "punch_certified": false
+          }
+        ],
+        "legacy_event_count": 1,
+        "both_reference_components_count": 0,
+        "censored_recovery_count": 0,
+        "certified_punch_count": null,
+        "certification": false
+      }
+    },
+    {
+      "trajectory": "head-advance-1-role-0-seed-2000010-swap-1.npz",
+      "demonstration_sha256": "19a70b3311624fd0e5c45369bcdf155849fcf469524cd60d3713a2df264ec8bb",
+      "learner_corner": 0,
+      "seed": 2000010,
+      "swap": true,
+      "survived": true,
+      "observations_match_exactly": true,
+      "events_match_exactly": true,
+      "scored_by_corner": [
+        1.0,
+        0.0
+      ],
+      "impact_events": [
+        {
+          "elapsed": 1.9200000000000015,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 0,
+              "time": 1.9160000000000015,
+              "contact_window_impulse": 0.6151225069505559
+            }
+          ]
+        }
+      ],
+      "native_trace_file": "/home/pedro/boxing-runs/striking-demo-motion-2080768/native/head-advance-1-role-0-seed-2000010-swap-1.npz",
+      "native_trace_sha256": "6254ed78b7a9536e513001a6495a4e517f187e9f0be529430d8537801ae849aa",
+      "all_hand_measurements": [
+        {
+          "corner": 0,
+          "hand": 0,
+          "onset_time": 1.9040000000000015,
+          "event_time": 1.9160000000000015,
+          "onset_relative_speed": 0.2894271266162154,
+          "onset_forward_cosine": 0.521763493945511,
+          "onset_contact_closing": 0.30950152973092154,
+          "onset_contact_advancing": 0.22490014935772829,
+          "pre_window_seconds": 0.24800000000000022,
+          "pre_peak_relative_speed": 0.6949489520985249,
+          "pre_max_displacement_m": 0.08801186717837788,
+          "pre_path_length_m": 0.11018089382315839,
+          "pre_elbow_excursion_rad": 0.3005734611857454,
+          "event_window_impulse_ns": 0.5232171371850982,
+          "native_contact_window_impulse_ns": 0.5232171371850982,
+          "post_window_seconds": 0.49999999999995404,
+          "post_contact_seconds": 0.022,
+          "return_toward_pre_window_position_m": 0.05105247458452361,
+          "post_window_complete": true
+        }
+      ],
+      "learner_motion_evidence": {
+        "profile": {
+          "version": 1,
+          "kind": "strike_motion_reference_evidence",
+          "measurement_only": true,
+          "speed_reference_m_s": 1.0,
+          "forward_cosine_reference": 0.7,
+          "pre_window_seconds": 0.25,
+          "post_window_seconds": 0.5,
+          "legacy_scorecard_unchanged": true,
+          "punch_certification_supported": false
+        },
+        "events": [
+          {
+            "profile_version": 1,
+            "corner": 0,
+            "hand": 0,
+            "speed_reference_met": false,
+            "forward_reference_met": false,
+            "both_reference_components_met": false,
+            "pre_max_displacement_m": 0.08801186717837788,
+            "pre_path_length_m": 0.11018089382315839,
+            "pre_elbow_excursion_rad": 0.3005734611857454,
+            "event_window_impulse_ns": 0.5232171371850982,
+            "recovery_observation_complete": true,
+            "return_toward_reference_m": 0.05105247458452361,
+            "guard_recovery_certified": false,
+            "punch_certified": false
+          }
+        ],
+        "legacy_event_count": 1,
+        "both_reference_components_count": 0,
+        "censored_recovery_count": 0,
+        "certified_punch_count": null,
+        "certification": false
+      }
+    },
+    {
+      "trajectory": "head-advance-1-role-0-seed-2000012-swap-0.npz",
+      "demonstration_sha256": "ebfbf28e01e1eba7e24e482bb86f991968d7fa139f2e5b58440540399bbbf95e",
+      "learner_corner": 0,
+      "seed": 2000012,
+      "swap": false,
+      "survived": true,
+      "observations_match_exactly": true,
+      "events_match_exactly": true,
+      "scored_by_corner": [
+        1.0,
+        0.0
+      ],
+      "impact_events": [
+        {
+          "elapsed": 2.139999999999986,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 0,
+              "time": 2.139999999999986,
+              "contact_window_impulse": 0.5116384119962273
+            }
+          ]
+        }
+      ],
+      "native_trace_file": "/home/pedro/boxing-runs/striking-demo-motion-2080768/native/head-advance-1-role-0-seed-2000012-swap-0.npz",
+      "native_trace_sha256": "f4776c95235c82cc5e204e65eff1fdadbf80a566698bbb01599d8db604e06767",
+      "all_hand_measurements": [
+        {
+          "corner": 0,
+          "hand": 0,
+          "onset_time": 2.131999999999987,
+          "event_time": 2.139999999999986,
+          "onset_relative_speed": 0.37469556407372245,
+          "onset_forward_cosine": 0.3552736271507937,
+          "onset_contact_closing": 0.3740255308510195,
+          "onset_contact_advancing": 0.2700902138233858,
+          "pre_window_seconds": 0.24999999999998535,
+          "pre_peak_relative_speed": 0.656255607560572,
+          "pre_max_displacement_m": 0.08297406193505397,
+          "pre_path_length_m": 0.11751664093266358,
+          "pre_elbow_excursion_rad": 0.2602146008427836,
+          "event_window_impulse_ns": 0.5116384119962273,
+          "native_contact_window_impulse_ns": 0.5116384119962273,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.036000000000000004,
+          "return_toward_pre_window_position_m": 0.041057089880768734,
+          "post_window_complete": true
+        }
+      ],
+      "learner_motion_evidence": {
+        "profile": {
+          "version": 1,
+          "kind": "strike_motion_reference_evidence",
+          "measurement_only": true,
+          "speed_reference_m_s": 1.0,
+          "forward_cosine_reference": 0.7,
+          "pre_window_seconds": 0.25,
+          "post_window_seconds": 0.5,
+          "legacy_scorecard_unchanged": true,
+          "punch_certification_supported": false
+        },
+        "events": [
+          {
+            "profile_version": 1,
+            "corner": 0,
+            "hand": 0,
+            "speed_reference_met": false,
+            "forward_reference_met": false,
+            "both_reference_components_met": false,
+            "pre_max_displacement_m": 0.08297406193505397,
+            "pre_path_length_m": 0.11751664093266358,
+            "pre_elbow_excursion_rad": 0.2602146008427836,
+            "event_window_impulse_ns": 0.5116384119962273,
+            "recovery_observation_complete": true,
+            "return_toward_reference_m": 0.041057089880768734,
+            "guard_recovery_certified": false,
+            "punch_certified": false
+          }
+        ],
+        "legacy_event_count": 1,
+        "both_reference_components_count": 0,
+        "censored_recovery_count": 0,
+        "certified_punch_count": null,
+        "certification": false
+      }
+    },
+    {
+      "trajectory": "head-advance-1-role-0-seed-2000014-swap-1.npz",
+      "demonstration_sha256": "6677302796fac7d094fdfe91294848ca17dfd312b4975be2d9ba73c5b28954d4",
+      "learner_corner": 0,
+      "seed": 2000014,
+      "swap": true,
+      "survived": true,
+      "observations_match_exactly": true,
+      "events_match_exactly": true,
+      "scored_by_corner": [
+        1.0,
+        0.0
+      ],
+      "impact_events": [
+        {
+          "elapsed": 1.8600000000000014,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 0,
+              "time": 1.8500000000000014,
+              "contact_window_impulse": 1.1995873235640049
+            }
+          ]
+        }
+      ],
+      "native_trace_file": "/home/pedro/boxing-runs/striking-demo-motion-2080768/native/head-advance-1-role-0-seed-2000014-swap-1.npz",
+      "native_trace_sha256": "734c6081dc15f50c042981db6a3b23a720c125212e53795dbff8c283706112d2",
+      "all_hand_measurements": [
+        {
+          "corner": 0,
+          "hand": 0,
+          "onset_time": 1.8440000000000014,
+          "event_time": 1.8500000000000014,
+          "onset_relative_speed": 0.42271369146205706,
+          "onset_forward_cosine": 0.442593674406385,
+          "onset_contact_closing": 0.48749191085964694,
+          "onset_contact_advancing": 0.28379490837671284,
+          "pre_window_seconds": 0.24800000000000022,
+          "pre_peak_relative_speed": 0.6632956997844011,
+          "pre_max_displacement_m": 0.0990687376836324,
+          "pre_path_length_m": 0.11155829487133309,
+          "pre_elbow_excursion_rad": 0.2957115951812156,
+          "event_window_impulse_ns": 0.5055244618218871,
+          "native_contact_window_impulse_ns": 0.5055244618218871,
+          "post_window_seconds": 0.49999999999996136,
+          "post_contact_seconds": 0.058,
+          "return_toward_pre_window_position_m": 0.07677363075432311,
+          "post_window_complete": true
+        }
+      ],
+      "learner_motion_evidence": {
+        "profile": {
+          "version": 1,
+          "kind": "strike_motion_reference_evidence",
+          "measurement_only": true,
+          "speed_reference_m_s": 1.0,
+          "forward_cosine_reference": 0.7,
+          "pre_window_seconds": 0.25,
+          "post_window_seconds": 0.5,
+          "legacy_scorecard_unchanged": true,
+          "punch_certification_supported": false
+        },
+        "events": [
+          {
+            "profile_version": 1,
+            "corner": 0,
+            "hand": 0,
+            "speed_reference_met": false,
+            "forward_reference_met": false,
+            "both_reference_components_met": false,
+            "pre_max_displacement_m": 0.0990687376836324,
+            "pre_path_length_m": 0.11155829487133309,
+            "pre_elbow_excursion_rad": 0.2957115951812156,
+            "event_window_impulse_ns": 0.5055244618218871,
+            "recovery_observation_complete": true,
+            "return_toward_reference_m": 0.07677363075432311,
+            "guard_recovery_certified": false,
+            "punch_certified": false
+          }
+        ],
+        "legacy_event_count": 1,
+        "both_reference_components_count": 0,
+        "censored_recovery_count": 0,
+        "certified_punch_count": null,
+        "certification": false
+      }
+    },
+    {
+      "trajectory": "head-advance-1-role-1-seed-2000006-swap-0.npz",
+      "demonstration_sha256": "95fbb4d67dfee5d789ae5cb003d315d3d70416ad4cd21766e95c3eb739a6d9ab",
+      "learner_corner": 1,
+      "seed": 2000006,
+      "swap": false,
+      "survived": true,
+      "observations_match_exactly": true,
+      "events_match_exactly": true,
+      "scored_by_corner": [
+        0.0,
+        1.0
+      ],
+      "impact_events": [
+        {
+          "elapsed": 1.9800000000000015,
+          "scored_by_corner": [
+            0.0,
+            1.0
+          ],
+          "hands": [
+            {
+              "corner": 1,
+              "hand": 0,
+              "time": 1.9800000000000015,
+              "contact_window_impulse": 0.5900431821580534
+            }
+          ]
+        }
+      ],
+      "native_trace_file": "/home/pedro/boxing-runs/striking-demo-motion-2080768/native/head-advance-1-role-1-seed-2000006-swap-0.npz",
+      "native_trace_sha256": "75ae6da4d3890f10fc71ac26e404b891cb6bf069c65c7f157b2dd82510368362",
+      "all_hand_measurements": [
+        {
+          "corner": 1,
+          "hand": 0,
+          "onset_time": 1.9720000000000015,
+          "event_time": 1.9800000000000015,
+          "onset_relative_speed": 0.3501178480905861,
+          "onset_forward_cosine": 0.4344809079063727,
+          "onset_contact_closing": 0.4811008804435683,
+          "onset_contact_advancing": 0.24962746855331736,
+          "pre_window_seconds": 0.24800000000000022,
+          "pre_peak_relative_speed": 0.610499722811556,
+          "pre_max_displacement_m": 0.10045972187259168,
+          "pre_path_length_m": 0.11395406189156887,
+          "pre_elbow_excursion_rad": 0.32737309700935757,
+          "event_window_impulse_ns": 0.5900431821580534,
+          "native_contact_window_impulse_ns": 0.5900431821580534,
+          "post_window_seconds": 0.49999999999994693,
+          "post_contact_seconds": 0.03,
+          "return_toward_pre_window_position_m": 0.05558728864793155,
+          "post_window_complete": true
+        }
+      ],
+      "learner_motion_evidence": {
+        "profile": {
+          "version": 1,
+          "kind": "strike_motion_reference_evidence",
+          "measurement_only": true,
+          "speed_reference_m_s": 1.0,
+          "forward_cosine_reference": 0.7,
+          "pre_window_seconds": 0.25,
+          "post_window_seconds": 0.5,
+          "legacy_scorecard_unchanged": true,
+          "punch_certification_supported": false
+        },
+        "events": [
+          {
+            "profile_version": 1,
+            "corner": 1,
+            "hand": 0,
+            "speed_reference_met": false,
+            "forward_reference_met": false,
+            "both_reference_components_met": false,
+            "pre_max_displacement_m": 0.10045972187259168,
+            "pre_path_length_m": 0.11395406189156887,
+            "pre_elbow_excursion_rad": 0.32737309700935757,
+            "event_window_impulse_ns": 0.5900431821580534,
+            "recovery_observation_complete": true,
+            "return_toward_reference_m": 0.05558728864793155,
+            "guard_recovery_certified": false,
+            "punch_certified": false
+          }
+        ],
+        "legacy_event_count": 1,
+        "both_reference_components_count": 0,
+        "censored_recovery_count": 0,
+        "certified_punch_count": null,
+        "certification": false
+      }
+    },
+    {
+      "trajectory": "head-advance-1-role-1-seed-2000008-swap-0.npz",
+      "demonstration_sha256": "0a0a9b7c5d1b4f09f8a2d45d816ea8e00e3b64e9d709a70a4e41ce050abd6373",
+      "learner_corner": 1,
+      "seed": 2000008,
+      "swap": false,
+      "survived": true,
+      "observations_match_exactly": true,
+      "events_match_exactly": true,
+      "scored_by_corner": [
+        0.0,
+        1.0
+      ],
+      "impact_events": [
+        {
+          "elapsed": 2.0799999999999925,
+          "scored_by_corner": [
+            0.0,
+            1.0
+          ],
+          "hands": [
+            {
+              "corner": 1,
+              "hand": 0,
+              "time": 2.073999999999993,
+              "contact_window_impulse": 1.2360629451543663
+            }
+          ]
+        }
+      ],
+      "native_trace_file": "/home/pedro/boxing-runs/striking-demo-motion-2080768/native/head-advance-1-role-1-seed-2000008-swap-0.npz",
+      "native_trace_sha256": "e6035d4ac6b4513860c0e570fd30e9dec607801f267141ba030e3d109d33182a",
+      "all_hand_measurements": [
+        {
+          "corner": 1,
+          "hand": 0,
+          "onset_time": 2.067999999999994,
+          "event_time": 2.073999999999993,
+          "onset_relative_speed": 0.5747803966728807,
+          "onset_forward_cosine": 0.5595661154843732,
+          "onset_contact_closing": 0.740108094799277,
+          "onset_contact_advancing": 0.2288267559481571,
+          "pre_window_seconds": 0.24999999999999245,
+          "pre_peak_relative_speed": 0.7192778550907406,
+          "pre_max_displacement_m": 0.09622797846087797,
+          "pre_path_length_m": 0.11728897734205003,
+          "pre_elbow_excursion_rad": 0.3302937252499397,
+          "event_window_impulse_ns": 0.6964253026743107,
+          "native_contact_window_impulse_ns": 0.6964253026743107,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.058,
+          "return_toward_pre_window_position_m": 0.06562658367783365,
+          "post_window_complete": true
+        }
+      ],
+      "learner_motion_evidence": {
+        "profile": {
+          "version": 1,
+          "kind": "strike_motion_reference_evidence",
+          "measurement_only": true,
+          "speed_reference_m_s": 1.0,
+          "forward_cosine_reference": 0.7,
+          "pre_window_seconds": 0.25,
+          "post_window_seconds": 0.5,
+          "legacy_scorecard_unchanged": true,
+          "punch_certification_supported": false
+        },
+        "events": [
+          {
+            "profile_version": 1,
+            "corner": 1,
+            "hand": 0,
+            "speed_reference_met": false,
+            "forward_reference_met": false,
+            "both_reference_components_met": false,
+            "pre_max_displacement_m": 0.09622797846087797,
+            "pre_path_length_m": 0.11728897734205003,
+            "pre_elbow_excursion_rad": 0.3302937252499397,
+            "event_window_impulse_ns": 0.6964253026743107,
+            "recovery_observation_complete": true,
+            "return_toward_reference_m": 0.06562658367783365,
+            "guard_recovery_certified": false,
+            "punch_certified": false
+          }
+        ],
+        "legacy_event_count": 1,
+        "both_reference_components_count": 0,
+        "censored_recovery_count": 0,
+        "certified_punch_count": null,
+        "certification": false
+      }
+    },
+    {
+      "trajectory": "head-advance-1-role-1-seed-2000014-swap-0.npz",
+      "demonstration_sha256": "37fbdf27772950e8b9703cf353198d3a6173bb684cff427c9e103c602ca6dfc6",
+      "learner_corner": 1,
+      "seed": 2000014,
+      "swap": false,
+      "survived": true,
+      "observations_match_exactly": true,
+      "events_match_exactly": true,
+      "scored_by_corner": [
+        0.0,
+        1.0
+      ],
+      "impact_events": [
+        {
+          "elapsed": 2.1999999999999793,
+          "scored_by_corner": [
+            0.0,
+            1.0
+          ],
+          "hands": [
+            {
+              "corner": 1,
+              "hand": 0,
+              "time": 2.1999999999999793,
+              "contact_window_impulse": 0.5210939596474194
+            }
+          ]
+        }
+      ],
+      "native_trace_file": "/home/pedro/boxing-runs/striking-demo-motion-2080768/native/head-advance-1-role-1-seed-2000014-swap-0.npz",
+      "native_trace_sha256": "63988c79db9ca8ca4dba196d14a607a72a5ca8be099f6313bfc6a023bac3beea",
+      "all_hand_measurements": [
+        {
+          "corner": 1,
+          "hand": 0,
+          "onset_time": 2.185999999999981,
+          "event_time": 2.1999999999999793,
+          "onset_relative_speed": 0.6066320783991012,
+          "onset_forward_cosine": 0.3776104194520083,
+          "onset_contact_closing": 0.38924472152121675,
+          "onset_contact_advancing": 0.41062801258520626,
+          "pre_window_seconds": 0.24999999999997935,
+          "pre_peak_relative_speed": 0.6066320783991012,
+          "pre_max_displacement_m": 0.08874012103749808,
+          "pre_path_length_m": 0.10562046359625141,
+          "pre_elbow_excursion_rad": 0.2901040109165131,
+          "event_window_impulse_ns": 0.5210939596474194,
+          "native_contact_window_impulse_ns": 0.5210939596474194,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.036000000000000004,
+          "return_toward_pre_window_position_m": 0.05813125153453605,
+          "post_window_complete": true
+        }
+      ],
+      "learner_motion_evidence": {
+        "profile": {
+          "version": 1,
+          "kind": "strike_motion_reference_evidence",
+          "measurement_only": true,
+          "speed_reference_m_s": 1.0,
+          "forward_cosine_reference": 0.7,
+          "pre_window_seconds": 0.25,
+          "post_window_seconds": 0.5,
+          "legacy_scorecard_unchanged": true,
+          "punch_certification_supported": false
+        },
+        "events": [
+          {
+            "profile_version": 1,
+            "corner": 1,
+            "hand": 0,
+            "speed_reference_met": false,
+            "forward_reference_met": false,
+            "both_reference_components_met": false,
+            "pre_max_displacement_m": 0.08874012103749808,
+            "pre_path_length_m": 0.10562046359625141,
+            "pre_elbow_excursion_rad": 0.2901040109165131,
+            "event_window_impulse_ns": 0.5210939596474194,
+            "recovery_observation_complete": true,
+            "return_toward_reference_m": 0.05813125153453605,
+            "guard_recovery_certified": false,
+            "punch_certified": false
+          }
+        ],
+        "legacy_event_count": 1,
+        "both_reference_components_count": 0,
+        "censored_recovery_count": 0,
+        "certified_punch_count": null,
+        "certification": false
+      }
+    },
+    {
+      "trajectory": "head-advance-1-role-1-seed-2000016-swap-1.npz",
+      "demonstration_sha256": "8867d61493d2eea9bb79439d62ff6b48da001f847eaf81bd5658f38a28a77004",
+      "learner_corner": 1,
+      "seed": 2000016,
+      "swap": true,
+      "survived": true,
+      "observations_match_exactly": true,
+      "events_match_exactly": true,
+      "scored_by_corner": [
+        0.0,
+        1.0
+      ],
+      "impact_events": [
+        {
+          "elapsed": 1.6400000000000012,
+          "scored_by_corner": [
+            0.0,
+            1.0
+          ],
+          "hands": [
+            {
+              "corner": 1,
+              "hand": 0,
+              "time": 1.6360000000000012,
+              "contact_window_impulse": 0.8470887231663872
+            }
+          ]
+        }
+      ],
+      "native_trace_file": "/home/pedro/boxing-runs/striking-demo-motion-2080768/native/head-advance-1-role-1-seed-2000016-swap-1.npz",
+      "native_trace_sha256": "beaf63911ad3f3d8549dc7ee6ec39a814760f4f10043f7d7ff9bf22919e7eef7",
+      "all_hand_measurements": [
+        {
+          "corner": 1,
+          "hand": 0,
+          "onset_time": 1.6300000000000012,
+          "event_time": 1.6360000000000012,
+          "onset_relative_speed": 0.5698365334812958,
+          "onset_forward_cosine": 0.4194497892888175,
+          "onset_contact_closing": 0.5805478051319047,
+          "onset_contact_advancing": 0.3815894207118358,
+          "pre_window_seconds": 0.24800000000000022,
+          "pre_peak_relative_speed": 0.5932716737147959,
+          "pre_max_displacement_m": 0.0913900873970121,
+          "pre_path_length_m": 0.11158225175123503,
+          "pre_elbow_excursion_rad": 0.29598731129311145,
+          "event_window_impulse_ns": 0.5593053111562128,
+          "native_contact_window_impulse_ns": 0.5593053111562128,
+          "post_window_seconds": 0.4999999999999851,
+          "post_contact_seconds": 0.06,
+          "return_toward_pre_window_position_m": 0.08275479418100923,
+          "post_window_complete": true
+        }
+      ],
+      "learner_motion_evidence": {
+        "profile": {
+          "version": 1,
+          "kind": "strike_motion_reference_evidence",
+          "measurement_only": true,
+          "speed_reference_m_s": 1.0,
+          "forward_cosine_reference": 0.7,
+          "pre_window_seconds": 0.25,
+          "post_window_seconds": 0.5,
+          "legacy_scorecard_unchanged": true,
+          "punch_certification_supported": false
+        },
+        "events": [
+          {
+            "profile_version": 1,
+            "corner": 1,
+            "hand": 0,
+            "speed_reference_met": false,
+            "forward_reference_met": false,
+            "both_reference_components_met": false,
+            "pre_max_displacement_m": 0.0913900873970121,
+            "pre_path_length_m": 0.11158225175123503,
+            "pre_elbow_excursion_rad": 0.29598731129311145,
+            "event_window_impulse_ns": 0.5593053111562128,
+            "recovery_observation_complete": true,
+            "return_toward_reference_m": 0.08275479418100923,
+            "guard_recovery_certified": false,
+            "punch_certified": false
+          }
+        ],
+        "legacy_event_count": 1,
+        "both_reference_components_count": 0,
+        "censored_recovery_count": 0,
+        "certified_punch_count": null,
+        "certification": false
+      }
+    },
+    {
+      "trajectory": "head-advance-1-role-1-seed-2000017-swap-0.npz",
+      "demonstration_sha256": "7f0290fafe27790221529464237a25d02d5edf44acb734939f362d1840bf56f4",
+      "learner_corner": 1,
+      "seed": 2000017,
+      "swap": false,
+      "survived": true,
+      "observations_match_exactly": true,
+      "events_match_exactly": true,
+      "scored_by_corner": [
+        0.0,
+        1.0
+      ],
+      "impact_events": [
+        {
+          "elapsed": 1.9200000000000015,
+          "scored_by_corner": [
+            0.0,
+            1.0
+          ],
+          "hands": [
+            {
+              "corner": 1,
+              "hand": 0,
+              "time": 1.9140000000000015,
+              "contact_window_impulse": 0.9836472724463459
+            }
+          ]
+        }
+      ],
+      "native_trace_file": "/home/pedro/boxing-runs/striking-demo-motion-2080768/native/head-advance-1-role-1-seed-2000017-swap-0.npz",
+      "native_trace_sha256": "b614951a5b9d46b62ea946c2209108626d57d1d825434ab083a239fe927114c8",
+      "all_hand_measurements": [
+        {
+          "corner": 1,
+          "hand": 0,
+          "onset_time": 1.9080000000000015,
+          "event_time": 1.9140000000000015,
+          "onset_relative_speed": 0.4770839532465076,
+          "onset_forward_cosine": 0.6614565509084989,
+          "onset_contact_closing": 0.6185492969093764,
+          "onset_contact_advancing": 0.31741929497729887,
+          "pre_window_seconds": 0.24800000000000022,
+          "pre_peak_relative_speed": 0.6547734472096953,
+          "pre_max_displacement_m": 0.09795195022512315,
+          "pre_path_length_m": 0.11895368906562442,
+          "pre_elbow_excursion_rad": 0.3390101856337937,
+          "event_window_impulse_ns": 0.5617316656510287,
+          "native_contact_window_impulse_ns": 0.5617316656510287,
+          "post_window_seconds": 0.49999999999995426,
+          "post_contact_seconds": 0.076,
+          "return_toward_pre_window_position_m": 0.08237967922303008,
+          "post_window_complete": true
+        }
+      ],
+      "learner_motion_evidence": {
+        "profile": {
+          "version": 1,
+          "kind": "strike_motion_reference_evidence",
+          "measurement_only": true,
+          "speed_reference_m_s": 1.0,
+          "forward_cosine_reference": 0.7,
+          "pre_window_seconds": 0.25,
+          "post_window_seconds": 0.5,
+          "legacy_scorecard_unchanged": true,
+          "punch_certification_supported": false
+        },
+        "events": [
+          {
+            "profile_version": 1,
+            "corner": 1,
+            "hand": 0,
+            "speed_reference_met": false,
+            "forward_reference_met": false,
+            "both_reference_components_met": false,
+            "pre_max_displacement_m": 0.09795195022512315,
+            "pre_path_length_m": 0.11895368906562442,
+            "pre_elbow_excursion_rad": 0.3390101856337937,
+            "event_window_impulse_ns": 0.5617316656510287,
+            "recovery_observation_complete": true,
+            "return_toward_reference_m": 0.08237967922303008,
+            "guard_recovery_certified": false,
+            "punch_certified": false
+          }
+        ],
+        "legacy_event_count": 1,
+        "both_reference_components_count": 0,
+        "censored_recovery_count": 0,
+        "certified_punch_count": null,
+        "certification": false
+      }
+    },
+    {
+      "trajectory": "head-advance-1-role-1-seed-2000017-swap-1.npz",
+      "demonstration_sha256": "96943753094f1e5c114a60f707c38d6ab621a658d76cc9360d516a061f82d273",
+      "learner_corner": 1,
+      "seed": 2000017,
+      "swap": true,
+      "survived": true,
+      "observations_match_exactly": true,
+      "events_match_exactly": true,
+      "scored_by_corner": [
+        0.0,
+        1.0
+      ],
+      "impact_events": [
+        {
+          "elapsed": 2.319999999999966,
+          "scored_by_corner": [
+            0.0,
+            1.0
+          ],
+          "hands": [
+            {
+              "corner": 1,
+              "hand": 0,
+              "time": 2.3139999999999668,
+              "contact_window_impulse": 0.830693765816365
+            }
+          ]
+        }
+      ],
+      "native_trace_file": "/home/pedro/boxing-runs/striking-demo-motion-2080768/native/head-advance-1-role-1-seed-2000017-swap-1.npz",
+      "native_trace_sha256": "32c140b84357b08b847ec6e60089494ba475f14f0f92360efd15cd0cc57c06c4",
+      "all_hand_measurements": [
+        {
+          "corner": 1,
+          "hand": 0,
+          "onset_time": 2.3059999999999676,
+          "event_time": 2.3139999999999668,
+          "onset_relative_speed": 0.42957273958124814,
+          "onset_forward_cosine": 0.4285831930524991,
+          "onset_contact_closing": 0.44085923105804237,
+          "onset_contact_advancing": 0.2887137494424763,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 0.5694546892123868,
+          "pre_max_displacement_m": 0.08211327260274177,
+          "pre_path_length_m": 0.10409222272915833,
+          "pre_elbow_excursion_rad": 0.29278296913127516,
+          "event_window_impulse_ns": 0.5679051737543404,
+          "native_contact_window_impulse_ns": 0.5679051737543404,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.042,
+          "return_toward_pre_window_position_m": 0.0654003835202102,
+          "post_window_complete": true
+        }
+      ],
+      "learner_motion_evidence": {
+        "profile": {
+          "version": 1,
+          "kind": "strike_motion_reference_evidence",
+          "measurement_only": true,
+          "speed_reference_m_s": 1.0,
+          "forward_cosine_reference": 0.7,
+          "pre_window_seconds": 0.25,
+          "post_window_seconds": 0.5,
+          "legacy_scorecard_unchanged": true,
+          "punch_certification_supported": false
+        },
+        "events": [
+          {
+            "profile_version": 1,
+            "corner": 1,
+            "hand": 0,
+            "speed_reference_met": false,
+            "forward_reference_met": false,
+            "both_reference_components_met": false,
+            "pre_max_displacement_m": 0.08211327260274177,
+            "pre_path_length_m": 0.10409222272915833,
+            "pre_elbow_excursion_rad": 0.29278296913127516,
+            "event_window_impulse_ns": 0.5679051737543404,
+            "recovery_observation_complete": true,
+            "return_toward_reference_m": 0.0654003835202102,
+            "guard_recovery_certified": false,
+            "punch_certified": false
+          }
+        ],
+        "legacy_event_count": 1,
+        "both_reference_components_count": 0,
+        "censored_recovery_count": 0,
+        "certified_punch_count": null,
+        "certification": false
+      }
+    }
+  ],
+  "active_trajectory": "head-advance-1-role-1-seed-2000017-swap-1.npz",
+  "updated_utc": "2026-10-24T17:50:42.649134+00:00",
+  "formal_world_controls_total": 2026879,
+  "learner_legacy_events": 15,
+  "learner_both_reference_events": 0,
+  "reviewed_utc": "2026-10-24T17:51:01.834302+00:00",
+  "continuation_decision": "Do not run more unchanged retention/BC/PPO. Establish a physically validated positive strike-cycle target under the same free-body motor/arm authority before a versioned objective comparison. Reference components alone cannot certify boxing."
+}

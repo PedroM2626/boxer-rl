@@ -17,8 +17,12 @@ found no demonstrated improvement and both final full gates fail. A
 that qualifying contacts do not establish recognizable punches. In the
 [completed passive punch-motion replay audit](docs/results/striking-pilot/punch-quality-2080768/README.md),
 all eight episodes reproduce exactly, but 0/19 selected contact events meet both
-old speed/direction references. Next is separate strike-motion evaluation and
-demonstration calibration before further PPO. General boxing remains
+old speed/direction references. Versioned motion evidence and the
+[complete retained-demo audit](docs/results/striking-pilot/demo-motion-2080768/README.md)
+also find no validated positive strike-cycle target. A
+[bounded scripted jab-cycle feasibility probe](docs/results/striking-pilot/jab-cycle-v1/README.md)
+also failed all sixteen conditions. Guard/strike reachability and first-fall
+tracking need investigation before redesign or further PPO. General boxing remains
 uncertified, and the stopped main policy has not been replaced.
 
 An [earlier striking final](docs/striking-generalization-audit.md) passed two

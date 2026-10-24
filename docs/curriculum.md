@@ -38,15 +38,31 @@ episodes, 4,000 diagnostic controls and zero PPO updates. Every original trial
 field reproduces exactly; fifteen focused tests pass. None of the 19 selected
 legacy events simultaneously meets the old speed/forward-cone references; video
 source hand excursion is only 5.3–9.1 cm in the preceding 250 ms. These descriptive
-references are not universal punch gates. Next implement a separate versioned
-strike-motion evaluation and audit positive demonstrations before the next
-objective/PPO allocation. No replay/training job is active.
+references are not universal punch gates. The separate version-1 motion evidence
+is now implemented, with per-hand component checks and censored recovery handling.
+The [complete retained-demo audit](results/striking-pilot/demo-motion-2080768/README.md)
+then exactly reproduced all fifteen trajectories / 7,500 controls. All fifteen
+learner contacts fall below both inherited motion references. Twenty-one focused
+tests pass. The old teacher stops correcting after its first contact; no validated
+positive full strike-cycle target was established. Do not extend unchanged
+retention/BC/PPO or restore an earlier actor.
+
+**Latest physical diagnostic:** [jab-cycle feasibility v1](results/striking-pilot/jab-cycle-v1/README.md)
+completed and is independently reviewed. All sixteen planned conditions fell;
+zero complete candidate episodes passed the unchanged prospective criterion.
+The job consumed 4,048 of its at most 8,000 controls; no learner updates.
+Nine focused controller/motion tests pass, but the scripted positive-target
+hypothesis failed. Reject v1 without imitation, threshold changes or PPO extension.
+Next check guard/strike reachability inside the real residual box and isolate
+first-fall/phase-tracking behavior before a bounded redesign. No job is active.
 
 Reviewed diagnostic PPO is **2,163,968**, at its ceiling. Formal diagnostic
-simulation is **2,019,379**, at the separately declared punch-audit ceiling.
+simulation is **2,030,927** after the reviewed prototype, under its completed
+ceiling **2,034,879**. Unused compute expires at review and no additional PPO,
+supervised or physical replay allocation is declared by this decision.
 Unused historical comparison compute is not an automatic continuation allocation.
 The completed audit is `/home/pedro/boxing-runs/striking-punch-quality-2080768/audit.json`;
-no new learner steps or physical controls are allocated after its review.
+the later demo-motion review accounts separately for its 7,500 additional controls.
 Main boxing **1,048,576**, foundation **474,992,640**, combined main **476,041,216**,
 BC 8,000 remain unchanged. Completed live audit and explicit recovery are at
 `/home/pedro/boxing-runs/striking-gae-generalization-2064384/audit.json`.

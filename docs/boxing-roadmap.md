@@ -36,8 +36,14 @@ The [native audit](results/striking-pilot/punch-quality-2080768/README.md) now m
 eight selected episodes exactly: 0/19 events meet both old component references,
 with only 5.3–9.1 cm pre-window hand travel in the published clip. Next implement
 separate strike-motion evaluation and calibrate positive demonstrations before
-declaring a versioned training objective/budget. These references do not define
-every punch type or replace failed historical gates.
+declaring a versioned training objective/budget. The version-1 evidence interface
+and [complete demo audit](results/striking-pilot/demo-motion-2080768/README.md) are
+now implemented/reviewed: fifteen retained targets also fail both references.
+The [bounded explicit jab-cycle prototype](results/striking-pilot/jab-cycle-v1/README.md)
+failed all sixteen conditions under the same motor/authority. It is not a learned
+policy or a usable positive target. Next audit guard/strike reachability and
+first-fall/phase tracking before redesign. These references do not define every
+punch type or replace failed gates.
 
 The immediate prerequisite is distinguishing moving touches from purposeful
 punches using passive kinematics, impulse timing, arm travel and recovery, with
