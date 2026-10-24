@@ -114,3 +114,28 @@ All initial 24M source profiles completed: 9,085 controls, pair survival 5/8 /
 6/8 / 5/8, no complete pass. Formal total after source evaluation is 1,496,411;
 PPO after the first verified block is 1,952,000. These are historical snapshots;
 live comparison and child progress counters take precedence during training.
+
+## First complete original screen, comparison still in progress
+
+The +8,192 half-noise checkpoint
+**c61f6e46c0419699b3850d7176f7d520e66ca0bdf66ea30fdc4fd1990d697e53**
+passes all original full criteria: neutral-0 **7/8** pair survivors with own
+impacts across two seeds, neutral-1 **8/8** across four scoring seeds, mirror
+**7/8** with seven red / eight blue surviving valid impacts and two two-way
+episodes. Total pair survival **22/24**. This is the first version-10 full pass;
+it does not inherit earlier version-8 successes.
+
+An independent snapshot review checks exact hash and sampling profile, finite
+actor/critic/Adam/normalizer/key, immutable adversary, all eight included finite
+PPO blocks, exact Adam 12,808 / 36,480 and counters 1,941,504 learner / 1,318,912
+world. All 24 complete original trials have correct seed/swap/role/controller
+markers and unchanged duration/thresholds; native logs are empty. Actual screen
+cost 11,129 controls is already included in live accounting, not charged twice.
+Raw reports, model, metrics and a separate one-record version-10 original
+history are archived under `sampling-1933312/half_noise/gate-8192`.
+
+The original pass streak is **one**, required two distinct consecutive complete
+passes. The +16,384 generation, fresh final and matched control remain pending;
+complete all bounded checks before an adoption or extension decision. A favorable
+intermediate checkpoint cannot replace later failures or fresh-set evidence.
+No stage promotion, main adoption or reliable-boxing claim is made.

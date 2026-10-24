@@ -21,6 +21,12 @@ Maximum 32,768 new credits (PPO ceiling **1,983,744**) and 84,000 evaluation
 controls (formal ceiling **1,571,326**). All source leaves, physics, rewards,
 original mean-action gates and main/BC counters remain intact; no automatic adoption.
 
+**Interim physical result:** the version-10 +8,192 checkpoint c61f6e46 passes
+its first complete original screen (22/24 paired survivors, neutral own-impact
+breadth and two surviving two-way mirror episodes), independently verified and
+archived. Its new task streak is one; the distinct second checkpoint, full
+fresh finals and matched control remain pending. No promotion or main adoption.
+
 **Current stage (2026-10-22):** all four foundation levels are certified by
 [two distinct consecutive complete physical passes](results/curriculum/foundation-certification/README.md).
 The foundation finished normally at **474,992,640 consumed main transitions**

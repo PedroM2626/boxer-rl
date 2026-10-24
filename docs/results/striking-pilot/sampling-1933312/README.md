@@ -29,3 +29,18 @@ is 5/8 neutral-0, 6/8 neutral-1 and 5/8 mirror, so the full set fails. Formal
 evaluation after that set is 1,496,411. Diagnostic PPO after the verified first
 block is 1,952,000; live counters supersede these historical snapshots.
 No main adoption, promotion or complete comparison result is claimed.
+
+## First original full pass
+
+The +8,192 c61f6e46 checkpoint independently passes the unchanged complete screen:
+neutral-0 / neutral-1 / mirror pair survival 7/8 / 8/8 / 7/8, own neutral impacts
+across two/four seeds and two surviving two-way mirror episodes. Exact model,
+all raw screen reports, eight finite training metrics and independent validation
+are under `half_noise/gate-8192`; the separate version-10 original history has
+one record and pass streak one. Actual 11,129 evaluation controls are already
+included in live consumption. No previous-family pass is inherited.
+
+The second distinct checkpoint, matched control and independent fresh final
+remain pending. Do not adopt the intermediate model, skip later failed gates or
+extend the budget from this result. Live comparison supersedes this snapshot;
+no stage promotion or boxing completion is claimed.
