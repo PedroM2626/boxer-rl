@@ -62,7 +62,14 @@ now retains 8/8 survival but no strikes. The
 [terminal workspace review](results/striking-pilot/terminal-workspace-v1/README.md)
 finds persistent endpoint errors in two local searches; this is not proof of
 collision-surface infeasibility. Next measure actual legal surface gaps and
-blocking contacts before another bounded target/authority intervention.
+blocking contacts before another bounded target/authority intervention. The
+[signed-surface audit](results/striking-pilot/surface-audit-v1/README.md) now finds
+recorded blocking intersections in 20/24 poses. The
+[reviewed 6/12 cm bow comparison](results/striking-pilot/arc-path-v4/README.md)
+has 7/8 and 8/8 pair survival, no commanded-left target contact and no candidate
+punch. Next test angle/range adjustment through the **existing lateral movement
+command** with the arm path fixed, before increasing authority or unfreezing the
+motor. All new schedules and budgets must be prospective; no job is active.
 No positive training target or general boxing certification follows.
 These references do not define every
 punch type or replace failed gates.

@@ -34,6 +34,9 @@ class JabFeasibility:
         site=env.pair.data.site(env.pair.maps[self.corner]['side']+'imu_in_torso')
         return site.xpos+site.xmat.reshape(3,3)@np.asarray(PROFILE['guard_local'])
 
+    def path_target(self,env,guard,target,fraction):
+        return guard+fraction*(target-guard)
+
     def action(self,env):
         pair=env.pair;corner=self.corner
         roots=[pair.data.qpos[m['root']:m['root']+2] for m in pair.maps]
@@ -45,7 +48,7 @@ class JabFeasibility:
         mapping=pair.maps[corner];guard=self.guard_target(env)
         foe=pair.model.geom(pair.maps[1-corner]['side']+'torso_collision').id
         target=pair.data.geom_xpos[foe]+np.array([0,0,PROFILE['target_torso_world_height_offset']])
-        desired_position=guard+fraction*(target-guard)
+        desired_position=self.path_target(env,guard,target,fraction)
         indices=np.array([i for i in env.arm_indices if 'left_' in pair.foundation.mj_model.actuator(int(i)).name])
         if len(indices)!=7:raise ValueError('seven original left-arm channels required')
         fist=int(pair.fists[corner,0]);jac=np.zeros((3,pair.model.nv));rot=np.zeros_like(jac)
@@ -135,3 +138,17 @@ class MotorGuardDwell(MotorGuardJab):
         if t<g+e+self.dwell_seconds+r:
             return 'retract',float((1+np.cos(np.pi*(t-g-e-self.dwell_seconds)/r))/2)
         return 'rest',0.
+
+
+class MotorGuardArc(MotorGuardDwell):
+    """Diagnostic outward bow around the opposing guard; original endpoints."""
+    def __init__(self,corner,arc_meters):
+        super().__init__(corner)
+        if not np.isfinite(arc_meters) or not 0<=arc_meters<=.12:raise ValueError('bounded finite arc required')
+        self.arc_meters=float(arc_meters)
+
+    def path_target(self,env,guard,target,fraction):
+        straight=super().path_target(env,guard,target,fraction)
+        if fraction<=0 or fraction>=1 or self.arc_meters==0:return straight
+        site=env.pair.data.site(env.pair.maps[self.corner]['side']+'imu_in_torso')
+        return straight+site.xmat.reshape(3,3)[:,1]*(self.arc_meters*np.sin(np.pi*fraction))

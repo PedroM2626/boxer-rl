@@ -1,0 +1,55 @@
+{
+  "status": "reviewed",
+  "groups": {
+    "recorded": {
+      "poses": 24,
+      "minimum_legal_gap_m": {
+        "minimum": 0.07587964954427259,
+        "median": 0.21127035284572349,
+        "maximum": 0.4100410679993176
+      },
+      "minimum_block_gap_m": {
+        "minimum": -0.0008893591342666179,
+        "median": -0.00013271273914804843,
+        "maximum": 0.22505388148708366
+      },
+      "legal_overlap_poses": 0,
+      "blocking_overlap_poses": 20
+    },
+    "best": {
+      "poses": 24,
+      "minimum_legal_gap_m": {
+        "minimum": -0.04023883738094586,
+        "median": 0.06434742840264099,
+        "maximum": 0.3621835064794421
+      },
+      "minimum_block_gap_m": {
+        "minimum": -0.042752490345881015,
+        "median": -0.009010159971748248,
+        "maximum": 0.21171759075738228
+      },
+      "legal_overlap_poses": 6,
+      "blocking_overlap_poses": 21
+    }
+  },
+  "new_physical_controls": 0,
+  "new_optimizer_updates": 0,
+  "formal_world_controls_total": 2051072,
+  "diagnostic_ppo_total": 2163968,
+  "main_combined_total": 476041216,
+  "standalone_bc_total": 8000,
+  "producer_cloned_forwards": 48,
+  "review_cloned_forwards": 48,
+  "cloned_forward_evaluations_total": 6349,
+  "producer_surface_queries": 480,
+  "review_surface_queries": 480,
+  "surface_distance_queries_total": 960,
+  "promotion": false,
+  "main_adoption": false,
+  "limitations": [
+    "Saved local-best poses were optimized for a point, not for nearest collision-surface gap.",
+    "Static overlap does not establish a balanced dynamic punch, contact impulse or collision-free path.",
+    "An earlier physical block event does not prove it is active at a later snapshot."
+  ],
+  "decision": "Interpret legal surface gaps and blocking intersections before a bounded target/path/authority intervention; no automatic training extension."
+}

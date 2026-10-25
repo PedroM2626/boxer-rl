@@ -37,7 +37,13 @@ timing/target lag while retaining that stable control. The
 also survives 8/8 without physical strikes. A
 [cloned terminal-workspace review](docs/results/striking-pilot/terminal-workspace-v1/README.md)
 finds unmatched endpoints in bounded local searches; next distinguish collision
-surface reach from the commanded point before changing authority. No PPO job is active. General boxing remains
+surface reach from the commanded point before changing authority. The
+[signed-surface audit](docs/results/striking-pilot/surface-audit-v1/README.md)
+finds blocking intersections; the [reviewed 6/12 cm bow comparison](docs/results/striking-pilot/arc-path-v4/README.md)
+still produces no commanded-left target contacts or candidate punches (survival
+7/8 and 8/8). Its sole legacy event is an incidental opposite-hand touch.
+Next test lateral movement commands through the learned motor under a bounded
+protocol. No PPO job is active. General boxing remains
 uncertified, and the stopped main policy has not been replaced.
 
 An [earlier striking final](docs/striking-generalization-audit.md) passed two

@@ -1,0 +1,2856 @@
+{
+  "status": "completed",
+  "phase": "awaiting_interpretation",
+  "controller_design_version": 4,
+  "terminal_dwell_seconds": 0.12,
+  "pid": 345,
+  "started_utc": "2026-10-25T17:31:02.541066+00:00",
+  "diagnostic_output": "/home/pedro/boxing-runs/striking-arc-path-v4",
+  "profile": {
+    "version": 1,
+    "guard_seconds": 0.35,
+    "extend_seconds": 0.18,
+    "retract_seconds": 0.25,
+    "rest_seconds": 0.3,
+    "engage_distance": 0.75,
+    "guard_local": [
+      0.16,
+      0.16,
+      0.12
+    ],
+    "target_torso_world_height_offset": 0.1,
+    "joint_correction_cap": 0.16,
+    "damping": 0.05,
+    "arm_residual_radians": 0.8,
+    "filter_old": 0.8,
+    "filter_new": 0.2
+  },
+  "prerequisites": {
+    "foundation": {
+      "balance": {
+        "records": 29,
+        "sha256": "8cea6a2f62ae68fd9a3118b881301785900df7d3af73322fccacfa0e2e3bc1f6"
+      },
+      "walk_easy": {
+        "records": 41,
+        "sha256": "f1e0e6f023ff4ac477171382069fe132af9180ae818b509a18c2572eca0200ee"
+      },
+      "walk": {
+        "records": 13,
+        "sha256": "d547d60455be5d8b6f9f49c7bec256cb0b0d6963e3345a7160a16f974d0c531c"
+      },
+      "approach": {
+        "records": 2,
+        "sha256": "b39b1990945e8a374802c3a190e5ac5e026ae39e7fd5ef61c5c2b01ad291c6fc"
+      }
+    },
+    "main_sha256": "efad0ccd1051ee5305d4ccf8ebbd7d0e402211f12ecd0cdf175b473b24a7b5b0"
+  },
+  "motor_sha256": "b39b1990945e8a374802c3a190e5ac5e026ae39e7fd5ef61c5c2b01ad291c6fc",
+  "source_surface_review_sha256": "31c1083445c33d6b3d2a9227884d0e240f20974a5c6cb1eafbb6a7b10e677919",
+  "source_review_sha256": "dd20cdcf0a7b0a4437aca24716afb61cf7d12067d72229c60ce5bb39409011df",
+  "source_audit_sha256": "14360792f9e0f6d57bc26b745387e8c87d6ffc7451bc8af0fe91ed8ce4984c64",
+  "formal_world_controls_before_job": 2051072,
+  "maximum_world_controls": 8000,
+  "formal_world_controls_ceiling": 2059072,
+  "diagnostic_world_controls": 7991,
+  "new_ppo_steps": 0,
+  "new_supervised_updates": 0,
+  "new_optimizer_updates": 0,
+  "diagnostic_ppo_retained": 2163968,
+  "main_project_consumed_retained": 476041216,
+  "main_boxing_retained": 1048576,
+  "cloned_forward_evaluations_retained": 6349,
+  "surface_distance_queries_retained": 960,
+  "learned_controller": false,
+  "assistance": false,
+  "promotion": false,
+  "policy_adoption": "none",
+  "trials": [
+    {
+      "case": "arc_006-corner-0-seed-7-swap-0",
+      "mode": "arc_006",
+      "arc_meters": 0.06,
+      "corner": 0,
+      "seed": 7,
+      "swap": false,
+      "controls": 500,
+      "elapsed": 10.000000000000009,
+      "survived": true,
+      "scores": [
+        0.0,
+        0.0
+      ],
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7547899641629581,
+            "upright": 0.9766600644629453,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7554029895152612,
+            "upright": 0.9992905347689235,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ]
+        ]
+      },
+      "events": [],
+      "candidate_events": 0,
+      "feasible_episode": false,
+      "phase_controls": {
+        "approach": 100,
+        "guard": 120,
+        "extend": 105,
+        "retract": 85,
+        "rest": 90
+      },
+      "first_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 2.2599999999999727
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 2.275999999999971
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 3.7679999999998066
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 3.8499999999997976
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 4.401999999999737
+        }
+      ],
+      "matched_prefix_controls": 118,
+      "matched_prefix_kind": "first_arc_extension",
+      "reference_full_trace_sha256": "f949b43501f35d86190e6c0eff3fb0d29d498ac2825c91afc14aa3ca3309fcaa",
+      "full_trace_file": "/home/pedro/boxing-runs/striking-arc-path-v4/full/arc_006-corner-0-seed-7-swap-0.npz",
+      "full_trace_sha256": "1290e651b0b6edcf5aa49e3e9924eed73d7f0ae5d46b865722a589c2344792b4",
+      "native_trace_file": "/home/pedro/boxing-runs/striking-arc-path-v4/native/arc_006-corner-0-seed-7-swap-0.npz",
+      "native_trace_sha256": "2c4d67ca4ad6951db48471c0226ed8e6e0a690129988b987fab3e31d7af8edd3"
+    },
+    {
+      "case": "arc_012-corner-0-seed-7-swap-0",
+      "mode": "arc_012",
+      "arc_meters": 0.12,
+      "corner": 0,
+      "seed": 7,
+      "swap": false,
+      "controls": 500,
+      "elapsed": 10.000000000000009,
+      "survived": true,
+      "scores": [
+        0.0,
+        0.0
+      ],
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7357350161857011,
+            "upright": 0.9966489738692262,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7542429288581342,
+            "upright": 0.9982146879169329,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ]
+        ]
+      },
+      "events": [],
+      "candidate_events": 0,
+      "feasible_episode": false,
+      "phase_controls": {
+        "approach": 100,
+        "guard": 120,
+        "extend": 105,
+        "retract": 85,
+        "rest": 90
+      },
+      "first_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 2.2599999999999727
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 2.275999999999971
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 3.717999999999812
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 3.8279999999998
+        }
+      ],
+      "matched_prefix_controls": 118,
+      "matched_prefix_kind": "first_arc_extension",
+      "reference_full_trace_sha256": "f949b43501f35d86190e6c0eff3fb0d29d498ac2825c91afc14aa3ca3309fcaa",
+      "full_trace_file": "/home/pedro/boxing-runs/striking-arc-path-v4/full/arc_012-corner-0-seed-7-swap-0.npz",
+      "full_trace_sha256": "96e7a0a58e758cad7f83f655ea960b4ed6f20f15099b2b423dd96543f4bdbcb8",
+      "native_trace_file": "/home/pedro/boxing-runs/striking-arc-path-v4/native/arc_012-corner-0-seed-7-swap-0.npz",
+      "native_trace_sha256": "3dc2c1f0611e8639329d91bc87435b1ca99de935eda4931b30c9283ba1220607"
+    },
+    {
+      "case": "arc_006-corner-0-seed-7-swap-1",
+      "mode": "arc_006",
+      "arc_meters": 0.06,
+      "corner": 0,
+      "seed": 7,
+      "swap": true,
+      "controls": 500,
+      "elapsed": 10.000000000000009,
+      "survived": true,
+      "scores": [
+        0.0,
+        0.0
+      ],
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7514583371137297,
+            "upright": 0.9982222606104959,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7563565427470029,
+            "upright": 0.9979909412979724,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ]
+        ]
+      },
+      "events": [],
+      "candidate_events": 0,
+      "feasible_episode": false,
+      "phase_controls": {
+        "approach": 79,
+        "guard": 120,
+        "extend": 105,
+        "retract": 91,
+        "rest": 105
+      },
+      "first_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 1.8300000000000014
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 1.8420000000000014
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 3.3619999999998513
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 4.457999999999731
+        }
+      ],
+      "matched_prefix_controls": 97,
+      "matched_prefix_kind": "first_arc_extension",
+      "reference_full_trace_sha256": "1bbf641bb4c85706e845edb610faa9189a3a5c7bb1b3dd81f2a45af3c2a26188",
+      "full_trace_file": "/home/pedro/boxing-runs/striking-arc-path-v4/full/arc_006-corner-0-seed-7-swap-1.npz",
+      "full_trace_sha256": "67581f473c0500e7069235f5f57e23e325054194fe9f12c112543e8da61eff28",
+      "native_trace_file": "/home/pedro/boxing-runs/striking-arc-path-v4/native/arc_006-corner-0-seed-7-swap-1.npz",
+      "native_trace_sha256": "e145b36bd11f99343ace6b77a99a7c8114708328332180f835349aae3e9795e6"
+    },
+    {
+      "case": "arc_012-corner-0-seed-7-swap-1",
+      "mode": "arc_012",
+      "arc_meters": 0.12,
+      "corner": 0,
+      "seed": 7,
+      "swap": true,
+      "controls": 500,
+      "elapsed": 10.000000000000009,
+      "survived": true,
+      "scores": [
+        0.0,
+        0.0
+      ],
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7554941134117763,
+            "upright": 0.9995222395798352,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7549735768956326,
+            "upright": 0.9983632370661979,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ]
+        ]
+      },
+      "events": [],
+      "candidate_events": 0,
+      "feasible_episode": false,
+      "phase_controls": {
+        "approach": 79,
+        "guard": 120,
+        "extend": 105,
+        "retract": 91,
+        "rest": 105
+      },
+      "first_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 1.8300000000000014
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 1.8420000000000014
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 3.4159999999998454
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 4.503999999999726
+        },
+        {
+          "geoms": [
+            "red/right_wrist_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 9.16599999999973
+        }
+      ],
+      "matched_prefix_controls": 97,
+      "matched_prefix_kind": "first_arc_extension",
+      "reference_full_trace_sha256": "1bbf641bb4c85706e845edb610faa9189a3a5c7bb1b3dd81f2a45af3c2a26188",
+      "full_trace_file": "/home/pedro/boxing-runs/striking-arc-path-v4/full/arc_012-corner-0-seed-7-swap-1.npz",
+      "full_trace_sha256": "98c46368a1ff1c2bca9d8d95ffec6d77bf3c87d72a5bc2b22754b5a54c741525",
+      "native_trace_file": "/home/pedro/boxing-runs/striking-arc-path-v4/native/arc_012-corner-0-seed-7-swap-1.npz",
+      "native_trace_sha256": "7711fd121726bb370a81b52eae86327fc9bb1df8b538d4029715544d397abb0c"
+    },
+    {
+      "case": "arc_006-corner-0-seed-23-swap-0",
+      "mode": "arc_006",
+      "arc_meters": 0.06,
+      "corner": 0,
+      "seed": 23,
+      "swap": false,
+      "controls": 500,
+      "elapsed": 10.000000000000009,
+      "survived": true,
+      "scores": [
+        0.0,
+        0.0
+      ],
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.749500374329963,
+            "upright": 0.9984671893269875,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7551095874348847,
+            "upright": 0.9979482679602354,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ]
+        ]
+      },
+      "events": [],
+      "candidate_events": 0,
+      "feasible_episode": false,
+      "phase_controls": {
+        "approach": 83,
+        "guard": 120,
+        "extend": 105,
+        "retract": 91,
+        "rest": 101
+      },
+      "first_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.04200000000000002
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 1.9220000000000015
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 1.9380000000000015
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_shoulder_yaw_collision"
+          ],
+          "elapsed": 4.567999999999719
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 4.5719999999997185
+        },
+        {
+          "geoms": [
+            "red/left_wrist_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 4.591999999999716
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 4.701999999999704
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 4.729999999999701
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/torso_collision"
+          ],
+          "elapsed": 4.83199999999969
+        },
+        {
+          "geoms": [
+            "red/right_wrist_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 5.577999999999608
+        }
+      ],
+      "matched_prefix_controls": 101,
+      "matched_prefix_kind": "first_arc_extension",
+      "reference_full_trace_sha256": "4b1df370bc9f1e947f75d396acc3f8fc47ae229a754a4c76d6b07f34a75e03df",
+      "full_trace_file": "/home/pedro/boxing-runs/striking-arc-path-v4/full/arc_006-corner-0-seed-23-swap-0.npz",
+      "full_trace_sha256": "4dc214c733a5abd99304921afbb521f4840f437be797abe86f85ab4d065c66d9",
+      "native_trace_file": "/home/pedro/boxing-runs/striking-arc-path-v4/native/arc_006-corner-0-seed-23-swap-0.npz",
+      "native_trace_sha256": "2f2dbfa2147ce5881428126335f6ce9f02c87dd485eb5dd47e1f95ad4bbd8cbc"
+    },
+    {
+      "case": "arc_012-corner-0-seed-23-swap-0",
+      "mode": "arc_012",
+      "arc_meters": 0.12,
+      "corner": 0,
+      "seed": 23,
+      "swap": false,
+      "controls": 500,
+      "elapsed": 10.000000000000009,
+      "survived": true,
+      "scores": [
+        0.0,
+        0.0
+      ],
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7552455305609629,
+            "upright": 0.998379595907543,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.755686441555957,
+            "upright": 0.9992902924029157,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ]
+        ]
+      },
+      "events": [],
+      "candidate_events": 0,
+      "feasible_episode": false,
+      "phase_controls": {
+        "approach": 83,
+        "guard": 120,
+        "extend": 105,
+        "retract": 91,
+        "rest": 101
+      },
+      "first_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.04200000000000002
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 1.9220000000000015
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 1.9380000000000015
+        },
+        {
+          "geoms": [
+            "red/torso_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 4.297999999999749
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/torso_collision"
+          ],
+          "elapsed": 4.311999999999747
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_shoulder_yaw_collision"
+          ],
+          "elapsed": 4.579999999999718
+        },
+        {
+          "geoms": [
+            "red/left_wrist_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 4.5899999999997165
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/left_shin"
+          ],
+          "elapsed": 4.655999999999709
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 4.7079999999997035
+        },
+        {
+          "geoms": [
+            "red/right_wrist_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 5.513999999999615
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 5.775999999999586
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 5.873999999999575
+        }
+      ],
+      "matched_prefix_controls": 101,
+      "matched_prefix_kind": "first_arc_extension",
+      "reference_full_trace_sha256": "4b1df370bc9f1e947f75d396acc3f8fc47ae229a754a4c76d6b07f34a75e03df",
+      "full_trace_file": "/home/pedro/boxing-runs/striking-arc-path-v4/full/arc_012-corner-0-seed-23-swap-0.npz",
+      "full_trace_sha256": "adfa169c4147e1671cf0775284da38b46c35ac83d7d3863e26d3cab29a2ec4af",
+      "native_trace_file": "/home/pedro/boxing-runs/striking-arc-path-v4/native/arc_012-corner-0-seed-23-swap-0.npz",
+      "native_trace_sha256": "93d98f2b4c0e8bd02bd11d502bf43c0a452b30e58f3172a6d85f13ec06a2bde8"
+    },
+    {
+      "case": "arc_006-corner-0-seed-23-swap-1",
+      "mode": "arc_006",
+      "arc_meters": 0.06,
+      "corner": 0,
+      "seed": 23,
+      "swap": true,
+      "controls": 500,
+      "elapsed": 10.000000000000009,
+      "survived": true,
+      "scores": [
+        0.0,
+        0.0
+      ],
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7717719458376531,
+            "upright": 0.9919477858319208,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7560641366965238,
+            "upright": 0.9986218955402766,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ]
+        ]
+      },
+      "events": [],
+      "candidate_events": 0,
+      "feasible_episode": false,
+      "phase_controls": {
+        "approach": 89,
+        "guard": 120,
+        "extend": 105,
+        "retract": 91,
+        "rest": 95
+      },
+      "first_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.19600000000000015
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 2.0519999999999956
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 2.055999999999995
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/torso_collision"
+          ],
+          "elapsed": 3.46399999999984
+        },
+        {
+          "geoms": [
+            "red/left_wrist_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 3.46599999999984
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 3.46599999999984
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_shoulder_yaw_collision"
+          ],
+          "elapsed": 3.4859999999998377
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 3.6159999999998234
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 3.653999999999819
+        }
+      ],
+      "matched_prefix_controls": 107,
+      "matched_prefix_kind": "first_arc_extension",
+      "reference_full_trace_sha256": "36adffc0fe1b1f854f61b59dd57329ea23a12a4f09aad0af944e0e0f39528b4b",
+      "full_trace_file": "/home/pedro/boxing-runs/striking-arc-path-v4/full/arc_006-corner-0-seed-23-swap-1.npz",
+      "full_trace_sha256": "93ed54467108b6bf81ba9f5211571ae951192177738435dd44468d8ef563ca11",
+      "native_trace_file": "/home/pedro/boxing-runs/striking-arc-path-v4/native/arc_006-corner-0-seed-23-swap-1.npz",
+      "native_trace_sha256": "b83f6619ad5b6b006c2d4fcc57d4c8a93023a1d0e7e328e118ddc914d18bcab8"
+    },
+    {
+      "case": "arc_012-corner-0-seed-23-swap-1",
+      "mode": "arc_012",
+      "arc_meters": 0.12,
+      "corner": 0,
+      "seed": 23,
+      "swap": true,
+      "controls": 500,
+      "elapsed": 10.000000000000009,
+      "survived": true,
+      "scores": [
+        0.0,
+        0.0
+      ],
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7344563592771391,
+            "upright": 0.9983526929688408,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7576054482925889,
+            "upright": 0.9993898801860744,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ]
+        ]
+      },
+      "events": [],
+      "candidate_events": 0,
+      "feasible_episode": false,
+      "phase_controls": {
+        "approach": 89,
+        "guard": 120,
+        "extend": 105,
+        "retract": 91,
+        "rest": 95
+      },
+      "first_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.19600000000000015
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 2.0519999999999956
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 2.055999999999995
+        },
+        {
+          "geoms": [
+            "red/right_wrist_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 3.381999999999849
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 3.511999999999835
+        },
+        {
+          "geoms": [
+            "red/left_wrist_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 3.5139999999998346
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 3.6399999999998207
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 3.7059999999998134
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/left_shin"
+          ],
+          "elapsed": 4.539999999999722
+        }
+      ],
+      "matched_prefix_controls": 107,
+      "matched_prefix_kind": "first_arc_extension",
+      "reference_full_trace_sha256": "36adffc0fe1b1f854f61b59dd57329ea23a12a4f09aad0af944e0e0f39528b4b",
+      "full_trace_file": "/home/pedro/boxing-runs/striking-arc-path-v4/full/arc_012-corner-0-seed-23-swap-1.npz",
+      "full_trace_sha256": "0851c709eb0a7df62f064b67c0ff825bf06418561a6c5e87a02a94ec8cd87117",
+      "native_trace_file": "/home/pedro/boxing-runs/striking-arc-path-v4/native/arc_012-corner-0-seed-23-swap-1.npz",
+      "native_trace_sha256": "dfc4ee7efb38bdc54e3fe16b44efe96caf87ac1dd3c844b17ef1fa49b21e1ce7"
+    },
+    {
+      "case": "arc_006-corner-1-seed-7-swap-0",
+      "mode": "arc_006",
+      "arc_meters": 0.06,
+      "corner": 1,
+      "seed": 7,
+      "swap": false,
+      "controls": 500,
+      "elapsed": 10.000000000000009,
+      "survived": true,
+      "scores": [
+        0.0,
+        0.0
+      ],
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7556445275628066,
+            "upright": 0.997309044087787,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7272517134311921,
+            "upright": 0.9665894081625944,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ]
+        ]
+      },
+      "events": [],
+      "candidate_events": 0,
+      "feasible_episode": false,
+      "phase_controls": {
+        "approach": 100,
+        "guard": 120,
+        "extend": 105,
+        "retract": 85,
+        "rest": 90
+      },
+      "first_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 2.2599999999999727
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 2.275999999999971
+        },
+        {
+          "geoms": [
+            "red/right_wrist_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 3.7039999999998137
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 3.783999999999805
+        }
+      ],
+      "matched_prefix_controls": 118,
+      "matched_prefix_kind": "first_arc_extension",
+      "reference_full_trace_sha256": "92248c427a31fdf1c8df2b011ffa3361ce364bd283d8babaf8b3dd6dd7700c85",
+      "full_trace_file": "/home/pedro/boxing-runs/striking-arc-path-v4/full/arc_006-corner-1-seed-7-swap-0.npz",
+      "full_trace_sha256": "7889f75cf3e4133ec358ad32929797398dfc7b0acec59f3e9f97347481bd4dd9",
+      "native_trace_file": "/home/pedro/boxing-runs/striking-arc-path-v4/native/arc_006-corner-1-seed-7-swap-0.npz",
+      "native_trace_sha256": "820c742dd7ad4f1208e4df744d55bb143d090c0d44d13f7e3a422654668be3d3"
+    },
+    {
+      "case": "arc_012-corner-1-seed-7-swap-0",
+      "mode": "arc_012",
+      "arc_meters": 0.12,
+      "corner": 1,
+      "seed": 7,
+      "swap": false,
+      "controls": 500,
+      "elapsed": 10.000000000000009,
+      "survived": true,
+      "scores": [
+        0.0,
+        0.0
+      ],
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7563450717350663,
+            "upright": 0.9982684482215542,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7403999162093201,
+            "upright": 0.9851701882033076,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ]
+        ]
+      },
+      "events": [],
+      "candidate_events": 0,
+      "feasible_episode": false,
+      "phase_controls": {
+        "approach": 100,
+        "guard": 120,
+        "extend": 105,
+        "retract": 85,
+        "rest": 90
+      },
+      "first_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 2.2599999999999727
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 2.275999999999971
+        },
+        {
+          "geoms": [
+            "red/right_wrist_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 3.717999999999812
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 3.8319999999997996
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 8.439999999999488
+        }
+      ],
+      "matched_prefix_controls": 118,
+      "matched_prefix_kind": "first_arc_extension",
+      "reference_full_trace_sha256": "92248c427a31fdf1c8df2b011ffa3361ce364bd283d8babaf8b3dd6dd7700c85",
+      "full_trace_file": "/home/pedro/boxing-runs/striking-arc-path-v4/full/arc_012-corner-1-seed-7-swap-0.npz",
+      "full_trace_sha256": "b5751bde6fd36b86c75c56d6cea0762648c13cb212b1ef4bd3043a7571d1a476",
+      "native_trace_file": "/home/pedro/boxing-runs/striking-arc-path-v4/native/arc_012-corner-1-seed-7-swap-0.npz",
+      "native_trace_sha256": "9c9afa04602ff2d8cf1f3defc40dfa53de81d2f9149ed62f06e19e027832b98d"
+    },
+    {
+      "case": "arc_006-corner-1-seed-7-swap-1",
+      "mode": "arc_006",
+      "arc_meters": 0.06,
+      "corner": 1,
+      "seed": 7,
+      "swap": true,
+      "controls": 500,
+      "elapsed": 10.000000000000009,
+      "survived": true,
+      "scores": [
+        0.0,
+        0.0
+      ],
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7515856181730814,
+            "upright": 0.9990358196704678,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7407434592470314,
+            "upright": 0.9675653582389758,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ]
+        ]
+      },
+      "events": [],
+      "candidate_events": 0,
+      "feasible_episode": false,
+      "phase_controls": {
+        "approach": 79,
+        "guard": 120,
+        "extend": 105,
+        "retract": 91,
+        "rest": 105
+      },
+      "first_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 1.8300000000000014
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 1.8420000000000014
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 3.355999999999852
+        },
+        {
+          "geoms": [
+            "red/right_wrist_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 4.481999999999728
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 8.647999999999557
+        }
+      ],
+      "matched_prefix_controls": 97,
+      "matched_prefix_kind": "first_arc_extension",
+      "reference_full_trace_sha256": "1015488fc1c4f992deb398992a6ebf260a2712795aedd54e548ebe8db54163c5",
+      "full_trace_file": "/home/pedro/boxing-runs/striking-arc-path-v4/full/arc_006-corner-1-seed-7-swap-1.npz",
+      "full_trace_sha256": "024375232aeb89e67382d2aabe7499e3ad561510a5862775c3d5a5613fff0fe7",
+      "native_trace_file": "/home/pedro/boxing-runs/striking-arc-path-v4/native/arc_006-corner-1-seed-7-swap-1.npz",
+      "native_trace_sha256": "a614aeec954dbc4425961c414a55e2dfa4cb80cb6a414ceb34a55fc53d92e723"
+    },
+    {
+      "case": "arc_012-corner-1-seed-7-swap-1",
+      "mode": "arc_012",
+      "arc_meters": 0.12,
+      "corner": 1,
+      "seed": 7,
+      "swap": true,
+      "controls": 500,
+      "elapsed": 10.000000000000009,
+      "survived": true,
+      "scores": [
+        0.0,
+        0.0
+      ],
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.755396074543691,
+            "upright": 0.997697899559076,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7508291257326691,
+            "upright": 0.9991740043540281,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ]
+        ]
+      },
+      "events": [],
+      "candidate_events": 0,
+      "feasible_episode": false,
+      "phase_controls": {
+        "approach": 79,
+        "guard": 120,
+        "extend": 105,
+        "retract": 91,
+        "rest": 105
+      },
+      "first_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 1.8300000000000014
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 1.8420000000000014
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 3.401999999999847
+        },
+        {
+          "geoms": [
+            "red/right_wrist_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 4.161999999999764
+        },
+        {
+          "geoms": [
+            "red/right_wrist_collision",
+            "blue/left_wrist_collision"
+          ],
+          "elapsed": 4.619999999999713
+        },
+        {
+          "geoms": [
+            "red/torso_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 4.779999999999696
+        },
+        {
+          "geoms": [
+            "red/left_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 5.451999999999622
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 5.83199999999958
+        }
+      ],
+      "matched_prefix_controls": 97,
+      "matched_prefix_kind": "first_arc_extension",
+      "reference_full_trace_sha256": "1015488fc1c4f992deb398992a6ebf260a2712795aedd54e548ebe8db54163c5",
+      "full_trace_file": "/home/pedro/boxing-runs/striking-arc-path-v4/full/arc_012-corner-1-seed-7-swap-1.npz",
+      "full_trace_sha256": "f7bf239a59ca7fc9bad2af42876fa4473ae18bac78907c5ace6778dba121cfb0",
+      "native_trace_file": "/home/pedro/boxing-runs/striking-arc-path-v4/native/arc_012-corner-1-seed-7-swap-1.npz",
+      "native_trace_sha256": "04ea95ab79609c679f05d1c0a6193e1946f33f99b48f0c96e09ec0869497907e"
+    },
+    {
+      "case": "arc_006-corner-1-seed-23-swap-0",
+      "mode": "arc_006",
+      "arc_meters": 0.06,
+      "corner": 1,
+      "seed": 23,
+      "swap": false,
+      "controls": 491,
+      "elapsed": 9.811999999999946,
+      "survived": false,
+      "scores": [
+        0.0,
+        0.0
+      ],
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7465502091234033,
+            "upright": 0.9993874533657153,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.549734046839832,
+            "upright": 0.6967719365805336,
+            "low_pelvis": true,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ]
+        ]
+      },
+      "events": [],
+      "candidate_events": 0,
+      "feasible_episode": false,
+      "phase_controls": {
+        "approach": 83,
+        "guard": 120,
+        "extend": 105,
+        "retract": 91,
+        "rest": 92
+      },
+      "first_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.04200000000000002
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 1.9220000000000015
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 1.9380000000000015
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 3.4259999999998443
+        },
+        {
+          "geoms": [
+            "red/right_wrist_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 4.541999999999722
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 7.961999999999345
+        }
+      ],
+      "matched_prefix_controls": 101,
+      "matched_prefix_kind": "first_arc_extension",
+      "reference_full_trace_sha256": "337ac15d1671f87c1ec25fe18f2baa480d8a7a199cf2b9daef4daab00eec8e81",
+      "full_trace_file": "/home/pedro/boxing-runs/striking-arc-path-v4/full/arc_006-corner-1-seed-23-swap-0.npz",
+      "full_trace_sha256": "6bef1ec4adb930df24343cf93efb582f95f970da810c12c643c8fee931a7347c",
+      "native_trace_file": "/home/pedro/boxing-runs/striking-arc-path-v4/native/arc_006-corner-1-seed-23-swap-0.npz",
+      "native_trace_sha256": "2f8d85dc4f9a7455473bb116651dc4d7c84472fb963a43f935e7ca8ac5c704ed"
+    },
+    {
+      "case": "arc_012-corner-1-seed-23-swap-0",
+      "mode": "arc_012",
+      "arc_meters": 0.12,
+      "corner": 1,
+      "seed": 23,
+      "swap": false,
+      "controls": 500,
+      "elapsed": 10.000000000000009,
+      "survived": true,
+      "scores": [
+        0.0,
+        0.0
+      ],
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.750528592591416,
+            "upright": 0.9999794061132298,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.748325767406953,
+            "upright": 0.9940148161745628,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ]
+        ]
+      },
+      "events": [],
+      "candidate_events": 0,
+      "feasible_episode": false,
+      "phase_controls": {
+        "approach": 83,
+        "guard": 120,
+        "extend": 105,
+        "retract": 91,
+        "rest": 101
+      },
+      "first_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.04200000000000002
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 1.9220000000000015
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 1.9380000000000015
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 3.491999999999837
+        },
+        {
+          "geoms": [
+            "red/right_wrist_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 4.585999999999717
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 8.963999999999663
+        }
+      ],
+      "matched_prefix_controls": 101,
+      "matched_prefix_kind": "first_arc_extension",
+      "reference_full_trace_sha256": "337ac15d1671f87c1ec25fe18f2baa480d8a7a199cf2b9daef4daab00eec8e81",
+      "full_trace_file": "/home/pedro/boxing-runs/striking-arc-path-v4/full/arc_012-corner-1-seed-23-swap-0.npz",
+      "full_trace_sha256": "bcba8118c39eba3c98aa260f1e9a50de3681a84a1a51f6bfc58b8282e9940508",
+      "native_trace_file": "/home/pedro/boxing-runs/striking-arc-path-v4/native/arc_012-corner-1-seed-23-swap-0.npz",
+      "native_trace_sha256": "d128eacd48144cab345f6faddb189228cd53e23d185fed6705238a347c5cf06f"
+    },
+    {
+      "case": "arc_006-corner-1-seed-23-swap-1",
+      "mode": "arc_006",
+      "arc_meters": 0.06,
+      "corner": 1,
+      "seed": 23,
+      "swap": true,
+      "controls": 500,
+      "elapsed": 10.000000000000009,
+      "survived": true,
+      "scores": [
+        0.0,
+        0.0
+      ],
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7580476327928843,
+            "upright": 0.9992079566085754,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7624931214029638,
+            "upright": 0.9904983473815556,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ]
+        ]
+      },
+      "events": [],
+      "candidate_events": 0,
+      "feasible_episode": false,
+      "phase_controls": {
+        "approach": 89,
+        "guard": 120,
+        "extend": 105,
+        "retract": 91,
+        "rest": 95
+      },
+      "first_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.19600000000000015
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 2.0519999999999956
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 2.055999999999995
+        },
+        {
+          "geoms": [
+            "red/right_wrist_collision",
+            "blue/left_wrist_collision"
+          ],
+          "elapsed": 3.4619999999998403
+        },
+        {
+          "geoms": [
+            "red/torso_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 3.4699999999998394
+        },
+        {
+          "geoms": [
+            "red/right_shoulder_yaw_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 3.4779999999998386
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 3.64599999999982
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/torso_collision"
+          ],
+          "elapsed": 3.8979999999997923
+        },
+        {
+          "geoms": [
+            "red/right_wrist_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 4.65199999999971
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 4.761999999999698
+        }
+      ],
+      "matched_prefix_controls": 107,
+      "matched_prefix_kind": "first_arc_extension",
+      "reference_full_trace_sha256": "c44035fe22894ad81c5f1944a8ff4a8eb10237bff086311cd4eb8d1cc8d73af0",
+      "full_trace_file": "/home/pedro/boxing-runs/striking-arc-path-v4/full/arc_006-corner-1-seed-23-swap-1.npz",
+      "full_trace_sha256": "236814dce02afceed91539f3f302bd078272e4676be36ee4d0dd319efb20e7e7",
+      "native_trace_file": "/home/pedro/boxing-runs/striking-arc-path-v4/native/arc_006-corner-1-seed-23-swap-1.npz",
+      "native_trace_sha256": "7f4470643df4ee555531c2cce7c1a92bfe380e6942d1a70851f1792cdef463c6"
+    },
+    {
+      "case": "arc_012-corner-1-seed-23-swap-1",
+      "mode": "arc_012",
+      "arc_meters": 0.12,
+      "corner": 1,
+      "seed": 23,
+      "swap": true,
+      "controls": 500,
+      "elapsed": 10.000000000000009,
+      "survived": true,
+      "scores": [
+        0.0,
+        1.0
+      ],
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7556603025381665,
+            "upright": 0.999193342733729,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7615875786886565,
+            "upright": 0.9868928037890073,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ]
+        ]
+      },
+      "events": [
+        {
+          "corner": 1,
+          "hand": 1,
+          "onset_time": 3.7419999999998095,
+          "event_time": 3.753999999999808,
+          "onset_relative_speed": 0.2936386088873281,
+          "onset_forward_cosine": 0.036283660943200166,
+          "onset_contact_closing": 0.39086652698091934,
+          "onset_contact_advancing": 0.2169734393858885,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 0.5563755094522167,
+          "pre_max_displacement_m": 0.039534890075881866,
+          "pre_path_length_m": 0.0787263136065854,
+          "pre_elbow_excursion_rad": 0.048119114217688774,
+          "event_window_impulse_ns": 0.5198081197733367,
+          "native_contact_window_impulse_ns": 0.5198081197733367,
+          "post_window_seconds": 0.4999999999999454,
+          "post_contact_seconds": 0.058,
+          "return_toward_pre_window_position_m": 0.02552111658558144,
+          "post_window_complete": true,
+          "jab_cycle_candidate": false
+        }
+      ],
+      "candidate_events": 0,
+      "feasible_episode": false,
+      "phase_controls": {
+        "approach": 89,
+        "guard": 120,
+        "extend": 105,
+        "retract": 91,
+        "rest": 95
+      },
+      "first_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.19600000000000015
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 2.0519999999999956
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 2.055999999999995
+        },
+        {
+          "geoms": [
+            "red/right_shoulder_yaw_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 3.5059999999998355
+        },
+        {
+          "geoms": [
+            "red/right_wrist_collision",
+            "blue/left_wrist_collision"
+          ],
+          "elapsed": 3.5059999999998355
+        },
+        {
+          "geoms": [
+            "red/torso_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 3.5139999999998346
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 3.6579999999998187
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/torso_collision"
+          ],
+          "elapsed": 3.7439999999998093
+        },
+        {
+          "geoms": [
+            "red/right_wrist_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 4.691999999999705
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 4.787999999999695
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 8.203999999999409
+        }
+      ],
+      "matched_prefix_controls": 107,
+      "matched_prefix_kind": "first_arc_extension",
+      "reference_full_trace_sha256": "c44035fe22894ad81c5f1944a8ff4a8eb10237bff086311cd4eb8d1cc8d73af0",
+      "full_trace_file": "/home/pedro/boxing-runs/striking-arc-path-v4/full/arc_012-corner-1-seed-23-swap-1.npz",
+      "full_trace_sha256": "3367f170031705c6099ee3a377b2402a436b21b90682308956cfae300b244349",
+      "native_trace_file": "/home/pedro/boxing-runs/striking-arc-path-v4/native/arc_012-corner-1-seed-23-swap-1.npz",
+      "native_trace_sha256": "33858052f8b9c721ee2b14803bd809fd5a4d4bc66c04ce4550c108a9b4af483c"
+    }
+  ],
+  "active_case": "arc_012-corner-1-seed-23-swap-1",
+  "updated_utc": "2026-10-25T17:32:40.341389+00:00",
+  "formal_world_controls_total": 2059063
+}

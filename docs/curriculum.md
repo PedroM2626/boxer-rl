@@ -3,7 +3,13 @@
 Maintain the [trajectory and decision record](experiment-history.md) at every
 reviewed intervention, including failed results, accounting and pending evidence.
 
-**Latest reviewed outcome (2026-10-24):** the
+**Current decision (2026-10-25):** the signed-surface audit and both lateral-bow
+arms are complete and independently reviewed. No candidate punch or positive
+demonstration is established. Next prospectively test angle/range adjustment
+through the existing lateral movement command while keeping arm authority fixed.
+No job or new allocation is active; no phase promotion or PPO extension.
+
+**Earlier reviewed outcome (2026-10-24):** the
 [broader frozen audit](striking-gae-generalization.md) completed 130 episodes /
 61,934 controls with no optimization. All new neutral profiles pass (31/32 and
 32/32 pair survivors), but mirror survival 23/32 fails three of four complete
@@ -93,17 +99,28 @@ is completed and independently reviewed: 24 snapshots, actual median endpoint
 error 34.9 cm versus best local static median 22.9 cm. Two starts do not prove
 global impossibility; endpoint error is not a collision-surface gap. Next inspect
 legal fist/target surface distances and blocking contacts at the recorded/best
-poses before selecting a bounded target/authority change. No job is active;
-no PPO, imitation, motor unfreezing or gate changes.
+poses before selecting a bounded target/authority change. The subsequent
+[signed-surface audit](striking-surface-audit.md) is independently reviewed:
+recorded legal gaps are positive in all 24 poses, while 20 overlap blocking
+surfaces. Of six static-best poses overlapping a legal surface, five also overlap
+blockers. This does not prove an entire dynamic path is blocked. A
+[6/12 cm lateral-bow comparison](results/striking-pilot/arc-path-v4/README.md)
+is independently reviewed after sixteen focused tests passed. Survival is 7/8
+and 8/8; neither arm produces any candidate punch or acting-left target contact.
+The single old-counter impact is an incidental low-speed right-hand touch.
+Reject both as positive targets. Next test the existing lateral command through
+the walking motor under a new prospective bounded protocol, not new root/body
+authority. No job, PPO, imitation, motor unfreezing or gate changes.
 
 Reviewed diagnostic PPO is **2,163,968**, at its ceiling. Formal diagnostic
-simulation is **2,051,072** after the reviewed terminal dwell adds 4,000 controls,
-at its completed physical ceiling **2,051,072**. No new physical allocation.
-Cloned kinematic evaluations are now **6,253**: prior 4,339 plus terminal-workspace
-producer 1,890 and independent review 24. Its explicit cumulative ceiling was
-**10,339**; unused compute expires at review. No new cloned allocation.
+simulation is **2,059,063** after the reviewed arc comparison adds 7,991 controls,
+under its completed ceiling **2,059,072**. The unused nine controls expire; no
+new physical allocation is declared.
+Cloned kinematic evaluations are now **6,349** after 48 producer + 48 independent
+surface-audit forwards. Signed-distance queries are separately **960** (480 + 480).
+Both new geometry allocations are exhausted; no new cloned/distance allocation.
 Unused compute expires at review. No additional PPO or supervised allocation;
-there is no current physical or cloned job/allocation.
+no physical, cloned or distance-query job/allocation is active.
 Unused historical comparison compute is not an automatic continuation allocation.
 The completed audit is `/home/pedro/boxing-runs/striking-punch-quality-2080768/audit.json`;
 the later demo-motion review accounts separately for its 7,500 additional controls.

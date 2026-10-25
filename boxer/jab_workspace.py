@@ -38,7 +38,7 @@ def controller_measurements(env,controller,action,phase,motor_result):
     guard=controller.guard_target(env)
     foe=p.model.geom(p.maps[1-c]['side']+'torso_collision').id
     strike=p.data.geom_xpos[foe]+[0,0,PROFILE['target_torso_world_height_offset']]
-    target=guard+fraction*(strike-guard);fist=int(p.fists[c,0])
+    target=controller.path_target(env,guard,strike,fraction);fist=int(p.fists[c,0])
     jac=np.zeros((3,p.model.nv));rotation=np.zeros_like(jac)
     mujoco.mj_jacGeom(p.model,p.data,jac,rotation,fist);jac=jac[:,m['v'][indices]]
     delta=jac.T@np.linalg.solve(jac@jac.T+PROFILE['damping']**2*np.eye(3),target-p.data.geom_xpos[fist])

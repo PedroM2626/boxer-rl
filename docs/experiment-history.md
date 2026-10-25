@@ -5,9 +5,9 @@ conditional and why the next experiment was authorized. Detailed protocols,
 full physical results, limitations, checkpoints and accounting remain in the
 linked reports. This index does not replace those records or the live state.
 
-Last consolidated review: **2026-10-24**, through completed consolidation, limited
-ten-second readiness verification, reviewed broader/pool audits, failed jab-cycle
-prototype and exact full-body/workspace review. Reliable general boxing is **not yet
+Last consolidated review: **2026-10-25**, through completed consolidation, limited
+ten-second readiness, reviewed broader/pool audits, guard/cycle diagnostics,
+signed collision surfaces and the failed lateral-bow comparison. Reliable general boxing is **not yet
 certified**. The foundation is certified; paired physical exchanges exist.
 
 ## Historical corrections and retained capabilities
@@ -136,6 +136,32 @@ intervention. Do not repeat unchanged dwell, enlarge authority blindly or resume
 training from these non-contact motions. No job or new allocation is active.
 
 ## Where to check current facts
+
+On 2026-10-25, the [signed-surface audit](striking-surface-audit.md) independently
+verified all 48 recorded/best poses and ten opposing surfaces per pose. Recorded
+poses have positive legal gaps in all 24 cases and blocking overlap in 20. The
+old static-best poses overlap a legal surface in six cases, five also intersecting
+a blocker. Prior positive-force blocking events exist by each recorded snapshot;
+this does not prove the same block is still active or the entire path blocked.
+Cloned count increases from 6,253 to **6,349**; **960** signed-distance queries
+are separately recorded. No physical or optimizer steps were added.
+
+That evidence motivated the [reviewed lateral-bow comparison](results/striking-pilot/arc-path-v4/README.md).
+Both complete arms / sixteen conditions are reviewed: 6 cm survival 7/8, 12 cm
+8/8, zero candidate punches and zero acting-left target contact substeps in all
+cases. The single old-counter event is an incidental **right-hand** touch at
+0.294 m/s with forward cosine .036, not the commanded jab. One 6 cm case fails
+the acting-body low-pelvis rule at 9.812 s. Sixteen focused tests pass; original
+endpoints, learned guard, authority, collisions and complete criteria are preserved.
+
+Consume **7,991 new controls**, cumulative physical **2,059,063**, below explicit
+2,059,072 ceiling; unused nine controls expire. PPO 2,163,968, cloned forwards
+6,349, signed distances 960 and main/BC counts unchanged. Reject both bows as
+positive demonstrations; no adoption, gate relaxation or unchanged PPO extension.
+All these scripted trials keep the existing three movement offsets zero. Next
+prospectively vary lateral command through the already-learned walking motor,
+with the arm path fixed, to test angle/range adjustment rather than blindly
+increase arm/body authority. No new allocation or job remains active.
 
 The user requested the current video after confirming no active training job.
 The [recorded terminal-dwell video](../fights/striking-pilot/terminal-dwell-v3-recorded.mp4)

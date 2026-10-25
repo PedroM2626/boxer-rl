@@ -49,3 +49,9 @@ at the recorded and locally optimized poses, together with blocking/inter-arm
 contacts, before selecting a bounded surface-target or authority intervention.
 Keep the learned guard, free legs, unassisted physics and complete independent
 criteria. No policy promotion, motor unfreezing or new allocation is declared.
+
+Follow-up: the [signed-surface audit](../surface-audit-v1/README.md) reproduces
+all recorded/best gaps, identifying blocking intersections and some static legal
+overlaps without claiming dynamic feasibility. Its subsequent
+[arc comparison](../arc-path-v4/README.md) fails to establish a positive punch
+cycle; see that report for the next lateral-command question and actual counters.

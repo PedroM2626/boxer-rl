@@ -3,7 +3,7 @@ import jax.numpy as jp
 import numpy as np
 import pytest
 
-from boxer.jab_feasibility import JabFeasibility,GuardOnly,GuardRamp,MotorGuardJab,MotorGuardDwell,cycle_fraction
+from boxer.jab_feasibility import JabFeasibility,GuardOnly,GuardRamp,MotorGuardJab,MotorGuardDwell,MotorGuardArc,cycle_fraction
 from boxer.striking_env import StrikingEnv
 from test_paired_foundation import foundation
 
@@ -96,3 +96,17 @@ def test_terminal_dwell_preserves_outbound_motion_and_releases_to_motor(foundati
     b,phase=dwell.action(env);assert phase=='extend';np.testing.assert_array_equal(dwell.entry_local,entry)
     env.pair.elapsed=.66;b,phase=dwell.action(env);assert phase=='retract';np.testing.assert_array_equal(b,0.)
     env.pair.elapsed=1.64;dwell.action(env);assert dwell.extension_cycle==1
+
+
+@pytest.mark.parametrize('corner',[0,1])
+def test_arc_keeps_endpoints_and_zero_arc_matches_original_actions(foundation,corner):
+    env=StrikingEnv(foundation,None,motor=lambda obs,key:(jp.zeros((2,29)),{}));env.reset(7)
+    dwell=MotorGuardDwell(corner);zero=MotorGuardArc(corner,0.);arc=MotorGuardArc(corner,.06)
+    dwell.started=zero.started=arc.started=0.;env.pair.elapsed=.44
+    a,_=dwell.action(env);b,_=zero.action(env);np.testing.assert_array_equal(a,b)
+    guard=np.array([1.,2.,3.]);target=np.array([2.,3.,4.])
+    for f in (0.,1.):np.testing.assert_array_equal(arc.path_target(env,guard,target,f),dwell.path_target(env,guard,target,f))
+    rotation=env.pair.data.site(env.pair.maps[corner]['side']+'imu_in_torso').xmat.reshape(3,3)
+    np.testing.assert_allclose(arc.path_target(env,guard,target,.5)-(guard+target)/2,rotation[:,1]*.06,atol=1e-14)
+    action,_=arc.action(env);np.testing.assert_array_equal(action[1-corner],0.)
+    np.testing.assert_array_equal(action[corner,:3],0.);np.testing.assert_array_equal(action[corner,10:],0.)
