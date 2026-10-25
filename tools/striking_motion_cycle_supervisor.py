@@ -44,6 +44,9 @@ def main():
     args=parser.parse_args();root=args.output;root.mkdir(parents=True,exist_ok=True)
     git_command=[args.git_executable]+(['-C',args.git_worktree] if args.git_worktree else [])
     assert os.environ['JAX_PLATFORMS']=='cpu'
+    for identity in ('user.name','user.email'):
+        value=subprocess.check_output(git_command+['config','--get',identity],text=True).strip()
+        if not value:raise ValueError('configured Git author required before any new physical evaluation')
     with ExitStack() as stack:
         for path in (root/'.supervisor.lock',Path('runs/striking_diagnostic_supervisor.lock')):
             h=stack.enter_context(path.open('a'));fcntl.flock(h,fcntl.LOCK_EX|fcntl.LOCK_NB)

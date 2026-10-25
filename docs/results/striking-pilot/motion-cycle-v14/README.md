@@ -29,3 +29,20 @@ zero teacher coefficient is explicit, old moving touches earn no full-cycle
 bonus, synthetic complete cycles pay once after recovery, independent per-hand
 acceptance agrees, original mixed physical routing remains intact. Synthetic
 fixtures verify accounting logic; they are not physical boxing demonstrations.
+
+## Integration verified; learning active
+
+The ordinary resume completed the included 1,024-credit integration with a
+finite validated PPO checkpoint d22fe0fe, actor/critic Adam 15,000/38,672,
+18 passive update-audit records and zero initial on-policy ratio clipping.
+Native-error log is empty. No baseline repeat, optimizer reset or rollback.
+The persistent supervisor is now collecting/updating toward the first 262,144-
+credit full gate within the prospective 1,048,576-credit allocation.
+See integration-review.json, integration-update-audit and the saved integration
+checkpoint. The live-training snapshot is historical; use live progress for the
+actual counter. Early training has no independently validated new valid punch.
+
+The resumed live audit may retain the old publication error text as historical
+metadata while status is running. It is preserved in the explicit failure record;
+inspect status, actual active child, current progress and native-error logs for
+current health. Git author checks now run before new physical evaluations.

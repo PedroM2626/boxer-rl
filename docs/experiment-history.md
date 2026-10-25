@@ -318,3 +318,15 @@ Twenty-six focused tests pass. A Git-author configuration failure stopped only
 publication, before training. Preserve failed state/log, use existing Windows Git
 through the WSL launcher, and resume without replaying the baseline or rebuilding
 the initial state. All consumed counters, source and optimizer remain intact.
+
+## V14 integration and active bounded learning, 2026-10-25
+
+Ordinary resume retained the 11,486 baseline controls and all source state. The
+included 1,024-credit integration verifies finite updates, exact Adam 15,000/
+38,672, 18 on-policy audit records, zero initial ratio clipping and empty native
+stderr. Saved integration checkpoint d22fe0fe is diagnostic, not a boxing pass.
+PPO is now active toward the first 262,144-credit independent full gate within
+1,048,576 total new credits. Actual live progress supersedes the archived sample.
+The first measured throughput is around 90 learner credits/s, so hours of learning
+are plausible; startup/steady-state variation prevents an exact runtime promise.
+No early zero-cycle conclusion, automatic extension or main adoption is made.

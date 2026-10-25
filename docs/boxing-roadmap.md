@@ -102,3 +102,15 @@ checks; audit that prior work rather than assuming it never existed.
 The present ten-second diagnostic gates are prerequisites, not a complete boxing
 certification. No fixed large step count guarantees learning. Every extension
 must cite measured physical evidence, bounded compute and a stop/review rule.
+
+## Current learned-cycle continuation (2026-10-25)
+
+The source/saved-state arm audit found no target-index/scaling or native control-
+clipping defect. The [v14 protocol](striking-motion-cycle-training.md) now resumes
+actual latest fixed control with the old touch-imitation coefficient explicitly
+zero and complete physical-cycle payments. Initial 24-condition baseline and
+1,024-credit integration are reviewed; bounded PPO is active. Keep 26 passing
+focused tests, independent original/motion gates, ordinary optimizer continuation
+and all consumed steps. First full gate at 262,144 new credits; first allocation
+at most 1,048,576. Hours may be needed; early sparse rewards are not proof of
+learned impossibility. Valid held-out reciprocal boxing remains the objective.
