@@ -7,7 +7,7 @@ reviewed intervention, including failed results, accounting and pending evidence
 arms are complete and independently reviewed. No candidate punch or positive
 demonstration is established. Next prospectively test angle/range adjustment
 through the existing lateral movement command while keeping arm authority fixed.
-No job or new allocation is active; no phase promotion or PPO extension.
+The [lateral command comparison](striking-lateral-command-comparison.md) is now active: sixteen conditions, at most 8,000 additional physical controls, ceiling 2,067,063 from 2,059,063. No phase promotion or PPO extension.
 
 **Earlier reviewed outcome (2026-10-24):** the
 [broader frozen audit](striking-gae-generalization.md) completed 130 episodes /

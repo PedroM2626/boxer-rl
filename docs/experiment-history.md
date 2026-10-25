@@ -210,3 +210,15 @@ For each new experiment, intervention, failure recovery or budget decision:
 6. Run appropriate checks, commit and push project-owned code, documentation and
    durable evidence. Clearly identify any evidence still local or job still
    awaiting review. Keep repository content in English.
+
+## Pending lateral command comparison, 2026-10-25
+
+The [prospective protocol](striking-lateral-command-comparison.md) fixes the
+straight v3 arm path and compares original lateral action bounds -1/+1 during
+guard/extension through the frozen walking motor. Sixteen conditions, at most
+8,000 physical controls, cumulative ceiling 2,067,063 from 2,059,063.
+No optimizer or additional geometry allocation. The matched historical control
+is retained; both full arms must be reviewed before any continuation decision.
+Sixteen focused feasibility/workspace tests pass, including both corners and
+command directions, phase release, baseline command consistency and unchanged
+physics. Hidden persistent launcher uses existing global locks; no duplicate job.

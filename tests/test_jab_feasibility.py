@@ -110,3 +110,29 @@ def test_arc_keeps_endpoints_and_zero_arc_matches_original_actions(foundation,co
     np.testing.assert_allclose(arc.path_target(env,guard,target,.5)-(guard+target)/2,rotation[:,1]*.06,atol=1e-14)
     action,_=arc.action(env);np.testing.assert_array_equal(action[1-corner],0.)
     np.testing.assert_array_equal(action[corner,:3],0.);np.testing.assert_array_equal(action[corner,10:],0.)
+
+
+@pytest.mark.parametrize('corner',[0,1])
+@pytest.mark.parametrize('direction',[-1,1])
+def test_side_step_uses_existing_command_before_arm_baseline(foundation,corner,direction):
+    from boxer.jab_feasibility import MotorGuardSideStep
+    seen=[]
+    def motor(obs,key):
+        seen.append(np.asarray(obs['state'])[:,9:12].copy())
+        return jp.zeros((2,29)),{}
+    env=StrikingEnv(foundation,None,motor=motor);env.reset(7)
+    controller=MotorGuardSideStep(corner,direction)
+    action,phase=controller.action(env)
+    assert phase=='approach';np.testing.assert_array_equal(action,0.)
+    controller.started=0.;before=env.pair.data.qpos.copy()
+    for t,active in ((.1,True),(.44,True),(.6,True),(.7,False),(1.,False)):
+        env.pair.elapsed=t;action,phase=controller.action(env)
+        assert action[corner,1]==(direction if active else 0)
+        np.testing.assert_array_equal(action[1-corner],0.)
+        np.testing.assert_array_equal(action[corner,[0,2]],0.)
+        np.testing.assert_array_equal(action[corner,10:],0.)
+        if phase=='extend':np.testing.assert_allclose(seen[-1],env.commands(action),atol=1e-7)
+        else:np.testing.assert_array_equal(action[:,3:],0.)
+        np.testing.assert_array_equal(env.pair.data.qpos,before)
+    assert env.pair.model.neq==0 and not np.any(env.pair.model.body_gravcomp)
+    assert not np.any(env.pair.data.qfrc_applied) and not np.any(env.pair.data.xfrc_applied)

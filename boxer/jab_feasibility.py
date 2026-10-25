@@ -37,10 +37,14 @@ class JabFeasibility:
     def path_target(self,env,guard,target,fraction):
         return guard+fraction*(target-guard)
 
+    def base_action(self,env):
+        """Existing movement-command channels, before calculating the arm baseline."""
+        return np.zeros((2,17))
+
     def action(self,env):
         pair=env.pair;corner=self.corner
         roots=[pair.data.qpos[m['root']:m['root']+2] for m in pair.maps]
-        distance=np.linalg.norm(roots[1]-roots[0]);result=np.zeros((2,17))
+        distance=np.linalg.norm(roots[1]-roots[0]);result=self.base_action(env)
         if self.started is None:
             if distance>PROFILE['engage_distance']:return result,'approach'
             self.started=pair.elapsed
@@ -109,7 +113,7 @@ class MotorGuardJab(JabFeasibility):
                 return np.zeros((2,17)),'approach'
             self.started=pair.elapsed
         elapsed=pair.elapsed-self.started;phase,_=self.phase_fraction(elapsed)
-        if phase!='extend':return np.zeros((2,17)),phase
+        if phase!='extend':return self.base_action(env),phase
         cycle=int(elapsed//self.cycle_duration())
         if self.extension_cycle!=cycle:
             self.extension_cycle=cycle
@@ -152,3 +156,18 @@ class MotorGuardArc(MotorGuardDwell):
         if fraction<=0 or fraction>=1 or self.arc_meters==0:return straight
         site=env.pair.data.site(env.pair.maps[self.corner]['side']+'imu_in_torso')
         return straight+site.xmat.reshape(3,3)[:,1]*(self.arc_meters*np.sin(np.pi*fraction))
+
+
+class MotorGuardSideStep(MotorGuardDwell):
+    """Diagnostic lateral command through the frozen motor, with a straight jab."""
+    def __init__(self,corner,direction):
+        super().__init__(corner)
+        if direction not in (-1,1):raise ValueError('one original lateral command bound required')
+        self.direction=int(direction)
+
+    def base_action(self,env):
+        result=super().base_action(env)
+        if self.started is not None:
+            phase,_=self.phase_fraction(env.pair.elapsed-self.started)
+            if phase in ('guard','extend'):result[self.corner,1]=self.direction
+        return result
