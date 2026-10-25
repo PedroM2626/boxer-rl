@@ -682,21 +682,130 @@
       "assistance": false,
       "main_adoption": false,
       "reviewed_utc": "2026-10-25T22:59:12.267064+00:00"
+    },
+    {
+      "label": "step-524288",
+      "new_ppo_steps": 524288,
+      "sha256": "77073d1d1df5e9f2a70256e4ec9128f800732f576a4938c4e6e2c27e6d94ae64",
+      "seeds": [
+        7,
+        23,
+        31,
+        47
+      ],
+      "controls": 12000,
+      "original_contact_gate": {
+        "profiles": {
+          "neutral-0": {
+            "pair_survivors": 8,
+            "own_surviving_scoring_seeds": [],
+            "surviving_events_by_corner": [
+              0.0,
+              0.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": false
+          },
+          "neutral-1": {
+            "pair_survivors": 8,
+            "own_surviving_scoring_seeds": [],
+            "surviving_events_by_corner": [
+              0.0,
+              0.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": false
+          },
+          "selfplay": {
+            "pair_survivors": 8,
+            "own_surviving_scoring_seeds": [
+              47
+            ],
+            "surviving_events_by_corner": [
+              0.0,
+              1.0
+            ],
+            "surviving_two_way_episodes": 0,
+            "passes_profile": true
+          }
+        },
+        "passes_complete": false
+      },
+      "motion": {
+        "neutral-0": {
+          "valid_cycles_by_corner": [
+            0,
+            0
+          ],
+          "own_surviving_valid_seeds": [],
+          "reciprocal_surviving_valid_seeds": [],
+          "passes": false
+        },
+        "neutral-1": {
+          "valid_cycles_by_corner": [
+            0,
+            0
+          ],
+          "own_surviving_valid_seeds": [],
+          "reciprocal_surviving_valid_seeds": [],
+          "passes": false
+        },
+        "selfplay": {
+          "valid_cycles_by_corner": [
+            0,
+            0
+          ],
+          "own_surviving_valid_seeds": [],
+          "reciprocal_surviving_valid_seeds": [],
+          "passes": false
+        }
+      },
+      "events": [
+        {
+          "profile": "selfplay",
+          "seed": 47,
+          "swap": false,
+          "corner": 1,
+          "hand": 0,
+          "onset_time": 4.311999999999747,
+          "event_time": 4.319999999999746,
+          "onset_relative_speed": 0.6683668323261776,
+          "onset_forward_cosine": 0.606651551182995,
+          "onset_contact_closing": 0.3050993433391378,
+          "onset_contact_advancing": 0.43372418188921824,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 1.0047575022636477,
+          "pre_max_displacement_m": 0.03992877838583463,
+          "pre_path_length_m": 0.14225758735594762,
+          "pre_elbow_excursion_rad": 0.14907091055101052,
+          "event_window_impulse_ns": 0.5360511415986626,
+          "native_contact_window_impulse_ns": 0.5360511415986626,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.03,
+          "return_toward_pre_window_position_m": 0.03151051315277833,
+          "post_window_complete": true,
+          "valid_cycle": false
+        }
+      ],
+      "passes_complete": false,
+      "assistance": false,
+      "main_adoption": false,
+      "reviewed_utc": "2026-10-25T23:49:44.149237+00:00"
     }
   ],
   "pid": 334,
-  "updated_utc": "2026-10-25T22:59:13.220863+00:00",
-  "new_ppo_steps": 262144,
-  "new_collection_world_controls": 262144,
-  "optimized_new_steps": 262144,
-  "diagnostic_ppo_total": 2426112,
-  "diagnostic_evaluation_controls": 21741,
-  "formal_world_controls_total": 2095543,
-  "active_gate": "step-262144",
+  "updated_utc": "2026-10-25T23:49:45.018484+00:00",
+  "new_ppo_steps": 524288,
+  "new_collection_world_controls": 524288,
+  "optimized_new_steps": 524288,
+  "diagnostic_ppo_total": 2688256,
+  "diagnostic_evaluation_controls": 33741,
+  "formal_world_controls_total": 2107543,
+  "active_gate": "step-524288",
   "active_role": "selfplay",
-  "active_child_pid": 13791,
+  "active_child_pid": 26645,
   "error": "Command '['git', 'commit', '-m', 'Record motion-cycle PPO baseline']' returned non-zero exit status 128.",
-  "target_new_ppo_steps": 262144,
+  "target_new_ppo_steps": 524288,
   "active_training_output": "/home/pedro/boxing-runs/striking-motion-cycle-v14/training",
   "integration_verified": true
 }
