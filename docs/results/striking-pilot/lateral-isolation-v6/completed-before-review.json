@@ -1,0 +1,1506 @@
+{
+  "status": "completed",
+  "phase": "awaiting_interpretation",
+  "controller_design_version": 6,
+  "terminal_dwell_seconds": 0.12,
+  "pid": 1361,
+  "started_utc": "2026-10-25T19:06:42.922511+00:00",
+  "diagnostic_output": "/home/pedro/boxing-runs/striking-lateral-isolation-v6",
+  "profile": {
+    "version": 1,
+    "guard_seconds": 0.35,
+    "extend_seconds": 0.18,
+    "retract_seconds": 0.25,
+    "rest_seconds": 0.3,
+    "engage_distance": 0.75,
+    "guard_local": [
+      0.16,
+      0.16,
+      0.12
+    ],
+    "target_torso_world_height_offset": 0.1,
+    "joint_correction_cap": 0.16,
+    "damping": 0.05,
+    "arm_residual_radians": 0.8,
+    "filter_old": 0.8,
+    "filter_new": 0.2
+  },
+  "prerequisites": {
+    "foundation": {
+      "balance": {
+        "records": 29,
+        "sha256": "8cea6a2f62ae68fd9a3118b881301785900df7d3af73322fccacfa0e2e3bc1f6"
+      },
+      "walk_easy": {
+        "records": 41,
+        "sha256": "f1e0e6f023ff4ac477171382069fe132af9180ae818b509a18c2572eca0200ee"
+      },
+      "walk": {
+        "records": 13,
+        "sha256": "d547d60455be5d8b6f9f49c7bec256cb0b0d6963e3345a7160a16f974d0c531c"
+      },
+      "approach": {
+        "records": 2,
+        "sha256": "b39b1990945e8a374802c3a190e5ac5e026ae39e7fd5ef61c5c2b01ad291c6fc"
+      }
+    },
+    "main_sha256": "efad0ccd1051ee5305d4ccf8ebbd7d0e402211f12ecd0cdf175b473b24a7b5b0"
+  },
+  "motor_sha256": "b39b1990945e8a374802c3a190e5ac5e026ae39e7fd5ef61c5c2b01ad291c6fc",
+  "source_accounting_review_sha256": "32097ded81def2ea6ac922be722545f66312e7cd05da64b4d40dd43eb5370b66",
+  "source_review_sha256": "32097ded81def2ea6ac922be722545f66312e7cd05da64b4d40dd43eb5370b66",
+  "source_audit_sha256": "b45dadee81d5965447844439f1afdb36c3f5006e829014e97ac4f06da4c1d024",
+  "formal_world_controls_before_job": 2066307,
+  "maximum_world_controls": 4000,
+  "formal_world_controls_ceiling": 2070307,
+  "diagnostic_world_controls": 4000,
+  "new_ppo_steps": 0,
+  "new_supervised_updates": 0,
+  "new_optimizer_updates": 0,
+  "diagnostic_ppo_retained": 2163968,
+  "main_project_consumed_retained": 476041216,
+  "main_boxing_retained": 1048576,
+  "cloned_forward_evaluations_retained": 6349,
+  "surface_distance_queries_retained": 960,
+  "learned_controller": false,
+  "assistance": false,
+  "promotion": false,
+  "policy_adoption": "none",
+  "trials": [
+    {
+      "case": "motor_only_positive-corner-0-seed-7-swap-0",
+      "mode": "motor_only_positive",
+      "lateral_action": 1,
+      "corner": 0,
+      "seed": 7,
+      "swap": false,
+      "controls": 500,
+      "elapsed": 10.000000000000009,
+      "survived": true,
+      "scores": [
+        0.0,
+        0.0
+      ],
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7504641032977695,
+            "upright": 0.9959327435026262,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7535768541517179,
+            "upright": 0.9995235323418146,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ]
+        ]
+      },
+      "events": [],
+      "candidate_events": 0,
+      "feasible_episode": false,
+      "phase_controls": {
+        "approach": 100,
+        "guard": 120,
+        "extend": 105,
+        "retract": 85,
+        "rest": 90
+      },
+      "first_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 2.293999999999969
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 2.301999999999968
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 4.345999999999743
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 8.691999999999572
+        },
+        {
+          "geoms": [
+            "red/left_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 8.791999999999605
+        }
+      ],
+      "matched_prefix_controls": 118,
+      "matched_prefix_kind": "first_arm_request_removed",
+      "reference_full_trace_sha256": "066b777a595ef30735dbd71d712bdd65b2c84340774b896c39e40cf098bddda1",
+      "full_trace_file": "/home/pedro/boxing-runs/striking-lateral-isolation-v6/full/motor_only_positive-corner-0-seed-7-swap-0.npz",
+      "full_trace_sha256": "41ebeffbaf39a0a55a3d6ec6128350e929f5202d8e494abe8fa9a6ba6f05fabf",
+      "native_trace_file": "/home/pedro/boxing-runs/striking-lateral-isolation-v6/native/motor_only_positive-corner-0-seed-7-swap-0.npz",
+      "native_trace_sha256": "8c3a87a7be2ac8f8d46cf1c7e633920f152df2c80e9e886d5b59a452c69dbe28"
+    },
+    {
+      "case": "motor_only_positive-corner-0-seed-7-swap-1",
+      "mode": "motor_only_positive",
+      "lateral_action": 1,
+      "corner": 0,
+      "seed": 7,
+      "swap": true,
+      "controls": 500,
+      "elapsed": 10.000000000000009,
+      "survived": true,
+      "scores": [
+        0.0,
+        0.0
+      ],
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7563844030607488,
+            "upright": 0.9943902015194124,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7548016187302631,
+            "upright": 0.9990310775297075,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ]
+        ]
+      },
+      "events": [],
+      "candidate_events": 0,
+      "feasible_episode": false,
+      "phase_controls": {
+        "approach": 79,
+        "guard": 120,
+        "extend": 105,
+        "retract": 91,
+        "rest": 105
+      },
+      "first_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 1.8180000000000014
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 1.8520000000000014
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 4.023999999999779
+        },
+        {
+          "geoms": [
+            "red/left_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 7.201999999999429
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 9.427999999999818
+        }
+      ],
+      "matched_prefix_controls": 97,
+      "matched_prefix_kind": "first_arm_request_removed",
+      "reference_full_trace_sha256": "ecb7a1ed8eaf2a4329883b38b7035115da74d678695dbf7ddd24dfd9befc5217",
+      "full_trace_file": "/home/pedro/boxing-runs/striking-lateral-isolation-v6/full/motor_only_positive-corner-0-seed-7-swap-1.npz",
+      "full_trace_sha256": "bb4fd5e3b0f3c945242988ea8bd753ab3c2cc9bb15abc21d7716de45f8473d57",
+      "native_trace_file": "/home/pedro/boxing-runs/striking-lateral-isolation-v6/native/motor_only_positive-corner-0-seed-7-swap-1.npz",
+      "native_trace_sha256": "04d3a2ddb632ef413a24ec6210b6b2d3a462c481ffddfff6b0de5934fb61c8ac"
+    },
+    {
+      "case": "motor_only_positive-corner-0-seed-23-swap-0",
+      "mode": "motor_only_positive",
+      "lateral_action": 1,
+      "corner": 0,
+      "seed": 23,
+      "swap": false,
+      "controls": 500,
+      "elapsed": 10.000000000000009,
+      "survived": true,
+      "scores": [
+        0.0,
+        0.0
+      ],
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7530388201382711,
+            "upright": 0.9939149592588272,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7530906246776993,
+            "upright": 0.9996298630117686,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ]
+        ]
+      },
+      "events": [],
+      "candidate_events": 0,
+      "feasible_episode": false,
+      "phase_controls": {
+        "approach": 83,
+        "guard": 120,
+        "extend": 105,
+        "retract": 91,
+        "rest": 101
+      },
+      "first_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.04200000000000002
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 1.9240000000000015
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 1.9440000000000015
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 4.089999999999772
+        },
+        {
+          "geoms": [
+            "red/left_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 7.251999999999423
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 7.365999999999411
+        }
+      ],
+      "matched_prefix_controls": 101,
+      "matched_prefix_kind": "first_arm_request_removed",
+      "reference_full_trace_sha256": "40ed7b9d3f86321e4876a7f9034daede78a983a5a397c4f06af8d7c6d65c6c10",
+      "full_trace_file": "/home/pedro/boxing-runs/striking-lateral-isolation-v6/full/motor_only_positive-corner-0-seed-23-swap-0.npz",
+      "full_trace_sha256": "41cec2cd452032f9c97e08419137b69c0c126c4f1ba8632ca9962ba8ea04c96b",
+      "native_trace_file": "/home/pedro/boxing-runs/striking-lateral-isolation-v6/native/motor_only_positive-corner-0-seed-23-swap-0.npz",
+      "native_trace_sha256": "8b9c8f729876071cb97d354a8e4254e861712a49a1769450072c4ea0f8938fc0"
+    },
+    {
+      "case": "motor_only_positive-corner-0-seed-23-swap-1",
+      "mode": "motor_only_positive",
+      "lateral_action": 1,
+      "corner": 0,
+      "seed": 23,
+      "swap": true,
+      "controls": 500,
+      "elapsed": 10.000000000000009,
+      "survived": true,
+      "scores": [
+        0.0,
+        0.0
+      ],
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7568702949207072,
+            "upright": 0.9925560378873088,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7533935481323377,
+            "upright": 0.9993003160652133,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ]
+        ]
+      },
+      "events": [],
+      "candidate_events": 0,
+      "feasible_episode": false,
+      "phase_controls": {
+        "approach": 89,
+        "guard": 120,
+        "extend": 105,
+        "retract": 91,
+        "rest": 95
+      },
+      "first_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.19600000000000015
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 2.093999999999991
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 2.0999999999999903
+        },
+        {
+          "geoms": [
+            "red/right_wrist_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 4.19199999999976
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 6.147999999999545
+        },
+        {
+          "geoms": [
+            "red/left_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 7.351999999999412
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 7.473999999999399
+        }
+      ],
+      "matched_prefix_controls": 107,
+      "matched_prefix_kind": "first_arm_request_removed",
+      "reference_full_trace_sha256": "aa2f9f832fac649ac7a8b4ac03a8eb68b174bea90408240f7af7b3b7766757af",
+      "full_trace_file": "/home/pedro/boxing-runs/striking-lateral-isolation-v6/full/motor_only_positive-corner-0-seed-23-swap-1.npz",
+      "full_trace_sha256": "4ce06a216b7f8e880a4777025e7bced9826a01358e79279c27ae9ee20a88c90c",
+      "native_trace_file": "/home/pedro/boxing-runs/striking-lateral-isolation-v6/native/motor_only_positive-corner-0-seed-23-swap-1.npz",
+      "native_trace_sha256": "e7d57d6d86cca92a2a40640c2eabbba1c5fe8cd08a73638e0c6021cd5d489a47"
+    },
+    {
+      "case": "motor_only_positive-corner-1-seed-7-swap-0",
+      "mode": "motor_only_positive",
+      "lateral_action": 1,
+      "corner": 1,
+      "seed": 7,
+      "swap": false,
+      "controls": 500,
+      "elapsed": 10.000000000000009,
+      "survived": true,
+      "scores": [
+        0.0,
+        0.0
+      ],
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7549326725044575,
+            "upright": 0.9994324387077347,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7478262225989442,
+            "upright": 0.9939924602636011,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "red/right_shin",
+            "blue/left_shin"
+          ]
+        ]
+      },
+      "events": [],
+      "candidate_events": 0,
+      "feasible_episode": false,
+      "phase_controls": {
+        "approach": 100,
+        "guard": 120,
+        "extend": 105,
+        "retract": 85,
+        "rest": 90
+      },
+      "first_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 2.265999999999972
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 2.2979999999999685
+        },
+        {
+          "geoms": [
+            "red/right_wrist_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 4.6719999999997075
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/left_shin"
+          ],
+          "elapsed": 7.599999999999385
+        }
+      ],
+      "matched_prefix_controls": 118,
+      "matched_prefix_kind": "first_arm_request_removed",
+      "reference_full_trace_sha256": "962c828530a81a71dfd1190130e1d07de45888dc70553f63b2bf6498b35bf2ae",
+      "full_trace_file": "/home/pedro/boxing-runs/striking-lateral-isolation-v6/full/motor_only_positive-corner-1-seed-7-swap-0.npz",
+      "full_trace_sha256": "bf7b7e0373b1bbb36754c8c3006db26c4c24fad669fe48bb563fc817af264278",
+      "native_trace_file": "/home/pedro/boxing-runs/striking-lateral-isolation-v6/native/motor_only_positive-corner-1-seed-7-swap-0.npz",
+      "native_trace_sha256": "e839cccc1d2f3fb8e12dbedceda44a6694d7b90851999f4f6c44ec117384c76b"
+    },
+    {
+      "case": "motor_only_positive-corner-1-seed-7-swap-1",
+      "mode": "motor_only_positive",
+      "lateral_action": 1,
+      "corner": 1,
+      "seed": 7,
+      "swap": true,
+      "controls": 500,
+      "elapsed": 10.000000000000009,
+      "survived": true,
+      "scores": [
+        0.0,
+        0.0
+      ],
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7545762191114852,
+            "upright": 0.9989701619286944,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.75589713526336,
+            "upright": 0.9972234802948723,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ]
+        ]
+      },
+      "events": [],
+      "candidate_events": 0,
+      "feasible_episode": false,
+      "phase_controls": {
+        "approach": 79,
+        "guard": 120,
+        "extend": 105,
+        "retract": 91,
+        "rest": 105
+      },
+      "first_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 1.8240000000000014
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 1.8500000000000014
+        },
+        {
+          "geoms": [
+            "red/right_wrist_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 4.019999999999779
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 8.319999999999448
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/left_shin"
+          ],
+          "elapsed": 8.343999999999456
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 9.996000000000008
+        }
+      ],
+      "matched_prefix_controls": 97,
+      "matched_prefix_kind": "first_arm_request_removed",
+      "reference_full_trace_sha256": "331d2d14c1450497ec33d0c48da9099089595f1e177fc0da6252922a1d421567",
+      "full_trace_file": "/home/pedro/boxing-runs/striking-lateral-isolation-v6/full/motor_only_positive-corner-1-seed-7-swap-1.npz",
+      "full_trace_sha256": "fd20768fd53fae83ceb4695b80dd2796922a042b7b10657f24dd5a15b909f490",
+      "native_trace_file": "/home/pedro/boxing-runs/striking-lateral-isolation-v6/native/motor_only_positive-corner-1-seed-7-swap-1.npz",
+      "native_trace_sha256": "655ac3d72cc591c444497dd783ea5fcaf1f81e12679a9dbdb0b015d3e65b9c56"
+    },
+    {
+      "case": "motor_only_positive-corner-1-seed-23-swap-0",
+      "mode": "motor_only_positive",
+      "lateral_action": 1,
+      "corner": 1,
+      "seed": 23,
+      "swap": false,
+      "controls": 500,
+      "elapsed": 10.000000000000009,
+      "survived": true,
+      "scores": [
+        0.0,
+        0.0
+      ],
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7602986953069119,
+            "upright": 0.9990388649853356,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7532951560678304,
+            "upright": 0.9928857205314605,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ]
+        ]
+      },
+      "events": [],
+      "candidate_events": 0,
+      "feasible_episode": false,
+      "phase_controls": {
+        "approach": 83,
+        "guard": 120,
+        "extend": 105,
+        "retract": 91,
+        "rest": 101
+      },
+      "first_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.04200000000000002
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 1.9340000000000015
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 1.9560000000000015
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 5.299999999999638
+        },
+        {
+          "geoms": [
+            "red/right_wrist_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 5.731999999999591
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/left_shin"
+          ],
+          "elapsed": 7.261999999999422
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 9.58199999999987
+        }
+      ],
+      "matched_prefix_controls": 101,
+      "matched_prefix_kind": "first_arm_request_removed",
+      "reference_full_trace_sha256": "5f735b868c800b790b485fca4583f2ef7b42b039c87c7fc2060cb619841497b1",
+      "full_trace_file": "/home/pedro/boxing-runs/striking-lateral-isolation-v6/full/motor_only_positive-corner-1-seed-23-swap-0.npz",
+      "full_trace_sha256": "dadd6b10115c9397fd6fb91888392515de80309aafeaa10b825b14b227fac078",
+      "native_trace_file": "/home/pedro/boxing-runs/striking-lateral-isolation-v6/native/motor_only_positive-corner-1-seed-23-swap-0.npz",
+      "native_trace_sha256": "57617c0902265e41cc76094bcf19461c6523eb9a3dd5e038fe1fb2f3ea4b6ab5"
+    },
+    {
+      "case": "motor_only_positive-corner-1-seed-23-swap-1",
+      "mode": "motor_only_positive",
+      "lateral_action": 1,
+      "corner": 1,
+      "seed": 23,
+      "swap": true,
+      "controls": 500,
+      "elapsed": 10.000000000000009,
+      "survived": true,
+      "scores": [
+        0.0,
+        0.0
+      ],
+      "terminal": {
+        "corners": [
+          {
+            "pelvis_height": 0.7525264995736749,
+            "upright": 0.9997043719356453,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7531234815215209,
+            "upright": 0.9942856379390336,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ]
+        ]
+      },
+      "events": [],
+      "candidate_events": 0,
+      "feasible_episode": false,
+      "phase_controls": {
+        "approach": 89,
+        "guard": 120,
+        "extend": 105,
+        "retract": 91,
+        "rest": 95
+      },
+      "first_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.19600000000000015
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 2.0799999999999925
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 2.0819999999999923
+        },
+        {
+          "geoms": [
+            "red/right_wrist_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 4.051999999999776
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 4.0639999999997745
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/left_shin"
+          ],
+          "elapsed": 4.9899999999996725
+        },
+        {
+          "geoms": [
+            "red/torso_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 5.001999999999671
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 7.319999999999416
+        }
+      ],
+      "matched_prefix_controls": 107,
+      "matched_prefix_kind": "first_arm_request_removed",
+      "reference_full_trace_sha256": "59b4ba5dc014d980dae31f2cd01273651305495c258a0a7c1985482121599ea1",
+      "full_trace_file": "/home/pedro/boxing-runs/striking-lateral-isolation-v6/full/motor_only_positive-corner-1-seed-23-swap-1.npz",
+      "full_trace_sha256": "addcb84b4da378eeac71547e171220f872119bca62f895a987ba8b804597672f",
+      "native_trace_file": "/home/pedro/boxing-runs/striking-lateral-isolation-v6/native/motor_only_positive-corner-1-seed-23-swap-1.npz",
+      "native_trace_sha256": "2a289136279b026bb7a1c3970fe584c873892c934d4f748589dd1db0ea31abb5"
+    }
+  ],
+  "active_case": "motor_only_positive-corner-1-seed-23-swap-1",
+  "updated_utc": "2026-10-25T19:07:26.793053+00:00",
+  "formal_world_controls_total": 2070307
+}

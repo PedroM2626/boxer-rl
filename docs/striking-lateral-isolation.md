@@ -1,5 +1,7 @@
 # Positive lateral command: isolate scripted arm interaction
 
+**Completed and independently reviewed:** [all results](results/striking-pilot/lateral-isolation-v6/README.md). Motor-only survival 8/8 versus 2/8 in the archived arm-plus-command control; all six failures disappear. Zero scored impacts or candidate punches. Consumed 4,000 controls, cumulative 2,070,307. The original prospective protocol below remains unchanged.
+
 Declared 2026-10-25 before collection, after the complete lateral-command-v5
 review. Its positive direction has six acting-body failures in eight cases,
 versus zero in the matched straight no-lateral control. Its negative direction

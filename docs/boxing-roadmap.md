@@ -69,7 +69,7 @@ recorded blocking intersections in 20/24 poses. The
 has 7/8 and 8/8 pair survival, no commanded-left target contact and no candidate
 punch. Next test angle/range adjustment through the **existing lateral movement
 command** with the arm path fixed, before increasing authority or unfreezing the
-motor. The [reviewed comparison](results/striking-pilot/lateral-command-v5/README.md) finds 8/8 versus 2/8 survivors and no commanded-left contact or candidate punch. Next isolate positive lateral command stability with arm requests disabled. No job or allocation is active.
+motor. The [reviewed comparison](results/striking-pilot/lateral-command-v5/README.md) finds 8/8 versus 2/8 survivors and no commanded-left contact or candidate punch. The [motor-only intervention](results/striking-pilot/lateral-isolation-v6/README.md) removes all six falls (8/8 survivors), with no scored impacts. Next test temporal separation of movement and extension under a separately declared allocation.
 No positive training target or general boxing certification follows.
 These references do not define every
 punch type or replace failed gates.

@@ -248,3 +248,16 @@ most 4,000 additional physical controls from 2,066,307, ceiling 2,070,307;
 all other compute and checkpoint counters retained. This is a causal diagnostic,
 not boxing training or a positive demonstration. Review every matched outcome
 before attributing failure or changing authority; no automatic learning extension.
+
+## Reviewed lateral/arm isolation, 2026-10-25
+
+[Eight matched interventions](results/striking-pilot/lateral-isolation-v6/README.md)
+all survive versus 2/8 archived arm-plus-positive-command controls: all six acting
+falls disappear. Motor-only still has no scored impact or candidate punch.
+This implicates the arm/locomotion combination on this cohort; it does not prove
+a unique joint mechanism or universal command safety. Independent review checks
+exact pre-extension prefixes, zero requests/residuals, command schedules, native
+physics, every original criterion and source/gate hashes. Eighteen focused tests
+pass. New 4,000 physical controls, cumulative 2,070,307, ceiling exhausted. Other
+compute/checkpoints unchanged. Next prospectively test guard-only footwork,
+released before extension, instead of changing motor authority or extending PPO.
