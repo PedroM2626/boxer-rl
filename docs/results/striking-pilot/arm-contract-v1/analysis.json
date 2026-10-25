@@ -1,0 +1,3185 @@
+{
+  "status": "reviewed_metadata_and_saved_arrays",
+  "prerequisites": {
+    "foundation": {
+      "balance": {
+        "records": 29,
+        "sha256": "8cea6a2f62ae68fd9a3118b881301785900df7d3af73322fccacfa0e2e3bc1f6"
+      },
+      "walk_easy": {
+        "records": 41,
+        "sha256": "f1e0e6f023ff4ac477171382069fe132af9180ae818b509a18c2572eca0200ee"
+      },
+      "walk": {
+        "records": 13,
+        "sha256": "d547d60455be5d8b6f9f49c7bec256cb0b0d6963e3345a7160a16f974d0c531c"
+      },
+      "approach": {
+        "records": 2,
+        "sha256": "b39b1990945e8a374802c3a190e5ac5e026ae39e7fd5ef61c5c2b01ad291c6fc"
+      }
+    },
+    "main_sha256": "efad0ccd1051ee5305d4ccf8ebbd7d0e402211f12ecd0cdf175b473b24a7b5b0"
+  },
+  "new_physical_controls": 0,
+  "new_cloned_forward_queries": 0,
+  "new_surface_queries": 0,
+  "new_optimizer_updates": 0,
+  "model_inspection": "Compiled models and joint tables only; no MjData, mj_forward, mj_kinematics, mj_step or search in this audit.",
+  "formal_world_controls_retained": 2073802,
+  "diagnostic_ppo_retained": 2163968,
+  "main_project_consumed_retained": 476041216,
+  "cloned_queries_retained": 6349,
+  "surface_queries_retained": 960,
+  "metadata": [
+    {
+      "side": "red/",
+      "name": "left_shoulder_pitch_joint",
+      "index": 15,
+      "qpos_index": 22,
+      "qvel_index": 21,
+      "position_gain": 75.0,
+      "velocity_gain": -0.0,
+      "legacy_position_gain": 75.0,
+      "ctrl_limited": true,
+      "ctrl_range": [
+        -3.0892,
+        2.6704
+      ],
+      "force_limited": false,
+      "force_range": [
+        0.0,
+        0.0
+      ],
+      "joint_range": [
+        -3.0892,
+        2.6704
+      ],
+      "default_pose": -0.21911999583244324
+    },
+    {
+      "side": "red/",
+      "name": "left_shoulder_roll_joint",
+      "index": 16,
+      "qpos_index": 23,
+      "qvel_index": 22,
+      "position_gain": 75.0,
+      "velocity_gain": -0.0,
+      "legacy_position_gain": 75.0,
+      "ctrl_limited": true,
+      "ctrl_range": [
+        -1.5882,
+        2.2515
+      ],
+      "force_limited": false,
+      "force_range": [
+        0.0,
+        0.0
+      ],
+      "joint_range": [
+        -1.5882,
+        2.2515
+      ],
+      "default_pose": 0.1233299970626831
+    },
+    {
+      "side": "red/",
+      "name": "left_shoulder_yaw_joint",
+      "index": 17,
+      "qpos_index": 24,
+      "qvel_index": 23,
+      "position_gain": 75.0,
+      "velocity_gain": -0.0,
+      "legacy_position_gain": 75.0,
+      "ctrl_limited": true,
+      "ctrl_range": [
+        -2.618,
+        2.618
+      ],
+      "force_limited": false,
+      "force_range": [
+        0.0,
+        0.0
+      ],
+      "joint_range": [
+        -2.618,
+        2.618
+      ],
+      "default_pose": 0.10506000369787216
+    },
+    {
+      "side": "red/",
+      "name": "left_elbow_joint",
+      "index": 18,
+      "qpos_index": 25,
+      "qvel_index": 24,
+      "position_gain": 75.0,
+      "velocity_gain": -0.0,
+      "legacy_position_gain": 75.0,
+      "ctrl_limited": true,
+      "ctrl_range": [
+        -1.0471999999999997,
+        2.0944
+      ],
+      "force_limited": false,
+      "force_range": [
+        0.0,
+        0.0
+      ],
+      "joint_range": [
+        -1.0472,
+        2.0944
+      ],
+      "default_pose": -0.5573400259017944
+    },
+    {
+      "side": "red/",
+      "name": "left_wrist_roll_joint",
+      "index": 19,
+      "qpos_index": 26,
+      "qvel_index": 25,
+      "position_gain": 2.0,
+      "velocity_gain": -0.0,
+      "legacy_position_gain": 20.0,
+      "ctrl_limited": true,
+      "ctrl_range": [
+        -1.97222,
+        1.97222
+      ],
+      "force_limited": false,
+      "force_range": [
+        0.0,
+        0.0
+      ],
+      "joint_range": [
+        -1.97222,
+        1.97222
+      ],
+      "default_pose": -0.00800000037997961
+    },
+    {
+      "side": "red/",
+      "name": "left_wrist_pitch_joint",
+      "index": 20,
+      "qpos_index": 27,
+      "qvel_index": 26,
+      "position_gain": 2.0,
+      "velocity_gain": -0.0,
+      "legacy_position_gain": 20.0,
+      "ctrl_limited": true,
+      "ctrl_range": [
+        -1.61443,
+        1.61443
+      ],
+      "force_limited": false,
+      "force_range": [
+        0.0,
+        0.0
+      ],
+      "joint_range": [
+        -1.61443,
+        1.61443
+      ],
+      "default_pose": -0.15000000596046448
+    },
+    {
+      "side": "red/",
+      "name": "left_wrist_yaw_joint",
+      "index": 21,
+      "qpos_index": 28,
+      "qvel_index": 27,
+      "position_gain": 2.0,
+      "velocity_gain": -0.0,
+      "legacy_position_gain": 20.0,
+      "ctrl_limited": true,
+      "ctrl_range": [
+        -1.61443,
+        1.61443
+      ],
+      "force_limited": false,
+      "force_range": [
+        0.0,
+        0.0
+      ],
+      "joint_range": [
+        -1.61443,
+        1.61443
+      ],
+      "default_pose": -0.0430000014603138
+    },
+    {
+      "side": "red/",
+      "name": "right_shoulder_pitch_joint",
+      "index": 22,
+      "qpos_index": 29,
+      "qvel_index": 28,
+      "position_gain": 75.0,
+      "velocity_gain": -0.0,
+      "legacy_position_gain": 75.0,
+      "ctrl_limited": true,
+      "ctrl_range": [
+        -3.0892,
+        2.6704
+      ],
+      "force_limited": false,
+      "force_range": [
+        0.0,
+        0.0
+      ],
+      "joint_range": [
+        -3.0892,
+        2.6704
+      ],
+      "default_pose": -0.21911999583244324
+    },
+    {
+      "side": "red/",
+      "name": "right_shoulder_roll_joint",
+      "index": 23,
+      "qpos_index": 30,
+      "qvel_index": 29,
+      "position_gain": 75.0,
+      "velocity_gain": -0.0,
+      "legacy_position_gain": 75.0,
+      "ctrl_limited": true,
+      "ctrl_range": [
+        -2.2515,
+        1.5882
+      ],
+      "force_limited": false,
+      "force_range": [
+        0.0,
+        0.0
+      ],
+      "joint_range": [
+        -2.2515,
+        1.5882
+      ],
+      "default_pose": -0.123259998857975
+    },
+    {
+      "side": "red/",
+      "name": "right_shoulder_yaw_joint",
+      "index": 24,
+      "qpos_index": 31,
+      "qvel_index": 30,
+      "position_gain": 75.0,
+      "velocity_gain": -0.0,
+      "legacy_position_gain": 75.0,
+      "ctrl_limited": true,
+      "ctrl_range": [
+        -2.618,
+        2.618
+      ],
+      "force_limited": false,
+      "force_range": [
+        0.0,
+        0.0
+      ],
+      "joint_range": [
+        -2.618,
+        2.618
+      ],
+      "default_pose": -0.10503000020980835
+    },
+    {
+      "side": "red/",
+      "name": "right_elbow_joint",
+      "index": 25,
+      "qpos_index": 32,
+      "qvel_index": 31,
+      "position_gain": 75.0,
+      "velocity_gain": -0.0,
+      "legacy_position_gain": 75.0,
+      "ctrl_limited": true,
+      "ctrl_range": [
+        -1.0471999999999997,
+        2.0944
+      ],
+      "force_limited": false,
+      "force_range": [
+        0.0,
+        0.0
+      ],
+      "joint_range": [
+        -1.0472,
+        2.0944
+      ],
+      "default_pose": -0.5573199987411499
+    },
+    {
+      "side": "red/",
+      "name": "right_wrist_roll_joint",
+      "index": 26,
+      "qpos_index": 33,
+      "qvel_index": 32,
+      "position_gain": 2.0,
+      "velocity_gain": -0.0,
+      "legacy_position_gain": 20.0,
+      "ctrl_limited": true,
+      "ctrl_range": [
+        -1.97222,
+        1.97222
+      ],
+      "force_limited": false,
+      "force_range": [
+        0.0,
+        0.0
+      ],
+      "joint_range": [
+        -1.97222,
+        1.97222
+      ],
+      "default_pose": 0.008999999612569809
+    },
+    {
+      "side": "red/",
+      "name": "right_wrist_pitch_joint",
+      "index": 27,
+      "qpos_index": 34,
+      "qvel_index": 33,
+      "position_gain": 2.0,
+      "velocity_gain": -0.0,
+      "legacy_position_gain": 20.0,
+      "ctrl_limited": true,
+      "ctrl_range": [
+        -1.61443,
+        1.61443
+      ],
+      "force_limited": false,
+      "force_range": [
+        0.0,
+        0.0
+      ],
+      "joint_range": [
+        -1.61443,
+        1.61443
+      ],
+      "default_pose": -0.15000000596046448
+    },
+    {
+      "side": "red/",
+      "name": "right_wrist_yaw_joint",
+      "index": 28,
+      "qpos_index": 35,
+      "qvel_index": 34,
+      "position_gain": 2.0,
+      "velocity_gain": -0.0,
+      "legacy_position_gain": 20.0,
+      "ctrl_limited": true,
+      "ctrl_range": [
+        -1.61443,
+        1.61443
+      ],
+      "force_limited": false,
+      "force_range": [
+        0.0,
+        0.0
+      ],
+      "joint_range": [
+        -1.61443,
+        1.61443
+      ],
+      "default_pose": 0.0430000014603138
+    },
+    {
+      "side": "blue/",
+      "name": "left_shoulder_pitch_joint",
+      "index": 15,
+      "qpos_index": 58,
+      "qvel_index": 56,
+      "position_gain": 75.0,
+      "velocity_gain": -0.0,
+      "legacy_position_gain": 75.0,
+      "ctrl_limited": true,
+      "ctrl_range": [
+        -3.0892,
+        2.6704
+      ],
+      "force_limited": false,
+      "force_range": [
+        0.0,
+        0.0
+      ],
+      "joint_range": [
+        -3.0892,
+        2.6704
+      ],
+      "default_pose": -0.21911999583244324
+    },
+    {
+      "side": "blue/",
+      "name": "left_shoulder_roll_joint",
+      "index": 16,
+      "qpos_index": 59,
+      "qvel_index": 57,
+      "position_gain": 75.0,
+      "velocity_gain": -0.0,
+      "legacy_position_gain": 75.0,
+      "ctrl_limited": true,
+      "ctrl_range": [
+        -1.5882,
+        2.2515
+      ],
+      "force_limited": false,
+      "force_range": [
+        0.0,
+        0.0
+      ],
+      "joint_range": [
+        -1.5882,
+        2.2515
+      ],
+      "default_pose": 0.1233299970626831
+    },
+    {
+      "side": "blue/",
+      "name": "left_shoulder_yaw_joint",
+      "index": 17,
+      "qpos_index": 60,
+      "qvel_index": 58,
+      "position_gain": 75.0,
+      "velocity_gain": -0.0,
+      "legacy_position_gain": 75.0,
+      "ctrl_limited": true,
+      "ctrl_range": [
+        -2.618,
+        2.618
+      ],
+      "force_limited": false,
+      "force_range": [
+        0.0,
+        0.0
+      ],
+      "joint_range": [
+        -2.618,
+        2.618
+      ],
+      "default_pose": 0.10506000369787216
+    },
+    {
+      "side": "blue/",
+      "name": "left_elbow_joint",
+      "index": 18,
+      "qpos_index": 61,
+      "qvel_index": 59,
+      "position_gain": 75.0,
+      "velocity_gain": -0.0,
+      "legacy_position_gain": 75.0,
+      "ctrl_limited": true,
+      "ctrl_range": [
+        -1.0471999999999997,
+        2.0944
+      ],
+      "force_limited": false,
+      "force_range": [
+        0.0,
+        0.0
+      ],
+      "joint_range": [
+        -1.0472,
+        2.0944
+      ],
+      "default_pose": -0.5573400259017944
+    },
+    {
+      "side": "blue/",
+      "name": "left_wrist_roll_joint",
+      "index": 19,
+      "qpos_index": 62,
+      "qvel_index": 60,
+      "position_gain": 2.0,
+      "velocity_gain": -0.0,
+      "legacy_position_gain": 20.0,
+      "ctrl_limited": true,
+      "ctrl_range": [
+        -1.97222,
+        1.97222
+      ],
+      "force_limited": false,
+      "force_range": [
+        0.0,
+        0.0
+      ],
+      "joint_range": [
+        -1.97222,
+        1.97222
+      ],
+      "default_pose": -0.00800000037997961
+    },
+    {
+      "side": "blue/",
+      "name": "left_wrist_pitch_joint",
+      "index": 20,
+      "qpos_index": 63,
+      "qvel_index": 61,
+      "position_gain": 2.0,
+      "velocity_gain": -0.0,
+      "legacy_position_gain": 20.0,
+      "ctrl_limited": true,
+      "ctrl_range": [
+        -1.61443,
+        1.61443
+      ],
+      "force_limited": false,
+      "force_range": [
+        0.0,
+        0.0
+      ],
+      "joint_range": [
+        -1.61443,
+        1.61443
+      ],
+      "default_pose": -0.15000000596046448
+    },
+    {
+      "side": "blue/",
+      "name": "left_wrist_yaw_joint",
+      "index": 21,
+      "qpos_index": 64,
+      "qvel_index": 62,
+      "position_gain": 2.0,
+      "velocity_gain": -0.0,
+      "legacy_position_gain": 20.0,
+      "ctrl_limited": true,
+      "ctrl_range": [
+        -1.61443,
+        1.61443
+      ],
+      "force_limited": false,
+      "force_range": [
+        0.0,
+        0.0
+      ],
+      "joint_range": [
+        -1.61443,
+        1.61443
+      ],
+      "default_pose": -0.0430000014603138
+    },
+    {
+      "side": "blue/",
+      "name": "right_shoulder_pitch_joint",
+      "index": 22,
+      "qpos_index": 65,
+      "qvel_index": 63,
+      "position_gain": 75.0,
+      "velocity_gain": -0.0,
+      "legacy_position_gain": 75.0,
+      "ctrl_limited": true,
+      "ctrl_range": [
+        -3.0892,
+        2.6704
+      ],
+      "force_limited": false,
+      "force_range": [
+        0.0,
+        0.0
+      ],
+      "joint_range": [
+        -3.0892,
+        2.6704
+      ],
+      "default_pose": -0.21911999583244324
+    },
+    {
+      "side": "blue/",
+      "name": "right_shoulder_roll_joint",
+      "index": 23,
+      "qpos_index": 66,
+      "qvel_index": 64,
+      "position_gain": 75.0,
+      "velocity_gain": -0.0,
+      "legacy_position_gain": 75.0,
+      "ctrl_limited": true,
+      "ctrl_range": [
+        -2.2515,
+        1.5882
+      ],
+      "force_limited": false,
+      "force_range": [
+        0.0,
+        0.0
+      ],
+      "joint_range": [
+        -2.2515,
+        1.5882
+      ],
+      "default_pose": -0.123259998857975
+    },
+    {
+      "side": "blue/",
+      "name": "right_shoulder_yaw_joint",
+      "index": 24,
+      "qpos_index": 67,
+      "qvel_index": 65,
+      "position_gain": 75.0,
+      "velocity_gain": -0.0,
+      "legacy_position_gain": 75.0,
+      "ctrl_limited": true,
+      "ctrl_range": [
+        -2.618,
+        2.618
+      ],
+      "force_limited": false,
+      "force_range": [
+        0.0,
+        0.0
+      ],
+      "joint_range": [
+        -2.618,
+        2.618
+      ],
+      "default_pose": -0.10503000020980835
+    },
+    {
+      "side": "blue/",
+      "name": "right_elbow_joint",
+      "index": 25,
+      "qpos_index": 68,
+      "qvel_index": 66,
+      "position_gain": 75.0,
+      "velocity_gain": -0.0,
+      "legacy_position_gain": 75.0,
+      "ctrl_limited": true,
+      "ctrl_range": [
+        -1.0471999999999997,
+        2.0944
+      ],
+      "force_limited": false,
+      "force_range": [
+        0.0,
+        0.0
+      ],
+      "joint_range": [
+        -1.0472,
+        2.0944
+      ],
+      "default_pose": -0.5573199987411499
+    },
+    {
+      "side": "blue/",
+      "name": "right_wrist_roll_joint",
+      "index": 26,
+      "qpos_index": 69,
+      "qvel_index": 67,
+      "position_gain": 2.0,
+      "velocity_gain": -0.0,
+      "legacy_position_gain": 20.0,
+      "ctrl_limited": true,
+      "ctrl_range": [
+        -1.97222,
+        1.97222
+      ],
+      "force_limited": false,
+      "force_range": [
+        0.0,
+        0.0
+      ],
+      "joint_range": [
+        -1.97222,
+        1.97222
+      ],
+      "default_pose": 0.008999999612569809
+    },
+    {
+      "side": "blue/",
+      "name": "right_wrist_pitch_joint",
+      "index": 27,
+      "qpos_index": 70,
+      "qvel_index": 68,
+      "position_gain": 2.0,
+      "velocity_gain": -0.0,
+      "legacy_position_gain": 20.0,
+      "ctrl_limited": true,
+      "ctrl_range": [
+        -1.61443,
+        1.61443
+      ],
+      "force_limited": false,
+      "force_range": [
+        0.0,
+        0.0
+      ],
+      "joint_range": [
+        -1.61443,
+        1.61443
+      ],
+      "default_pose": -0.15000000596046448
+    },
+    {
+      "side": "blue/",
+      "name": "right_wrist_yaw_joint",
+      "index": 28,
+      "qpos_index": 71,
+      "qvel_index": 69,
+      "position_gain": 2.0,
+      "velocity_gain": -0.0,
+      "legacy_position_gain": 20.0,
+      "ctrl_limited": true,
+      "ctrl_range": [
+        -1.61443,
+        1.61443
+      ],
+      "force_limited": false,
+      "force_range": [
+        0.0,
+        0.0
+      ],
+      "joint_range": [
+        -1.61443,
+        1.61443
+      ],
+      "default_pose": 0.0430000014603138
+    }
+  ],
+  "trials": [
+    {
+      "study": "terminal-dwell-v3",
+      "case": "terminal_dwell-corner-0-seed-7-swap-0",
+      "active_controls": 105,
+      "full_trace_sha256": "f949b43501f35d86190e6c0eff3fb0d29d498ac2825c91afc14aa3ca3309fcaa",
+      "joints": [
+        {
+          "name": "left_shoulder_pitch_joint",
+          "median_abs_target_error_rad": 0.12283280487875992,
+          "p95_abs_target_error_rad": 0.16000000610379234,
+          "median_abs_after_control_error_rad": 0.08291110035540306,
+          "median_abs_jacobian_correction_rad": 0.14620194895552863,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.5845004794140845
+        },
+        {
+          "name": "left_shoulder_roll_joint",
+          "median_abs_target_error_rad": 0.04385044771157279,
+          "p95_abs_target_error_rad": 0.08235711673296683,
+          "median_abs_after_control_error_rad": 0.02738996841285704,
+          "median_abs_jacobian_correction_rad": 0.04385045347187158,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.8589675488017946
+        },
+        {
+          "name": "left_shoulder_yaw_joint",
+          "median_abs_target_error_rad": 0.06600430606272067,
+          "p95_abs_target_error_rad": 0.12143789518320967,
+          "median_abs_after_control_error_rad": 0.04451609171263071,
+          "median_abs_jacobian_correction_rad": 0.06600430731166523,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.9804517132568683
+        },
+        {
+          "name": "left_elbow_joint",
+          "median_abs_target_error_rad": 0.057607674494336555,
+          "p95_abs_target_error_rad": 0.13055484666411768,
+          "median_abs_after_control_error_rad": 0.022785896454704323,
+          "median_abs_jacobian_correction_rad": 0.15999999999999998,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.6712275124267149
+        },
+        {
+          "name": "left_wrist_roll_joint",
+          "median_abs_target_error_rad": 0.007739530501421427,
+          "p95_abs_target_error_rad": 0.017868360713285156,
+          "median_abs_after_control_error_rad": 0.011724315837672777,
+          "median_abs_jacobian_correction_rad": 0.007739528127872777,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.3815852149868926
+        },
+        {
+          "name": "left_wrist_pitch_joint",
+          "median_abs_target_error_rad": 0.09597736412150513,
+          "p95_abs_target_error_rad": 0.13160117458923276,
+          "median_abs_after_control_error_rad": 0.08900745890543876,
+          "median_abs_jacobian_correction_rad": 0.09593109935132998,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.6456524700419886
+        },
+        {
+          "name": "left_wrist_yaw_joint",
+          "median_abs_target_error_rad": 0.024403185841418262,
+          "p95_abs_target_error_rad": 0.04791482529817325,
+          "median_abs_after_control_error_rad": 0.04841459615118343,
+          "median_abs_jacobian_correction_rad": 0.02307176488107432,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.2293443793222567
+        }
+      ]
+    },
+    {
+      "study": "terminal-dwell-v3",
+      "case": "terminal_dwell-corner-0-seed-7-swap-1",
+      "active_controls": 105,
+      "full_trace_sha256": "1bbf641bb4c85706e845edb610faa9189a3a5c7bb1b3dd81f2a45af3c2a26188",
+      "joints": [
+        {
+          "name": "left_shoulder_pitch_joint",
+          "median_abs_target_error_rad": 0.1149223627324224,
+          "p95_abs_target_error_rad": 0.16000001734574731,
+          "median_abs_after_control_error_rad": 0.08138868719010384,
+          "median_abs_jacobian_correction_rad": 0.15038432274961822,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.4109320841285826
+        },
+        {
+          "name": "left_shoulder_roll_joint",
+          "median_abs_target_error_rad": 0.05251653982853287,
+          "p95_abs_target_error_rad": 0.08463950652514644,
+          "median_abs_after_control_error_rad": 0.028901200854994813,
+          "median_abs_jacobian_correction_rad": 0.052516545316689235,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.7444103824847136
+        },
+        {
+          "name": "left_shoulder_yaw_joint",
+          "median_abs_target_error_rad": 0.07519888323247292,
+          "p95_abs_target_error_rad": 0.12456455819522488,
+          "median_abs_after_control_error_rad": 0.053724647776721424,
+          "median_abs_jacobian_correction_rad": 0.07519890895571157,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.0237222680927598
+        },
+        {
+          "name": "left_elbow_joint",
+          "median_abs_target_error_rad": 0.06162658493396361,
+          "p95_abs_target_error_rad": 0.13225921483573316,
+          "median_abs_after_control_error_rad": 0.023289686436556226,
+          "median_abs_jacobian_correction_rad": 0.15783914226924978,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.6171646605048502
+        },
+        {
+          "name": "left_wrist_roll_joint",
+          "median_abs_target_error_rad": 0.007718394155744823,
+          "p95_abs_target_error_rad": 0.021362449042083384,
+          "median_abs_after_control_error_rad": 0.010582490110239491,
+          "median_abs_jacobian_correction_rad": 0.007718390445500739,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.6475481718550411
+        },
+        {
+          "name": "left_wrist_pitch_joint",
+          "median_abs_target_error_rad": 0.10035627572624581,
+          "p95_abs_target_error_rad": 0.13403040706909145,
+          "median_abs_after_control_error_rad": 0.10177968293287498,
+          "median_abs_jacobian_correction_rad": 0.09977259208907555,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.4208415488375007
+        },
+        {
+          "name": "left_wrist_yaw_joint",
+          "median_abs_target_error_rad": 0.027985721423501198,
+          "p95_abs_target_error_rad": 0.14509112234426483,
+          "median_abs_after_control_error_rad": 0.06416581853824443,
+          "median_abs_jacobian_correction_rad": 0.026321827641110768,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.6219718613509053
+        }
+      ]
+    },
+    {
+      "study": "terminal-dwell-v3",
+      "case": "terminal_dwell-corner-0-seed-23-swap-0",
+      "active_controls": 105,
+      "full_trace_sha256": "4b1df370bc9f1e947f75d396acc3f8fc47ae229a754a4c76d6b07f34a75e03df",
+      "joints": [
+        {
+          "name": "left_shoulder_pitch_joint",
+          "median_abs_target_error_rad": 0.11276531705506948,
+          "p95_abs_target_error_rad": 0.16000000486893595,
+          "median_abs_after_control_error_rad": 0.07866060533409747,
+          "median_abs_jacobian_correction_rad": 0.13031558176624813,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.6135736374673575
+        },
+        {
+          "name": "left_shoulder_roll_joint",
+          "median_abs_target_error_rad": 0.05054952248946451,
+          "p95_abs_target_error_rad": 0.08349234722020905,
+          "median_abs_after_control_error_rad": 0.02531679931171736,
+          "median_abs_jacobian_correction_rad": 0.050549511606443914,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.8275635392244455
+        },
+        {
+          "name": "left_shoulder_yaw_joint",
+          "median_abs_target_error_rad": 0.05920374969506231,
+          "p95_abs_target_error_rad": 0.12517598471998115,
+          "median_abs_after_control_error_rad": 0.04179145172102755,
+          "median_abs_jacobian_correction_rad": 0.05920375493566332,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.8106203715574392
+        },
+        {
+          "name": "left_elbow_joint",
+          "median_abs_target_error_rad": 0.06471809719547428,
+          "p95_abs_target_error_rad": 0.14345854366920843,
+          "median_abs_after_control_error_rad": 0.025633789150168007,
+          "median_abs_jacobian_correction_rad": 0.16,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.590493949063392
+        },
+        {
+          "name": "left_wrist_roll_joint",
+          "median_abs_target_error_rad": 0.008404528841069736,
+          "p95_abs_target_error_rad": 0.02359051288125289,
+          "median_abs_after_control_error_rad": 0.011282093277805494,
+          "median_abs_jacobian_correction_rad": 0.008404534221031101,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.5503549263384291
+        },
+        {
+          "name": "left_wrist_pitch_joint",
+          "median_abs_target_error_rad": 0.10331846222057334,
+          "p95_abs_target_error_rad": 0.133814344647231,
+          "median_abs_after_control_error_rad": 0.1182959666991858,
+          "median_abs_jacobian_correction_rad": 0.1025148815667684,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.8024546568440909
+        },
+        {
+          "name": "left_wrist_yaw_joint",
+          "median_abs_target_error_rad": 0.022226978654778268,
+          "p95_abs_target_error_rad": 0.1393008336560285,
+          "median_abs_after_control_error_rad": 0.056604783779465345,
+          "median_abs_jacobian_correction_rad": 0.021074833634196766,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.3478922265685744
+        }
+      ]
+    },
+    {
+      "study": "terminal-dwell-v3",
+      "case": "terminal_dwell-corner-0-seed-23-swap-1",
+      "active_controls": 105,
+      "full_trace_sha256": "36adffc0fe1b1f854f61b59dd57329ea23a12a4f09aad0af944e0e0f39528b4b",
+      "joints": [
+        {
+          "name": "left_shoulder_pitch_joint",
+          "median_abs_target_error_rad": 0.12547044823388837,
+          "p95_abs_target_error_rad": 0.16000000730421546,
+          "median_abs_after_control_error_rad": 0.08368264674341996,
+          "median_abs_jacobian_correction_rad": 0.1418425302127569,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.6510919248589133
+        },
+        {
+          "name": "left_shoulder_roll_joint",
+          "median_abs_target_error_rad": 0.057916719087509456,
+          "p95_abs_target_error_rad": 0.09385438247191434,
+          "median_abs_after_control_error_rad": 0.030046927056800954,
+          "median_abs_jacobian_correction_rad": 0.057916716036189315,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.9294860015652496
+        },
+        {
+          "name": "left_shoulder_yaw_joint",
+          "median_abs_target_error_rad": 0.0638842912879872,
+          "p95_abs_target_error_rad": 0.12806525395338764,
+          "median_abs_after_control_error_rad": 0.04387967249133684,
+          "median_abs_jacobian_correction_rad": 0.06388429881934096,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.9366957069459866
+        },
+        {
+          "name": "left_elbow_joint",
+          "median_abs_target_error_rad": 0.06391315796671097,
+          "p95_abs_target_error_rad": 0.13751483662008304,
+          "median_abs_after_control_error_rad": 0.02183408412797183,
+          "median_abs_jacobian_correction_rad": 0.15999999999999998,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.7355598308909626
+        },
+        {
+          "name": "left_wrist_roll_joint",
+          "median_abs_target_error_rad": 0.008415149975558728,
+          "p95_abs_target_error_rad": 0.0232616384851861,
+          "median_abs_after_control_error_rad": 0.011368372296577231,
+          "median_abs_jacobian_correction_rad": 0.007621716244499456,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.3863057053650011
+        },
+        {
+          "name": "left_wrist_pitch_joint",
+          "median_abs_target_error_rad": 0.09631718717841706,
+          "p95_abs_target_error_rad": 0.13124289228134772,
+          "median_abs_after_control_error_rad": 0.09544180836766161,
+          "median_abs_jacobian_correction_rad": 0.09612019965944497,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.4356177661360976
+        },
+        {
+          "name": "left_wrist_yaw_joint",
+          "median_abs_target_error_rad": 0.025593481044732858,
+          "p95_abs_target_error_rad": 0.09623755665669105,
+          "median_abs_after_control_error_rad": 0.05844151411470711,
+          "median_abs_jacobian_correction_rad": 0.022334207985610012,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.8881178739130363
+        }
+      ]
+    },
+    {
+      "study": "terminal-dwell-v3",
+      "case": "terminal_dwell-corner-1-seed-7-swap-0",
+      "active_controls": 105,
+      "full_trace_sha256": "92248c427a31fdf1c8df2b011ffa3361ce364bd283d8babaf8b3dd6dd7700c85",
+      "joints": [
+        {
+          "name": "left_shoulder_pitch_joint",
+          "median_abs_target_error_rad": 0.11074735504445776,
+          "p95_abs_target_error_rad": 0.16000000110207854,
+          "median_abs_after_control_error_rad": 0.07729552249612925,
+          "median_abs_jacobian_correction_rad": 0.14071914583137402,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.4767259079094244
+        },
+        {
+          "name": "left_shoulder_roll_joint",
+          "median_abs_target_error_rad": 0.057028333409116685,
+          "p95_abs_target_error_rad": 0.07701324538003901,
+          "median_abs_after_control_error_rad": 0.0316248662315608,
+          "median_abs_jacobian_correction_rad": 0.05702833321098203,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.8837713982159158
+        },
+        {
+          "name": "left_shoulder_yaw_joint",
+          "median_abs_target_error_rad": 0.06924706149414857,
+          "p95_abs_target_error_rad": 0.10896724833738113,
+          "median_abs_after_control_error_rad": 0.04872709791078619,
+          "median_abs_jacobian_correction_rad": 0.06924706775948206,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.9368248860658064
+        },
+        {
+          "name": "left_elbow_joint",
+          "median_abs_target_error_rad": 0.0613275822993957,
+          "p95_abs_target_error_rad": 0.13431949663786424,
+          "median_abs_after_control_error_rad": 0.02111836037246336,
+          "median_abs_jacobian_correction_rad": 0.15999999999999998,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.6828775268442544
+        },
+        {
+          "name": "left_wrist_roll_joint",
+          "median_abs_target_error_rad": 0.008805243616163277,
+          "p95_abs_target_error_rad": 0.021486512259236683,
+          "median_abs_after_control_error_rad": 0.013049663020206749,
+          "median_abs_jacobian_correction_rad": 0.008805243519904388,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.6489344150497411
+        },
+        {
+          "name": "left_wrist_pitch_joint",
+          "median_abs_target_error_rad": 0.10041235928928896,
+          "p95_abs_target_error_rad": 0.12975862869446603,
+          "median_abs_after_control_error_rad": 0.10336454605468581,
+          "median_abs_jacobian_correction_rad": 0.10032358942977379,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.3839121505461144
+        },
+        {
+          "name": "left_wrist_yaw_joint",
+          "median_abs_target_error_rad": 0.02778100323568336,
+          "p95_abs_target_error_rad": 0.14766692342487744,
+          "median_abs_after_control_error_rad": 0.06681452511615299,
+          "median_abs_jacobian_correction_rad": 0.026035814619732936,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.5097794661527888
+        }
+      ]
+    },
+    {
+      "study": "terminal-dwell-v3",
+      "case": "terminal_dwell-corner-1-seed-7-swap-1",
+      "active_controls": 105,
+      "full_trace_sha256": "1015488fc1c4f992deb398992a6ebf260a2712795aedd54e548ebe8db54163c5",
+      "joints": [
+        {
+          "name": "left_shoulder_pitch_joint",
+          "median_abs_target_error_rad": 0.12249247839496391,
+          "p95_abs_target_error_rad": 0.16000000366551098,
+          "median_abs_after_control_error_rad": 0.0879091186726757,
+          "median_abs_jacobian_correction_rad": 0.13969318992899926,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.5302488191971135
+        },
+        {
+          "name": "left_shoulder_roll_joint",
+          "median_abs_target_error_rad": 0.04883491047416226,
+          "p95_abs_target_error_rad": 0.07929870815962044,
+          "median_abs_after_control_error_rad": 0.025589324354093626,
+          "median_abs_jacobian_correction_rad": 0.04883490356956789,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.7936167676849488
+        },
+        {
+          "name": "left_shoulder_yaw_joint",
+          "median_abs_target_error_rad": 0.06521310116813828,
+          "p95_abs_target_error_rad": 0.12735336822906043,
+          "median_abs_after_control_error_rad": 0.04634334351585556,
+          "median_abs_jacobian_correction_rad": 0.06521312500124132,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.9122168287291039
+        },
+        {
+          "name": "left_elbow_joint",
+          "median_abs_target_error_rad": 0.061155829441901344,
+          "p95_abs_target_error_rad": 0.14187163770725572,
+          "median_abs_after_control_error_rad": 0.022371458216682155,
+          "median_abs_jacobian_correction_rad": 0.16,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.6408327303987273
+        },
+        {
+          "name": "left_wrist_roll_joint",
+          "median_abs_target_error_rad": 0.008373317273968041,
+          "p95_abs_target_error_rad": 0.020390970286569256,
+          "median_abs_after_control_error_rad": 0.011184735977881777,
+          "median_abs_jacobian_correction_rad": 0.008373317342159702,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.48225136379759387
+        },
+        {
+          "name": "left_wrist_pitch_joint",
+          "median_abs_target_error_rad": 0.10380300118667835,
+          "p95_abs_target_error_rad": 0.13166116048297255,
+          "median_abs_after_control_error_rad": 0.10404738605221389,
+          "median_abs_jacobian_correction_rad": 0.10221768789608673,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.7596387826508753
+        },
+        {
+          "name": "left_wrist_yaw_joint",
+          "median_abs_target_error_rad": 0.024218781406057655,
+          "p95_abs_target_error_rad": 0.0693236167981172,
+          "median_abs_after_control_error_rad": 0.06106526930962225,
+          "median_abs_jacobian_correction_rad": 0.02026771086020003,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.5293981611451806
+        }
+      ]
+    },
+    {
+      "study": "terminal-dwell-v3",
+      "case": "terminal_dwell-corner-1-seed-23-swap-0",
+      "active_controls": 105,
+      "full_trace_sha256": "337ac15d1671f87c1ec25fe18f2baa480d8a7a199cf2b9daef4daab00eec8e81",
+      "joints": [
+        {
+          "name": "left_shoulder_pitch_joint",
+          "median_abs_target_error_rad": 0.1235094112393541,
+          "p95_abs_target_error_rad": 0.15999999997943926,
+          "median_abs_after_control_error_rad": 0.08405758223980259,
+          "median_abs_jacobian_correction_rad": 0.1335374143040315,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.7698069343408431
+        },
+        {
+          "name": "left_shoulder_roll_joint",
+          "median_abs_target_error_rad": 0.045378056751255655,
+          "p95_abs_target_error_rad": 0.10595882493771579,
+          "median_abs_after_control_error_rad": 0.026273084269528055,
+          "median_abs_jacobian_correction_rad": 0.044963158865505254,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.6930426451257116
+        },
+        {
+          "name": "left_shoulder_yaw_joint",
+          "median_abs_target_error_rad": 0.051083626664636,
+          "p95_abs_target_error_rad": 0.155729975632312,
+          "median_abs_after_control_error_rad": 0.02694749763737038,
+          "median_abs_jacobian_correction_rad": 0.05108362385832094,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.9400181762162964
+        },
+        {
+          "name": "left_elbow_joint",
+          "median_abs_target_error_rad": 0.046024677095885425,
+          "p95_abs_target_error_rad": 0.14332933784507515,
+          "median_abs_after_control_error_rad": 0.017065273918967852,
+          "median_abs_jacobian_correction_rad": 0.16,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.4688930387948753
+        },
+        {
+          "name": "left_wrist_roll_joint",
+          "median_abs_target_error_rad": 0.004962493425615184,
+          "p95_abs_target_error_rad": 0.03346401237899776,
+          "median_abs_after_control_error_rad": 0.006821012473614871,
+          "median_abs_jacobian_correction_rad": 0.004880923030323954,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.04152021735020053
+        },
+        {
+          "name": "left_wrist_pitch_joint",
+          "median_abs_target_error_rad": 0.09616345844386778,
+          "p95_abs_target_error_rad": 0.17173989168571427,
+          "median_abs_after_control_error_rad": 0.09151885171602353,
+          "median_abs_jacobian_correction_rad": 0.08893847231787676,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.7332369538232701
+        },
+        {
+          "name": "left_wrist_yaw_joint",
+          "median_abs_target_error_rad": 0.017224438277314486,
+          "p95_abs_target_error_rad": 0.07399204432619816,
+          "median_abs_after_control_error_rad": 0.028659997798167275,
+          "median_abs_jacobian_correction_rad": 0.015139645474071574,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.31533938983803256
+        }
+      ]
+    },
+    {
+      "study": "terminal-dwell-v3",
+      "case": "terminal_dwell-corner-1-seed-23-swap-1",
+      "active_controls": 105,
+      "full_trace_sha256": "c44035fe22894ad81c5f1944a8ff4a8eb10237bff086311cd4eb8d1cc8d73af0",
+      "joints": [
+        {
+          "name": "left_shoulder_pitch_joint",
+          "median_abs_target_error_rad": 0.11793920382145678,
+          "p95_abs_target_error_rad": 0.16000000198408426,
+          "median_abs_after_control_error_rad": 0.0849867072140702,
+          "median_abs_jacobian_correction_rad": 0.14164319244913204,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.4563084021226387
+        },
+        {
+          "name": "left_shoulder_roll_joint",
+          "median_abs_target_error_rad": 0.05288760694940742,
+          "p95_abs_target_error_rad": 0.09792113874553234,
+          "median_abs_after_control_error_rad": 0.028312758979706795,
+          "median_abs_jacobian_correction_rad": 0.05288760622063085,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.9374109251569883
+        },
+        {
+          "name": "left_shoulder_yaw_joint",
+          "median_abs_target_error_rad": 0.06415119251431606,
+          "p95_abs_target_error_rad": 0.133304070221538,
+          "median_abs_after_control_error_rad": 0.04227961850802309,
+          "median_abs_jacobian_correction_rad": 0.06415120097495458,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.9443952046496558
+        },
+        {
+          "name": "left_elbow_joint",
+          "median_abs_target_error_rad": 0.06524535864248045,
+          "p95_abs_target_error_rad": 0.1337609224518454,
+          "median_abs_after_control_error_rad": 0.022702030601956448,
+          "median_abs_jacobian_correction_rad": 0.15999999999999998,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.7189613012084772
+        },
+        {
+          "name": "left_wrist_roll_joint",
+          "median_abs_target_error_rad": 0.007199354077924214,
+          "p95_abs_target_error_rad": 0.021743378486984898,
+          "median_abs_after_control_error_rad": 0.012858321888063136,
+          "median_abs_jacobian_correction_rad": 0.007066021388759419,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.4955858102235928
+        },
+        {
+          "name": "left_wrist_pitch_joint",
+          "median_abs_target_error_rad": 0.09936254523998575,
+          "p95_abs_target_error_rad": 0.13392776222756408,
+          "median_abs_after_control_error_rad": 0.10346847325007957,
+          "median_abs_jacobian_correction_rad": 0.0987045647975348,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.36832537232581225
+        },
+        {
+          "name": "left_wrist_yaw_joint",
+          "median_abs_target_error_rad": 0.022991957574467425,
+          "p95_abs_target_error_rad": 0.1020621982980564,
+          "median_abs_after_control_error_rad": 0.039081063804039806,
+          "median_abs_jacobian_correction_rad": 0.022616349560037864,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.0241076042312385
+        }
+      ]
+    },
+    {
+      "study": "lateral-command-v5",
+      "case": "lateral_minus-corner-0-seed-7-swap-0",
+      "active_controls": 105,
+      "full_trace_sha256": "12eb7f2cac6c114759633789d1922138813b6c8930ff2c7f46974d1b506143a6",
+      "joints": [
+        {
+          "name": "left_shoulder_pitch_joint",
+          "median_abs_target_error_rad": 0.13299946296633486,
+          "p95_abs_target_error_rad": 0.16000002702539634,
+          "median_abs_after_control_error_rad": 0.09370282426064291,
+          "median_abs_jacobian_correction_rad": 0.14429842054823583,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.4920400179083526
+        },
+        {
+          "name": "left_shoulder_roll_joint",
+          "median_abs_target_error_rad": 0.03966174664451046,
+          "p95_abs_target_error_rad": 0.11084541691078974,
+          "median_abs_after_control_error_rad": 0.026827789761858706,
+          "median_abs_jacobian_correction_rad": 0.03966174412164962,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.6012418652567401
+        },
+        {
+          "name": "left_shoulder_yaw_joint",
+          "median_abs_target_error_rad": 0.09688400067896802,
+          "p95_abs_target_error_rad": 0.1599999923666775,
+          "median_abs_after_control_error_rad": 0.06356743231789166,
+          "median_abs_jacobian_correction_rad": 0.09688398330294373,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.3644223071281247
+        },
+        {
+          "name": "left_elbow_joint",
+          "median_abs_target_error_rad": 0.06653322382563204,
+          "p95_abs_target_error_rad": 0.14524023803639302,
+          "median_abs_after_control_error_rad": 0.024811780069344702,
+          "median_abs_jacobian_correction_rad": 0.14845809622522643,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.7591601511207593
+        },
+        {
+          "name": "left_wrist_roll_joint",
+          "median_abs_target_error_rad": 0.010852383850249198,
+          "p95_abs_target_error_rad": 0.03578361176665478,
+          "median_abs_after_control_error_rad": 0.022097166966068865,
+          "median_abs_jacobian_correction_rad": 0.010348782329201363,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.1346332114644426
+        },
+        {
+          "name": "left_wrist_pitch_joint",
+          "median_abs_target_error_rad": 0.11193602828451066,
+          "p95_abs_target_error_rad": 0.14413135752900208,
+          "median_abs_after_control_error_rad": 0.13191004715736654,
+          "median_abs_jacobian_correction_rad": 0.11148751338933116,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.0050803702930344
+        },
+        {
+          "name": "left_wrist_yaw_joint",
+          "median_abs_target_error_rad": 0.03728494925186587,
+          "p95_abs_target_error_rad": 0.21789663071858154,
+          "median_abs_after_control_error_rad": 0.06618996877638245,
+          "median_abs_jacobian_correction_rad": 0.02499878914446929,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.4028073865858315
+        }
+      ]
+    },
+    {
+      "study": "lateral-command-v5",
+      "case": "lateral_plus-corner-0-seed-7-swap-0",
+      "active_controls": 105,
+      "full_trace_sha256": "066b777a595ef30735dbd71d712bdd65b2c84340774b896c39e40cf098bddda1",
+      "joints": [
+        {
+          "name": "left_shoulder_pitch_joint",
+          "median_abs_target_error_rad": 0.13186023885581355,
+          "p95_abs_target_error_rad": 0.1600000094751349,
+          "median_abs_after_control_error_rad": 0.09059744985531715,
+          "median_abs_jacobian_correction_rad": 0.14431688369404128,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.793358946454671
+        },
+        {
+          "name": "left_shoulder_roll_joint",
+          "median_abs_target_error_rad": 0.04595807514179183,
+          "p95_abs_target_error_rad": 0.06827003662254355,
+          "median_abs_after_control_error_rad": 0.023911695253404915,
+          "median_abs_jacobian_correction_rad": 0.04595807615250601,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.9501591287692424
+        },
+        {
+          "name": "left_shoulder_yaw_joint",
+          "median_abs_target_error_rad": 0.04340965972193929,
+          "p95_abs_target_error_rad": 0.13073889662533378,
+          "median_abs_after_control_error_rad": 0.02660565958480432,
+          "median_abs_jacobian_correction_rad": 0.04340965548862433,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.7319350222268839
+        },
+        {
+          "name": "left_elbow_joint",
+          "median_abs_target_error_rad": 0.06069775571552094,
+          "p95_abs_target_error_rad": 0.13616914720530943,
+          "median_abs_after_control_error_rad": 0.021473670596987723,
+          "median_abs_jacobian_correction_rad": 0.15999999999999998,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.6989192934230348
+        },
+        {
+          "name": "left_wrist_roll_joint",
+          "median_abs_target_error_rad": 0.005371341533102892,
+          "p95_abs_target_error_rad": 0.04110278632920558,
+          "median_abs_after_control_error_rad": 0.007539281235834638,
+          "median_abs_jacobian_correction_rad": 0.004931492871491902,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.03551506627975768
+        },
+        {
+          "name": "left_wrist_pitch_joint",
+          "median_abs_target_error_rad": 0.08554441736297724,
+          "p95_abs_target_error_rad": 0.1356106566776724,
+          "median_abs_after_control_error_rad": 0.07725401298532283,
+          "median_abs_jacobian_correction_rad": 0.08097419657524532,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.7637548940791983
+        },
+        {
+          "name": "left_wrist_yaw_joint",
+          "median_abs_target_error_rad": 0.01493578532813658,
+          "p95_abs_target_error_rad": 0.07221657209666162,
+          "median_abs_after_control_error_rad": 0.027618593816128197,
+          "median_abs_jacobian_correction_rad": 0.014123857839861975,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.5331078926525031
+        }
+      ]
+    },
+    {
+      "study": "lateral-command-v5",
+      "case": "lateral_minus-corner-0-seed-7-swap-1",
+      "active_controls": 105,
+      "full_trace_sha256": "c50df39827ba9c77e7c308aec9ac949b02ba015510f85c68c14b6dea1221b597",
+      "joints": [
+        {
+          "name": "left_shoulder_pitch_joint",
+          "median_abs_target_error_rad": 0.12553431395176684,
+          "p95_abs_target_error_rad": 0.1600000127438008,
+          "median_abs_after_control_error_rad": 0.09293934632687095,
+          "median_abs_jacobian_correction_rad": 0.14247469679342234,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.3472924458053537
+        },
+        {
+          "name": "left_shoulder_roll_joint",
+          "median_abs_target_error_rad": 0.04673598593451614,
+          "p95_abs_target_error_rad": 0.08153542966191557,
+          "median_abs_after_control_error_rad": 0.02679244735096597,
+          "median_abs_jacobian_correction_rad": 0.046735984119971284,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.7879506368888063
+        },
+        {
+          "name": "left_shoulder_yaw_joint",
+          "median_abs_target_error_rad": 0.09058447431445626,
+          "p95_abs_target_error_rad": 0.15212135792759413,
+          "median_abs_after_control_error_rad": 0.06234598831406085,
+          "median_abs_jacobian_correction_rad": 0.09058449348416642,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.2356235222601306
+        },
+        {
+          "name": "left_elbow_joint",
+          "median_abs_target_error_rad": 0.06163008181634327,
+          "p95_abs_target_error_rad": 0.14261527611260735,
+          "median_abs_after_control_error_rad": 0.02451721369160525,
+          "median_abs_jacobian_correction_rad": 0.16,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.5802919769075947
+        },
+        {
+          "name": "left_wrist_roll_joint",
+          "median_abs_target_error_rad": 0.01266023091061197,
+          "p95_abs_target_error_rad": 0.03610331339350213,
+          "median_abs_after_control_error_rad": 0.01958321618530684,
+          "median_abs_jacobian_correction_rad": 0.012895970479512131,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.484208719470438
+        },
+        {
+          "name": "left_wrist_pitch_joint",
+          "median_abs_target_error_rad": 0.12364800103390439,
+          "p95_abs_target_error_rad": 0.18234422720952448,
+          "median_abs_after_control_error_rad": 0.14651372805510232,
+          "median_abs_jacobian_correction_rad": 0.12215561517134133,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.9144456551784226
+        },
+        {
+          "name": "left_wrist_yaw_joint",
+          "median_abs_target_error_rad": 0.07738751874142072,
+          "p95_abs_target_error_rad": 0.22187150943460543,
+          "median_abs_after_control_error_rad": 0.13091439431239646,
+          "median_abs_jacobian_correction_rad": 0.027397523837659032,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.6479407627226437
+        }
+      ]
+    },
+    {
+      "study": "lateral-command-v5",
+      "case": "lateral_plus-corner-0-seed-7-swap-1",
+      "active_controls": 94,
+      "full_trace_sha256": "ecb7a1ed8eaf2a4329883b38b7035115da74d678695dbf7ddd24dfd9befc5217",
+      "joints": [
+        {
+          "name": "left_shoulder_pitch_joint",
+          "median_abs_target_error_rad": 0.11131449184968903,
+          "p95_abs_target_error_rad": 0.15999999080105845,
+          "median_abs_after_control_error_rad": 0.07065904092167935,
+          "median_abs_jacobian_correction_rad": 0.13433372920126846,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.476723561095762
+        },
+        {
+          "name": "left_shoulder_roll_joint",
+          "median_abs_target_error_rad": 0.06001355104860124,
+          "p95_abs_target_error_rad": 0.10813728613650164,
+          "median_abs_after_control_error_rad": 0.03370928919420238,
+          "median_abs_jacobian_correction_rad": 0.05421167950644449,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.302553189120038
+        },
+        {
+          "name": "left_shoulder_yaw_joint",
+          "median_abs_target_error_rad": 0.03914893977806161,
+          "p95_abs_target_error_rad": 0.15999998784292666,
+          "median_abs_after_control_error_rad": 0.022072832710371387,
+          "median_abs_jacobian_correction_rad": 0.04324588452510017,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.177793067857725
+        },
+        {
+          "name": "left_elbow_joint",
+          "median_abs_target_error_rad": 0.06059620245266287,
+          "p95_abs_target_error_rad": 0.1345409767639764,
+          "median_abs_after_control_error_rad": 0.020603945190388676,
+          "median_abs_jacobian_correction_rad": 0.15999999999999998,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.7102775704917654
+        },
+        {
+          "name": "left_wrist_roll_joint",
+          "median_abs_target_error_rad": 0.003537086765531907,
+          "p95_abs_target_error_rad": 0.019852225155626912,
+          "median_abs_after_control_error_rad": 0.0041962871073296625,
+          "median_abs_jacobian_correction_rad": 0.0033638613787926527,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.013358534305177722
+        },
+        {
+          "name": "left_wrist_pitch_joint",
+          "median_abs_target_error_rad": 0.07553528361630471,
+          "p95_abs_target_error_rad": 0.16591479596673767,
+          "median_abs_after_control_error_rad": 0.05511561796524603,
+          "median_abs_jacobian_correction_rad": 0.07061056044752391,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.5717571625631477
+        },
+        {
+          "name": "left_wrist_yaw_joint",
+          "median_abs_target_error_rad": 0.011595721288736448,
+          "p95_abs_target_error_rad": 0.0620947983330149,
+          "median_abs_after_control_error_rad": 0.016486645847455565,
+          "median_abs_jacobian_correction_rad": 0.011435352125417509,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.21222823100526111
+        }
+      ]
+    },
+    {
+      "study": "lateral-command-v5",
+      "case": "lateral_minus-corner-0-seed-23-swap-0",
+      "active_controls": 105,
+      "full_trace_sha256": "991f67d4b19875d497fc1faf4ac7a5faf2245a045359a06920ec04ebf0ac3ea6",
+      "joints": [
+        {
+          "name": "left_shoulder_pitch_joint",
+          "median_abs_target_error_rad": 0.12946242573685718,
+          "p95_abs_target_error_rad": 0.16000001633440442,
+          "median_abs_after_control_error_rad": 0.09609814004458517,
+          "median_abs_jacobian_correction_rad": 0.14690932999745027,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.5585604148996715
+        },
+        {
+          "name": "left_shoulder_roll_joint",
+          "median_abs_target_error_rad": 0.04399570679243919,
+          "p95_abs_target_error_rad": 0.09025698430867231,
+          "median_abs_after_control_error_rad": 0.027583223718650185,
+          "median_abs_jacobian_correction_rad": 0.04399571385610236,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.7739031011136601
+        },
+        {
+          "name": "left_shoulder_yaw_joint",
+          "median_abs_target_error_rad": 0.09738023759767245,
+          "p95_abs_target_error_rad": 0.1490296393128727,
+          "median_abs_after_control_error_rad": 0.06807526674262943,
+          "median_abs_jacobian_correction_rad": 0.09738027158721219,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.3177881008998789
+        },
+        {
+          "name": "left_elbow_joint",
+          "median_abs_target_error_rad": 0.06472901331568535,
+          "p95_abs_target_error_rad": 0.1399741414362018,
+          "median_abs_after_control_error_rad": 0.021650570561028176,
+          "median_abs_jacobian_correction_rad": 0.15759468676585575,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.6677889603037395
+        },
+        {
+          "name": "left_wrist_roll_joint",
+          "median_abs_target_error_rad": 0.011469840983465762,
+          "p95_abs_target_error_rad": 0.0309814341805813,
+          "median_abs_after_control_error_rad": 0.016266335878325044,
+          "median_abs_jacobian_correction_rad": 0.011665855275122289,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.9916647348429143
+        },
+        {
+          "name": "left_wrist_pitch_joint",
+          "median_abs_target_error_rad": 0.11505552995130519,
+          "p95_abs_target_error_rad": 0.14609267323639843,
+          "median_abs_after_control_error_rad": 0.1318478248895404,
+          "median_abs_jacobian_correction_rad": 0.11425080083326761,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.7732600528741794
+        },
+        {
+          "name": "left_wrist_yaw_joint",
+          "median_abs_target_error_rad": 0.07127452256699995,
+          "p95_abs_target_error_rad": 0.22929554019990375,
+          "median_abs_after_control_error_rad": 0.11501286416619726,
+          "median_abs_jacobian_correction_rad": 0.033384700913643095,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.823850403604078
+        }
+      ]
+    },
+    {
+      "study": "lateral-command-v5",
+      "case": "lateral_plus-corner-0-seed-23-swap-0",
+      "active_controls": 75,
+      "full_trace_sha256": "40ed7b9d3f86321e4876a7f9034daede78a983a5a397c4f06af8d7c6d65c6c10",
+      "joints": [
+        {
+          "name": "left_shoulder_pitch_joint",
+          "median_abs_target_error_rad": 0.11431253358623183,
+          "p95_abs_target_error_rad": 0.16000000513489016,
+          "median_abs_after_control_error_rad": 0.07568310357501684,
+          "median_abs_jacobian_correction_rad": 0.1502381973857101,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.8453394823222702
+        },
+        {
+          "name": "left_shoulder_roll_joint",
+          "median_abs_target_error_rad": 0.04716244881443013,
+          "p95_abs_target_error_rad": 0.07369605007159173,
+          "median_abs_after_control_error_rad": 0.02479733078832674,
+          "median_abs_jacobian_correction_rad": 0.04716243511673485,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.8762293321887892
+        },
+        {
+          "name": "left_shoulder_yaw_joint",
+          "median_abs_target_error_rad": 0.044314768283609585,
+          "p95_abs_target_error_rad": 0.10468964557509353,
+          "median_abs_after_control_error_rad": 0.03006502027294569,
+          "median_abs_jacobian_correction_rad": 0.04431477285498622,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.6310179084027913
+        },
+        {
+          "name": "left_elbow_joint",
+          "median_abs_target_error_rad": 0.07085769162705435,
+          "p95_abs_target_error_rad": 0.1412035796488646,
+          "median_abs_after_control_error_rad": 0.0277075867012607,
+          "median_abs_jacobian_correction_rad": 0.15861065021340298,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.7417695796474617
+        },
+        {
+          "name": "left_wrist_roll_joint",
+          "median_abs_target_error_rad": 0.00483480776915236,
+          "p95_abs_target_error_rad": 0.014942232892119225,
+          "median_abs_after_control_error_rad": 0.007534005353843028,
+          "median_abs_jacobian_correction_rad": 0.004740668052398225,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.015174882890309105
+        },
+        {
+          "name": "left_wrist_pitch_joint",
+          "median_abs_target_error_rad": 0.08040485744547095,
+          "p95_abs_target_error_rad": 0.13602007641329353,
+          "median_abs_after_control_error_rad": 0.07141021043681194,
+          "median_abs_jacobian_correction_rad": 0.08040485618886233,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.082669406713338
+        },
+        {
+          "name": "left_wrist_yaw_joint",
+          "median_abs_target_error_rad": 0.014584303436589868,
+          "p95_abs_target_error_rad": 0.04171245252222796,
+          "median_abs_after_control_error_rad": 0.03063069145601474,
+          "median_abs_jacobian_correction_rad": 0.014584306905417094,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.36033321921492184
+        }
+      ]
+    },
+    {
+      "study": "lateral-command-v5",
+      "case": "lateral_minus-corner-0-seed-23-swap-1",
+      "active_controls": 105,
+      "full_trace_sha256": "2c3b87eafac932a17d454a5740a14f357b73d8e26d3fadd48eaa987a2a2cb5c7",
+      "joints": [
+        {
+          "name": "left_shoulder_pitch_joint",
+          "median_abs_target_error_rad": 0.12258493450135555,
+          "p95_abs_target_error_rad": 0.16000000776283274,
+          "median_abs_after_control_error_rad": 0.09057283269696792,
+          "median_abs_jacobian_correction_rad": 0.14753552878759044,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.3788539682173264
+        },
+        {
+          "name": "left_shoulder_roll_joint",
+          "median_abs_target_error_rad": 0.05648529989364576,
+          "p95_abs_target_error_rad": 0.09354062136459969,
+          "median_abs_after_control_error_rad": 0.033782960906728624,
+          "median_abs_jacobian_correction_rad": 0.05648530620376421,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.8851297669680951
+        },
+        {
+          "name": "left_shoulder_yaw_joint",
+          "median_abs_target_error_rad": 0.0980882696749294,
+          "p95_abs_target_error_rad": 0.15311762241142937,
+          "median_abs_after_control_error_rad": 0.07046949978537786,
+          "median_abs_jacobian_correction_rad": 0.09808826802317566,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.470733576748439
+        },
+        {
+          "name": "left_elbow_joint",
+          "median_abs_target_error_rad": 0.06163077150368644,
+          "p95_abs_target_error_rad": 0.13946970704510045,
+          "median_abs_after_control_error_rad": 0.01934723575030583,
+          "median_abs_jacobian_correction_rad": 0.15097451062739123,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.699958360702025
+        },
+        {
+          "name": "left_wrist_roll_joint",
+          "median_abs_target_error_rad": 0.011264644163839654,
+          "p95_abs_target_error_rad": 0.033858928746040406,
+          "median_abs_after_control_error_rad": 0.02042167431716558,
+          "median_abs_jacobian_correction_rad": 0.011268530108294175,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.1305255658060493
+        },
+        {
+          "name": "left_wrist_pitch_joint",
+          "median_abs_target_error_rad": 0.10440478413323406,
+          "p95_abs_target_error_rad": 0.14903720984453464,
+          "median_abs_after_control_error_rad": 0.1336139232663165,
+          "median_abs_jacobian_correction_rad": 0.10428689441183082,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.5882949103161121
+        },
+        {
+          "name": "left_wrist_yaw_joint",
+          "median_abs_target_error_rad": 0.06916504616482469,
+          "p95_abs_target_error_rad": 0.24514973598124404,
+          "median_abs_after_control_error_rad": 0.1176538889723715,
+          "median_abs_jacobian_correction_rad": 0.034747659847535806,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.8323060111415883
+        }
+      ]
+    },
+    {
+      "study": "lateral-command-v5",
+      "case": "lateral_plus-corner-0-seed-23-swap-1",
+      "active_controls": 90,
+      "full_trace_sha256": "aa2f9f832fac649ac7a8b4ac03a8eb68b174bea90408240f7af7b3b7766757af",
+      "joints": [
+        {
+          "name": "left_shoulder_pitch_joint",
+          "median_abs_target_error_rad": 0.11367384585858609,
+          "p95_abs_target_error_rad": 0.16000001535522246,
+          "median_abs_after_control_error_rad": 0.08802637637657029,
+          "median_abs_jacobian_correction_rad": 0.13632334756811937,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.5472046078727897
+        },
+        {
+          "name": "left_shoulder_roll_joint",
+          "median_abs_target_error_rad": 0.05657136936054211,
+          "p95_abs_target_error_rad": 0.0866513612121778,
+          "median_abs_after_control_error_rad": 0.027197439250330156,
+          "median_abs_jacobian_correction_rad": 0.056571375293781485,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.1698606575453465
+        },
+        {
+          "name": "left_shoulder_yaw_joint",
+          "median_abs_target_error_rad": 0.052229372965261214,
+          "p95_abs_target_error_rad": 0.1408527602212244,
+          "median_abs_after_control_error_rad": 0.029628101180554152,
+          "median_abs_jacobian_correction_rad": 0.05451141032761288,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.9973054836457698
+        },
+        {
+          "name": "left_elbow_joint",
+          "median_abs_target_error_rad": 0.06184856383255866,
+          "p95_abs_target_error_rad": 0.1323112789539421,
+          "median_abs_after_control_error_rad": 0.020208337881842398,
+          "median_abs_jacobian_correction_rad": 0.15999999999999998,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.8299075906086533
+        },
+        {
+          "name": "left_wrist_roll_joint",
+          "median_abs_target_error_rad": 0.00769975585967193,
+          "p95_abs_target_error_rad": 0.04219920952325724,
+          "median_abs_after_control_error_rad": 0.010715280773276891,
+          "median_abs_jacobian_correction_rad": 0.007191747691238797,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.040471060930397686
+        },
+        {
+          "name": "left_wrist_pitch_joint",
+          "median_abs_target_error_rad": 0.08244182309176107,
+          "p95_abs_target_error_rad": 0.13743434265384838,
+          "median_abs_after_control_error_rad": 0.06665983425647223,
+          "median_abs_jacobian_correction_rad": 0.08079557337729176,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.3196978147726677
+        },
+        {
+          "name": "left_wrist_yaw_joint",
+          "median_abs_target_error_rad": 0.017398696482040593,
+          "p95_abs_target_error_rad": 0.049773372012584215,
+          "median_abs_after_control_error_rad": 0.02761303853785447,
+          "median_abs_jacobian_correction_rad": 0.01626549147093484,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.303846523259543
+        }
+      ]
+    },
+    {
+      "study": "lateral-command-v5",
+      "case": "lateral_minus-corner-1-seed-7-swap-0",
+      "active_controls": 105,
+      "full_trace_sha256": "4f2dc3f96759a919cf88517305dd15bfd60239ef52cc691044e54c64a51b3705",
+      "joints": [
+        {
+          "name": "left_shoulder_pitch_joint",
+          "median_abs_target_error_rad": 0.13409353905757704,
+          "p95_abs_target_error_rad": 0.16000001124561078,
+          "median_abs_after_control_error_rad": 0.1017253480103576,
+          "median_abs_jacobian_correction_rad": 0.1492195403057135,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.4912560100897707
+        },
+        {
+          "name": "left_shoulder_roll_joint",
+          "median_abs_target_error_rad": 0.05156518450467454,
+          "p95_abs_target_error_rad": 0.09555124364598526,
+          "median_abs_after_control_error_rad": 0.03010613179174218,
+          "median_abs_jacobian_correction_rad": 0.051565182784138984,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.8867962120956163
+        },
+        {
+          "name": "left_shoulder_yaw_joint",
+          "median_abs_target_error_rad": 0.10236793052432341,
+          "p95_abs_target_error_rad": 0.15072784836641873,
+          "median_abs_after_control_error_rad": 0.07256748867739421,
+          "median_abs_jacobian_correction_rad": 0.10236791348315571,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.3140809996743419
+        },
+        {
+          "name": "left_elbow_joint",
+          "median_abs_target_error_rad": 0.06542574183436407,
+          "p95_abs_target_error_rad": 0.13860194516248178,
+          "median_abs_after_control_error_rad": 0.024627926566985037,
+          "median_abs_jacobian_correction_rad": 0.15795770965523906,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.648643319323004
+        },
+        {
+          "name": "left_wrist_roll_joint",
+          "median_abs_target_error_rad": 0.012770892666134875,
+          "p95_abs_target_error_rad": 0.03628757617458789,
+          "median_abs_after_control_error_rad": 0.01854809019807102,
+          "median_abs_jacobian_correction_rad": 0.013479200554793555,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.4622997981740682
+        },
+        {
+          "name": "left_wrist_pitch_joint",
+          "median_abs_target_error_rad": 0.11925011965330762,
+          "p95_abs_target_error_rad": 0.13611308548820172,
+          "median_abs_after_control_error_rad": 0.14052234835227656,
+          "median_abs_jacobian_correction_rad": 0.11830808468609239,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.7092666642371869
+        },
+        {
+          "name": "left_wrist_yaw_joint",
+          "median_abs_target_error_rad": 0.08634986175909909,
+          "p95_abs_target_error_rad": 0.24127806579232527,
+          "median_abs_after_control_error_rad": 0.1303624865816364,
+          "median_abs_jacobian_correction_rad": 0.03111347017295124,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.9261608974699278
+        }
+      ]
+    },
+    {
+      "study": "lateral-command-v5",
+      "case": "lateral_plus-corner-1-seed-7-swap-0",
+      "active_controls": 45,
+      "full_trace_sha256": "962c828530a81a71dfd1190130e1d07de45888dc70553f63b2bf6498b35bf2ae",
+      "joints": [
+        {
+          "name": "left_shoulder_pitch_joint",
+          "median_abs_target_error_rad": 0.1320371609084614,
+          "p95_abs_target_error_rad": 0.16000001284990092,
+          "median_abs_after_control_error_rad": 0.0879922406746726,
+          "median_abs_jacobian_correction_rad": 0.1517205392663893,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.6803823268020923
+        },
+        {
+          "name": "left_shoulder_roll_joint",
+          "median_abs_target_error_rad": 0.03588885658719057,
+          "p95_abs_target_error_rad": 0.0729674461633768,
+          "median_abs_after_control_error_rad": 0.022517194116938755,
+          "median_abs_jacobian_correction_rad": 0.03407359951603159,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.7206573204611089
+        },
+        {
+          "name": "left_shoulder_yaw_joint",
+          "median_abs_target_error_rad": 0.04401068995639801,
+          "p95_abs_target_error_rad": 0.12362927149654365,
+          "median_abs_after_control_error_rad": 0.031969091397972105,
+          "median_abs_jacobian_correction_rad": 0.04401068485504739,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.7327606842786796
+        },
+        {
+          "name": "left_elbow_joint",
+          "median_abs_target_error_rad": 0.06677254909345293,
+          "p95_abs_target_error_rad": 0.1373551546899352,
+          "median_abs_after_control_error_rad": 0.020674590608203078,
+          "median_abs_jacobian_correction_rad": 0.1531479956605716,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.662990833744443
+        },
+        {
+          "name": "left_wrist_roll_joint",
+          "median_abs_target_error_rad": 0.005463864843913924,
+          "p95_abs_target_error_rad": 0.062481420342596815,
+          "median_abs_after_control_error_rad": 0.0070393117591840415,
+          "median_abs_jacobian_correction_rad": 0.004441539518295477,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.01992860485734297
+        },
+        {
+          "name": "left_wrist_pitch_joint",
+          "median_abs_target_error_rad": 0.07483014319517545,
+          "p95_abs_target_error_rad": 0.15779536609150321,
+          "median_abs_after_control_error_rad": 0.07485667925119815,
+          "median_abs_jacobian_correction_rad": 0.0727778996422991,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.1664631941473456
+        },
+        {
+          "name": "left_wrist_yaw_joint",
+          "median_abs_target_error_rad": 0.015049215472319077,
+          "p95_abs_target_error_rad": 0.1542799153266443,
+          "median_abs_after_control_error_rad": 0.03373457645048704,
+          "median_abs_jacobian_correction_rad": 0.01423623205261726,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.5505612360565132
+        }
+      ]
+    },
+    {
+      "study": "lateral-command-v5",
+      "case": "lateral_minus-corner-1-seed-7-swap-1",
+      "active_controls": 105,
+      "full_trace_sha256": "dc65371593b5cb360e268e20b84056299bc51732d2f6d7b2b43ec6dfce6474c2",
+      "joints": [
+        {
+          "name": "left_shoulder_pitch_joint",
+          "median_abs_target_error_rad": 0.13641205329330774,
+          "p95_abs_target_error_rad": 0.16000001566810634,
+          "median_abs_after_control_error_rad": 0.0976305193867043,
+          "median_abs_jacobian_correction_rad": 0.15999999999999998,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.7458521113552528
+        },
+        {
+          "name": "left_shoulder_roll_joint",
+          "median_abs_target_error_rad": 0.056772701617269106,
+          "p95_abs_target_error_rad": 0.10392901420277602,
+          "median_abs_after_control_error_rad": 0.03495778475142616,
+          "median_abs_jacobian_correction_rad": 0.05677269757740186,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.8534807288408971
+        },
+        {
+          "name": "left_shoulder_yaw_joint",
+          "median_abs_target_error_rad": 0.10870270975291788,
+          "p95_abs_target_error_rad": 0.14558279197837243,
+          "median_abs_after_control_error_rad": 0.07433386466374658,
+          "median_abs_jacobian_correction_rad": 0.10870271716358906,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.4002434818461904
+        },
+        {
+          "name": "left_elbow_joint",
+          "median_abs_target_error_rad": 0.057735367587313985,
+          "p95_abs_target_error_rad": 0.11937159936245945,
+          "median_abs_after_control_error_rad": 0.019701336043717904,
+          "median_abs_jacobian_correction_rad": 0.14517195104293648,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.6800677549170049
+        },
+        {
+          "name": "left_wrist_roll_joint",
+          "median_abs_target_error_rad": 0.009848753097442375,
+          "p95_abs_target_error_rad": 0.03472734743395414,
+          "median_abs_after_control_error_rad": 0.015148515592424965,
+          "median_abs_jacobian_correction_rad": 0.010319428443684941,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.2494851703216314
+        },
+        {
+          "name": "left_wrist_pitch_joint",
+          "median_abs_target_error_rad": 0.10654700192014727,
+          "p95_abs_target_error_rad": 0.1341156423042492,
+          "median_abs_after_control_error_rad": 0.11831844550657533,
+          "median_abs_jacobian_correction_rad": 0.10564243770390239,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.43461454424768503
+        },
+        {
+          "name": "left_wrist_yaw_joint",
+          "median_abs_target_error_rad": 0.05609669265571268,
+          "p95_abs_target_error_rad": 0.2503575335790047,
+          "median_abs_after_control_error_rad": 0.1094662846908726,
+          "median_abs_jacobian_correction_rad": 0.0372349099718787,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.8604885455264468
+        }
+      ]
+    },
+    {
+      "study": "lateral-command-v5",
+      "case": "lateral_plus-corner-1-seed-7-swap-1",
+      "active_controls": 105,
+      "full_trace_sha256": "331d2d14c1450497ec33d0c48da9099089595f1e177fc0da6252922a1d421567",
+      "joints": [
+        {
+          "name": "left_shoulder_pitch_joint",
+          "median_abs_target_error_rad": 0.12398048626355207,
+          "p95_abs_target_error_rad": 0.16000001393772464,
+          "median_abs_after_control_error_rad": 0.07949503109949585,
+          "median_abs_jacobian_correction_rad": 0.14707280942867312,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.3892784562737008
+        },
+        {
+          "name": "left_shoulder_roll_joint",
+          "median_abs_target_error_rad": 0.05254305604084153,
+          "p95_abs_target_error_rad": 0.11582078452570196,
+          "median_abs_after_control_error_rad": 0.027461374481654477,
+          "median_abs_jacobian_correction_rad": 0.05243626977382926,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.1401407383463467
+        },
+        {
+          "name": "left_shoulder_yaw_joint",
+          "median_abs_target_error_rad": 0.046211687139734337,
+          "p95_abs_target_error_rad": 0.16000000415073903,
+          "median_abs_after_control_error_rad": 0.03128110630134229,
+          "median_abs_jacobian_correction_rad": 0.046024820037753766,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.9474757028386465
+        },
+        {
+          "name": "left_elbow_joint",
+          "median_abs_target_error_rad": 0.059833624380197,
+          "p95_abs_target_error_rad": 0.1436069028391887,
+          "median_abs_after_control_error_rad": 0.02510246909003663,
+          "median_abs_jacobian_correction_rad": 0.15444919103826768,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.6023141839095858
+        },
+        {
+          "name": "left_wrist_roll_joint",
+          "median_abs_target_error_rad": 0.0047790268205684105,
+          "p95_abs_target_error_rad": 0.01796700902377301,
+          "median_abs_after_control_error_rad": 0.00524323096659117,
+          "median_abs_jacobian_correction_rad": 0.00400079889669315,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.012332437154454296
+        },
+        {
+          "name": "left_wrist_pitch_joint",
+          "median_abs_target_error_rad": 0.06731711078413379,
+          "p95_abs_target_error_rad": 0.14647476182951533,
+          "median_abs_after_control_error_rad": 0.058748153185576885,
+          "median_abs_jacobian_correction_rad": 0.06793032831249396,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.4253436394001975
+        },
+        {
+          "name": "left_wrist_yaw_joint",
+          "median_abs_target_error_rad": 0.01821535845561388,
+          "p95_abs_target_error_rad": 0.049872167345347385,
+          "median_abs_after_control_error_rad": 0.02398274394949318,
+          "median_abs_jacobian_correction_rad": 0.016186130329656226,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.2149057732700431
+        }
+      ]
+    },
+    {
+      "study": "lateral-command-v5",
+      "case": "lateral_minus-corner-1-seed-23-swap-0",
+      "active_controls": 105,
+      "full_trace_sha256": "926d5bff66495edf97c00fc9f84112ecb9071cfb8606645b51656044074ddc0e",
+      "joints": [
+        {
+          "name": "left_shoulder_pitch_joint",
+          "median_abs_target_error_rad": 0.13328572819258555,
+          "p95_abs_target_error_rad": 0.16000000686527968,
+          "median_abs_after_control_error_rad": 0.09903865509743381,
+          "median_abs_jacobian_correction_rad": 0.1472427815752524,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.6826129745714489
+        },
+        {
+          "name": "left_shoulder_roll_joint",
+          "median_abs_target_error_rad": 0.054682823594239954,
+          "p95_abs_target_error_rad": 0.09611387540700554,
+          "median_abs_after_control_error_rad": 0.03184305277132657,
+          "median_abs_jacobian_correction_rad": 0.05468282436212252,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.8240487535909046
+        },
+        {
+          "name": "left_shoulder_yaw_joint",
+          "median_abs_target_error_rad": 0.10519401506739823,
+          "p95_abs_target_error_rad": 0.15529426782897712,
+          "median_abs_after_control_error_rad": 0.0716178869213201,
+          "median_abs_jacobian_correction_rad": 0.10519401281702767,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.337452848187626
+        },
+        {
+          "name": "left_elbow_joint",
+          "median_abs_target_error_rad": 0.06632565242587975,
+          "p95_abs_target_error_rad": 0.12558930905282828,
+          "median_abs_after_control_error_rad": 0.022256512560295483,
+          "median_abs_jacobian_correction_rad": 0.1548685049731225,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.7291823715209125
+        },
+        {
+          "name": "left_wrist_roll_joint",
+          "median_abs_target_error_rad": 0.013668956738741134,
+          "p95_abs_target_error_rad": 0.042519125840716716,
+          "median_abs_after_control_error_rad": 0.020604821966965614,
+          "median_abs_jacobian_correction_rad": 0.013866274251306904,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.459422793898029
+        },
+        {
+          "name": "left_wrist_pitch_joint",
+          "median_abs_target_error_rad": 0.1219560302300981,
+          "p95_abs_target_error_rad": 0.14201809889940856,
+          "median_abs_after_control_error_rad": 0.1419020883473897,
+          "median_abs_jacobian_correction_rad": 0.12082290114212635,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.7464592359554517
+        },
+        {
+          "name": "left_wrist_yaw_joint",
+          "median_abs_target_error_rad": 0.0694936813922426,
+          "p95_abs_target_error_rad": 0.243445327688468,
+          "median_abs_after_control_error_rad": 0.1265398277626636,
+          "median_abs_jacobian_correction_rad": 0.03192134708703337,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.8352356060426973
+        }
+      ]
+    },
+    {
+      "study": "lateral-command-v5",
+      "case": "lateral_plus-corner-1-seed-23-swap-0",
+      "active_controls": 30,
+      "full_trace_sha256": "5f735b868c800b790b485fca4583f2ef7b42b039c87c7fc2060cb619841497b1",
+      "joints": [
+        {
+          "name": "left_shoulder_pitch_joint",
+          "median_abs_target_error_rad": 0.10491335461785084,
+          "p95_abs_target_error_rad": 0.15999999865952683,
+          "median_abs_after_control_error_rad": 0.07707012039627775,
+          "median_abs_jacobian_correction_rad": 0.15123367183880684,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.4112976565826576
+        },
+        {
+          "name": "left_shoulder_roll_joint",
+          "median_abs_target_error_rad": 0.030066856618603126,
+          "p95_abs_target_error_rad": 0.0807013477770697,
+          "median_abs_after_control_error_rad": 0.018208013995501506,
+          "median_abs_jacobian_correction_rad": 0.030066854540188058,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.5651713573007324
+        },
+        {
+          "name": "left_shoulder_yaw_joint",
+          "median_abs_target_error_rad": 0.04551948362945593,
+          "p95_abs_target_error_rad": 0.09551833575806751,
+          "median_abs_after_control_error_rad": 0.031938626925759286,
+          "median_abs_jacobian_correction_rad": 0.04551948799823122,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.6155822388598806
+        },
+        {
+          "name": "left_elbow_joint",
+          "median_abs_target_error_rad": 0.07758341364211332,
+          "p95_abs_target_error_rad": 0.15601106724798838,
+          "median_abs_after_control_error_rad": 0.029371291088439777,
+          "median_abs_jacobian_correction_rad": 0.15999999999999998,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.8485357475830742
+        },
+        {
+          "name": "left_wrist_roll_joint",
+          "median_abs_target_error_rad": 0.004499354568542842,
+          "p95_abs_target_error_rad": 0.01341207800945757,
+          "median_abs_after_control_error_rad": 0.007035049583390594,
+          "median_abs_jacobian_correction_rad": 0.004499357927825597,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.1339544702186277
+        },
+        {
+          "name": "left_wrist_pitch_joint",
+          "median_abs_target_error_rad": 0.08051279537997685,
+          "p95_abs_target_error_rad": 0.13480828738348433,
+          "median_abs_after_control_error_rad": 0.0802306107626044,
+          "median_abs_jacobian_correction_rad": 0.0805128205280928,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.0032943516598736
+        },
+        {
+          "name": "left_wrist_yaw_joint",
+          "median_abs_target_error_rad": 0.01407760440626886,
+          "p95_abs_target_error_rad": 0.026668620857199822,
+          "median_abs_after_control_error_rad": 0.0323206636112327,
+          "median_abs_jacobian_correction_rad": 0.014077606969849825,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.7004804458231497
+        }
+      ]
+    },
+    {
+      "study": "lateral-command-v5",
+      "case": "lateral_minus-corner-1-seed-23-swap-1",
+      "active_controls": 105,
+      "full_trace_sha256": "d1ced00579ff81421b32bf9e5d936fb28df6e571f78690fdc910589568f128b1",
+      "joints": [
+        {
+          "name": "left_shoulder_pitch_joint",
+          "median_abs_target_error_rad": 0.12716824611672728,
+          "p95_abs_target_error_rad": 0.16000000393056737,
+          "median_abs_after_control_error_rad": 0.09621680912959912,
+          "median_abs_jacobian_correction_rad": 0.14421020508441812,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.5466051348763823
+        },
+        {
+          "name": "left_shoulder_roll_joint",
+          "median_abs_target_error_rad": 0.050764144577553516,
+          "p95_abs_target_error_rad": 0.11373558281929583,
+          "median_abs_after_control_error_rad": 0.03161734759360091,
+          "median_abs_jacobian_correction_rad": 0.05076415524904193,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.7632161573017628
+        },
+        {
+          "name": "left_shoulder_yaw_joint",
+          "median_abs_target_error_rad": 0.09407907778755614,
+          "p95_abs_target_error_rad": 0.15999999559039918,
+          "median_abs_after_control_error_rad": 0.06450763275819943,
+          "median_abs_jacobian_correction_rad": 0.09407907616281375,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.3260949702511071
+        },
+        {
+          "name": "left_elbow_joint",
+          "median_abs_target_error_rad": 0.06554405090170967,
+          "p95_abs_target_error_rad": 0.1315394262563945,
+          "median_abs_after_control_error_rad": 0.02382222637500545,
+          "median_abs_jacobian_correction_rad": 0.1508111791428981,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.6429735704386628
+        },
+        {
+          "name": "left_wrist_roll_joint",
+          "median_abs_target_error_rad": 0.011195380778101748,
+          "p95_abs_target_error_rad": 0.03647563363332041,
+          "median_abs_after_control_error_rad": 0.019678326295706094,
+          "median_abs_jacobian_correction_rad": 0.010678356785710635,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.3474739869186303
+        },
+        {
+          "name": "left_wrist_pitch_joint",
+          "median_abs_target_error_rad": 0.11080122854221536,
+          "p95_abs_target_error_rad": 0.14004774223325767,
+          "median_abs_after_control_error_rad": 0.1352531775621285,
+          "median_abs_jacobian_correction_rad": 0.11073659140660813,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.8403581266250224
+        },
+        {
+          "name": "left_wrist_yaw_joint",
+          "median_abs_target_error_rad": 0.042981108629262396,
+          "p95_abs_target_error_rad": 0.26184947689035487,
+          "median_abs_after_control_error_rad": 0.0918751313156681,
+          "median_abs_jacobian_correction_rad": 0.028534903135056633,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.2382656520660378
+        }
+      ]
+    },
+    {
+      "study": "lateral-command-v5",
+      "case": "lateral_plus-corner-1-seed-23-swap-1",
+      "active_controls": 105,
+      "full_trace_sha256": "59b4ba5dc014d980dae31f2cd01273651305495c258a0a7c1985482121599ea1",
+      "joints": [
+        {
+          "name": "left_shoulder_pitch_joint",
+          "median_abs_target_error_rad": 0.127518154257662,
+          "p95_abs_target_error_rad": 0.16000000690645425,
+          "median_abs_after_control_error_rad": 0.08919286918434619,
+          "median_abs_jacobian_correction_rad": 0.14724906963447304,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.5802938309829186
+        },
+        {
+          "name": "left_shoulder_roll_joint",
+          "median_abs_target_error_rad": 0.04973442234073152,
+          "p95_abs_target_error_rad": 0.0737478097956774,
+          "median_abs_after_control_error_rad": 0.03158665827607425,
+          "median_abs_jacobian_correction_rad": 0.04973442878513099,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.9153257614026175
+        },
+        {
+          "name": "left_shoulder_yaw_joint",
+          "median_abs_target_error_rad": 0.04238524070596472,
+          "p95_abs_target_error_rad": 0.11211744675746863,
+          "median_abs_after_control_error_rad": 0.02557744679394777,
+          "median_abs_jacobian_correction_rad": 0.042385237785062146,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.7590244611856837
+        },
+        {
+          "name": "left_elbow_joint",
+          "median_abs_target_error_rad": 0.058277381959307005,
+          "p95_abs_target_error_rad": 0.14104825927594158,
+          "median_abs_after_control_error_rad": 0.02269523691725743,
+          "median_abs_jacobian_correction_rad": 0.15999999999999998,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.7848602629641062
+        },
+        {
+          "name": "left_wrist_roll_joint",
+          "median_abs_target_error_rad": 0.00613134529496809,
+          "p95_abs_target_error_rad": 0.01769329068344238,
+          "median_abs_after_control_error_rad": 0.008489762307745757,
+          "median_abs_jacobian_correction_rad": 0.005986236766169238,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.14863012944889153
+        },
+        {
+          "name": "left_wrist_pitch_joint",
+          "median_abs_target_error_rad": 0.08931011399643429,
+          "p95_abs_target_error_rad": 0.12456513971707228,
+          "median_abs_after_control_error_rad": 0.07081882664749728,
+          "median_abs_jacobian_correction_rad": 0.09307390155900108,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.6843500638257456
+        },
+        {
+          "name": "left_wrist_yaw_joint",
+          "median_abs_target_error_rad": 0.015966881805594073,
+          "p95_abs_target_error_rad": 0.04700673874529008,
+          "median_abs_after_control_error_rad": 0.031038913154264713,
+          "median_abs_jacobian_correction_rad": 0.015126745057678331,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.6229823039891053
+        }
+      ]
+    },
+    {
+      "study": "guard-step-v7",
+      "case": "guard_step_positive-corner-0-seed-7-swap-0",
+      "active_controls": 75,
+      "full_trace_sha256": "3ee3678fb1f7e44a4804d5bc43bcc9f171bbdb2204775a3340def8c24a238838",
+      "joints": [
+        {
+          "name": "left_shoulder_pitch_joint",
+          "median_abs_target_error_rad": 0.12041397723146308,
+          "p95_abs_target_error_rad": 0.1599999994771525,
+          "median_abs_after_control_error_rad": 0.08133776816316474,
+          "median_abs_jacobian_correction_rad": 0.1410497698870269,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.9502849820532482
+        },
+        {
+          "name": "left_shoulder_roll_joint",
+          "median_abs_target_error_rad": 0.046119094592412035,
+          "p95_abs_target_error_rad": 0.08186745373012924,
+          "median_abs_after_control_error_rad": 0.02478159871060702,
+          "median_abs_jacobian_correction_rad": 0.046119097479056126,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.971188412622442
+        },
+        {
+          "name": "left_shoulder_yaw_joint",
+          "median_abs_target_error_rad": 0.0538728224406497,
+          "p95_abs_target_error_rad": 0.12489757032042696,
+          "median_abs_after_control_error_rad": 0.03178154241055603,
+          "median_abs_jacobian_correction_rad": 0.053872843519109787,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.0260531702561533
+        },
+        {
+          "name": "left_elbow_joint",
+          "median_abs_target_error_rad": 0.05665694372587984,
+          "p95_abs_target_error_rad": 0.13665908291176054,
+          "median_abs_after_control_error_rad": 0.020348273439405,
+          "median_abs_jacobian_correction_rad": 0.15999999999999998,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.712413171369937
+        },
+        {
+          "name": "left_wrist_roll_joint",
+          "median_abs_target_error_rad": 0.004986337615402764,
+          "p95_abs_target_error_rad": 0.023525723113071086,
+          "median_abs_after_control_error_rad": 0.006947099322136885,
+          "median_abs_jacobian_correction_rad": 0.0049863349981342925,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.08005284357483915
+        },
+        {
+          "name": "left_wrist_pitch_joint",
+          "median_abs_target_error_rad": 0.09173550856271112,
+          "p95_abs_target_error_rad": 0.1277601349822783,
+          "median_abs_after_control_error_rad": 0.07476166653152677,
+          "median_abs_jacobian_correction_rad": 0.09218859957852224,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.7560663040903313
+        },
+        {
+          "name": "left_wrist_yaw_joint",
+          "median_abs_target_error_rad": 0.017922023335673387,
+          "p95_abs_target_error_rad": 0.0888941072748966,
+          "median_abs_after_control_error_rad": 0.03471977004689927,
+          "median_abs_jacobian_correction_rad": 0.016120562463694706,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.36364065034466103
+        }
+      ]
+    },
+    {
+      "study": "guard-step-v7",
+      "case": "guard_step_positive-corner-0-seed-7-swap-1",
+      "active_controls": 75,
+      "full_trace_sha256": "8a997d6ae33e6a7305015a0b1ebd6bedabf81f0d78b88d2f058784c085fbdb9d",
+      "joints": [
+        {
+          "name": "left_shoulder_pitch_joint",
+          "median_abs_target_error_rad": 0.09515491544977639,
+          "p95_abs_target_error_rad": 0.1600000100231192,
+          "median_abs_after_control_error_rad": 0.07145335739068881,
+          "median_abs_jacobian_correction_rad": 0.12249071080877971,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.2131912548423327
+        },
+        {
+          "name": "left_shoulder_roll_joint",
+          "median_abs_target_error_rad": 0.0621822432585922,
+          "p95_abs_target_error_rad": 0.08482225188942995,
+          "median_abs_after_control_error_rad": 0.03272964781854862,
+          "median_abs_jacobian_correction_rad": 0.06218225807361891,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.9938989442137524
+        },
+        {
+          "name": "left_shoulder_yaw_joint",
+          "median_abs_target_error_rad": 0.05010970813371399,
+          "p95_abs_target_error_rad": 0.15999998890507391,
+          "median_abs_after_control_error_rad": 0.026745710937890965,
+          "median_abs_jacobian_correction_rad": 0.05111851249467714,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.9071445138000918
+        },
+        {
+          "name": "left_elbow_joint",
+          "median_abs_target_error_rad": 0.054260895608248316,
+          "p95_abs_target_error_rad": 0.14911291926952666,
+          "median_abs_after_control_error_rad": 0.017313627414590065,
+          "median_abs_jacobian_correction_rad": 0.16,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.6331723796398336
+        },
+        {
+          "name": "left_wrist_roll_joint",
+          "median_abs_target_error_rad": 0.00483903460037613,
+          "p95_abs_target_error_rad": 0.037197732846556905,
+          "median_abs_after_control_error_rad": 0.005682500354150771,
+          "median_abs_jacobian_correction_rad": 0.004735010425951772,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.02349727034141596
+        },
+        {
+          "name": "left_wrist_pitch_joint",
+          "median_abs_target_error_rad": 0.07348314245558311,
+          "p95_abs_target_error_rad": 0.13282755795661347,
+          "median_abs_after_control_error_rad": 0.0648904798062345,
+          "median_abs_jacobian_correction_rad": 0.07818023330099798,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.120942115871932
+        },
+        {
+          "name": "left_wrist_yaw_joint",
+          "median_abs_target_error_rad": 0.014351185257055296,
+          "p95_abs_target_error_rad": 0.0481154944751917,
+          "median_abs_after_control_error_rad": 0.02341457345289666,
+          "median_abs_jacobian_correction_rad": 0.013932673584490893,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.29646293857480327
+        }
+      ]
+    },
+    {
+      "study": "guard-step-v7",
+      "case": "guard_step_positive-corner-0-seed-23-swap-0",
+      "active_controls": 105,
+      "full_trace_sha256": "0de1e8ae23af8e69e59f598f54718ddbea601d1d23a0d69730ae3c3abcbd0433",
+      "joints": [
+        {
+          "name": "left_shoulder_pitch_joint",
+          "median_abs_target_error_rad": 0.12950189849188004,
+          "p95_abs_target_error_rad": 0.16000001265786423,
+          "median_abs_after_control_error_rad": 0.09002354396118878,
+          "median_abs_jacobian_correction_rad": 0.15499079271026817,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.7888668032506951
+        },
+        {
+          "name": "left_shoulder_roll_joint",
+          "median_abs_target_error_rad": 0.05339151638365956,
+          "p95_abs_target_error_rad": 0.077389662814345,
+          "median_abs_after_control_error_rad": 0.03185822908283578,
+          "median_abs_jacobian_correction_rad": 0.05368115241717307,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.8832602932997944
+        },
+        {
+          "name": "left_shoulder_yaw_joint",
+          "median_abs_target_error_rad": 0.05158052638020372,
+          "p95_abs_target_error_rad": 0.12506925842446617,
+          "median_abs_after_control_error_rad": 0.0357258397879313,
+          "median_abs_jacobian_correction_rad": 0.051580525111026454,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.7518700258633786
+        },
+        {
+          "name": "left_elbow_joint",
+          "median_abs_target_error_rad": 0.05432980036902219,
+          "p95_abs_target_error_rad": 0.1304628957263977,
+          "median_abs_after_control_error_rad": 0.02016104888955049,
+          "median_abs_jacobian_correction_rad": 0.15134823026212574,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.6113726684515624
+        },
+        {
+          "name": "left_wrist_roll_joint",
+          "median_abs_target_error_rad": 0.006491418755580633,
+          "p95_abs_target_error_rad": 0.01624264055358967,
+          "median_abs_after_control_error_rad": 0.008824917899667082,
+          "median_abs_jacobian_correction_rad": 0.006491419335238988,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.1021541857942273
+        },
+        {
+          "name": "left_wrist_pitch_joint",
+          "median_abs_target_error_rad": 0.08004475073211353,
+          "p95_abs_target_error_rad": 0.13289406229823988,
+          "median_abs_after_control_error_rad": 0.060046329967563705,
+          "median_abs_jacobian_correction_rad": 0.08202922570971598,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.9206870479796314
+        },
+        {
+          "name": "left_wrist_yaw_joint",
+          "median_abs_target_error_rad": 0.019079392955693858,
+          "p95_abs_target_error_rad": 0.0475897466687298,
+          "median_abs_after_control_error_rad": 0.036907866946097184,
+          "median_abs_jacobian_correction_rad": 0.018746784425597747,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.556797011714583
+        }
+      ]
+    },
+    {
+      "study": "guard-step-v7",
+      "case": "guard_step_positive-corner-0-seed-23-swap-1",
+      "active_controls": 60,
+      "full_trace_sha256": "d0e6e8395134b93f06fa5376d59802ab294a1173bd7cbef0bc9b7a9076d62b42",
+      "joints": [
+        {
+          "name": "left_shoulder_pitch_joint",
+          "median_abs_target_error_rad": 0.11671689748996097,
+          "p95_abs_target_error_rad": 0.16000001253137763,
+          "median_abs_after_control_error_rad": 0.07974690750705415,
+          "median_abs_jacobian_correction_rad": 0.1318022190944576,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.6959415541115108
+        },
+        {
+          "name": "left_shoulder_roll_joint",
+          "median_abs_target_error_rad": 0.0530339220770228,
+          "p95_abs_target_error_rad": 0.08279863485211952,
+          "median_abs_after_control_error_rad": 0.028563524702170606,
+          "median_abs_jacobian_correction_rad": 0.05303392685949339,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.0810533028336389
+        },
+        {
+          "name": "left_shoulder_yaw_joint",
+          "median_abs_target_error_rad": 0.0498592083589227,
+          "p95_abs_target_error_rad": 0.1472715707205937,
+          "median_abs_after_control_error_rad": 0.03229994790603037,
+          "median_abs_jacobian_correction_rad": 0.049859225580249855,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.8918173416811412
+        },
+        {
+          "name": "left_elbow_joint",
+          "median_abs_target_error_rad": 0.06343334066362553,
+          "p95_abs_target_error_rad": 0.14266145173481165,
+          "median_abs_after_control_error_rad": 0.021972072295065766,
+          "median_abs_jacobian_correction_rad": 0.15999999999999998,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.4868649575663326
+        },
+        {
+          "name": "left_wrist_roll_joint",
+          "median_abs_target_error_rad": 0.005419827030774593,
+          "p95_abs_target_error_rad": 0.025544857176651198,
+          "median_abs_after_control_error_rad": 0.006186756370492125,
+          "median_abs_jacobian_correction_rad": 0.005419827514388323,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.056221379268629086
+        },
+        {
+          "name": "left_wrist_pitch_joint",
+          "median_abs_target_error_rad": 0.08860022151145915,
+          "p95_abs_target_error_rad": 0.1379313179471389,
+          "median_abs_after_control_error_rad": 0.063325227386759,
+          "median_abs_jacobian_correction_rad": 0.08976308721365658,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.8739057524976035
+        },
+        {
+          "name": "left_wrist_yaw_joint",
+          "median_abs_target_error_rad": 0.01528010689102893,
+          "p95_abs_target_error_rad": 0.04875995114789334,
+          "median_abs_after_control_error_rad": 0.031139933301332412,
+          "median_abs_jacobian_correction_rad": 0.015072724562635764,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.21201090773975995
+        }
+      ]
+    },
+    {
+      "study": "guard-step-v7",
+      "case": "guard_step_positive-corner-1-seed-7-swap-0",
+      "active_controls": 105,
+      "full_trace_sha256": "df8bfb051a3d76eada2d4c64e128fd385ac316bd51110b56c099f791941b4bc5",
+      "joints": [
+        {
+          "name": "left_shoulder_pitch_joint",
+          "median_abs_target_error_rad": 0.12507775802952448,
+          "p95_abs_target_error_rad": 0.16000000625254507,
+          "median_abs_after_control_error_rad": 0.0822236818393024,
+          "median_abs_jacobian_correction_rad": 0.14885542903694965,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 2.0424773828903326
+        },
+        {
+          "name": "left_shoulder_roll_joint",
+          "median_abs_target_error_rad": 0.050270741662418544,
+          "p95_abs_target_error_rad": 0.07701000227424024,
+          "median_abs_after_control_error_rad": 0.02622791765904216,
+          "median_abs_jacobian_correction_rad": 0.050270751751937376,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.0760529167042892
+        },
+        {
+          "name": "left_shoulder_yaw_joint",
+          "median_abs_target_error_rad": 0.0515501925747629,
+          "p95_abs_target_error_rad": 0.11695754085389498,
+          "median_abs_after_control_error_rad": 0.033943818546689486,
+          "median_abs_jacobian_correction_rad": 0.05155020591446807,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.8437969514982454
+        },
+        {
+          "name": "left_elbow_joint",
+          "median_abs_target_error_rad": 0.05490957871259908,
+          "p95_abs_target_error_rad": 0.13775215676747513,
+          "median_abs_after_control_error_rad": 0.01752680908190715,
+          "median_abs_jacobian_correction_rad": 0.15999999999999998,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.531026001939252
+        },
+        {
+          "name": "left_wrist_roll_joint",
+          "median_abs_target_error_rad": 0.006917626174530872,
+          "p95_abs_target_error_rad": 0.01775202874546982,
+          "median_abs_after_control_error_rad": 0.008691985930035964,
+          "median_abs_jacobian_correction_rad": 0.006912580528225076,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.04413095245427466
+        },
+        {
+          "name": "left_wrist_pitch_joint",
+          "median_abs_target_error_rad": 0.08292992439684184,
+          "p95_abs_target_error_rad": 0.12600780194661587,
+          "median_abs_after_control_error_rad": 0.06691576015990795,
+          "median_abs_jacobian_correction_rad": 0.08317259699930478,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.9394299482314878
+        },
+        {
+          "name": "left_wrist_yaw_joint",
+          "median_abs_target_error_rad": 0.018360213190933297,
+          "p95_abs_target_error_rad": 0.04207711875644327,
+          "median_abs_after_control_error_rad": 0.034150644019862245,
+          "median_abs_jacobian_correction_rad": 0.017449188217121922,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.2153083007066258
+        }
+      ]
+    },
+    {
+      "study": "guard-step-v7",
+      "case": "guard_step_positive-corner-1-seed-7-swap-1",
+      "active_controls": 90,
+      "full_trace_sha256": "af2a2ad3b52018366f8cee799e2a4c67654e3abe2234e4e2752b5ef21575a6f1",
+      "joints": [
+        {
+          "name": "left_shoulder_pitch_joint",
+          "median_abs_target_error_rad": 0.10641251287210601,
+          "p95_abs_target_error_rad": 0.16000000314947863,
+          "median_abs_after_control_error_rad": 0.07203331163122875,
+          "median_abs_jacobian_correction_rad": 0.14541813101154719,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.4930578495377538
+        },
+        {
+          "name": "left_shoulder_roll_joint",
+          "median_abs_target_error_rad": 0.05338989329347557,
+          "p95_abs_target_error_rad": 0.07949093148438974,
+          "median_abs_after_control_error_rad": 0.029969986172299803,
+          "median_abs_jacobian_correction_rad": 0.053389894312840754,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.8936446635040955
+        },
+        {
+          "name": "left_shoulder_yaw_joint",
+          "median_abs_target_error_rad": 0.04949404520628671,
+          "p95_abs_target_error_rad": 0.15999999186339112,
+          "median_abs_after_control_error_rad": 0.029538089241803456,
+          "median_abs_jacobian_correction_rad": 0.04974330961196795,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.9916941215052555
+        },
+        {
+          "name": "left_elbow_joint",
+          "median_abs_target_error_rad": 0.057345291906246605,
+          "p95_abs_target_error_rad": 0.1478536750709524,
+          "median_abs_after_control_error_rad": 0.017925152011370668,
+          "median_abs_jacobian_correction_rad": 0.15591526025257493,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.5017634230758494
+        },
+        {
+          "name": "left_wrist_roll_joint",
+          "median_abs_target_error_rad": 0.004808615752356422,
+          "p95_abs_target_error_rad": 0.021827918580705107,
+          "median_abs_after_control_error_rad": 0.005802870720521373,
+          "median_abs_jacobian_correction_rad": 0.004377254114416978,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.020213910369011923
+        },
+        {
+          "name": "left_wrist_pitch_joint",
+          "median_abs_target_error_rad": 0.06216857237530804,
+          "p95_abs_target_error_rad": 0.13372299872777071,
+          "median_abs_after_control_error_rad": 0.04641431651220085,
+          "median_abs_jacobian_correction_rad": 0.07401205900971033,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.171690578168592
+        },
+        {
+          "name": "left_wrist_yaw_joint",
+          "median_abs_target_error_rad": 0.015605258378794624,
+          "p95_abs_target_error_rad": 0.0790460215470957,
+          "median_abs_after_control_error_rad": 0.02690735771617024,
+          "median_abs_jacobian_correction_rad": 0.015227678631194733,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.32414842398146915
+        }
+      ]
+    },
+    {
+      "study": "guard-step-v7",
+      "case": "guard_step_positive-corner-1-seed-23-swap-0",
+      "active_controls": 105,
+      "full_trace_sha256": "321f35d323cd72e16ea7f79feaeadec86946eb633f6767388484197289041b08",
+      "joints": [
+        {
+          "name": "left_shoulder_pitch_joint",
+          "median_abs_target_error_rad": 0.11484878703049223,
+          "p95_abs_target_error_rad": 0.16000000532613545,
+          "median_abs_after_control_error_rad": 0.07569745227533509,
+          "median_abs_jacobian_correction_rad": 0.1438951926795119,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.7110091476402998
+        },
+        {
+          "name": "left_shoulder_roll_joint",
+          "median_abs_target_error_rad": 0.044644592068033145,
+          "p95_abs_target_error_rad": 0.07904084489620324,
+          "median_abs_after_control_error_rad": 0.027293103614844563,
+          "median_abs_jacobian_correction_rad": 0.04464458352814146,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.8926551687350844
+        },
+        {
+          "name": "left_shoulder_yaw_joint",
+          "median_abs_target_error_rad": 0.05085546858835346,
+          "p95_abs_target_error_rad": 0.11675313681453343,
+          "median_abs_after_control_error_rad": 0.03282585656870185,
+          "median_abs_jacobian_correction_rad": 0.050855464653428724,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.877090515230736
+        },
+        {
+          "name": "left_elbow_joint",
+          "median_abs_target_error_rad": 0.06030517833534978,
+          "p95_abs_target_error_rad": 0.14485744456792976,
+          "median_abs_after_control_error_rad": 0.02086986827960703,
+          "median_abs_jacobian_correction_rad": 0.15999999999999998,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.4998673437306982
+        },
+        {
+          "name": "left_wrist_roll_joint",
+          "median_abs_target_error_rad": 0.005274706031538415,
+          "p95_abs_target_error_rad": 0.015494862317755495,
+          "median_abs_after_control_error_rad": 0.00525050572230135,
+          "median_abs_jacobian_correction_rad": 0.005355814362266009,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.05886584661347978
+        },
+        {
+          "name": "left_wrist_pitch_joint",
+          "median_abs_target_error_rad": 0.08957061234744243,
+          "p95_abs_target_error_rad": 0.13107038439788304,
+          "median_abs_after_control_error_rad": 0.07758787463797205,
+          "median_abs_jacobian_correction_rad": 0.08961355368231193,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.8303563409874875
+        },
+        {
+          "name": "left_wrist_yaw_joint",
+          "median_abs_target_error_rad": 0.016827755485180444,
+          "p95_abs_target_error_rad": 0.03650521703372518,
+          "median_abs_after_control_error_rad": 0.029937805711316767,
+          "median_abs_jacobian_correction_rad": 0.016249583372702277,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.5368213947199068
+        }
+      ]
+    },
+    {
+      "study": "guard-step-v7",
+      "case": "guard_step_positive-corner-1-seed-23-swap-1",
+      "active_controls": 105,
+      "full_trace_sha256": "cb45a1d709c06905843a1bd49853a4830e2aadcda80d74020e4ebfa13e652e3d",
+      "joints": [
+        {
+          "name": "left_shoulder_pitch_joint",
+          "median_abs_target_error_rad": 0.11999567583095222,
+          "p95_abs_target_error_rad": 0.16000000883275095,
+          "median_abs_after_control_error_rad": 0.07851923916017056,
+          "median_abs_jacobian_correction_rad": 0.14568854523953179,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.5889402681640388
+        },
+        {
+          "name": "left_shoulder_roll_joint",
+          "median_abs_target_error_rad": 0.04505790214843762,
+          "p95_abs_target_error_rad": 0.07816276902627209,
+          "median_abs_after_control_error_rad": 0.027451169605196633,
+          "median_abs_jacobian_correction_rad": 0.04505791212149514,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.9051535517021607
+        },
+        {
+          "name": "left_shoulder_yaw_joint",
+          "median_abs_target_error_rad": 0.056376747440089914,
+          "p95_abs_target_error_rad": 0.12047543912209521,
+          "median_abs_after_control_error_rad": 0.03808914856970855,
+          "median_abs_jacobian_correction_rad": 0.05637673589198977,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.8181798556350446
+        },
+        {
+          "name": "left_elbow_joint",
+          "median_abs_target_error_rad": 0.06303547194580116,
+          "p95_abs_target_error_rad": 0.13713798119500917,
+          "median_abs_after_control_error_rad": 0.02387437323540599,
+          "median_abs_jacobian_correction_rad": 0.15999999999999998,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 1.6381698053180767
+        },
+        {
+          "name": "left_wrist_roll_joint",
+          "median_abs_target_error_rad": 0.005716086800950326,
+          "p95_abs_target_error_rad": 0.021807746713284195,
+          "median_abs_after_control_error_rad": 0.008057482979998629,
+          "median_abs_jacobian_correction_rad": 0.005678071795385695,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.31011811263875644
+        },
+        {
+          "name": "left_wrist_pitch_joint",
+          "median_abs_target_error_rad": 0.09300668202029183,
+          "p95_abs_target_error_rad": 0.2980432518480584,
+          "median_abs_after_control_error_rad": 0.09034199441394783,
+          "median_abs_jacobian_correction_rad": 0.09291803883197854,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.6978694150104953
+        },
+        {
+          "name": "left_wrist_yaw_joint",
+          "median_abs_target_error_rad": 0.017933247060476915,
+          "p95_abs_target_error_rad": 0.11807053455558006,
+          "median_abs_after_control_error_rad": 0.038943930059184645,
+          "median_abs_jacobian_correction_rad": 0.017933245663683012,
+          "fraction_actuator_ctrl_clipped": 0.0,
+          "median_abs_joint_speed": 0.8018935112475146
+        }
+      ]
+    }
+  ],
+  "summary": [
+    {
+      "study": "terminal-dwell-v3",
+      "name": "left_shoulder_pitch_joint",
+      "active_joint_samples": 840,
+      "median_abs_target_error_rad": 0.11994971400161172,
+      "p95_abs_target_error_rad": 0.16000000707840167,
+      "median_abs_after_control_error_rad": 0.08223717201716349
+    },
+    {
+      "study": "terminal-dwell-v3",
+      "name": "left_shoulder_roll_joint",
+      "active_joint_samples": 840,
+      "median_abs_target_error_rad": 0.051610732199009364,
+      "p95_abs_target_error_rad": 0.08790551629558277,
+      "median_abs_after_control_error_rad": 0.02818178278444527
+    },
+    {
+      "study": "terminal-dwell-v3",
+      "name": "left_shoulder_yaw_joint",
+      "active_joint_samples": 840,
+      "median_abs_target_error_rad": 0.06497459951914836,
+      "p95_abs_target_error_rad": 0.12845632156712652,
+      "median_abs_after_control_error_rad": 0.04459411317100105
+    },
+    {
+      "study": "terminal-dwell-v3",
+      "name": "left_elbow_joint",
+      "active_joint_samples": 840,
+      "median_abs_target_error_rad": 0.061382496298875835,
+      "p95_abs_target_error_rad": 0.14028944301355387,
+      "median_abs_after_control_error_rad": 0.02135757970574384
+    },
+    {
+      "study": "terminal-dwell-v3",
+      "name": "left_wrist_roll_joint",
+      "active_joint_samples": 840,
+      "median_abs_target_error_rad": 0.007724140164125051,
+      "p95_abs_target_error_rad": 0.02137777584160941,
+      "median_abs_after_control_error_rad": 0.011066211853091545
+    },
+    {
+      "study": "terminal-dwell-v3",
+      "name": "left_wrist_pitch_joint",
+      "active_joint_samples": 840,
+      "median_abs_target_error_rad": 0.0997939143227613,
+      "p95_abs_target_error_rad": 0.132892032821409,
+      "median_abs_after_control_error_rad": 0.09973745045026162
+    },
+    {
+      "study": "terminal-dwell-v3",
+      "name": "left_wrist_yaw_joint",
+      "active_joint_samples": 840,
+      "median_abs_target_error_rad": 0.02552941291442635,
+      "p95_abs_target_error_rad": 0.10733691574870821,
+      "median_abs_after_control_error_rad": 0.053501036522210915
+    },
+    {
+      "study": "lateral-command-v5",
+      "name": "left_shoulder_pitch_joint",
+      "active_joint_samples": 1489,
+      "median_abs_target_error_rad": 0.1255489592570509,
+      "p95_abs_target_error_rad": 0.16000001131962288,
+      "median_abs_after_control_error_rad": 0.08988407169263457
+    },
+    {
+      "study": "lateral-command-v5",
+      "name": "left_shoulder_roll_joint",
+      "active_joint_samples": 1489,
+      "median_abs_target_error_rad": 0.04939720872406303,
+      "p95_abs_target_error_rad": 0.09676303908847977,
+      "median_abs_after_control_error_rad": 0.028127340834067247
+    },
+    {
+      "study": "lateral-command-v5",
+      "name": "left_shoulder_yaw_joint",
+      "active_joint_samples": 1489,
+      "median_abs_target_error_rad": 0.07548075788417627,
+      "p95_abs_target_error_rad": 0.15339173349805174,
+      "median_abs_after_control_error_rad": 0.04624095448080938
+    },
+    {
+      "study": "lateral-command-v5",
+      "name": "left_elbow_joint",
+      "active_joint_samples": 1489,
+      "median_abs_target_error_rad": 0.061676184740293225,
+      "p95_abs_target_error_rad": 0.13970911276611006,
+      "median_abs_after_control_error_rad": 0.021950274273094095
+    },
+    {
+      "study": "lateral-command-v5",
+      "name": "left_wrist_roll_joint",
+      "active_joint_samples": 1489,
+      "median_abs_target_error_rad": 0.008199805568850922,
+      "p95_abs_target_error_rad": 0.0350434905331379,
+      "median_abs_after_control_error_rad": 0.011599200934678047
+    },
+    {
+      "study": "lateral-command-v5",
+      "name": "left_wrist_pitch_joint",
+      "active_joint_samples": 1489,
+      "median_abs_target_error_rad": 0.09902697368230082,
+      "p95_abs_target_error_rad": 0.14075907531764523,
+      "median_abs_after_control_error_rad": 0.10898572336573707
+    },
+    {
+      "study": "lateral-command-v5",
+      "name": "left_wrist_yaw_joint",
+      "active_joint_samples": 1489,
+      "median_abs_target_error_rad": 0.031577900320223076,
+      "p95_abs_target_error_rad": 0.21911847572135232,
+      "median_abs_after_control_error_rad": 0.05461902327339785
+    },
+    {
+      "study": "guard-step-v7",
+      "name": "left_shoulder_pitch_joint",
+      "active_joint_samples": 720,
+      "median_abs_target_error_rad": 0.11750793001274346,
+      "p95_abs_target_error_rad": 0.16000000899832542,
+      "median_abs_after_control_error_rad": 0.07900592512823634
+    },
+    {
+      "study": "guard-step-v7",
+      "name": "left_shoulder_roll_joint",
+      "active_joint_samples": 720,
+      "median_abs_target_error_rad": 0.050557721352011545,
+      "p95_abs_target_error_rad": 0.08055754487275414,
+      "median_abs_after_control_error_rad": 0.02793923112435609
+    },
+    {
+      "study": "guard-step-v7",
+      "name": "left_shoulder_yaw_joint",
+      "active_joint_samples": 720,
+      "median_abs_target_error_rad": 0.05185322481514826,
+      "p95_abs_target_error_rad": 0.1340944875265467,
+      "median_abs_after_control_error_rad": 0.033225086069257226
+    },
+    {
+      "study": "guard-step-v7",
+      "name": "left_elbow_joint",
+      "active_joint_samples": 720,
+      "median_abs_target_error_rad": 0.05823407136362345,
+      "p95_abs_target_error_rad": 0.1420464586407988,
+      "median_abs_after_control_error_rad": 0.019948135664530332
+    },
+    {
+      "study": "guard-step-v7",
+      "name": "left_wrist_roll_joint",
+      "active_joint_samples": 720,
+      "median_abs_target_error_rad": 0.005795322785651091,
+      "p95_abs_target_error_rad": 0.020855437424989832,
+      "median_abs_after_control_error_rad": 0.00706084355763913
+    },
+    {
+      "study": "guard-step-v7",
+      "name": "left_wrist_pitch_joint",
+      "active_joint_samples": 720,
+      "median_abs_target_error_rad": 0.08408958284082323,
+      "p95_abs_target_error_rad": 0.1339972330354412,
+      "median_abs_after_control_error_rad": 0.0687119132166639
+    },
+    {
+      "study": "guard-step-v7",
+      "name": "left_wrist_yaw_joint",
+      "active_joint_samples": 720,
+      "median_abs_target_error_rad": 0.01726032796009962,
+      "p95_abs_target_error_rad": 0.0515308241736355,
+      "median_abs_after_control_error_rad": 0.031275443929612
+    }
+  ],
+  "limitations": [
+    "Target error does not isolate collision, actuator or feedback causes.",
+    "Legacy and current action interfaces/scales are different contracts; gain differences do not alone prove the cause of failed punches.",
+    "No learned training or physical feasibility test is performed."
+  ]
+}

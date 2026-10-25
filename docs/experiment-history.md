@@ -285,3 +285,25 @@ Reject the handoff as sufficient and stop unchanged dwell/lateral sweeps. Next
 audit original/current arm action contracts and actual joint-target tracking in
 source/saved trajectories before another prospectively bounded physical change.
 No motor unfreezing, larger authority, weaker gates or PPO/BC extension justified.
+
+## Arm audit and learned-cycle objective, 2026-10-25
+
+[Compiled metadata/saved-array audit](results/striking-pilot/arm-contract-v1/README.md)
+checks 32 trajectories without new physical controls or selected-state kinematics:
+correct action/joint maps, zero native actuator target clipping, measured finite
+joint tracking; wrist gain difference was already documented, not isolated as a
+failure cause. Short scripted tests reject those scripts, not the possibility of
+learning; a perfect scripted teacher is not a prerequisite for all further PPO.
+
+[Prospective version 14](striking-motion-cycle-training.md) resumes actual latest
+fixed-control final 3a34aa85 with actor/critic/Adam/RNG/norm intact, explicitly
+removes legacy touch payments and zeroes obsolete touch-retention loss, adds
+completed-cycle rewards and bounded native forward preparation. Neither shape
+reward nor hours elapsed certify punching. Independent full original contact
+and per-hand motion gates plus fresh final holdouts remain required.
+Allocate at most 1,048,576 new diagnostic learner credits (2,163,968 -> 3,212,544)
+and 72,000 formal evaluation controls (2,073,802 -> 2,145,802). First 1,024-credit
+integration is included. New training collection world controls recorded apart
+from formal evaluation; main remains 476,041,216. No new geometry/BC/render budget.
+Do not call zero cycles in early minutes a learned impossibility result; stop
+numerical faults immediately and review the full bounded history before extension.

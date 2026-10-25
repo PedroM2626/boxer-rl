@@ -150,6 +150,11 @@ def main(argv=None):
         if saved.get('training_kind')=='ppo' and saved.get('optimizer_kind')=='split_adam_v1':
             from boxer.striking_train import require_ppo_checkpoint
             require_ppo_checkpoint(saved)
+        if saved.get('motion_cycle_ppo') or manifest.get('motion_cycle_ppo') or config.get('motion_cycle_ppo'):
+            from boxer.striking_motion_reward import PROFILE as MOTION_PROFILE
+            if (not all(x.get('motion_cycle_ppo') for x in (saved,manifest,config)) or config.get('version')!=14
+                    or any(x.get('motion_reward_profile')!=MOTION_PROFILE for x in (saved,manifest,config))):
+                raise ValueError('manifest, configuration and saved motion reward disagree')
         if manifest.get('kl_guard_ppo',False)!=saved.get('kl_guard_ppo',False) or manifest.get('kl_guard_target')!=saved.get('kl_guard_target'):
             raise ValueError('manifest and saved KL guard profile disagree')
         if manifest.get('long_gae_ppo',False)!=saved.get('long_gae_ppo',False) or manifest.get('training_gae_lambda')!=saved.get('training_gae_lambda'):

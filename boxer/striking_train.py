@@ -103,6 +103,9 @@ def validate_resume_config(previous, current, explicit_profile_change=False):
 def require_ppo_checkpoint(saved):
     if saved.get('training_kind','ppo')!='ppo' or saved.get('ppo_optimizer_compatible') is False:
         raise ValueError('non-PPO checkpoint requires an explicit validated optimizer migration before PPO resume')
+    if 'motion_cycle_transition' in saved or 'motion_reward_profile' in saved or saved.get('motion_cycle_ppo'):
+        from boxer.striking_motion_reward import validate_motion_metadata
+        validate_motion_metadata(saved)
     kind=saved.get('optimizer_kind')
     if kind is not None:
         from boxer.striking_ppo_warmstart import OPTIMIZER_KIND,validate_split_checkpoint
@@ -192,6 +195,7 @@ def main(argv=None):
     parser.add_argument('--reduced-noise-ppo',action='store_true',help='explicit half-standard-deviation on-policy sampling profile')
     parser.add_argument('--kl-guard-ppo',action='store_true',help='explicit actor-only full-rollout KL stop, critic keeps all updates')
     parser.add_argument('--long-gae-ppo',action='store_true',help='explicit lambda .99 over latest original fixed-opponent control')
+    parser.add_argument('--motion-cycle-ppo',action='store_true',help='versioned complete-cycle reward with obsolete touch-teacher loss disabled')
     parser.add_argument('--pool-opponent-ppo',action='store_true',help='explicit immutable archived opponent pool over the latest long-GAE source')
     parser.add_argument('--conservative-actor-ppo',action='store_true')
     parser.add_argument('--actor-learning-rate',type=float,choices=(.0001,.00001),default=.0001)
@@ -211,7 +215,7 @@ def main(argv=None):
         raise ValueError('demonstration PPO requires contact resume without the rejected anchor-only profile')
     if not args.demonstration_ppo and args.retention_loss_weight!=0.:
         raise ValueError('retention loss requires explicit demonstration PPO')
-    if args.neutral_contact_ppo and (not args.demonstration_ppo or args.retention_loss_weight!=1.):
+    if args.neutral_contact_ppo and (not args.demonstration_ppo or args.retention_loss_weight!=(0. if args.motion_cycle_ppo else 1.)):
         raise ValueError('neutral contact task requires the reviewed demonstration-retention path')
     if args.credit_horizon_ppo and not args.neutral_contact_ppo:
         raise ValueError('credit-horizon comparison requires the reviewed neutral task')
@@ -232,6 +236,8 @@ def main(argv=None):
         raise ValueError('KL guard requires original covariance and fixed-opponent rewards')
     if args.long_gae_ppo and (not args.fixed_opponent_ppo or args.kl_guard_ppo or args.reduced_noise_ppo or args.posture_cost_ppo):
         raise ValueError('long GAE requires the original fixed-opponent update and reward path')
+    if args.motion_cycle_ppo and (not args.long_gae_ppo or args.pool_opponent_ppo or args.retention_loss_weight!=0.):
+        raise ValueError('motion-cycle training requires original long-GAE fixed task and zero teacher loss')
     if args.pool_opponent_ppo and not args.long_gae_ppo:
         raise ValueError('opponent pool requires the explicit inherited long-GAE profile')
     if args.conservative_actor_ppo and (not args.mixed_partner_ppo or args.actor_learning_rate!=.00001):
@@ -286,6 +292,7 @@ def train(args):
     kl_guard_ppo=getattr(args,'kl_guard_ppo',False)
     long_gae_ppo=getattr(args,'long_gae_ppo',False)
     pool_opponent_ppo=getattr(args,'pool_opponent_ppo',False)
+    motion_cycle_ppo=getattr(args,'motion_cycle_ppo',False)
     env_class=StrikingEnv
     if contact_ppo:
         from boxer.striking_contact import ContactAwareStrikingEnv
@@ -361,6 +368,10 @@ def train(args):
                                 if pool_opponent_ppo:
                                     interface_metadata.update(pool_opponent_ppo=True)
                                     config.update(interface_metadata,version=13)
+    if motion_cycle_ppo:
+        from boxer.striking_motion_reward import PROFILE as MOTION_PROFILE
+        interface_metadata.update(motion_cycle_ppo=True,motion_reward_profile=MOTION_PROFILE)
+        config.update(interface_metadata,version=14)
     checkpoint_path=args.output/'checkpoint/latest.json'
     if previous:
         if not args.resume:
@@ -383,6 +394,8 @@ def train(args):
             raise ValueError('boxing checkpoint checksum mismatch')
         saved=pickle.loads(payload)
         require_ppo_checkpoint(saved)
+        if motion_cycle_ppo != saved.get('motion_cycle_ppo',False):
+            raise ValueError('motion-cycle checkpoint and explicit training reward must agree')
         if demonstration_ppo != saved.get('demonstration_ppo',False):
             raise ValueError('explicit demonstration checkpoint and training path must agree')
         if neutral_contact_ppo != saved.get('neutral_contact_ppo',False):
@@ -491,6 +504,10 @@ def train(args):
     for env in envs[1:]:env.motor=envs[0].motor
     episode=np.full(args.worlds,consumed//rows,dtype=np.int64)
     obs=np.stack([env.reset(args.seed+1009*i+int(episode[i]),swap=bool(i%2)) for i,env in enumerate(envs)]).reshape(rows,observation_size)
+    if motion_cycle_ppo:
+        from boxer.striking_motion_reward import MotionCycleMonitor,replace_contact_payment
+        motion_monitors=[MotionCycleMonitor() for env in envs]
+        for env,monitor in zip(envs,motion_monitors):env.env.pair.diagnostic_punch_trace=monitor
     if pool_opponent_ppo:
         from boxer.striking_opponent_pool import (restore_sampler, draw_opponent,
             validate_pool_ledger, pool_predictor, OFFSET)
@@ -518,6 +535,10 @@ def train(args):
         mixed_credits=np.maximum(np.asarray(continuation['mixed_credits_by_mode_and_corner'],dtype=np.int64),
             np.asarray(progress.get('mixed_credits_by_mode_and_corner',[[0,0],[0,0]]),dtype=np.int64))
     scored=np.zeros(2)
+    motion_cycles=np.asarray(progress.get('motion_cycles_by_corner',[0.,0.]),float) if motion_cycle_ppo else np.zeros(2)
+    motion_own=float(progress.get('motion_learner_cycles_total',0.)) if motion_cycle_ppo else 0.
+    motion_other=float(progress.get('motion_opponent_cycles_total',0.)) if motion_cycle_ppo else 0.
+    motion_dense=0.
     posture_cost_sum=0.
     def record(status='running',**extra):
         progress=dict(consumed_steps=consumed,optimized_steps=optimized,
@@ -534,6 +555,7 @@ def train(args):
             validate_pool_ledger(pool_credits,mixed_credits)
             progress.update(pool_credits_by_opponent_and_corner=pool_credits.tolist(),
                 pool_sampler_state=pool_rng.bit_generator.state,pool_assignments=pool_assignments.tolist())
+        if motion_cycle_ppo:progress.update(motion_cycles_by_corner=motion_cycles.tolist(),motion_learner_cycles_total=motion_own,motion_opponent_cycles_total=motion_other,session_motion_dense_reward=motion_dense)
         if posture_cost_ppo:progress['session_posture_cost']=posture_cost_sum
         if kl_guard_ppo:progress.update(kl_guard_actor_steps_total=sum(guard_steps),last_kl_guard=last_guard)
         atomic_json(args.output/'progress.json',progress)
@@ -583,6 +605,10 @@ def train(args):
                     next_obs,reward,done,outcome=env.step(actions[i],
                         opponent_actions[i] if env.active_opponent else None)
                 else:next_obs,reward,done,outcome=env.step(actions[i])
+                if motion_cycle_ppo:
+                    cycles,dense=motion_monitors[i].consume()
+                    reward=replace_contact_payment(reward,outcome,cycles,dense,env.learner_corner)
+                    motion_cycles+=cycles;motion_own+=float(cycles[env.learner_corner]);motion_other+=float(cycles[1-env.learner_corner]);motion_dense+=float(dense[env.learner_corner])
                 if posture_cost_ppo:
                     from boxer.striking_posture_cost import learner_cost
                     cost=learner_cost(env);posture_cost_sum+=cost
@@ -593,6 +619,9 @@ def train(args):
                     completed_rounds+=1;falls+=int(outcome['done'])
                     episode[i]+=1
                     next_obs=env.reset(args.seed+1009*i+int(episode[i]),swap=bool(episode[i]%2))
+                    if motion_cycle_ppo:
+                        motion_monitors[i]=MotionCycleMonitor()
+                        env.env.pair.diagnostic_punch_trace=motion_monitors[i]
                     if pool_opponent_ppo:pool_assignments[i]=draw_opponent(pool_rng,env.active_opponent)
                 following.append(next_obs)
             for k,v in dict(obs=obs.copy(),raw=np.asarray(raw),logp=np.asarray(logp),

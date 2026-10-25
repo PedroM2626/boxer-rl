@@ -3,14 +3,18 @@
 Maintain the [trajectory and decision record](experiment-history.md) at every
 reviewed intervention, including failed results, accounting and pending evidence.
 
-**Current decision (2026-10-25):** [motor-only isolation](results/striking-pilot/lateral-isolation-v6/README.md)
-removes all six positive-command-plus-arm failures (8/8 survivors). The subsequent
-[guard-only command handoff](results/striking-pilot/guard-step-v7/README.md) still
-has only 4/8 survivors, zero impacts or candidate punches; one former survivor
-regresses. Reject it as sufficient and stop unchanged dwell/lateral timing sweeps.
-Next audit original/current arm action contracts and actual joint-target tracking
-from source/saved trajectories before new bounded physical work. No active job or
-allocation, PPO/BC extension, motor unfreezing, adoption or phase promotion.
+**Current decision (2026-10-25):** the [arm contract audit](results/striking-pilot/arm-contract-v1/README.md)
+finds no joint-order/baseline-scaling or native actuator-clipping defect in 32 saved
+trajectories. Scripted failures do not establish that PPO cannot learn punching.
+The [prospective motion-cycle PPO v14](striking-motion-cycle-training.md) warm-starts
+the actual latest fixed-control final, preserves Adam/RNG/normalizer and changes
+the touch objective explicitly. Full-cycle payment, zero old touch-teacher loss,
+unchanged physical gates plus independent per-hand motion gates. Budget: at most
+1,048,576 new diagnostic credits (global ceiling 3,212,544), 72,000 formal evaluation
+controls (ceiling 2,145,802), with complete periodic and fresh final checks.
+The hidden job is `/home/pedro/boxing-runs/striking-motion-cycle-v14/audit.json`;
+inspect its active child and training/progress.json before launch or recovery.
+No main adoption, foundation change, gate relaxation or automatic budget extension.
 
 **Earlier reviewed outcome (2026-10-24):** the
 [broader frozen audit](striking-gae-generalization.md) completed 130 episodes /
@@ -118,12 +122,11 @@ authority. The completed lateral-command diagnostic finds no candidate punch; no
 Reviewed diagnostic PPO is **2,163,968**, at its ceiling. Formal diagnostic
 simulation is **2,073,802** after motor-only isolation adds 4,000 and guard-step
 adds 3,495 controls. The completed ceiling was **2,074,307**; unused **505 expire**.
-No additional physical allocation or job is active.
+Those historical allocations are closed. The separate prospective v14 allocation allows up to 1,048,576 new diagnostic PPO credits and 72,000 evaluation controls; use its live ledgers for current consumption.
 Cloned kinematic evaluations are now **6,349** after 48 producer + 48 independent
 surface-audit forwards. Signed-distance queries are separately **960** (480 + 480).
 Both new geometry allocations are exhausted; no new cloned/distance allocation.
-Unused compute expires at review. No additional PPO or supervised allocation;
-no physical, cloned or distance-query job is active.
+Unused historical compute expires at review. The declared v14 PPO/evaluation allocation is separate; no new supervised, cloned or distance-query allocation.
 Unused historical comparison compute is not an automatic continuation allocation.
 The completed audit is `/home/pedro/boxing-runs/striking-punch-quality-2080768/audit.json`;
 the later demo-motion review accounts separately for its 7,500 additional controls.

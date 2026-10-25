@@ -54,7 +54,7 @@ def validate_mixed_metadata(saved):
         from boxer.striking_kl_guard import expected_actor_count
         actor_count=expected_actor_count(saved)
     if (saved.get('mixed_partner_ppo') is not True or saved.get('credit_horizon_ppo') is not True
-            or saved.get('training_gamma') != .999 or saved.get('retention_loss_weight') != 1.
+            or saved.get('training_gamma') != .999 or saved.get('retention_loss_weight') != (0. if saved.get('motion_cycle_ppo') else 1.)
             or transition != dict(source_sha256=SOURCE_SHA, consumed_steps=1736704,
                 world_control_steps=1114112, actor_count=9608, critic_count=33280,
                 neutral_credits_by_corner=[50229, 48075], optimizer_reset=False,
