@@ -237,3 +237,14 @@ Reject both as positive targets; do not extend PPO/imitation. Next isolate the
 positive-direction schedule with arm requests disabled before any motor change.
 No active job or further allocation. The pending entry above records the original
 prospective decision, now resolved by this complete review.
+
+## Prospective motor-only lateral isolation, 2026-10-25
+
+[Protocol](striking-lateral-isolation.md): remove all scripted arm residual
+requests from the eight positive-direction conditions, preserving frozen motor,
+activation/phase schedule and original command channel. Compare to all eight
+archived v5 positive cases with exact pre-extension state prefixes. Allocate at
+most 4,000 additional physical controls from 2,066,307, ceiling 2,070,307;
+all other compute and checkpoint counters retained. This is a causal diagnostic,
+not boxing training or a positive demonstration. Review every matched outcome
+before attributing failure or changing authority; no automatic learning extension.

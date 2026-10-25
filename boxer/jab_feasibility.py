@@ -171,3 +171,16 @@ class MotorGuardSideStep(MotorGuardDwell):
             phase,_=self.phase_fraction(env.pair.elapsed-self.started)
             if phase in ('guard','extend'):result[self.corner,1]=self.direction
         return result
+
+
+class MotorOnlySideStep(MotorGuardSideStep):
+    """Matched movement schedule with all arm residual requests disabled."""
+    def action(self,env):
+        pair=env.pair
+        if self.started is None:
+            roots=[pair.data.qpos[m['root']:m['root']+2] for m in pair.maps]
+            if np.linalg.norm(roots[1]-roots[0])>PROFILE['engage_distance']:
+                return np.zeros((2,17)),'approach'
+            self.started=pair.elapsed
+        phase,_=self.phase_fraction(pair.elapsed-self.started)
+        return self.base_action(env),phase

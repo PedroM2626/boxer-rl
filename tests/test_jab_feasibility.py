@@ -136,3 +136,21 @@ def test_side_step_uses_existing_command_before_arm_baseline(foundation,corner,d
         np.testing.assert_array_equal(env.pair.data.qpos,before)
     assert env.pair.model.neq==0 and not np.any(env.pair.model.body_gravcomp)
     assert not np.any(env.pair.data.qfrc_applied) and not np.any(env.pair.data.xfrc_applied)
+
+
+@pytest.mark.parametrize('corner',[0,1])
+def test_motor_only_side_step_matches_schedule_without_arm_solver(foundation,corner):
+    from boxer.jab_feasibility import MotorOnlySideStep,MotorGuardSideStep
+    def forbidden_motor(obs,key):raise AssertionError('controller must not run motor/arm IK')
+    env=StrikingEnv(foundation,None,motor=forbidden_motor);env.reset(7)
+    controller=MotorOnlySideStep(corner,1);reference=MotorGuardSideStep(corner,1)
+    action,phase=controller.action(env)
+    assert phase=='approach';np.testing.assert_array_equal(action,0.)
+    controller.started=reference.started=0.;before=env.pair.data.qpos.copy()
+    for t in (0.,.34,.44,.60,.70,1.,1.54,9.9):
+        env.pair.elapsed=t;action,phase=controller.action(env)
+        np.testing.assert_array_equal(action,reference.base_action(env))
+        np.testing.assert_array_equal(action[:,3:],0.)
+        assert phase==reference.phase_fraction(t)[0]
+        np.testing.assert_array_equal(env.pair.data.qpos,before)
+    assert controller.entry_local is None and controller.extension_cycle is None
