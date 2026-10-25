@@ -154,3 +154,23 @@ def test_motor_only_side_step_matches_schedule_without_arm_solver(foundation,cor
         assert phase==reference.phase_fraction(t)[0]
         np.testing.assert_array_equal(env.pair.data.qpos,before)
     assert controller.entry_local is None and controller.extension_cycle is None
+
+
+@pytest.mark.parametrize('corner',[0,1])
+def test_guard_step_releases_lateral_before_arm_baseline(foundation,corner):
+    from boxer.jab_feasibility import GuardStepJab
+    seen=[]
+    def motor(obs,key):
+        seen.append(np.asarray(obs['state'])[:,9:12].copy())
+        return jp.zeros((2,29)),{}
+    env=StrikingEnv(foundation,None,motor=motor);env.reset(7)
+    controller=GuardStepJab(corner,1);controller.started=0.
+    for t in (.1,.44,.60,.7,1.,1.3):
+        env.pair.elapsed=t;action,phase=controller.action(env)
+        assert action[corner,1]==(1 if phase=='guard' else 0)
+        np.testing.assert_array_equal(action[1-corner],0.)
+        np.testing.assert_array_equal(action[corner,[0,2]],0.)
+        if phase=='extend':
+            np.testing.assert_allclose(seen[-1],env.commands(action),atol=1e-7)
+            assert np.any(action[corner,3:10])
+        else:np.testing.assert_array_equal(action[:,3:],0.)

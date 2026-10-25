@@ -184,3 +184,13 @@ class MotorOnlySideStep(MotorGuardSideStep):
             self.started=pair.elapsed
         phase,_=self.phase_fraction(pair.elapsed-self.started)
         return self.base_action(env),phase
+
+
+class GuardStepJab(MotorGuardSideStep):
+    """Diagnostic temporal handoff: lateral guard movement, then straight jab."""
+    def base_action(self,env):
+        result=super().base_action(env)
+        if self.started is not None:
+            phase,_=self.phase_fraction(env.pair.elapsed-self.started)
+            if phase!='guard':result[self.corner,1]=0.
+        return result

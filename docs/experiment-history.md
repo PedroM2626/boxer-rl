@@ -261,3 +261,12 @@ physics, every original criterion and source/gate hashes. Eighteen focused tests
 pass. New 4,000 physical controls, cumulative 2,070,307, ceiling exhausted. Other
 compute/checkpoints unchanged. Next prospectively test guard-only footwork,
 released before extension, instead of changing motor authority or extending PPO.
+
+## Prospective temporal handoff, 2026-10-25
+
+[Guard-step protocol](striking-guard-step.md): release positive lateral movement
+before extension/dwell, keep original straight arm path and authority. All eight
+matched v5 positive controls remain fixed. At most 4,000 new physical controls
+from 2,070,307 to 2,074,307. The completed isolation justifies testing overlap;
+it does not justify motor unfreezing, changed gates or PPO/imitation extension.
+Review complete survival and punch conjunctions before any adoption/next budget.
