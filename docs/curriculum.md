@@ -3,11 +3,12 @@
 Maintain the [trajectory and decision record](experiment-history.md) at every
 reviewed intervention, including failed results, accounting and pending evidence.
 
-**Current decision (2026-10-25):** the signed-surface audit and both lateral-bow
-arms are complete and independently reviewed. No candidate punch or positive
-demonstration is established. Next prospectively test angle/range adjustment
-through the existing lateral movement command while keeping arm authority fixed.
-The [lateral command comparison](striking-lateral-command-comparison.md) is now active: sixteen conditions, at most 8,000 additional physical controls, ceiling 2,067,063 from 2,059,063. No phase promotion or PPO extension.
+**Current decision (2026-10-25):** the [lateral motor-command comparison](results/striking-pilot/lateral-command-v5/README.md) is independently reviewed.
+Negative direction survives 8/8; positive survives 2/8 (five low-pelvis and one
+self-leg failure). Both have zero commanded-left contacts or candidate punches.
+Reject both as positive targets. Next isolate the positive movement command with
+arm requests disabled before changing the motor or extending learning.
+No active job, allocation, phase promotion or PPO extension.
 
 **Earlier reviewed outcome (2026-10-24):** the
 [broader frozen audit](striking-gae-generalization.md) completed 130 episodes /
@@ -110,17 +111,17 @@ and 8/8; neither arm produces any candidate punch or acting-left target contact.
 The single old-counter impact is an incidental low-speed right-hand touch.
 Reject both as positive targets. Next test the existing lateral command through
 the walking motor under a new prospective bounded protocol, not new root/body
-authority. No job, PPO, imitation, motor unfreezing or gate changes.
+authority. The completed lateral-command diagnostic finds no candidate punch; no PPO, imitation, motor unfreezing or gate changes.
 
 Reviewed diagnostic PPO is **2,163,968**, at its ceiling. Formal diagnostic
-simulation is **2,059,063** after the reviewed arc comparison adds 7,991 controls,
-under its completed ceiling **2,059,072**. The unused nine controls expire; no
-new physical allocation is declared.
+simulation is **2,066,307** after the lateral comparison adds 7,244 controls,
+below its completed ceiling **2,067,063**. The unused 756 expire. No active
+physical allocation; review both complete arms before any new bounded decision.
 Cloned kinematic evaluations are now **6,349** after 48 producer + 48 independent
 surface-audit forwards. Signed-distance queries are separately **960** (480 + 480).
 Both new geometry allocations are exhausted; no new cloned/distance allocation.
 Unused compute expires at review. No additional PPO or supervised allocation;
-no physical, cloned or distance-query job/allocation is active.
+no physical, cloned or distance-query job is active.
 Unused historical comparison compute is not an automatic continuation allocation.
 The completed audit is `/home/pedro/boxing-runs/striking-punch-quality-2080768/audit.json`;
 the later demo-motion review accounts separately for its 7,500 additional controls.

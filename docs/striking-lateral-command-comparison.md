@@ -1,5 +1,7 @@
 # Lateral movement-command comparison
 
+**Completed and independently reviewed:** [full results](results/striking-pilot/lateral-command-v5/README.md). Both arms have zero candidate punches; survival 8/8 versus 2/8. Consumed 7,244 controls, cumulative 2,066,307. Unused 756 expire. The prospective protocol below remains unchanged.
+
 Declared 2026-10-25 before collection. The reviewed arc-path study has no
 commanded-left contact in sixteen cases; signed surface evidence shows frequent
 blocking overlaps. All previous scripted cycles kept movement offsets zero.

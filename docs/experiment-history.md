@@ -222,3 +222,18 @@ is retained; both full arms must be reviewed before any continuation decision.
 Sixteen focused feasibility/workspace tests pass, including both corners and
 command directions, phase release, baseline command consistency and unchanged
 physics. Hidden persistent launcher uses existing global locks; no duplicate job.
+
+## Reviewed lateral commands, 2026-10-25
+
+[Complete results](results/striking-pilot/lateral-command-v5/README.md): negative
+lateral action 8/8 survivors, positive 2/8, six acting-body falls (five low-pelvis,
+one self-leg). Both arms have zero commanded-left target contacts and zero
+complete candidate punches. One incidental right touch fails motion criteria.
+The 16-case independent review validates prefixes, command/path schedules,
+finite native physics, hashes, all events and consumed accounting. All 16
+focused tests pass. New 7,244 physical controls, cumulative 2,066,307 below
+2,067,063; unused 756 expire. Other compute/checkpoints unchanged.
+Reject both as positive targets; do not extend PPO/imitation. Next isolate the
+positive-direction schedule with arm requests disabled before any motor change.
+No active job or further allocation. The pending entry above records the original
+prospective decision, now resolved by this complete review.

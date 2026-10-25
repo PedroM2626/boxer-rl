@@ -42,8 +42,7 @@ surface reach from the commanded point before changing authority. The
 finds blocking intersections; the [reviewed 6/12 cm bow comparison](docs/results/striking-pilot/arc-path-v4/README.md)
 still produces no commanded-left target contacts or candidate punches (survival
 7/8 and 8/8). Its sole legacy event is an incidental opposite-hand touch.
-Next test lateral movement commands through the learned motor under a bounded
-protocol. No PPO job is active. General boxing remains
+The [reviewed lateral motor-command comparison](docs/results/striking-pilot/lateral-command-v5/README.md) has 8/8 versus 2/8 survivors and no candidate punches. Next isolate the regressing command schedule with arm requests disabled. No PPO job is active. General boxing remains
 uncertified, and the stopped main policy has not been replaced.
 
 An [earlier striking final](docs/striking-generalization-audit.md) passed two
