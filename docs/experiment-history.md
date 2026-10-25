@@ -270,3 +270,18 @@ matched v5 positive controls remain fixed. At most 4,000 new physical controls
 from 2,070,307 to 2,074,307. The completed isolation justifies testing overlap;
 it does not justify motor unfreezing, changed gates or PPO/imitation extension.
 Review complete survival and punch conjunctions before any adoption/next budget.
+
+## Reviewed temporal handoff and stop decision, 2026-10-25
+
+[Guard-step v7](results/striking-pilot/guard-step-v7/README.md): 4/8 survivors,
+zero impacts/commanded-left contacts/candidates. Three old positive-control
+failures survive, one previous survivor falls. Two low-pelvis and two self-leg
+first falls. Twenty focused tests and the full independent trace/source/criteria
+review pass. A further 24-trajectory saved-array comparison preserves terminal
+windows without new physics; errors near falling states are not causal proof.
+New 3,495 controls, cumulative 2,073,802 under 2,074,307; unused 505 expire.
+All other compute and checkpoints retained. No job or allocation active.
+Reject the handoff as sufficient and stop unchanged dwell/lateral sweeps. Next
+audit original/current arm action contracts and actual joint-target tracking in
+source/saved trajectories before another prospectively bounded physical change.
+No motor unfreezing, larger authority, weaker gates or PPO/BC extension justified.

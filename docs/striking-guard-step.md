@@ -1,5 +1,7 @@
 # Separate lateral movement and straight extension in time
 
+**Completed and independently reviewed:** [all results](results/striking-pilot/guard-step-v7/README.md). Pair survival 4/8, zero impacts or candidates; three old failures recover but one survivor regresses. Actual 3,495 controls, cumulative 2,073,802. Unused 505 expire. The original prospective protocol below remains unchanged.
+
 Declared 2026-10-25 after independent v6 review, before collection. Removing arm
 requests eliminates all six v5 positive-command failures (8/8 motor-only survivors
 versus 2/8 concurrent-control survivors), but no valid punch has been produced.

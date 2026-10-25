@@ -42,7 +42,7 @@ surface reach from the commanded point before changing authority. The
 finds blocking intersections; the [reviewed 6/12 cm bow comparison](docs/results/striking-pilot/arc-path-v4/README.md)
 still produces no commanded-left target contacts or candidate punches (survival
 7/8 and 8/8). Its sole legacy event is an incidental opposite-hand touch.
-The [reviewed lateral motor-command comparison](docs/results/striking-pilot/lateral-command-v5/README.md) has 8/8 versus 2/8 survivors and no candidate punches. The [motor-only isolation](docs/results/striking-pilot/lateral-isolation-v6/README.md) removes all six falls (8/8 survivors), but produces no punch. Next test temporal separation of lateral movement and arm extension. No PPO job is active. General boxing remains
+The [reviewed lateral motor-command comparison](docs/results/striking-pilot/lateral-command-v5/README.md) has 8/8 versus 2/8 survivors and no candidate punches. The [motor-only isolation](docs/results/striking-pilot/lateral-isolation-v6/README.md) removes all six falls (8/8 survivors), but produces no punch. The [reviewed temporal handoff](docs/results/striking-pilot/guard-step-v7/README.md) still has only 4/8 survivors and no punches. Stop unchanged timing/lateral sweeps; next audit arm contracts and joint tracking from saved/source evidence. No PPO job is active. General boxing remains
 uncertified, and the stopped main policy has not been replaced.
 
 An [earlier striking final](docs/striking-generalization-audit.md) passed two

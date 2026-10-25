@@ -3,12 +3,14 @@
 Maintain the [trajectory and decision record](experiment-history.md) at every
 reviewed intervention, including failed results, accounting and pending evidence.
 
-**Current decision (2026-10-25):** the [motor-only lateral isolation](results/striking-pilot/lateral-isolation-v6/README.md) is independently reviewed.
-All eight pairs survive; all six positive-command-plus-arm failures disappear.
-No scored impact or candidate punch. Retain this as causal diagnostic evidence,
-not a boxing policy. Next test lateral movement only during guard, released
-before extension, under a separate prospective budget. No PPO extension,
-motor unfreezing, checkpoint adoption or phase promotion.
+**Current decision (2026-10-25):** [motor-only isolation](results/striking-pilot/lateral-isolation-v6/README.md)
+removes all six positive-command-plus-arm failures (8/8 survivors). The subsequent
+[guard-only command handoff](results/striking-pilot/guard-step-v7/README.md) still
+has only 4/8 survivors, zero impacts or candidate punches; one former survivor
+regresses. Reject it as sufficient and stop unchanged dwell/lateral timing sweeps.
+Next audit original/current arm action contracts and actual joint-target tracking
+from source/saved trajectories before new bounded physical work. No active job or
+allocation, PPO/BC extension, motor unfreezing, adoption or phase promotion.
 
 **Earlier reviewed outcome (2026-10-24):** the
 [broader frozen audit](striking-gae-generalization.md) completed 130 episodes /
@@ -114,8 +116,9 @@ the walking motor under a new prospective bounded protocol, not new root/body
 authority. The completed lateral-command diagnostic finds no candidate punch; no PPO, imitation, motor unfreezing or gate changes.
 
 Reviewed diagnostic PPO is **2,163,968**, at its ceiling. Formal diagnostic
-simulation is **2,070,307** after the motor-only isolation adds 4,000 controls,
-exactly at its completed ceiling. No unused allocation carries forward.
+simulation is **2,073,802** after motor-only isolation adds 4,000 and guard-step
+adds 3,495 controls. The completed ceiling was **2,074,307**; unused **505 expire**.
+No additional physical allocation or job is active.
 Cloned kinematic evaluations are now **6,349** after 48 producer + 48 independent
 surface-audit forwards. Signed-distance queries are separately **960** (480 + 480).
 Both new geometry allocations are exhausted; no new cloned/distance allocation.
