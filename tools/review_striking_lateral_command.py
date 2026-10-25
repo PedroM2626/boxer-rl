@@ -144,7 +144,7 @@ def main():
         limitations=['Motor-only corner labels duplicate four unique reset conditions; they are not eight independent samples.',
             'Two seeds and ten-second scripted episodes do not certify learned punching or generalization.',
             'Historical guard/cycle cases are reused with exact approach prefixes; this remains a scripted diagnostic, not a learned boxer.'],
-        decision='Interpret both complete lateral command arms against the historical straight control; no automatic training or positive-demo adoption.')
+        decision='Review both complete lateral command arms against the historical straight control; retain all failures and require a documented continuation decision before any further allocation or adoption.')
     archive=Path('docs/results/striking-pilot/lateral-command-v5');archive.mkdir(parents=True,exist_ok=True)
     for folder in ('full','native'):shutil.copytree(root/folder,archive/folder,dirs_exist_ok=True)
     for filename in ('audit.json','progress.json','native-errors.log'):shutil.copy2(root/filename,archive/filename)
