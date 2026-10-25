@@ -40,7 +40,9 @@ def independent_cycle(e):
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output',type=Path,required=True);parser.add_argument('--resume',action='store_true')
+    parser.add_argument('--git-executable',default='git');parser.add_argument('--git-worktree')
     args=parser.parse_args();root=args.output;root.mkdir(parents=True,exist_ok=True)
+    git_command=[args.git_executable]+(['-C',args.git_worktree] if args.git_worktree else [])
     assert os.environ['JAX_PLATFORMS']=='cpu'
     with ExitStack() as stack:
         for path in (root/'.supervisor.lock',Path('runs/striking_diagnostic_supervisor.lock')):
@@ -125,15 +127,15 @@ def main():
                 if folder.is_dir() and (folder/'motion-gate.json').exists():shutil.copytree(folder,ARCHIVE/'gates'/folder.name,dirs_exist_ok=True)
             atomic_json(ARCHIVE/'job-state.json',state)
             atomic_json(ARCHIVE/'training-progress.json',json.loads((training/'progress.json').read_text()))
-            staged=subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines()
+            staged=subprocess.check_output(git_command+['diff','--cached','--name-only'],text=True).splitlines()
             prefixes=(str(ARCHIVE).replace('\\','/')+'/',str(CHECKPOINTS).replace('\\','/')+'/')
             if any(not name.startswith(prefixes) for name in staged):raise RuntimeError('unrelated staged changes block automatic publication')
-            subprocess.run(['git','add','--',str(ARCHIVE),str(CHECKPOINTS)],check=True)
+            subprocess.run(git_command+['add','--',str(ARCHIVE),str(CHECKPOINTS)],check=True)
             logs=[str(p) for p in ARCHIVE.rglob('*-errors.log')]
-            if logs:subprocess.run(['git','add','-f','--',*logs],check=True)
-            if subprocess.run(['git','diff','--cached','--quiet']).returncode:
-                subprocess.run(['git','commit','-m',f'Record motion-cycle PPO {label}'],check=True)
-                subprocess.run(['git','push'],check=True)
+            if logs:subprocess.run(git_command+['add','-f','--',*logs],check=True)
+            if subprocess.run(git_command+['diff','--cached','--quiet']).returncode:
+                subprocess.run(git_command+['commit','-m',f'Record motion-cycle PPO {label}'],check=True)
+                subprocess.run(git_command+['push'],check=True)
 
         def evaluate(offset,label,seeds):
             if any(g['label']==label for g in state['gates']):return

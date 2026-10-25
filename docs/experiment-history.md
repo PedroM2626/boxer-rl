@@ -307,3 +307,14 @@ integration is included. New training collection world controls recorded apart
 from formal evaluation; main remains 476,041,216. No new geometry/BC/render budget.
 Do not call zero cycles in early minutes a learned impossibility result; stop
 numerical faults immediately and review the full bounded history before extension.
+
+## V14 baseline and publication recovery, 2026-10-25
+
+[Complete 24-condition baseline](results/striking-pilot/motion-cycle-v14/README.md):
+7/8 and 8/8 neutral survivors, 6/8 mirror; original complete gate fails and all
+motion-cycle counts are zero. This is the unchanged source actor, not PPO failure.
+New formal evaluation 11,486, cumulative 2,085,288; zero new PPO before integration.
+Twenty-six focused tests pass. A Git-author configuration failure stopped only
+publication, before training. Preserve failed state/log, use existing Windows Git
+through the WSL launcher, and resume without replaying the baseline or rebuilding
+the initial state. All consumed counters, source and optimizer remain intact.

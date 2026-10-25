@@ -1,0 +1,1753 @@
+{
+  "kind": "striking_interface_evaluation",
+  "updated_utc": "2026-10-25T19:35:43.972131+00:00",
+  "assistance": false,
+  "source_sha256": "b39b1990945e8a374802c3a190e5ac5e026ae39e7fd5ef61c5c2b01ad291c6fc",
+  "striking_sha256": "96b32ca6f1a5d647e90710a7ca8c06fa01c9bbbdf0ca4b2d04c27803eb574543",
+  "opponent_sha256": null,
+  "evaluated_corner": null,
+  "diagnostic_base_yaw_scale": 1.0,
+  "simulated_world_transitions": 3603,
+  "optimization_transitions": 0,
+  "scorecard_version": 1,
+  "episode_seconds": 10.0,
+  "trials": [
+    {
+      "mode": "trained",
+      "seed": 7,
+      "swap": false,
+      "survived": true,
+      "elapsed": 10.000000000000009,
+      "final_distance": 0.5635107781441094,
+      "scored_by_corner": [
+        1.0,
+        0.0
+      ],
+      "raw_legal_impulse": [
+        0.8790080376406612,
+        0.0
+      ],
+      "fallen": [
+        false,
+        false
+      ],
+      "finite": true,
+      "minimum_hand_target_distance": [
+        0.16115823980192306,
+        0.2717253872749556
+      ],
+      "mean_abs_arm_residual": [
+        0.1583763112257077,
+        0.0
+      ],
+      "max_abs_arm_residual": [
+        0.7340843309610573,
+        0.0
+      ],
+      "impact_events": [
+        {
+          "control_step": 124,
+          "elapsed": 2.4999999999999463,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 0,
+              "score_time": 2.4959999999999467,
+              "contact_window_impulse": 0.745406797739231
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        }
+      ],
+      "punch_trace_file": "/home/pedro/boxing-runs/striking-motion-cycle-v14/gates/baseline/neutral-0/native/trained-seed-7-swap-0.npz",
+      "punch_trace_sha256": "60b84678e7a9b1f1a000e92bfd2cdc9f997251159b6c746869e3ec8abea05e53",
+      "punch_measurements": [
+        {
+          "corner": 0,
+          "hand": 0,
+          "onset_time": 2.485999999999948,
+          "event_time": 2.4959999999999467,
+          "onset_relative_speed": 0.6590226297335045,
+          "onset_forward_cosine": 0.10728325391604765,
+          "onset_contact_closing": 0.4312640376988556,
+          "onset_contact_advancing": 0.2749914916140122,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 0.6970339521634397,
+          "pre_max_displacement_m": 0.03491968633019984,
+          "pre_path_length_m": 0.08760642545555743,
+          "pre_elbow_excursion_rad": 0.12392682493842452,
+          "event_window_impulse_ns": 0.5893185803272607,
+          "native_contact_window_impulse_ns": 0.5893185803272607,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.028,
+          "return_toward_pre_window_position_m": 0.010481199716276021,
+          "post_window_complete": true
+        }
+      ],
+      "first_observed_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 2.2419999999999747
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 2.2879999999999696
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 2.3979999999999575
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/torso_collision"
+          ],
+          "elapsed": 2.4879999999999476
+        },
+        {
+          "geoms": [
+            "red/left_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 2.5139999999999447
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/left_shin"
+          ],
+          "elapsed": 2.575999999999938
+        }
+      ],
+      "trace_file": "/home/pedro/boxing-runs/striking-motion-cycle-v14/gates/baseline/neutral-0/full/trained-seed-7-swap-0.npz",
+      "trace_sha256": "b03b5bc4ac85fa924fa0ce125936acad80df0b039977160f7cffeb95252b2f61",
+      "first_fall_time": null,
+      "terminal_state": {
+        "corners": [
+          {
+            "pelvis_height": 0.75198773690588,
+            "upright": 0.9910472460882186,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.756405297134439,
+            "upright": 0.9998600145694745,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ]
+        ]
+      }
+    },
+    {
+      "mode": "trained",
+      "seed": 7,
+      "swap": true,
+      "survived": true,
+      "elapsed": 10.000000000000009,
+      "final_distance": 0.5166918698890973,
+      "scored_by_corner": [
+        2.0,
+        0.0
+      ],
+      "raw_legal_impulse": [
+        4.110750782130252,
+        0.0
+      ],
+      "fallen": [
+        false,
+        false
+      ],
+      "finite": true,
+      "minimum_hand_target_distance": [
+        0.1577912641716751,
+        0.19696922039896092
+      ],
+      "mean_abs_arm_residual": [
+        0.18624700832982555,
+        0.0
+      ],
+      "max_abs_arm_residual": [
+        0.6917287157069366,
+        0.0
+      ],
+      "impact_events": [
+        {
+          "control_step": 316,
+          "elapsed": 6.339999999999524,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 6.337999999999524,
+              "contact_window_impulse": 0.537557652528833
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 347,
+          "elapsed": 6.9599999999994555,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 6.947999999999457,
+              "contact_window_impulse": 0.7055118189660419
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        }
+      ],
+      "punch_trace_file": "/home/pedro/boxing-runs/striking-motion-cycle-v14/gates/baseline/neutral-0/native/trained-seed-7-swap-1.npz",
+      "punch_trace_sha256": "c1107e96b4a0757b670fc0bbba9318166331264afaa0f2b5e536e38cd2c7545a",
+      "punch_measurements": [
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 6.313999999999527,
+          "event_time": 6.337999999999524,
+          "onset_relative_speed": 1.0857186029114405,
+          "onset_forward_cosine": 0.36101867346589034,
+          "onset_contact_closing": 0.7430019142491251,
+          "onset_contact_advancing": 0.7274680163669549,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 1.1304373858314094,
+          "pre_max_displacement_m": 0.09668588664942086,
+          "pre_path_length_m": 0.20135392897212204,
+          "pre_elbow_excursion_rad": 0.17417212779090785,
+          "event_window_impulse_ns": 0.5173208759130459,
+          "native_contact_window_impulse_ns": 0.5173208759130458,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.114,
+          "return_toward_pre_window_position_m": 0.0029952863256790564,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 6.885999999999464,
+          "event_time": 6.947999999999457,
+          "onset_relative_speed": 0.999504464463002,
+          "onset_forward_cosine": 0.29055786035963,
+          "onset_contact_closing": 0.6304503860644585,
+          "onset_contact_advancing": 0.6907631789826878,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 1.0132740303555368,
+          "pre_max_displacement_m": 0.04739434398989661,
+          "pre_path_length_m": 0.15443368164917165,
+          "pre_elbow_excursion_rad": 0.11643721015694775,
+          "event_window_impulse_ns": 0.5150572003729681,
+          "native_contact_window_impulse_ns": 0.5150572003729682,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.066,
+          "return_toward_pre_window_position_m": 0.012580490700581932,
+          "post_window_complete": true
+        }
+      ],
+      "first_observed_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 1.8160000000000014
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 2.1139999999999888
+        },
+        {
+          "geoms": [
+            "red/left_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 2.2079999999999784
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 2.891999999999903
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 5.6459999999996
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_elbow_yaw_collision"
+          ],
+          "elapsed": 6.263999999999532
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/left_shin"
+          ],
+          "elapsed": 6.309999999999527
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/torso_collision"
+          ],
+          "elapsed": 6.315999999999526
+        },
+        {
+          "geoms": [
+            "red/left_wrist_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 6.655999999999489
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 6.861999999999466
+        }
+      ],
+      "trace_file": "/home/pedro/boxing-runs/striking-motion-cycle-v14/gates/baseline/neutral-0/full/trained-seed-7-swap-1.npz",
+      "trace_sha256": "0f2201d3327ba02a081a189285045fe0f113504f9ce75627b831a41865c6539c",
+      "first_fall_time": null,
+      "terminal_state": {
+        "corners": [
+          {
+            "pelvis_height": 0.7463211749356852,
+            "upright": 0.9814766099542793,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.755139377405233,
+            "upright": 0.9962854033266464,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ]
+        ]
+      }
+    },
+    {
+      "mode": "trained",
+      "seed": 23,
+      "swap": false,
+      "survived": true,
+      "elapsed": 10.000000000000009,
+      "final_distance": 0.5953441028530602,
+      "scored_by_corner": [
+        0.0,
+        0.0
+      ],
+      "raw_legal_impulse": [
+        5.830682884537675,
+        0.0
+      ],
+      "fallen": [
+        false,
+        false
+      ],
+      "finite": true,
+      "minimum_hand_target_distance": [
+        0.158656092160215,
+        0.22495017368520792
+      ],
+      "mean_abs_arm_residual": [
+        0.18483069155278267,
+        0.0
+      ],
+      "max_abs_arm_residual": [
+        0.7178113317091537,
+        0.0
+      ],
+      "impact_events": [],
+      "punch_trace_file": "/home/pedro/boxing-runs/striking-motion-cycle-v14/gates/baseline/neutral-0/native/trained-seed-23-swap-0.npz",
+      "punch_trace_sha256": "db0dd931abac25d21f7167cb919dd9c7373b6acdb88f8b9a5d2134ae9e710e21",
+      "punch_measurements": [],
+      "first_observed_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.04200000000000002
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 1.414000000000001
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 1.446000000000001
+        },
+        {
+          "geoms": [
+            "red/left_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 1.464000000000001
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/torso_collision"
+          ],
+          "elapsed": 1.5040000000000011
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/left_shin"
+          ],
+          "elapsed": 1.5060000000000011
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 2.6699999999999275
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/torso_collision"
+          ],
+          "elapsed": 6.029999999999558
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 8.501999999999509
+        }
+      ],
+      "trace_file": "/home/pedro/boxing-runs/striking-motion-cycle-v14/gates/baseline/neutral-0/full/trained-seed-23-swap-0.npz",
+      "trace_sha256": "a597222aa9a5366751ee949f51669ead7f2719e8772c41d5e0a26b895be162ef",
+      "first_fall_time": null,
+      "terminal_state": {
+        "corners": [
+          {
+            "pelvis_height": 0.7476740908386911,
+            "upright": 0.9917462912438294,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7560458908439804,
+            "upright": 0.9974035672158537,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ]
+        ]
+      }
+    },
+    {
+      "mode": "trained",
+      "seed": 23,
+      "swap": true,
+      "survived": true,
+      "elapsed": 10.000000000000009,
+      "final_distance": 0.5335835720136591,
+      "scored_by_corner": [
+        0.0,
+        0.0
+      ],
+      "raw_legal_impulse": [
+        1.0131826191083722,
+        0.0
+      ],
+      "fallen": [
+        false,
+        false
+      ],
+      "finite": true,
+      "minimum_hand_target_distance": [
+        0.16555083832411693,
+        0.21795396556633442
+      ],
+      "mean_abs_arm_residual": [
+        0.17081989768628428,
+        0.0
+      ],
+      "max_abs_arm_residual": [
+        0.7142709714152911,
+        0.0
+      ],
+      "impact_events": [],
+      "punch_trace_file": "/home/pedro/boxing-runs/striking-motion-cycle-v14/gates/baseline/neutral-0/native/trained-seed-23-swap-1.npz",
+      "punch_trace_sha256": "7462631c48a7752a34f112a6c203b53f5de1adcc60f1ba94705c6c88a2a3d787",
+      "punch_measurements": [],
+      "first_observed_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.19600000000000015
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 2.039999999999997
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 2.1999999999999793
+        },
+        {
+          "geoms": [
+            "red/left_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 2.4259999999999544
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 2.803999999999913
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_elbow_yaw_collision"
+          ],
+          "elapsed": 5.005999999999671
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 6.785999999999475
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/torso_collision"
+          ],
+          "elapsed": 7.019999999999449
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/left_shin"
+          ],
+          "elapsed": 7.305999999999417
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 7.705999999999373
+        }
+      ],
+      "trace_file": "/home/pedro/boxing-runs/striking-motion-cycle-v14/gates/baseline/neutral-0/full/trained-seed-23-swap-1.npz",
+      "trace_sha256": "a81523b801d1ebd1056471790f61d127c668b4c969d99d1385022db08070dec1",
+      "first_fall_time": null,
+      "terminal_state": {
+        "corners": [
+          {
+            "pelvis_height": 0.7428134822003924,
+            "upright": 0.97883900039892,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.755639773772609,
+            "upright": 0.9967410369972566,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ]
+        ]
+      }
+    },
+    {
+      "mode": "trained",
+      "seed": 31,
+      "swap": false,
+      "survived": true,
+      "elapsed": 10.000000000000009,
+      "final_distance": 0.5560484382396814,
+      "scored_by_corner": [
+        0.0,
+        0.0
+      ],
+      "raw_legal_impulse": [
+        0.0,
+        0.0
+      ],
+      "fallen": [
+        false,
+        false
+      ],
+      "finite": true,
+      "minimum_hand_target_distance": [
+        0.17430128263493794,
+        0.26307112828006446
+      ],
+      "mean_abs_arm_residual": [
+        0.15371674698459764,
+        0.0
+      ],
+      "max_abs_arm_residual": [
+        0.6442766276230936,
+        0.0
+      ],
+      "impact_events": [],
+      "punch_trace_file": "/home/pedro/boxing-runs/striking-motion-cycle-v14/gates/baseline/neutral-0/native/trained-seed-31-swap-0.npz",
+      "punch_trace_sha256": "2e7c8d7facd49da8e6f7d6cb8db9b8b648ba4df076e30cdc395d005df4954393",
+      "punch_measurements": [],
+      "first_observed_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.032000000000000015
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 2.55599999999994
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 2.5959999999999357
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 2.6259999999999324
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/left_shin"
+          ],
+          "elapsed": 2.939999999999898
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_wrist_collision"
+          ],
+          "elapsed": 3.0499999999998857
+        }
+      ],
+      "trace_file": "/home/pedro/boxing-runs/striking-motion-cycle-v14/gates/baseline/neutral-0/full/trained-seed-31-swap-0.npz",
+      "trace_sha256": "fb567a67d4e82b27387428388babb3f907e6cdcd80b00117cd34388b1de3b7c7",
+      "first_fall_time": null,
+      "terminal_state": {
+        "corners": [
+          {
+            "pelvis_height": 0.7547001272427425,
+            "upright": 0.9815009117617942,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7569299362203993,
+            "upright": 0.9999406808293503,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ]
+        ]
+      }
+    },
+    {
+      "mode": "trained",
+      "seed": 31,
+      "swap": true,
+      "survived": true,
+      "elapsed": 10.000000000000009,
+      "final_distance": 0.5207254822611246,
+      "scored_by_corner": [
+        0.0,
+        0.0
+      ],
+      "raw_legal_impulse": [
+        0.41222250527640436,
+        0.0
+      ],
+      "fallen": [
+        false,
+        false
+      ],
+      "finite": true,
+      "minimum_hand_target_distance": [
+        0.15922489043073265,
+        0.21928579325607722
+      ],
+      "mean_abs_arm_residual": [
+        0.2013566703595401,
+        0.0
+      ],
+      "max_abs_arm_residual": [
+        0.8237260501109869,
+        0.0
+      ],
+      "impact_events": [],
+      "punch_trace_file": "/home/pedro/boxing-runs/striking-motion-cycle-v14/gates/baseline/neutral-0/native/trained-seed-31-swap-1.npz",
+      "punch_trace_sha256": "b0e16b211c68ab442d2ed70a62e5bb011b62e0f370a5d22aa36d4d9ac6f2ee2f",
+      "punch_measurements": [],
+      "first_observed_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.10200000000000008
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 1.6280000000000012
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 1.6520000000000012
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/left_shin"
+          ],
+          "elapsed": 1.9680000000000015
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 1.9960000000000016
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 7.025999999999448
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/torso_collision"
+          ],
+          "elapsed": 7.423999999999404
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_elbow_yaw_collision"
+          ],
+          "elapsed": 9.978000000000002
+        }
+      ],
+      "trace_file": "/home/pedro/boxing-runs/striking-motion-cycle-v14/gates/baseline/neutral-0/full/trained-seed-31-swap-1.npz",
+      "trace_sha256": "08f9d815ca614d0f6321baad8661c6f964295e6c477426014ab0d6b1cf253173",
+      "first_fall_time": null,
+      "terminal_state": {
+        "corners": [
+          {
+            "pelvis_height": 0.7381983792506633,
+            "upright": 0.9674734169186874,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7558190208540141,
+            "upright": 0.9973960592321104,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ]
+        ]
+      }
+    },
+    {
+      "mode": "trained",
+      "seed": 47,
+      "swap": false,
+      "survived": false,
+      "elapsed": 2.0539999999999954,
+      "final_distance": 0.34155308132695406,
+      "scored_by_corner": [
+        1.0,
+        0.0
+      ],
+      "raw_legal_impulse": [
+        0.9080887646006304,
+        4.872989401835488
+      ],
+      "fallen": [
+        true,
+        false
+      ],
+      "finite": true,
+      "minimum_hand_target_distance": [
+        0.14355500910140717,
+        0.10996701708937932
+      ],
+      "mean_abs_arm_residual": [
+        0.08905595896075334,
+        0.0
+      ],
+      "max_abs_arm_residual": [
+        0.4954945456676307,
+        0.0
+      ],
+      "impact_events": [
+        {
+          "control_step": 95,
+          "elapsed": 1.9200000000000015,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 1.9120000000000015,
+              "contact_window_impulse": 0.7930411062888703
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        }
+      ],
+      "punch_trace_file": "/home/pedro/boxing-runs/striking-motion-cycle-v14/gates/baseline/neutral-0/native/trained-seed-47-swap-0.npz",
+      "punch_trace_sha256": "5c76c3dced341cf217a84e1f8277d2997c929b422da15fa66d444dd38aaef1ef",
+      "punch_measurements": [
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 1.9080000000000015,
+          "event_time": 1.9120000000000015,
+          "onset_relative_speed": 0.6344844887392653,
+          "onset_forward_cosine": 0.05738751387739994,
+          "onset_contact_closing": 1.4427990515268159,
+          "onset_contact_advancing": 0.48424625138780253,
+          "pre_window_seconds": 0.24800000000000022,
+          "pre_peak_relative_speed": 1.6705566274581933,
+          "pre_max_displacement_m": 0.11783076526326364,
+          "pre_path_length_m": 0.3013668461919492,
+          "pre_elbow_excursion_rad": 0.3697625480510066,
+          "event_window_impulse_ns": 0.5607372368765253,
+          "native_contact_window_impulse_ns": 0.5607372368765253,
+          "post_window_seconds": 0.13999999999999413,
+          "post_contact_seconds": 0.024,
+          "return_toward_pre_window_position_m": 0.0014866438970589507,
+          "post_window_complete": false
+        }
+      ],
+      "first_observed_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.23600000000000018
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 1.8480000000000014
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 1.8560000000000014
+        },
+        {
+          "geoms": [
+            "red/head_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 1.8880000000000015
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/torso_collision"
+          ],
+          "elapsed": 1.9100000000000015
+        },
+        {
+          "geoms": [
+            "red/right_wrist_collision",
+            "blue/torso_collision"
+          ],
+          "elapsed": 1.9160000000000015
+        },
+        {
+          "geoms": [
+            "red/right_thigh",
+            "blue/right_shin"
+          ],
+          "elapsed": 1.9820000000000015
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_elbow_yaw_collision"
+          ],
+          "elapsed": 2.0359999999999974
+        }
+      ],
+      "trace_file": "/home/pedro/boxing-runs/striking-motion-cycle-v14/gates/baseline/neutral-0/full/trained-seed-47-swap-0.npz",
+      "trace_sha256": "f7c11a0e98f568d7ea452c5a9d2624c102eb157888f944eb20214764ae824909",
+      "first_fall_time": 2.0539999999999954,
+      "terminal_state": {
+        "corners": [
+          {
+            "pelvis_height": 0.5490694064840931,
+            "upright": 0.9335448784232632,
+            "low_pelvis": true,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7596926461897205,
+            "upright": 0.9905141670634703,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ]
+        ]
+      }
+    },
+    {
+      "mode": "trained",
+      "seed": 47,
+      "swap": true,
+      "survived": true,
+      "elapsed": 10.000000000000009,
+      "final_distance": 0.7784126739268615,
+      "scored_by_corner": [
+        1.0,
+        0.0
+      ],
+      "raw_legal_impulse": [
+        2.265351757059387,
+        0.0
+      ],
+      "fallen": [
+        false,
+        false
+      ],
+      "finite": true,
+      "minimum_hand_target_distance": [
+        0.1600911581356427,
+        0.22134177017317166
+      ],
+      "mean_abs_arm_residual": [
+        0.18354944163553882,
+        0.0
+      ],
+      "max_abs_arm_residual": [
+        0.7633003771775044,
+        0.0
+      ],
+      "impact_events": [
+        {
+          "control_step": 341,
+          "elapsed": 6.839999999999469,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 6.82999999999947,
+              "contact_window_impulse": 0.5993302069658721
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        }
+      ],
+      "punch_trace_file": "/home/pedro/boxing-runs/striking-motion-cycle-v14/gates/baseline/neutral-0/native/trained-seed-47-swap-1.npz",
+      "punch_trace_sha256": "45fbc6bc5505967fd95f767d086132b59aecfce01bd7ce06deaf38c2a01951c0",
+      "punch_measurements": [
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 6.817999999999471,
+          "event_time": 6.82999999999947,
+          "onset_relative_speed": 0.864218459249318,
+          "onset_forward_cosine": 0.2221203706835031,
+          "onset_contact_closing": 0.4119375632856118,
+          "onset_contact_advancing": 0.42020000562917725,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 1.540318483984914,
+          "pre_max_displacement_m": 0.10181187708124205,
+          "pre_path_length_m": 0.21700021709743622,
+          "pre_elbow_excursion_rad": 0.1089383565595004,
+          "event_window_impulse_ns": 0.5140374925402309,
+          "native_contact_window_impulse_ns": 0.5140374925402309,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.076,
+          "return_toward_pre_window_position_m": 0.003993634961366373,
+          "post_window_complete": true
+        }
+      ],
+      "first_observed_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.032000000000000015
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 2.203999999999979
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 2.2639999999999723
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/left_shin"
+          ],
+          "elapsed": 2.5259999999999434
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 2.5899999999999364
+        },
+        {
+          "geoms": [
+            "red/left_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 2.6799999999999264
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/torso_collision"
+          ],
+          "elapsed": 6.819999999999471
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_elbow_yaw_collision"
+          ],
+          "elapsed": 7.291999999999419
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 9.095999999999707
+        }
+      ],
+      "trace_file": "/home/pedro/boxing-runs/striking-motion-cycle-v14/gates/baseline/neutral-0/full/trained-seed-47-swap-1.npz",
+      "trace_sha256": "01710c8c8d15f3aba92bcfd1ba7333934ccc439dc938dcf27abcbdaa63237a3e",
+      "first_fall_time": null,
+      "terminal_state": {
+        "corners": [
+          {
+            "pelvis_height": 0.7464202033433055,
+            "upright": 0.9966752073071474,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7543136397587035,
+            "upright": 0.9990962726823661,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ]
+        ]
+      }
+    }
+  ],
+  "engagement_distance": 0.45,
+  "engagement_reward_distance": 0.45,
+  "actor_inputs": 148,
+  "actions": 17,
+  "body_residual_radians": 0.0,
+  "contact_history": true,
+  "sampled_policy": false,
+  "policy_sampling_log_std_offset": 0.0,
+  "diagnostic_arm_noise_scale": 1.0,
+  "diagnostic_arm_noise_hold": 1,
+  "neutral_partner_learner_corner": 0,
+  "diagnostic_zero_command_offsets": false,
+  "diagnostic_zero_arm_residuals": false,
+  "diagnostic_approach_gain": null,
+  "diagnostic_profile_override": false,
+  "certification": false
+}

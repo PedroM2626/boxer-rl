@@ -1,0 +1,27 @@
+wsl: Failed to translate 'D:\IBM Bob\bin'
+Author identity unknown
+
+*** Please tell me who you are.
+
+Run
+
+  git config --global user.email "you@example.com"
+  git config --global user.name "Your Name"
+
+to set your account's default identity.
+Omit --global to set the identity only in this repository.
+
+fatal: empty ident name (for <pedro@PedroM.localdomain>) not allowed
+Traceback (most recent call last):
+  File "/mnt/e/boxer-agent/tools/striking_motion_cycle_supervisor.py", line 221, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/mnt/e/boxer-agent/tools/striking_motion_cycle_supervisor.py", line 207, in main
+    evaluate(0,'baseline',SEEDS)
+  File "/mnt/e/boxer-agent/tools/striking_motion_cycle_supervisor.py", line 182, in evaluate
+    publish(label)
+  File "/mnt/e/boxer-agent/tools/striking_motion_cycle_supervisor.py", line 135, in publish
+    subprocess.run(['git','commit','-m',f'Record motion-cycle PPO {label}'],check=True)
+  File "/home/pedro/.local/share/uv/python/cpython-3.12.15-linux-x86_64-gnu/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'commit', '-m', 'Record motion-cycle PPO baseline']' returned non-zero exit status 128.
