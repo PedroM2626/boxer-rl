@@ -3,7 +3,20 @@
 Maintain the [trajectory and decision record](experiment-history.md) at every
 reviewed intervention, including failed results, accounting and pending evidence.
 
-**Current decision (2026-10-26):** the completed v14 block produced no valid
+**Latest completed review (2026-10-26):** v15 exhausted its 2,097,152-credit
+allocation with exact final 9132ab4c. Original/fresh neutral valid cycles are
+13/23; mirror cycles 2/0. Original survival 5/5/1 and fresh 6/5/2 out of eight
+per profile fail full gates. No training remains active, no promotion or rollback.
+Global diagnostic PPO 5,309,696 and formal controls 2,183,338. Retain the actual
+final optimizer; do not extend unchanged PPO. A separately declared diagnostic
+of at most 8,000 formal controls compares final v15 against its exact frozen
+training opponent in both roles on the existing fresh seeds, reusing the saved
+mirror comparison. Formal ceiling 2,191,338; no PPO, reward or physics changes.
+Read [the diagnostic protocol](results/striking-pilot/v15-opponent-gap/README.md)
+and inspect its live state before launching anything else:
+`/home/pedro/boxing-runs/striking-v15-opponent-gap/state.json`.
+
+**Earlier v15 decision (2026-10-26):** the completed v14 block produced no valid
 punch cycles. The [saved reward/exploration audit](results/striking-pilot/contact-progress-v15/proposal-audit.json)
 finds higher paid preparation/hand speed but larger target-center distances and
 fewer legal contacts; no demonstrated saved-covariance collapse. This justifies

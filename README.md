@@ -2,7 +2,16 @@
 
 ## Current experiment: unassisted paired boxing diagnostics
 
-Current next step (2026-10-26): [target-coupled contact-progress PPO v15](docs/striking-contact-progress-training.md)
+Latest review (2026-10-26): v15 completed all 2,097,152 new credits. The final
+policy produces **23 complete neutral-practice strikes on fresh seeds**, but
+only 2/8 fresh mirror pairs survive, with zero fresh mirror valid cycles.
+No full gate passes or general boxing completion. Unchanged PPO is stopped at
+its ceiling. A [bounded opponent-distribution diagnostic](docs/results/striking-pilot/v15-opponent-gap/README.md)
+now checks the exact frozen training adversary against the existing mirror result,
+with no learning or weakened criteria. See the
+[completed trajectory](docs/results/striking-pilot/contact-progress-v15/README.md).
+
+Earlier intervention (2026-10-26): [target-coupled contact-progress PPO v15](docs/striking-contact-progress-training.md)
 preserves the actual latest learner/Adam and unchanged physical gates. The audit
 finds faster preparation but larger target distances and less legal contact in
 v14; the new objective explicitly couples progress to targets/physical contact.
@@ -10,7 +19,7 @@ A [qualitative scope estimate](docs/completion-status.md) is about 40%; learned
 stable reciprocal boxing remains outstanding. New budgets are declared
 before collection; inspect live state before recovery or another launch.
 
-Latest reviewed outcome (2026-10-26): v15 at **1,048,576 new credits** produces
+Intermediate reviewed outcome (2026-10-26): v15 at **1,048,576 new credits** produces
 **six complete deterministic punch cycles against neutral partners**, four in
 corner 0 and two in corner 1, on two surviving known seeds per corner. The
 [independent saved-trace review](docs/results/striking-pilot/contact-progress-v15/step-1048576-independent-review.json)

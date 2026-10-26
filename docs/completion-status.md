@@ -16,6 +16,13 @@ because code, reports and checkpoints exist.
 | Stable repeated attacks and return in both corners | Outstanding |
 | Reciprocal boxing, defense and fresh/longer-round robustness | Outstanding; survival alone is insufficient |
 
+The completed v15 final produces 23 valid neutral-practice cycles on fresh seeds
+(13/10 across learner corners), but fresh mirror survival is 2/8 with zero valid
+cycles. Original mirror has two valid corner-1 cycles with only 1/8 pair survival.
+These results strengthen the isolated learned-strike evidence without closing
+the stable reciprocal-fight gap. No complete gate passes. Unchanged training is
+stopped at the approved ceiling; a bounded frozen-opponent diagnostic is active.
+
 The first deterministic neutral-practice strikes are now supported by native
 motion/contact/recovery measurements. At the subsequent 1,572,864-credit gate,
 neutral valid cycles fall from six to two; mirror survival recovers to 2/8 but

@@ -23,12 +23,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--label', required=True)
     args = parser.parse_args()
-    assert args.label.startswith('step-') and args.label[5:].isdigit()
+    assert args.label == 'fresh-final' or (args.label.startswith('step-') and args.label[5:].isdigit())
     archive = Path('docs/results/striking-pilot/contact-progress-v15')
     folder = archive / 'gates' / args.label
     gate = json.loads((folder / 'motion-gate.json').read_text())
     prerequisites = verify_prerequisites()
-    cp = Path('checkpoints/striking-validation/contact-progress-v15') / args.label
+    checkpoint_label = 'step-2097152' if args.label == 'fresh-final' else args.label
+    cp = Path('checkpoints/striking-validation/contact-progress-v15') / checkpoint_label
     manifest = json.loads((cp / 'latest.json').read_text())
     payload = cp / manifest['file']
     assert sha(payload) == manifest['sha256'] == gate['sha256']
