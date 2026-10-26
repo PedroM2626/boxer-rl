@@ -187,3 +187,44 @@ lineage world controls **3,555,328**. New gate evaluation **8,635**, cumulative 
 forwards **2,197**, all retained. The live next-chunk counter advances separately.
 Evidence: `step-1048576-independent-review.json`; reusable read-only check:
 `tools/review_contact_progress_gate.py --label step-1048576`.
+
+## Third v15 full gate: more contacts, weaker recovery, 2026-10-26
+
+Independently reviewed **step-1572864**, exact checkpoint
+`39f9e3d39b03d6164518c8418c46fa3eb4b24c92d6b01e8f254ab4daf0589e2d`.
+The saved-data audit rechecks all 24 native/full trace hashes, finite arrays,
+PPO payload, legal native impulse and unchanged full motion/contact conjunctions;
+complete foundation histories/prerequisites remain verified. No new simulation,
+optimization, geometry search or rendering is consumed by this review.
+
+Pair survival is **6/8 neutral 0, 7/8 neutral 1, 2/8 mirror**, compared with
+7/8, 7/8, 0/8 at the preceding gate. There are **two complete deterministic
+neutral cycles**, one corner-0 cycle on surviving seed 31 and one corner-1 cycle
+on surviving seed 23. Each neutral role now misses the two-seed motion criterion.
+Mirror has zero valid cycles; two surviving episodes exchange legacy contacts.
+Neither original nor motion full gates pass; consecutive complete-pass streak
+remains zero. This is mixed evidence, not steady improvement or certification.
+
+Across the complete gate, legacy event descriptors increase **271 -> 436**,
+onset-speed qualifying events **209 -> 384**, pretravel qualifying events
+**65 -> 198**, but return-travel qualifying events fall **80 -> 30**, and full
+cycles **6 -> 2**. Counts concern individual components across the complete set,
+not matched causal comparisons; they cannot be borrowed across events or hands.
+These observations identify recovery consistency as a continuing bottleneck, not
+an isolated cause of the survival regression or proof of eventual convergence.
+
+Decision: retain the actual latest checkpoint/Adam and continue the already
+approved final chunk toward **2,097,152 new credits**, then original and fresh
+full evaluations. Do not roll back to the six-cycle checkpoint, weaken criteria,
+add a recovery reward mid-block, or extend the budget now. Review all completed
+policies/gates at the ceiling before deciding whether a bounded new intervention
+is justified. Exactly one learner and one supervisor are live, all native-error
+logs empty; training remains productive with free legs and unassisted physics.
+
+At this completed gate: new PPO/collection **1,572,864**, global diagnostic PPO
+**4,785,408**; lineage consumed/optimized **4,702,208**, lineage world controls
+**4,079,616**. This gate uses **9,023** evaluation controls; v15 cumulative
+**27,586**, global formal **2,168,560**, under the existing **2,200,974** ceiling.
+The live final-chunk counter advances separately. Main **476,041,216**, BC
+**8,000**, cloned queries **6,349**, signed-distance calls **960** and render
+forwards **2,197** unchanged. Evidence: `step-1572864-independent-review.json`.

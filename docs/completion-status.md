@@ -17,7 +17,11 @@ because code, reports and checkpoints exist.
 | Reciprocal boxing, defense and fresh/longer-round robustness | Outstanding; survival alone is insufficient |
 
 The first deterministic neutral-practice strikes are now supported by native
-motion/contact/recovery measurements. The same checkpoint fails all eight mirror
+motion/contact/recovery measurements. At the subsequent 1,572,864-credit gate,
+neutral valid cycles fall from six to two; mirror survival recovers to 2/8 but
+still has zero valid cycles. No full pass or consistent retention is established.
+The preceding 1,048,576-credit checkpoint's
+evaluation fails all eight mirror
 episodes on pair survival, with zero scored contacts or valid cycles there.
 This is a serious stability regression from 5/8 mirror survivors at the preceding
 gate, not completion of reciprocal boxing. No causal explanation is established.

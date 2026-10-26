@@ -43,6 +43,15 @@ with no intervention, budget extension or numerical error. See
 [the independent review](results/striking-pilot/contact-progress-v15/step-1048576-independent-review.json).
 This is limited deterministic striking evidence, not stable reciprocal boxing.
 
+**Third gate, 1,572,864 new credits:** saved-data review verifies checkpoint
+39f9e3d3. Neutral complete cycles fall from six to two (one per role, each on
+only one surviving seed); mirror has zero. Pair survival is 6/8, 7/8, 2/8.
+More scored contacts/speed/pretravel coexist with fewer qualifying returns.
+No complete pass or promotion. Continue only the predeclared final chunk and
+full/fresh checks at 2,097,152; no rollback, gate change or budget extension.
+Formal controls total 2,168,560; diagnostic PPO at the completed gate 4,785,408.
+See [third-gate review](results/striking-pilot/contact-progress-v15/step-1572864-independent-review.json).
+
 
 **Earlier reviewed outcome (2026-10-24):** the
 [broader frozen audit](striking-gae-generalization.md) completed 130 episodes /
