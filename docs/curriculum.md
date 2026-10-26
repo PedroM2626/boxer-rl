@@ -32,6 +32,17 @@ approved continuation and all criteria unchanged. Formal evaluation is 2,150,902
 renderer forwards 2,197 after two read-only 66-frame renders. No new training or
 physical evaluation allocation, interruption, source rollback or promotion.
 
+**Next full gate, 1,048,576 new v15 credits:** independent saved-data review of
+b2a2c04c verifies six deterministic valid cycles (neutral 0: four; neutral 1: two),
+on surviving seeds 7 and 23 in both corners. These neutral motion subchecks pass,
+but original survival remains 7/8 and 7/8, and mirror survival regresses to 0/8
+with no scored contact before termination. No full pass, streak or promotion.
+Formal evaluation now totals 2,159,537 (18,563 new in v15); main remains
+476,041,216. Continue the already approved next chunk to 1,572,864 new credits,
+with no intervention, budget extension or numerical error. See
+[the independent review](results/striking-pilot/contact-progress-v15/step-1048576-independent-review.json).
+This is limited deterministic striking evidence, not stable reciprocal boxing.
+
 
 **Earlier reviewed outcome (2026-10-24):** the
 [broader frozen audit](striking-gae-generalization.md) completed 130 episodes /

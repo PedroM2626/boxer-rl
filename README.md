@@ -7,16 +7,25 @@ preserves the actual latest learner/Adam and unchanged physical gates. The audit
 finds faster preparation but larger target distances and less legal contact in
 v14; the new objective explicitly couples progress to targets/physical contact.
 A [qualitative scope estimate](docs/completion-status.md) is about 40%; learned
-valid punches and reciprocal boxing remain outstanding. New budgets are declared
+stable reciprocal boxing remains outstanding. New budgets are declared
 before collection; inspect live state before recovery or another launch.
 
-Latest reviewed outcome (2026-10-26): [motion-cycle PPO v14 completed](docs/results/striking-pilot/motion-cycle-v14/README.md)
+Latest reviewed outcome (2026-10-26): v15 at **1,048,576 new credits** produces
+**six complete deterministic punch cycles against neutral partners**, four in
+corner 0 and two in corner 1, on two surviving known seeds per corner. The
+[independent saved-trace review](docs/results/striking-pilot/contact-progress-v15/step-1048576-independent-review.json)
+verifies checkpoint/native/full hashes, finite arrays and unchanged criteria.
+However, mirror pair survival regresses from 5/8 to **0/8**, with no scored contacts
+or valid cycles before termination. Neither full gate passes; no promotion or
+main adoption. The approved v15 job continues toward its next scheduled gate,
+within the existing 2,097,152-credit allocation, without resets or weaker gates.
+
+Earlier outcome (2026-10-26): [motion-cycle PPO v14 completed](docs/results/striking-pilot/motion-cycle-v14/README.md)
 all 1,048,576 new learner credits and six full evaluations before the computer
 restart. All 144 saved native/full trajectories verify, but **zero valid complete
 punch cycles** occur. Fresh final pair survival is 20/24; no boxing milestone or
-main adoption. No job or new allocation is active. Review reward/exploration
-before a separately justified continuation; the finite block does not prove
-learning impossible.
+main adoption. That completed block motivated the separately declared v15
+continuation; the finite block does not prove learning impossible.
 
 See the [project trajectory and experiment index](docs/experiment-history.md)
 for reviewed successes, failed approaches, limitations and pending decisions.

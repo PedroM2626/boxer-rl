@@ -12,12 +12,18 @@ because code, reports and checkpoints exist.
 | Two free bodies, real contacts, fists, separated spawns | Implemented and physically checked; no support forces |
 | Standing, walking, approach | Four foundation stages certified by distinct consecutive full passes |
 | Paired training, provenance, native motion evaluation | Implemented, with complete failures and budgets retained |
-| Learned complete valid punch | Not demonstrated; v14 full 1,048,576-credit block and 144 evaluations have zero |
+| Learned complete valid punch | v15 at 1,048,576 new credits: six deterministic cycles against neutral partners, both corners; known seeds only |
 | Stable repeated attacks and return in both corners | Outstanding |
 | Reciprocal boxing, defense and fresh/longer-round robustness | Outstanding; survival alone is insufficient |
 
-The next concrete gap is linking learned arm motion to real legal impacts and
-recovery. The [v15 protocol](striking-contact-progress-training.md) addresses the
+The first deterministic neutral-practice strikes are now supported by native
+motion/contact/recovery measurements. The same checkpoint fails all eight mirror
+episodes on pair survival, with zero scored contacts or valid cycles there.
+This is a serious stability regression from 5/8 mirror survivors at the preceding
+gate, not completion of reciprocal boxing. No causal explanation is established.
+The next concrete gap is preserving balance while both policies act, then
+repeating valid strikes against active opponents across fresh conditions.
+The [v15 protocol](striking-contact-progress-training.md) addresses the
 measured separation between paid preparation and actual target contact, without
 weakening full gates or rolling back the actual latest final. It is a bounded
 next learning intervention, not a claim that the remaining gap has been closed.

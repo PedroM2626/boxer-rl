@@ -435,3 +435,44 @@ scope labels. An occluded initial view was preserved and camera-only revision
 verified. All 330 frames decode; two impact previews inspected. New render forwards
 132, cumulative 2,197. No additional training/evaluation/geometry/BC allocation,
 policy alteration, rollback, current-learner interruption or promotion.
+
+## Deterministic neutral strikes and mirror regression, 2026-10-26
+
+At the scheduled **1,048,576 new-credit** gate, checkpoint **b2a2c04c**
+(`b2a2c04cd69e9ff8059647bae4ef8750033496f5edcb6ef1b560ea2fb6232df1`)
+produces six complete valid cycles without policy sampling: four neutral-0 and
+two neutral-1. Each role has valid cycles on surviving known seeds 7 and 23.
+Independent saved-data review checks all 24 native/full trace hashes and finite
+arrays, reproduces native descriptors and full motion/original contact results,
+checks legal impulse/closing/advancement, and validates the exact PPO payload.
+No new physics, optimizer, render or geometry controls are consumed by review.
+
+The important failure remains: neutral pair survival is 7/8 and 7/8, while mirror
+pair survival falls from 5/8 at 524,288 to **0/8**. All eight mirror episodes end
+at first-fall predicates after 0.842–6.552 seconds, before any scored legal contact;
+zero mirror valid cycles. Therefore these failures are not evidence of successful
+knockouts. The recorded first-fall predicate does not by itself isolate the cause
+of instability; changing arm motions/engagement may contribute but is not proven.
+The neutral-motion success cannot replace original survival or reciprocal gates.
+
+Training reports 171 learner cycles and zero frozen-opponent cycles at the chunk
+boundary; these are sampled training counters, distinct from the six verified
+deterministic evaluation events. The parent and exactly one next learner remain
+alive, native error logs empty. All earlier failed gates are preserved. Full
+foundation histories remain certified and unchanged. No complete v15 pass exists.
+
+Decision: continue the predeclared chunk to **1,572,864 new credits**, ordinary
+warm start from the actual latest policy/Adam, without rollback, reward/physics
+changes, weakened gates or budget extension. The total v15 ceiling remains
+2,097,152 new credits and 60,000 evaluation controls. Review the next full gate
+for mirror recovery as well as neutral strike retention before any further
+intervention; surviving neutral strikes alone do not justify adoption.
+
+Accounting at this completed gate: new v15 PPO/collection controls **1,048,576**,
+global diagnostic PPO **4,261,120**; lineage consumed/optimized **4,177,920**,
+lineage world controls **3,555,328**. New gate evaluation **8,635**, cumulative v15
+**18,563**, global formal **2,159,537** under 2,200,974. Main **476,041,216**, BC
+**8,000**, cloned queries **6,349**, signed-distance calls **960**, renderer
+forwards **2,197**, all retained. The live next-chunk counter advances separately.
+Evidence: `step-1048576-independent-review.json`; reusable read-only check:
+`tools/review_contact_progress_gate.py --label step-1048576`.
