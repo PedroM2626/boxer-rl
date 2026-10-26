@@ -363,3 +363,27 @@ The original `fall` label includes self-leg contact and need not depict a topple
 body. Zero valid punches is displayed explicitly. Render forwards now 2,065;
 formal evaluation 2,140,974 and diagnostic PPO 3,212,544 remain unchanged.
 Source hashes, indices and video checksum: motion-cycle-v14/final-video.json.
+
+## Functional scope estimate and target-coupled v15, 2026-10-26
+
+The [approximately 40% estimate](completion-status.md) is qualitative demonstrated
+functional scope, not remaining time or learning convergence. Core learned
+strikes/reciprocal boxing still lack evidence. The saved-array reward audit shows
+after 3 s: learner median hand speed .415 -> .556 m/s, minimum hand/target-center
+distance .291 -> .347 m, legal contact fraction .002229 -> zero; replayed
+preparation reward 11.68 -> 23.18 on original-seed evaluation cohorts. Saved
+Gaussian std remains about .13-.15. Correlation does not isolate every cause;
+this is evidence for replacing target-uncoupled preparation, not raising noise
+or declaring learning impossible.
+
+[V15 prospective protocol](striking-contact-progress-training.md) preserves actual
+latest be59681d, actor/critic/Adam/RNG/norm and teacher coefficient zero. Replace
+forward-air payment with bounded terminal-corrected target potential; graded
+same-hand real legal contact subgoals supply credit without declaring punches.
+Keep delayed complete-cycle payment and every independent original/motion gate.
+Allocate at most 2,097,152 new credits (global 3,212,544 -> 5,309,696), plus at most
+60,000 new evaluation controls (2,140,974 -> 2,200,974). First 1,024 integration
+included. Reuse the exact v14 final full historical baseline without rerunning,
+relabeling source hashes or double-counting consumed evaluation. Main and all
+geometry/render/BC counters retained. This is an executed next learning
+intervention toward the gap, not a claim that the gap has been closed.

@@ -2,6 +2,14 @@
 
 ## Current experiment: unassisted paired boxing diagnostics
 
+Current next step (2026-10-26): [target-coupled contact-progress PPO v15](docs/striking-contact-progress-training.md)
+preserves the actual latest learner/Adam and unchanged physical gates. The audit
+finds faster preparation but larger target distances and less legal contact in
+v14; the new objective explicitly couples progress to targets/physical contact.
+A [qualitative scope estimate](docs/completion-status.md) is about 40%; learned
+valid punches and reciprocal boxing remain outstanding. New budgets are declared
+before collection; inspect live state before recovery or another launch.
+
 Latest reviewed outcome (2026-10-26): [motion-cycle PPO v14 completed](docs/results/striking-pilot/motion-cycle-v14/README.md)
 all 1,048,576 new learner credits and six full evaluations before the computer
 restart. All 144 saved native/full trajectories verify, but **zero valid complete

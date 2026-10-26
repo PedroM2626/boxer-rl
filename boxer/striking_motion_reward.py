@@ -35,7 +35,7 @@ class MotionCycleMonitor(PunchTrace):
         self._capture_events(self.rows[-1])
         if len(self.rows)>PROFILE['retained_native_samples']:del self.rows[0]
 
-    def consume(self,dt=.02):
+    def consume(self,dt=.02,terminal=False):
         if not self.rows or not self.new_rows:return np.zeros(2),np.zeros(2)
         recent=self.rows[-self.new_rows:]
         new=np.asarray([r['local_velocity'] for r in recent])

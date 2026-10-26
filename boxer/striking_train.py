@@ -106,6 +106,9 @@ def require_ppo_checkpoint(saved):
     if 'motion_cycle_transition' in saved or 'motion_reward_profile' in saved or saved.get('motion_cycle_ppo'):
         from boxer.striking_motion_reward import validate_motion_metadata
         validate_motion_metadata(saved)
+    if 'contact_progress_transition' in saved or 'contact_progress_profile' in saved or saved.get('contact_progress_ppo'):
+        from boxer.striking_contact_progress import validate_progress_metadata
+        validate_progress_metadata(saved)
     kind=saved.get('optimizer_kind')
     if kind is not None:
         from boxer.striking_ppo_warmstart import OPTIMIZER_KIND,validate_split_checkpoint
@@ -195,6 +198,7 @@ def main(argv=None):
     parser.add_argument('--reduced-noise-ppo',action='store_true',help='explicit half-standard-deviation on-policy sampling profile')
     parser.add_argument('--kl-guard-ppo',action='store_true',help='explicit actor-only full-rollout KL stop, critic keeps all updates')
     parser.add_argument('--long-gae-ppo',action='store_true',help='explicit lambda .99 over latest original fixed-opponent control')
+    parser.add_argument('--contact-progress-ppo',action='store_true',help='v15 target-coupled potential and physical per-hand contact subgoals')
     parser.add_argument('--motion-cycle-ppo',action='store_true',help='versioned complete-cycle reward with obsolete touch-teacher loss disabled')
     parser.add_argument('--pool-opponent-ppo',action='store_true',help='explicit immutable archived opponent pool over the latest long-GAE source')
     parser.add_argument('--conservative-actor-ppo',action='store_true')
@@ -236,6 +240,8 @@ def main(argv=None):
         raise ValueError('KL guard requires original covariance and fixed-opponent rewards')
     if args.long_gae_ppo and (not args.fixed_opponent_ppo or args.kl_guard_ppo or args.reduced_noise_ppo or args.posture_cost_ppo):
         raise ValueError('long GAE requires the original fixed-opponent update and reward path')
+    if args.contact_progress_ppo and not args.motion_cycle_ppo:
+        raise ValueError('contact progress requires the retained explicit motion-cycle task')
     if args.motion_cycle_ppo and (not args.long_gae_ppo or args.pool_opponent_ppo or args.retention_loss_weight!=0.):
         raise ValueError('motion-cycle training requires original long-GAE fixed task and zero teacher loss')
     if args.pool_opponent_ppo and not args.long_gae_ppo:
@@ -293,6 +299,7 @@ def train(args):
     long_gae_ppo=getattr(args,'long_gae_ppo',False)
     pool_opponent_ppo=getattr(args,'pool_opponent_ppo',False)
     motion_cycle_ppo=getattr(args,'motion_cycle_ppo',False)
+    contact_progress_ppo=getattr(args,'contact_progress_ppo',False)
     env_class=StrikingEnv
     if contact_ppo:
         from boxer.striking_contact import ContactAwareStrikingEnv
@@ -372,6 +379,10 @@ def train(args):
         from boxer.striking_motion_reward import PROFILE as MOTION_PROFILE
         interface_metadata.update(motion_cycle_ppo=True,motion_reward_profile=MOTION_PROFILE)
         config.update(interface_metadata,version=14)
+    if contact_progress_ppo:
+        from boxer.striking_contact_progress import PROFILE as PROGRESS_PROFILE
+        interface_metadata.update(contact_progress_ppo=True,contact_progress_profile=PROGRESS_PROFILE)
+        config.update(interface_metadata,version=15)
     checkpoint_path=args.output/'checkpoint/latest.json'
     if previous:
         if not args.resume:
@@ -394,6 +405,8 @@ def train(args):
             raise ValueError('boxing checkpoint checksum mismatch')
         saved=pickle.loads(payload)
         require_ppo_checkpoint(saved)
+        if contact_progress_ppo != saved.get('contact_progress_ppo',False):
+            raise ValueError('contact progress checkpoint and explicit training reward must agree')
         if motion_cycle_ppo != saved.get('motion_cycle_ppo',False):
             raise ValueError('motion-cycle checkpoint and explicit training reward must agree')
         if demonstration_ppo != saved.get('demonstration_ppo',False):
@@ -506,7 +519,11 @@ def train(args):
     obs=np.stack([env.reset(args.seed+1009*i+int(episode[i]),swap=bool(i%2)) for i,env in enumerate(envs)]).reshape(rows,observation_size)
     if motion_cycle_ppo:
         from boxer.striking_motion_reward import MotionCycleMonitor,replace_contact_payment
-        motion_monitors=[MotionCycleMonitor() for env in envs]
+        monitor_class=MotionCycleMonitor
+        if contact_progress_ppo:
+            from boxer.striking_contact_progress import ContactProgressMonitor
+            monitor_class=ContactProgressMonitor
+        motion_monitors=[monitor_class() for env in envs]
         for env,monitor in zip(envs,motion_monitors):env.env.pair.diagnostic_punch_trace=monitor
     if pool_opponent_ppo:
         from boxer.striking_opponent_pool import (restore_sampler, draw_opponent,
@@ -538,6 +555,7 @@ def train(args):
     motion_cycles=np.asarray(progress.get('motion_cycles_by_corner',[0.,0.]),float) if motion_cycle_ppo else np.zeros(2)
     motion_own=float(progress.get('motion_learner_cycles_total',0.)) if motion_cycle_ppo else 0.
     motion_other=float(progress.get('motion_opponent_cycles_total',0.)) if motion_cycle_ppo else 0.
+    progress_potential=0.;progress_contact=0.
     motion_dense=0.
     posture_cost_sum=0.
     def record(status='running',**extra):
@@ -556,6 +574,7 @@ def train(args):
             progress.update(pool_credits_by_opponent_and_corner=pool_credits.tolist(),
                 pool_sampler_state=pool_rng.bit_generator.state,pool_assignments=pool_assignments.tolist())
         if motion_cycle_ppo:progress.update(motion_cycles_by_corner=motion_cycles.tolist(),motion_learner_cycles_total=motion_own,motion_opponent_cycles_total=motion_other,session_motion_dense_reward=motion_dense)
+        if contact_progress_ppo:progress.update(session_target_potential_reward=progress_potential,session_physical_contact_progress_reward=progress_contact)
         if posture_cost_ppo:progress['session_posture_cost']=posture_cost_sum
         if kl_guard_ppo:progress.update(kl_guard_actor_steps_total=sum(guard_steps),last_kl_guard=last_guard)
         atomic_json(args.output/'progress.json',progress)
@@ -606,8 +625,12 @@ def train(args):
                         opponent_actions[i] if env.active_opponent else None)
                 else:next_obs,reward,done,outcome=env.step(actions[i])
                 if motion_cycle_ppo:
-                    cycles,dense=motion_monitors[i].consume()
+                    cycles,dense=motion_monitors[i].consume(terminal=done)
                     reward=replace_contact_payment(reward,outcome,cycles,dense,env.learner_corner)
+                    if contact_progress_ppo:
+                        parts=motion_monitors[i].last_components
+                        progress_potential+=float(parts['target_potential'][env.learner_corner])
+                        progress_contact+=float(parts['physical_contact_progress'][env.learner_corner])
                     motion_cycles+=cycles;motion_own+=float(cycles[env.learner_corner]);motion_other+=float(cycles[1-env.learner_corner]);motion_dense+=float(dense[env.learner_corner])
                 if posture_cost_ppo:
                     from boxer.striking_posture_cost import learner_cost
@@ -620,7 +643,7 @@ def train(args):
                     episode[i]+=1
                     next_obs=env.reset(args.seed+1009*i+int(episode[i]),swap=bool(episode[i]%2))
                     if motion_cycle_ppo:
-                        motion_monitors[i]=MotionCycleMonitor()
+                        motion_monitors[i]=monitor_class()
                         env.env.pair.diagnostic_punch_trace=motion_monitors[i]
                     if pool_opponent_ppo:pool_assignments[i]=draw_opponent(pool_rng,env.active_opponent)
                 following.append(next_obs)

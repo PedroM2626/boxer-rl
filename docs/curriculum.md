@@ -3,17 +3,20 @@
 Maintain the [trajectory and decision record](experiment-history.md) at every
 reviewed intervention, including failed results, accounting and pending evidence.
 
-**Current decision (2026-10-26):** [motion-cycle PPO v14 is completed and independently reviewed](results/striking-pilot/motion-cycle-v14/README.md).
-All 1,048,576 new credits were consumed/optimized; all six complete gates and 144
-native/full trajectories verify. Zero complete valid punch cycles in training or
-evaluation. Intermediate 24/24 pair survival does not establish striking; fresh
-final survival is 20/24 with one low-speed contact. All original complete contact
-and added motion gates fail. No learner adoption, phase promotion or boxing
-certification. Completion preceded the reported restart; no job is active.
-Do not resume the completed allocation or rollback. Next review reward component
-scale/credit and exploration before a separately justified bounded continuation.
-The result rejects a success claim for this block, not the possibility of learning
-with further work. Full results/checkpoints were pushed to the existing remote.
+**Current decision (2026-10-26):** the completed v14 block produced no valid
+punch cycles. The [saved reward/exploration audit](results/striking-pilot/contact-progress-v15/proposal-audit.json)
+finds higher paid preparation/hand speed but larger target-center distances and
+fewer legal contacts; no demonstrated saved-covariance collapse. This justifies
+[prospective target-coupled contact-progress PPO v15](striking-contact-progress-training.md),
+not a success claim or weakened gates. Preserve actual latest be59681d and all
+Adam/RNG/norm; replace air-preparation payment with bounded target potential and
+explicit graded same-hand physical contact subgoals. Full-cycle criteria unchanged.
+New ceiling: at most 2,097,152 learner credits (global PPO 5,309,696) and 60,000
+new evaluation controls (global formal 2,200,974); historical v14 baseline reused
+with its actual source hash and zero new evaluation debit. No main adoption or
+new geometry/BC/render allocation. Live job:
+`/home/pedro/boxing-runs/striking-contact-progress-v15/audit.json` and
+`training/progress.json`; inspect actual processes before launch or recovery.
 
 **Earlier reviewed outcome (2026-10-24):** the
 [broader frozen audit](striking-gae-generalization.md) completed 130 episodes /
@@ -123,7 +126,7 @@ Reviewed diagnostic PPO is **3,212,544**, at its completed ceiling after v14 add
 67,172 new controls, under **2,145,802**; unused **4,828 expire**. V14 collection
 world controls **1,048,576** are recorded separately from these evaluations.
 Final saved-state video adds 1,565 render forwards (cumulative **2,065**), with zero new physical or optimizer transitions.
-No additional PPO or evaluation allocation is active; current live state is
+The historical v14 allocation is closed; the separate prospective v15 allocation above applies. Completed v14 live state is
 `/home/pedro/boxing-runs/striking-motion-cycle-v14/audit.json` (completed).
 Cloned kinematic evaluations are now **6,349** after 48 producer + 48 independent
 surface-audit forwards. Signed-distance queries are separately **960** (480 + 480).

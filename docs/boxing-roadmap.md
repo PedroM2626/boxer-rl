@@ -124,3 +124,14 @@ one low-speed touch. No certification/adoption or active job. Review reward scal
 credit and exploration before a separately justified continuation. Actual learned
 impact/travel/recovery, stable reciprocal boxing, two distinct complete passes and
 fresh validation remain outstanding. Preserve all budgets and failed evidence.
+
+## Closing the remaining functional gap: v15
+
+See [completion status](completion-status.md) for the qualitative approximately
+40% scope estimate and outstanding capabilities. [V15](striking-contact-progress-training.md)
+addresses measured air-preparation reward without target contact, preserving all
+physical criteria and the latest optimizer. This is a bounded 2,097,152-credit
+next experiment, with exact historical-baseline reuse, full repeated checks and
+fresh seeds. Partial contact subgoals are not punches. First demonstrate learned
+complete strikes; then stable repeated reciprocal exchanges and broader rounds.
+Do not equate infrastructure completion with functional boxing completion.
