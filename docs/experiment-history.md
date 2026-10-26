@@ -387,3 +387,15 @@ included. Reuse the exact v14 final full historical baseline without rerunning,
 relabeling source hashes or double-counting consumed evaluation. Main and all
 geometry/render/BC counters retained. This is an executed next learning
 intervention toward the gap, not a claim that the gap has been closed.
+
+## V15 verified integration and active learning, 2026-10-26
+
+Thirty focused tests pass. The included 1,024-credit real integration produces
+finite checkpoint 9da56178, actor/critic Adam 31,384/55,056, 18 passive update-audit
+records with zero initial ratio clipping and empty native stderr. Graded contact
+payment is exercised (1.41765); complete learner cycles remain zero. This is a
+mechanical/credit-path check, not evidence of learned valid punches. No source
+field or optimizer was reset. Historical baseline reuse consumes zero new
+evaluation transitions. The persistent job is collecting/updating toward 524,288
+new credits within the 2,097,152 allocation; inspect live progress for current
+consumption. Partial milestones must not be presented as closing the boxing gap.
