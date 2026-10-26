@@ -4,4 +4,4 @@ cd "$(dirname "$0")/.."
 export PYTHONPATH=.
 export JAX_PLATFORMS=cpu
 export MUJOCO_GL=egl
-exec "$HOME/venvs/boxing_curriculum/bin/python" -u tools/run_v15_opponent_gap.py
+exec "$HOME/venvs/boxing_curriculum/bin/python" -u tools/run_v15_opponent_gap.py "$@"

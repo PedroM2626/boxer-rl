@@ -16,6 +16,17 @@ Read [the diagnostic protocol](results/striking-pilot/v15-opponent-gap/README.md
 and inspect its live state before launching anything else:
 `/home/pedro/boxing-runs/striking-v15-opponent-gap/state.json`.
 
+That diagnostic is now completed/reviewed: 3/8 and 4/8 pair survivors, with
+zero/one learner valid cycles; the learner also falls against its actual frozen
+training opponent. Formal total 2,188,806. Opponent identity alone does not resolve
+the deficit. The next bounded action-interface diagnostic masks only learned
+navigation offsets in both current actors, preserving motor/arms/physics, on
+the same fresh set. At most 4,000 new formal controls; ceiling 2,192,806, zero PPO.
+Masked diagnostics are never promotable. Active output:
+`/home/pedro/boxing-runs/striking-v15-navigation-ablation/state.json`.
+Read [the prospective protocol](results/striking-pilot/v15-navigation-ablation/README.md)
+before intervening or launching another job.
+
 **Earlier v15 decision (2026-10-26):** the completed v14 block produced no valid
 punch cycles. The [saved reward/exploration audit](results/striking-pilot/contact-progress-v15/proposal-audit.json)
 finds higher paid preparation/hand speed but larger target-center distances and
