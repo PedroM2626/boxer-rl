@@ -399,3 +399,20 @@ field or optimizer was reset. Historical baseline reuse consumes zero new
 evaluation transitions. The persistent job is collecting/updating toward 524,288
 new credits within the 2,097,152 allocation; inspect live progress for current
 consumption. Partial milestones must not be presented as closing the boxing gap.
+
+## First complete-cycle training counter and evidence capture, 2026-10-26
+
+V15 progress reports the first learner complete-cycle **0 -> 1** at 404,480 new
+credits (optimized lineage 3,533,824), corner 0; opponent cycles stay zero. The
+previous/first log records and adjacent policy snapshots 3,531,776 / 3,532,800 /
+3,533,824 are archived with hashes. This is a training-monitor signal only: the
+first event's raw native window was not retained, exact hand/episode are unknown,
+and no held-out full gate has confirmed it. No phase or adoption is advanced.
+
+Keep the live 524,288-target collection running without restart or new allocation.
+Add passive bounded-window event/pose/control/policy-version capture for the next
+naturally launched training chunks; no retrospective video is invented. Independent
+acceptance remains unchanged. Thirty-two focused tests pass, including unchanged
+physics with capture on and checksum/provenance serialization. All main counters,
+foundation histories and source policies remain verified. No extra physics or
+geometry was consumed by this log/checkpoint review.

@@ -9,6 +9,7 @@ from boxer.striking_motion_reward import (SOURCE,SOURCE_SHA,PROFILE,prepare_moti
 from boxer.striking_train import require_ppo_checkpoint,validate_resume_config,main
 from tools.striking_contact_compare import load_checked
 from test_strike_motion import event
+from test_paired_foundation import foundation
 
 
 def test_warm_start_preserves_latest_actor_critic_adam_rng_and_normalizer():
@@ -95,7 +96,7 @@ def test_complete_synthetic_native_cycle_pays_once_only_after_full_post_window()
     arrays['event'][164,0,1]=True
     arrays['impulse'][125:165,0,1]=.013
     arrays['window_impulse'][164,0,1]=.52
-    monitor=MotionCycleMonitor();total=np.zeros(2)
+    monitor=MotionCycleMonitor();monitor.capture_completed_events=True;total=np.zeros(2)
     for i in range(n):
         monitor.rows.append({k:v[i].copy() for k,v in arrays.items()});monitor.new_rows+=1
         monitor._capture_events(monitor.rows[-1])
@@ -103,6 +104,9 @@ def test_complete_synthetic_native_cycle_pays_once_only_after_full_post_window()
             cycles,_=monitor.consume();total+=cycles
             if t[i]<.826:np.testing.assert_array_equal(total,0.)
     np.testing.assert_array_equal(total,[1.,0.])
+    captured=monitor.take_completed_evidence();assert len(captured)==1 and captured[0]['event']['hand']==1
+    assert cycle_qualifies(captured[0]['event']) and len(captured[0]['arrays']['time_before'])>=400
+    assert monitor.take_completed_evidence()==[]
 
 
 def test_independent_gate_matches_full_per_hand_conjunction():
@@ -114,3 +118,36 @@ def test_independent_gate_matches_full_per_hand_conjunction():
             pre_max_displacement_m=float(rng.uniform(0,.3)),post_window_complete=bool(rng.integers(0,2)),
             return_toward_pre_window_position_m=float(rng.uniform(-.1,.2)),post_contact_seconds=float(rng.uniform(0,.2)))
         assert independent_cycle(e)==cycle_qualifies(e)
+
+
+def test_capture_is_passive_and_keeps_native_pose_force_and_control_evidence(foundation):
+    from boxer.paired_foundation import PairedFoundation
+    plain=PairedFoundation(foundation);observed=PairedFoundation(foundation)
+    plain.reset(73);observed.reset(73);monitor=MotionCycleMonitor()
+    monitor.capture_completed_events=True;monitor.control_policy_optimized_steps=1024
+    observed.diagnostic_punch_trace=monitor;rng=np.random.default_rng(16)
+    for _ in range(10):
+        action=rng.normal(0,.03,(2,29));a=plain.step(action);b=observed.step(action)
+        for key in a:np.testing.assert_array_equal(a[key],b[key])
+        for key in ('qpos','qvel','ctrl'):np.testing.assert_array_equal(getattr(plain.data,key),getattr(observed.data,key))
+    arrays=monitor.arrays();assert arrays['evidence_qpos_before'].shape==(100,72)
+    assert arrays['evidence_qvel_before'].shape==(100,70)
+    assert arrays['evidence_ctrl'].shape==(100,58)
+    np.testing.assert_array_equal(arrays['applied_force_norm'],0.)
+    np.testing.assert_array_equal(arrays['policy_optimized_steps'],1024)
+
+
+def test_saved_event_manifest_preserves_window_policy_hashes(tmp_path):
+    import pickle,hashlib
+    from boxer.striking_event_evidence import save_completed_evidence
+    cp=tmp_path/'checkpoint';cp.mkdir();payload=pickle.dumps(dict(optimized_steps=1024))
+    (cp/'step-1024.pkl').write_bytes(payload)
+    monitor=MotionCycleMonitor();monitor.completed_evidence=[dict(event=dict(event(),event_time=.3),
+        arrays=dict(policy_optimized_steps=np.array([1024,1024]),time_before=np.array([0.,.002])))]
+    files=save_completed_evidence(monitor,tmp_path/'events',cp,consumed=2000,world=1,learner_corner=0,
+        reset_seed=73,swap=False,active_opponent=True,foundation_sha256='a'*64)
+    assert len(files)==1
+    manifest=json.loads(Path(files[0]).read_text());assert manifest['controlled_by']=='learner'
+    assert manifest['policy_checkpoints_in_window'][0]['sha256']==hashlib.sha256(payload).hexdigest()
+    assert hashlib.sha256(Path(manifest['native_file']).read_bytes()).hexdigest()==manifest['native_sha256']
+    assert manifest['new_physical_controls_for_capture']==0 and not manifest['main_adoption']

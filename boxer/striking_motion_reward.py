@@ -25,6 +25,17 @@ class MotionCycleMonitor(PunchTrace):
     """Bounded native history; pay each measured completed cycle once, per hand."""
     def __init__(self):
         super().__init__();self.paid=set();self.pending_events=set();self.new_rows=0
+        self.capture_completed_events=False;self.completed_evidence=[];self.control_policy_optimized_steps=-1
+
+    def before_substep(self,pair,positions,velocities,torso_motion):
+        super().before_substep(pair,positions,velocities,torso_motion)
+        if self.capture_completed_events:
+            self.pending.update(evidence_qpos_before=pair.data.qpos.copy(),evidence_qvel_before=pair.data.qvel.copy(),
+                evidence_ctrl=pair.data.ctrl.copy(),policy_optimized_steps=np.int64(self.control_policy_optimized_steps),
+                applied_force_norm=np.array(np.linalg.norm(pair.data.qfrc_applied)+np.linalg.norm(pair.data.xfrc_applied)))
+
+    def take_completed_evidence(self):
+        rows=self.completed_evidence;self.completed_evidence=[];return rows
 
     def _capture_events(self,row):
         for corner,hand in zip(*np.nonzero(row['event'])):
@@ -47,13 +58,17 @@ class MotionCycleMonitor(PunchTrace):
         ready={k for k in self.pending_events if now>=k[2]+.5}
         # Most controls have no mature impact: do not rebuild 650-row arrays then.
         if ready:
-            for event in describe_events(self.arrays()):
+            arrays=self.arrays()
+            for event in describe_events(arrays):
                 key=(event['corner'],event['hand'],event['event_time'])
                 if key in ready and event['post_window_complete']:
                     self.pending_events.discard(key)
                     if key not in self.paid:
                         self.paid.add(key)
-                        if cycle_qualifies(event):cycles[event['corner']]+=1
+                        if cycle_qualifies(event):
+                            cycles[event['corner']]+=1
+                            if self.capture_completed_events:
+                                self.completed_evidence.append(dict(event=dict(event),arrays={k:v.copy() for k,v in arrays.items()}))
         self.paid={k for k in self.paid if k[2]>=now-2.}
         self.new_rows=0
         return cycles,dense

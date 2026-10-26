@@ -1,0 +1,115 @@
+{
+  "scope": "training_monitor_counter_only_pending_independent_policy_evaluation",
+  "previous_update": {
+    "consumed_steps": 3532800,
+    "optimized_steps": 3532800,
+    "world_control_steps": 2910208,
+    "updated_utc": "2026-10-26T17:46:26.775432+00:00",
+    "rounds": 953,
+    "fall_rounds": 197,
+    "scored_by_corner": [
+      279.0,
+      290.0
+    ],
+    "actor_steps_per_second": 91.11465373819891,
+    "phase": "updated",
+    "mean_loss": 0.13505127403186634,
+    "combined_foundation_and_lineage_steps": 478525440,
+    "actor_adam_count": 37672,
+    "critic_adam_count": 61344,
+    "neutral_credits_by_corner": [
+      50229,
+      48075
+    ],
+    "mixed_credits_by_mode_and_corner": [
+      [
+        442374,
+        455674
+      ],
+      [
+        447943,
+        450105
+      ]
+    ],
+    "motion_cycles_by_corner": [
+      0.0,
+      0.0
+    ],
+    "motion_learner_cycles_total": 0.0,
+    "motion_opponent_cycles_total": 0.0,
+    "session_motion_dense_reward": -203.99005400764193,
+    "session_target_potential_reward": -410.3691570122531,
+    "session_physical_contact_progress_reward": 300.47038816872345
+  },
+  "first_positive_update": {
+    "consumed_steps": 3533824,
+    "optimized_steps": 3533824,
+    "world_control_steps": 2911232,
+    "updated_utc": "2026-10-26T17:46:38.796393+00:00",
+    "rounds": 953,
+    "fall_rounds": 197,
+    "scored_by_corner": [
+      284.0,
+      297.0
+    ],
+    "actor_steps_per_second": 91.09855772228882,
+    "phase": "updated",
+    "mean_loss": 1.4895471036434174,
+    "combined_foundation_and_lineage_steps": 478526464,
+    "actor_adam_count": 37688,
+    "critic_adam_count": 61360,
+    "neutral_credits_by_corner": [
+      50229,
+      48075
+    ],
+    "mixed_credits_by_mode_and_corner": [
+      [
+        442630,
+        455930
+      ],
+      [
+        448327,
+        450233
+      ]
+    ],
+    "motion_cycles_by_corner": [
+      1.0,
+      0.0
+    ],
+    "motion_learner_cycles_total": 1.0,
+    "motion_opponent_cycles_total": 0.0,
+    "session_motion_dense_reward": -191.9588164173598,
+    "session_target_potential_reward": -407.64201877059486,
+    "session_physical_contact_progress_reward": 311.01865483103984
+  },
+  "observed_change": 1,
+  "learner_corner": 0,
+  "hand_not_logged": true,
+  "exact_event_time_not_logged": true,
+  "new_credits_at_first_report": 404480,
+  "diagnostic_ppo_total_at_first_report": 3617024,
+  "formal_world_controls_retained": 2140974,
+  "main_project_consumed_retained": 476041216,
+  "saved_adjacent_policy_versions": [
+    {
+      "optimized_steps": 3531776,
+      "sha256": "9ecd92b43c4f8b4f44e4414b250e7e91ea3a5321daf023ed4d2b4aa53954d88c",
+      "folder": "checkpoints/striking-validation/contact-progress-v15/first-training-counter/step-3531776"
+    },
+    {
+      "optimized_steps": 3532800,
+      "sha256": "790d237d1ff50af71516d732e93d8b5ecfba7be175be2e3eef60ff1337c5a534",
+      "folder": "checkpoints/striking-validation/contact-progress-v15/first-training-counter/step-3532800"
+    },
+    {
+      "optimized_steps": 3533824,
+      "sha256": "98de4c54e135d206d777aed75fcf8d9256b968a78f64dde8e225f5d01e7ea8a2",
+      "folder": "checkpoints/striking-validation/contact-progress-v15/first-training-counter/step-3533824"
+    }
+  ],
+  "independent_gate_pass": false,
+  "main_adoption": false,
+  "raw_event_window_available": false,
+  "limitation": "Only the cumulative training counter and update boundary survive for this first event; its native history was not retained. It may span PPO updates and must not be advertised as a replicated held-out punch or a video-confirmed event.",
+  "continuation": "Keep the productive job running. Full original/motion evaluation remains at 524288 new credits. Passive raw-state/event capture is added for subsequent naturally launched training chunks without changing reward, physics, policy or budgets."
+}

@@ -516,6 +516,7 @@ def train(args):
     # Share the already compiled frozen network across worlds.
     for env in envs[1:]:env.motor=envs[0].motor
     episode=np.full(args.worlds,consumed//rows,dtype=np.int64)
+    initial_episode_index=consumed//rows
     obs=np.stack([env.reset(args.seed+1009*i+int(episode[i]),swap=bool(i%2)) for i,env in enumerate(envs)]).reshape(rows,observation_size)
     if motion_cycle_ppo:
         from boxer.striking_motion_reward import MotionCycleMonitor,replace_contact_payment
@@ -524,7 +525,9 @@ def train(args):
             from boxer.striking_contact_progress import ContactProgressMonitor
             monitor_class=ContactProgressMonitor
         motion_monitors=[monitor_class() for env in envs]
-        for env,monitor in zip(envs,motion_monitors):env.env.pair.diagnostic_punch_trace=monitor
+        for env,monitor in zip(envs,motion_monitors):
+            monitor.capture_completed_events=True
+            env.env.pair.diagnostic_punch_trace=monitor
     if pool_opponent_ppo:
         from boxer.striking_opponent_pool import (restore_sampler, draw_opponent,
             validate_pool_ledger, pool_predictor, OFFSET)
@@ -620,6 +623,7 @@ def train(args):
                     pool_credits[pool_assignments[i],env.learner_corner]+=1
                 # Count attempted physics even if a later world/update fails.
                 record(phase='collecting')
+                if motion_cycle_ppo:motion_monitors[i].control_policy_optimized_steps=optimized
                 if mixed_partner_ppo:
                     next_obs,reward,done,outcome=env.step(actions[i],
                         opponent_actions[i] if env.active_opponent else None)
@@ -627,6 +631,12 @@ def train(args):
                 if motion_cycle_ppo:
                     cycles,dense=motion_monitors[i].consume(terminal=done)
                     reward=replace_contact_payment(reward,outcome,cycles,dense,env.learner_corner)
+                    from boxer.striking_event_evidence import save_completed_evidence
+                    save_completed_evidence(motion_monitors[i],args.output/'motion-event-evidence',checkpoint_path.parent,
+                        consumed=consumed,world=i,learner_corner=env.learner_corner,
+                        reset_seed=args.seed+1009*i+int(episode[i]),
+                        swap=bool(i%2) if episode[i]==initial_episode_index else bool(episode[i]%2),
+                        active_opponent=env.active_opponent,foundation_sha256=metadata['sha256'])
                     if contact_progress_ppo:
                         parts=motion_monitors[i].last_components
                         progress_potential+=float(parts['target_potential'][env.learner_corner])
@@ -644,6 +654,7 @@ def train(args):
                     next_obs=env.reset(args.seed+1009*i+int(episode[i]),swap=bool(episode[i]%2))
                     if motion_cycle_ppo:
                         motion_monitors[i]=monitor_class()
+                        motion_monitors[i].capture_completed_events=True
                         env.env.pair.diagnostic_punch_trace=motion_monitors[i]
                     if pool_opponent_ppo:pool_assignments[i]=draw_opponent(pool_rng,env.active_opponent)
                 following.append(next_obs)

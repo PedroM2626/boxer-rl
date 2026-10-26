@@ -51,3 +51,30 @@ Combined main remains 476,041,216; main boxing 1,048,576; standalone BC 8,000;
 cloned queries 6,349; signed distance calls 960; renderer forwards 2,065.
 The integration is inside the declared new budget. Subsequent actual learning
 requires hours; sparse early full-cycle counts are not an impossibility result.
+
+## First training counter signal, 2026-10-26 17:46 UTC
+
+At the completed update reporting **404,480 new v15 credits**, the cumulative
+learner complete-cycle counter changes **0 -> 1**, corner 0; opponent counter
+remains zero. first-training-counter.json preserves the previous/first-positive
+progress records and adjacent policy snapshots. These are full-cycle monitor
+counts, not the graded-contact subgoal payment. All source/history/checkpoint
+checks and native error logs remain healthy; the productive job is not restarted.
+
+Scope is deliberately limited: the first event's native rolling history was not
+retained, so its exact hand/episode/onset measurements and video are unavailable.
+It may span PPO updates. Do not advertise this counter as a replicated held-out
+punch, a deterministic policy milestone, two-way boxing or a stage pass. The
+scheduled full original/motion gate remains at 524,288 new credits.
+
+Passive evidence capture is added for subsequent naturally launched training
+chunks. It saves qualified event descriptors, bounded native kinematics/contacts,
+qpos/qvel, actual actuator controls, external-force norm and all learner policy
+checkpoint versions occurring in the window. The window can span PPO updates;
+source hashes are retained for every version. Capture changes no reward, action,
+RNG, optimizer, simulation or allocation. The already running collection process
+keeps its loaded code until the ordinary stage handoff; its old events cannot be
+retroactively reconstructed. Captured stochastic events still require independent
+policy evaluations. Thirty-two focused tests pass, including bitwise-identical
+physics with capture enabled, native state shapes, checkpoint/file hashes and
+single-payment/recovery timing. No extra physical/geometry/render allocation.

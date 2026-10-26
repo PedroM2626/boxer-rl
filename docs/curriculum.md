@@ -17,6 +17,13 @@ with its actual source hash and zero new evaluation debit. No main adoption or
 new geometry/BC/render allocation. Live job:
 `/home/pedro/boxing-runs/striking-contact-progress-v15/audit.json` and
 `training/progress.json`; inspect actual processes before launch or recovery.
+At 404,480 new v15 credits the training learner complete-cycle counter first
+changes 0 -> 1 (corner 0). This is a counter-only training signal, with no retained
+raw event window or held-out confirmation; no promotion or success claim. Preserve
+it and adjacent policies in first-training-counter.json. Passive evidence capture
+will apply at the next ordinary training-process handoff, without restarting the
+productive job or changing rewards/physics. Full evaluation is still at 524,288.
+
 
 **Earlier reviewed outcome (2026-10-24):** the
 [broader frozen audit](striking-gae-generalization.md) completed 130 episodes /

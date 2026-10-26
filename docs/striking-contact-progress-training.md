@@ -92,3 +92,15 @@ Publish owned checkpoints/results at complete gates, retain prior failures and
 the existing monitoring schedule. Live job:
 `/home/pedro/boxing-runs/striking-contact-progress-v15/audit.json` and
 `training/progress.json`. Inspect the actual active process before any intervention.
+
+## Passive event evidence addition, 2026-10-26
+
+After the first cumulative training-cycle signal, add bounded raw event/state
+capture in future naturally launched training chunks. Do not interrupt productive
+collection to apply an observer. Store the original native event windows, qpos/
+qvel, actuator controls, applied-force norm and every learner checkpoint version
+in a window, including cross-update windows. This is observation only and does not
+change rewards, thresholds, action distributions, source, optimizer, physics or
+budgets. Artifacts remain training evidence pending independent policy evaluation.
+Earlier counter-only events cannot be reconstructed as videos or promoted as
+held-out successes. Existing scheduled gates and monitoring remain authoritative.
