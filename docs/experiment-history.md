@@ -416,3 +416,22 @@ acceptance remains unchanged. Thirty-two focused tests pass, including unchanged
 physics with capture on and checksum/provenance serialization. All main counters,
 foundation histories and source policies remain verified. No extra physics or
 geometry was consumed by this log/checkpoint review.
+
+## V15 first deterministic gate and verified raw training cycles, 2026-10-26
+
+The complete 524,288-credit gate (42f3d004) is independently reviewed: 7/8, 7/8,
+5/8 pair survivors; 240 legacy contacts, **zero full valid cycles**. Both original
+contact and motion gates fail, so no advancement. New evaluation 9,928, formal
+cumulative 2,150,902 within the existing 2,200,974 ceiling. Training continues
+productively toward 1,048,576 new credits within the unchanged 2,097,152 allocation.
+
+A frozen raw-window review independently verifies **37 stochastic learner cycles**
+(19/18 corners; four active-opponent cases), including real legal impulse,
+component conjunctions, full recovery windows, zero applied forces, native timing,
+finite state/controls and all source checkpoint versions. All windows and policy
+payloads are archived; this is not deterministic generalization or a stage pass.
+The first neutral/active windows are rendered at normal/quarter speed with explicit
+scope labels. An occluded initial view was preserved and camera-only revision
+verified. All 330 frames decode; two impact previews inspected. New render forwards
+132, cumulative 2,197. No additional training/evaluation/geometry/BC allocation,
+policy alteration, rollback, current-learner interruption or promotion.

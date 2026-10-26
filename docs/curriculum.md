@@ -22,7 +22,15 @@ changes 0 -> 1 (corner 0). This is a counter-only training signal, with no retai
 raw event window or held-out confirmation; no promotion or success claim. Preserve
 it and adjacent policies in first-training-counter.json. Passive evidence capture
 will apply at the next ordinary training-process handoff, without restarting the
-productive job or changing rewards/physics. Full evaluation is still at 524,288.
+productive job or changing rewards/physics. The first full evaluation at 524,288 is now complete: 7/8, 7/8 and 5/8
+survivors, 240 legacy contacts but zero full valid cycles. Both gates fail.
+Independently checked raw stochastic training windows now establish 37 cycles
+meeting the existing references, in both corners (four active-opponent cases);
+these are not deterministic held-out passes. See first-captured-event-review.json
+and the explicitly scoped normal/slow saved-state video. Keep the productive
+approved continuation and all criteria unchanged. Formal evaluation is 2,150,902;
+renderer forwards 2,197 after two read-only 66-frame renders. No new training or
+physical evaluation allocation, interruption, source rollback or promotion.
 
 
 **Earlier reviewed outcome (2026-10-24):** the

@@ -78,3 +78,71 @@ retroactively reconstructed. Captured stochastic events still require independen
 policy evaluations. Thirty-two focused tests pass, including bitwise-identical
 physics with capture enabled, native state shapes, checkpoint/file hashes and
 single-payment/recovery timing. No extra physical/geometry/render allocation.
+
+## Prospective verified-window visualization, 2026-10-26
+
+The first captured-window review verifies 37 stochastic learner cycles (both
+corners; four against active frozen opponents) from native measurements. The
+524,288-credit deterministic full gate still has zero valid cycles and fails
+original survival criteria (7/8, 7/8, 5/8). No promotion or training intervention.
+
+Render exactly the earliest verified neutral-practice event and earliest verified
+active-opponent event from that frozen review, not selected maxima. Declare 66
+new read-only render forwards from 2,065 to 2,131; zero new training, physical,
+optimizer or diagnostic geometry controls. Independent render model/data and a
+render-specific lock allow ongoing productive collection to continue untouched.
+Each 1.3 s saved window is shown at normal and quarter speed; all 330 encoded
+frames must decode and impact previews be inspected. Explicitly label stochastic
+training and the failed deterministic gate. This is evidence of actual recorded
+exploratory cycles, not a repeatable learned-policy or boxing certification.
+
+The initial 66-forward render completed and all 330 frames decode, but visual
+inspection shows one neutral event partly occluded by the other body. Preserve
+that file/metadata and declare a second **66-forward** camera-only render, using
+the view perpendicular to root separation at the recorded onset. Same two source
+windows, normal/quarter speed and labels. Renderer cumulative ceiling **2,197**
+from 2,131; no training/physics/optimizer changes or interruption. This improves
+visibility rather than selecting a different successful event.
+
+## First full gate and independently checked training windows, 2026-10-26
+
+At **524,288 new credits**, the full deterministic checkpoint **42f3d004** has
+pair survival **7/8 neutral 0, 7/8 neutral 1, 5/8 mirror**. It generates 240 legacy
+contact events, but **zero complete valid cycles**. Only 12 events meet pretravel,
+88 meet onset speed and 63 meet speed plus direction; components cannot be mixed
+across hands/events. Both original complete contact and added motion gates fail.
+No promotion or adoption. New evaluation consumption 9,928, cumulative **2,150,902**;
+all original gate histories, hashes, finite-state and native-error checks verify.
+
+The frozen first-captured-event review verifies **37 distinct stochastic learner
+windows**, 19 in corner 0 and 18 in corner 1; four occur against the active frozen
+opponent. All pass an independently applied complete-cycle conjunction, native
+legal impulse >=.5 N s, onset closing/advancement, 2 ms timing, zero applied
+forces, finite qpos/qvel/control arrays and every source policy checksum. Each
+window and its referenced policy payloads are archived in reviewed-training-events
+and captured-event-policies. The review is a fixed snapshot; more live events can
+arrive later. Earlier counter-only cycles still have no raw data.
+
+This is real recorded exploratory motion/contact/recovery evidence, stronger than
+a cumulative counter, but **not deterministic held-out policy success**. Windows
+may span PPO updates, and the training policy is sampled. Keep the productive
+approved continuation toward 1,048,576 new credits without resets, duplicate jobs,
+changed gates or a new training budget. Stable repeated and reciprocal boxing
+remain open. Source files and component counts: first-captured-event-review.json.
+
+### Verified event video
+
+The side-view video shows the earliest captured verified neutral-practice event
+and earliest captured active-opponent event, normal speed and quarter speed.
+Both retain right-hand real contacts and recovery: onset speeds **1.37 / 1.30 m/s**,
+pretravel **12.9 / 12.2 cm**, return **8.2 / 8.5 cm**. The labels explicitly state
+stochastic training and zero deterministic-gate valid cycles.
+
+`fights/striking-pilot/contact-progress-v15-verified-training-cycles-side-view.mp4`
+is **13.2 seconds**, 25 fps, all **330 frames decoded**. Both impact previews
+were visually checked. Initial occluded fixed-camera rendering and its metadata
+are preserved. Two separate 66-forward saved-state renders add **132**, renderer
+cumulative **2,197**; zero new physics, optimizer updates or diagnostic geometry
+queries. The live learner remains uninterrupted under a separate render lock.
+Known FFmpeg/JAX subprocess warnings are archived; both encodes/decodes completed.
+This video does not certify stable boxing or a deterministic policy milestone.

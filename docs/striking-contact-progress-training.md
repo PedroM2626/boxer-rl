@@ -104,3 +104,16 @@ change rewards, thresholds, action distributions, source, optimizer, physics or
 budgets. Artifacts remain training evidence pending independent policy evaluation.
 Earlier counter-only events cannot be reconstructed as videos or promoted as
 held-out successes. Existing scheduled gates and monitoring remain authoritative.
+
+## Read-only verified-event visualization allocation, 2026-10-26
+
+The first frozen captured-window audit independently verifies 37 stochastic
+training cycles; the scheduled 524,288 deterministic gate has zero full cycles
+and fails original survival thresholds. Show the earliest verified neutral and
+active-opponent windows, not selected largest scores. Two 66-forward renders
+(initial fixed camera, revised side view after occlusion QA) add 132 forwards,
+cumulative 2,197. All 330 frames of each output decode. No physical integration,
+actor execution, new learner credit, geometry search, global training lock or
+live-job interruption. Source windows, policies, scope labels and both camera
+versions remain archived. This does not change training/evaluation budgets or
+constitute a promotion. Maintain the remaining performance-based full checks.
