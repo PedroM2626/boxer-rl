@@ -352,3 +352,14 @@ blindly extend or repeat: next inspect reward scale/credit and exploration/actua
 arm motion before choosing a separately justified continuation. Still missing are
 learned complete legal punches, robust reciprocal exchanges and repeated full
 independent plus fresh validation. All prior failures remain archived.
+
+## Final learned-checkpoint video, 2026-10-26
+
+Rendered all eight archived fresh-final self-play episodes in order, including
+both original early terminations, from exact saved qpos/qvel. No new physics or
+policy execution. Closed fists use the existing visual-only graft. All 1,565
+frames decode at 25 fps (62.6 seconds); mid-episode and terminal previews inspected.
+The original `fall` label includes self-leg contact and need not depict a toppled
+body. Zero valid punches is displayed explicitly. Render forwards now 2,065;
+formal evaluation 2,140,974 and diagnostic PPO 3,212,544 remain unchanged.
+Source hashes, indices and video checksum: motion-cycle-v14/final-video.json.

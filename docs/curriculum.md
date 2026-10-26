@@ -122,6 +122,7 @@ Reviewed diagnostic PPO is **3,212,544**, at its completed ceiling after v14 add
 1,048,576 learner credits. Formal diagnostic evaluation is **2,140,974** after
 67,172 new controls, under **2,145,802**; unused **4,828 expire**. V14 collection
 world controls **1,048,576** are recorded separately from these evaluations.
+Final saved-state video adds 1,565 render forwards (cumulative **2,065**), with zero new physical or optimizer transitions.
 No additional PPO or evaluation allocation is active; current live state is
 `/home/pedro/boxing-runs/striking-motion-cycle-v14/audit.json` (completed).
 Cloned kinematic evaluations are now **6,349** after 48 producer + 48 independent

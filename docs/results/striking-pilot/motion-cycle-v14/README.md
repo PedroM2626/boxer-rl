@@ -96,3 +96,33 @@ Next inspect reward-component scale/credit and exploration/actual arm motion to
 choose a separately justified continuation. Still required: learned legal impact
 with speed, travel and recovery, stable reciprocal exchanges, and repeated full
 independent passes plus fresh-seed validation. The boxing objective is incomplete.
+
+## Final video: prospective saved-state rendering
+
+Authorized 2026-10-26 to show the user the actual final result. Render all eight
+fresh-final self-play cases in their existing archived order, including both
+first-fall episodes. No selected best scene, altered policy or extra physical
+simulation. Closed-fist visuals reuse the established render-only graft.
+Declare exactly 1,565 render forwards, from cumulative 500 to 2,065; native/
+physical/optimizer/diagnostic geometry counters remain unchanged. Resolution
+640x480 at 25 fps; retain terminal states and label every seed/swap, contact
+counter, zero valid cycles and episode result. Decode all frames and inspect
+previews before delivery. This visualization does not provide new training or
+punch evidence. Full selection/checksums go in final-video.json.
+
+### Final video verified
+
+`fights/striking-pilot/motion-cycle-v14-final-fresh-selfplay.mp4`: **62.6 seconds**,
+640x480, 25 fps, all **1,565 frames decoded**. All eight fresh self-play episodes
+appear in archived order; source hashes and frame indices are in final-video.json.
+Both a mid-episode closed-fist preview and an early-terminal preview were visually
+inspected. The caption's `fall` result uses the original first-fall predicate,
+which includes self-leg contact; it does not necessarily mean a body has toppled.
+No valid complete punch is claimed. This is the final learned checkpoint, not the
+earlier scripted terminal-dwell prototype.
+
+Render forwards add 1,565 to the prior 500, cumulative **2,065**. New physical
+controls/optimizer updates/diagnostic geometry queries remain zero. The known
+FFmpeg/JAX subprocess warning is retained in video-render-stderr.log; encoding
+and all-frame decoding completed without a deadlock or a physical simulation.
+Video SHA-256: `6124e783d015bf932cca5334f792ec9aa6c1819e3798c92028e35bb93c7ba401`.
