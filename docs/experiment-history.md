@@ -330,3 +330,25 @@ PPO is now active toward the first 262,144-credit independent full gate within
 The first measured throughput is around 90 learner credits/s, so hours of learning
 are plausible; startup/steady-state variation prevents an exact runtime promise.
 No early zero-cycle conclusion, automatic extension or main adoption is made.
+
+## V14 full outcome after computer restart, independently reviewed 2026-10-26
+
+[Complete report](results/striking-pilot/motion-cycle-v14/README.md): all 1,048,576
+new learner credits were consumed and optimized; final/fresh evaluations completed
+at 2026-10-25 22:37:26 America/Sao_Paulo. No active job; this is a completed budget,
+not an interrupted learner requiring restart. Final SHA be59681d retained.
+All six full gates, 144 native/full trace pairs, hashes, finite states and event
+windows verify; native error logs empty. Every complete original contact gate
+and motion gate fails. Zero valid cycles in training or evaluation. Intermediate
+pair survival reaches 24/24; final original 22/24, fresh 20/24. Original final has
+zero scored events; fresh has one low-speed short-excursion contact, not a punch.
+The actual latest final is retained without adoption or rollback.
+
+New formal evaluation 67,172, cumulative 2,140,974, ceiling 2,145,802; unused 4,828
+expire. Diagnostic PPO 3,212,544 at ceiling; new training collection controls
+1,048,576 separately recorded. Main 476,041,216 and other compute unchanged.
+No conclusion that learning is impossible follows from this finite block. Do not
+blindly extend or repeat: next inspect reward scale/credit and exploration/actual
+arm motion before choosing a separately justified continuation. Still missing are
+learned complete legal punches, robust reciprocal exchanges and repeated full
+independent plus fresh validation. All prior failures remain archived.

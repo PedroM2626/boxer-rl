@@ -3,18 +3,17 @@
 Maintain the [trajectory and decision record](experiment-history.md) at every
 reviewed intervention, including failed results, accounting and pending evidence.
 
-**Current decision (2026-10-25):** the [arm contract audit](results/striking-pilot/arm-contract-v1/README.md)
-finds no joint-order/baseline-scaling or native actuator-clipping defect in 32 saved
-trajectories. Scripted failures do not establish that PPO cannot learn punching.
-The [prospective motion-cycle PPO v14](striking-motion-cycle-training.md) warm-starts
-the actual latest fixed-control final, preserves Adam/RNG/normalizer and changes
-the touch objective explicitly. Full-cycle payment, zero old touch-teacher loss,
-unchanged physical gates plus independent per-hand motion gates. Budget: at most
-1,048,576 new diagnostic credits (global ceiling 3,212,544), 72,000 formal evaluation
-controls (ceiling 2,145,802), with complete periodic and fresh final checks.
-The hidden job is `/home/pedro/boxing-runs/striking-motion-cycle-v14/audit.json`;
-inspect its active child and training/progress.json before launch or recovery.
-No main adoption, foundation change, gate relaxation or automatic budget extension.
+**Current decision (2026-10-26):** [motion-cycle PPO v14 is completed and independently reviewed](results/striking-pilot/motion-cycle-v14/README.md).
+All 1,048,576 new credits were consumed/optimized; all six complete gates and 144
+native/full trajectories verify. Zero complete valid punch cycles in training or
+evaluation. Intermediate 24/24 pair survival does not establish striking; fresh
+final survival is 20/24 with one low-speed contact. All original complete contact
+and added motion gates fail. No learner adoption, phase promotion or boxing
+certification. Completion preceded the reported restart; no job is active.
+Do not resume the completed allocation or rollback. Next review reward component
+scale/credit and exploration before a separately justified bounded continuation.
+The result rejects a success claim for this block, not the possibility of learning
+with further work. Full results/checkpoints were pushed to the existing remote.
 
 **Earlier reviewed outcome (2026-10-24):** the
 [broader frozen audit](striking-gae-generalization.md) completed 130 episodes /
@@ -119,10 +118,12 @@ Reject both as positive targets. Next test the existing lateral command through
 the walking motor under a new prospective bounded protocol, not new root/body
 authority. The completed lateral-command diagnostic finds no candidate punch; no PPO, imitation, motor unfreezing or gate changes.
 
-Reviewed diagnostic PPO is **2,163,968**, at its ceiling. Formal diagnostic
-simulation is **2,073,802** after motor-only isolation adds 4,000 and guard-step
-adds 3,495 controls. The completed ceiling was **2,074,307**; unused **505 expire**.
-Those historical allocations are closed. The separate prospective v14 allocation allows up to 1,048,576 new diagnostic PPO credits and 72,000 evaluation controls; use its live ledgers for current consumption.
+Reviewed diagnostic PPO is **3,212,544**, at its completed ceiling after v14 adds
+1,048,576 learner credits. Formal diagnostic evaluation is **2,140,974** after
+67,172 new controls, under **2,145,802**; unused **4,828 expire**. V14 collection
+world controls **1,048,576** are recorded separately from these evaluations.
+No additional PPO or evaluation allocation is active; current live state is
+`/home/pedro/boxing-runs/striking-motion-cycle-v14/audit.json` (completed).
 Cloned kinematic evaluations are now **6,349** after 48 producer + 48 independent
 surface-audit forwards. Signed-distance queries are separately **960** (480 + 480).
 Both new geometry allocations are exhausted; no new cloned/distance allocation.

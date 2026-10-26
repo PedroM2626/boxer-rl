@@ -114,3 +114,13 @@ focused tests, independent original/motion gates, ordinary optimizer continuatio
 and all consumed steps. First full gate at 262,144 new credits; first allocation
 at most 1,048,576. Hours may be needed; early sparse rewards are not proof of
 learned impossibility. Valid held-out reciprocal boxing remains the objective.
+
+## Completed learned-cycle block, reviewed 2026-10-26
+
+[V14 full review](results/striking-pilot/motion-cycle-v14/README.md): 1,048,576 new
+credits, six full evaluations/144 episodes, zero valid complete cycles. Intermediate
+survival of 24/24 does not imply striking; final fresh set has 20/24 survivors and
+one low-speed touch. No certification/adoption or active job. Review reward scale,
+credit and exploration before a separately justified continuation. Actual learned
+impact/travel/recovery, stable reciprocal boxing, two distinct complete passes and
+fresh validation remain outstanding. Preserve all budgets and failed evidence.

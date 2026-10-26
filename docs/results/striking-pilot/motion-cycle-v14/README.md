@@ -46,3 +46,53 @@ The resumed live audit may retain the old publication error text as historical
 metadata while status is running. It is preserved in the explicit failure record;
 inspect status, actual active child, current progress and native-error logs for
 current health. Git author checks now run before new physical evaluations.
+
+## Completed allocation: independent review, 2026-10-26
+
+The entire 1,048,576 new PPO credits were consumed and optimized before the
+reported computer restart. Final training checkpoint be59681d has lineage
+3,129,344 consumed/optimized credits, 2,506,752 collection world controls and
+actor/critic Adam 31,368/55,040. The supervisor completed final fresh evaluation
+at 2026-10-26 01:37:26 UTC (2026-10-25 22:37:26 America/Sao_Paulo).
+No process is currently running. The completed allocation must not be restarted
+as an interrupted job or reset to its initialization.
+
+[completed-review.json](completed-review.json) verifies all six complete gates,
+**144 native and 144 full trace files**, checksums, finite arrays, event windows,
+source checkpoints, original complete gates and consumed accounting without new
+physics or optimization. All native-error logs are empty; main and foundation
+provenance and original histories remain intact.
+
+| New learned credits | Pair survivors, neutral 0 / neutral 1 / mirror | Legacy scored events | Complete valid cycles |
+| --- | --- | --- | --- |
+| Baseline | 7 / 8 / 6 | 18 | 0 |
+| 262,144 | 6 / 8 / 6 | 0 | 0 |
+| 524,288 | 8 / 8 / 8 | 1 | 0 |
+| 786,432 | 8 / 8 / 8 | 0 | 0 |
+| 1,048,576 | 7 / 8 / 7 | 0 | 0 |
+| Same final, fresh seeds | 8 / 6 / 6 | 1 | 0 |
+
+All six complete original contact gates fail (survival alone is insufficient);
+all independent full-cycle gates fail. Training's cumulative own/opponent
+complete-cycle payments are also zero. The last fresh contact has onset speed
+.509 m/s and pre-window excursion 5.76 cm, below the prospective requirements.
+Some intermediate samples preserve balance, but this is not a demonstrated
+boxing improvement or a learned valid punch. The deterministic final loses the
+baseline contact behavior on original seeds; do not describe that as mastery.
+
+New formal evaluation controls **67,172**, cumulative **2,140,974**, below the
+**2,145,802** ceiling; unused **4,828 expire**. Diagnostic PPO **3,212,544**, at its
+ceiling. The new 1,048,576 training world controls remain separately recorded.
+Combined main stays 476,041,216; main boxing 1,048,576; standalone BC 8,000;
+cloned queries 6,349; signed distances 960; renderer forwards 500.
+
+The initial author-configuration error was publication-only, recovered and
+archived; the stale error string in final state is not a later physics failure.
+The final completed state and all checkpoints were committed and pushed before
+this review. This finite training block does not prove that learning is impossible
+or that more volume cannot help. It does establish that v14 has not produced a
+valid-cycle milestone. Do not promote, replay or blindly extend this allocation.
+Next inspect reward-component scale/credit and exploration/actual arm motion to
+choose a separately justified continuation. Still required: learned legal impact
+with speed, travel and recovery, stable reciprocal exchanges, and repeated full
+independent passes plus fresh-seed validation. The boxing objective is incomplete.

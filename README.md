@@ -2,6 +2,14 @@
 
 ## Current experiment: unassisted paired boxing diagnostics
 
+Latest reviewed outcome (2026-10-26): [motion-cycle PPO v14 completed](docs/results/striking-pilot/motion-cycle-v14/README.md)
+all 1,048,576 new learner credits and six full evaluations before the computer
+restart. All 144 saved native/full trajectories verify, but **zero valid complete
+punch cycles** occur. Fresh final pair survival is 20/24; no boxing milestone or
+main adoption. No job or new allocation is active. Review reward/exploration
+before a separately justified continuation; the finite block does not prove
+learning impossible.
+
 See the [project trajectory and experiment index](docs/experiment-history.md)
 for reviewed successes, failed approaches, limitations and pending decisions.
 
@@ -42,7 +50,7 @@ surface reach from the commanded point before changing authority. The
 finds blocking intersections; the [reviewed 6/12 cm bow comparison](docs/results/striking-pilot/arc-path-v4/README.md)
 still produces no commanded-left target contacts or candidate punches (survival
 7/8 and 8/8). Its sole legacy event is an incidental opposite-hand touch.
-The [reviewed lateral motor-command comparison](docs/results/striking-pilot/lateral-command-v5/README.md) has 8/8 versus 2/8 survivors and no candidate punches. The [motor-only isolation](docs/results/striking-pilot/lateral-isolation-v6/README.md) removes all six falls (8/8 survivors), but produces no punch. The [reviewed temporal handoff](docs/results/striking-pilot/guard-step-v7/README.md) still has only 4/8 survivors and no punches. Stop unchanged timing/lateral sweeps; next audit arm contracts and joint tracking from saved/source evidence. The [version-14 learned-cycle PPO protocol](docs/striking-motion-cycle-training.md) now allows a bounded 1,048,576-credit continuation with valid-cycle rewards and zero obsolete touch-imitation loss; inspect its live state before any launch. General boxing remains
+The [reviewed lateral motor-command comparison](docs/results/striking-pilot/lateral-command-v5/README.md) has 8/8 versus 2/8 survivors and no candidate punches. The [motor-only isolation](docs/results/striking-pilot/lateral-isolation-v6/README.md) removes all six falls (8/8 survivors), but produces no punch. The [reviewed temporal handoff](docs/results/striking-pilot/guard-step-v7/README.md) still has only 4/8 survivors and no punches. Stop unchanged timing/lateral sweeps; next audit arm contracts and joint tracking from saved/source evidence. The [version-14 learned-cycle PPO protocol](docs/striking-motion-cycle-training.md) completed its bounded 1,048,576-credit continuation with zero valid cycles; inspect the reviewed outcome before any new allocation. General boxing remains
 uncertified, and the stopped main policy has not been replaced.
 
 An [earlier striking final](docs/striking-generalization-audit.md) passed two
