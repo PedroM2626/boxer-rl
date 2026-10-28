@@ -911,3 +911,17 @@ Thirty focused reward, trace and gate-protection tests passed. Source actor,
 critic, both Adam states, normalization, RNG, sampler states and frozen adversary
 were compared exactly after transition. Use the persistent hidden WSL launcher;
 job state: `/home/pedro/boxing-runs/striking-arm-effort-v17/audit.json`.
+
+### V17 finite integration completed
+
+The 1,024-credit integration finished at lineage **7,324,672** consumed and
+optimized, **6,702,080** collection controls. Checkpoint SHA-256
+`c8709013df0e558687d852e30efcce4efb06785bd5799d998ae6cc9c2bd6a340` has finite
+numeric leaves and actor/critic Adam counts **96,920 / 120,592**, exactly the
+source plus 16 updates. All 18 update-audit records exist, with first-rollout
+clipped fraction **0.0**. The measured training-only arm cost is positive
+(4.606 over this integration), native error log is empty, and all source actor,
+critic, optimizer, RNG, normalizer, samplers and frozen opponent were preserved.
+This confirms implementation integration, not improved boxing. The hidden
+supervisor has started the next chunk toward the first 524,288-credit full gate;
+all physical and promotion criteria remain unchanged.
