@@ -3,10 +3,11 @@
 ## Current experiment: unassisted paired boxing diagnostics
 
 Current work (2026-10-28): [arm-effort PPO v17](docs/results/striking-pilot/arm-effort-v17/README.md)
-tests a training-only effort cost, with full arm authority, to combine stability
-and valid punches. Matched diagnostics with zero or half learned arm outputs
-improve survival but produce no valid strikes; the unmodified v16 policy strikes
-but frequently falls. Independent physical gates remain unchanged.
+completed its allocation without a full pass. Its final fresh self-play survives
+3/8 pairs; both actors strike in one surviving episode. No PPO job is active.
+The user requested GPU throughput recovery and a fair legacy-policy comparison;
+small current-model GPU preflights show promising contact measurements but an
+unresolved solver warning. Independent physical gates remain unchanged.
 
 Previous work (2026-10-28): [contact-rebalance PPO v16](docs/results/striking-pilot/contact-rebalance-v16/README.md)
 completed its 2,097,152-credit allocation. The final policy has 42 valid neutral

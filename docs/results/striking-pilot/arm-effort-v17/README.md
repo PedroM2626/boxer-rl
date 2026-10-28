@@ -122,3 +122,69 @@ buffer-overflow handling must be compared before using a GPU backend for trainin
 Benchmark the validated batched implementation on this GPU; do not promise the
 legacy environment's throughput or silently transplant its incompatible policy.
 The live CPU learner was not interrupted by this small preflight.
+
+## V17 completed and GPU contact preflight, 2026-10-28
+
+The v17 arm-effort block completed **2,097,152 new PPO credits** at its declared
+ceiling, global diagnostic PPO **9,504,000**. Final policy SHA-256:
+`f311640d78941546938412f5802cff872e0a3611c392f49a3b4719eefaa1f26a`.
+All five new original/fresh full gates failed. The last original gate has pair
+survival **4/8, 3/8, 2/8**, neutral valid cycles 11/10, and no mirror valid
+cycles. Its fresh gate has survival **5/8, 7/8, 3/8**, neutral valid cycles
+17/16 and mirror cycles 4/1, reciprocal on one surviving seed. The original
+v16 source baseline had 5/8, 6/8, 3/8 with reciprocal cycles on three known
+seeds. Sequential checkpoints and different fresh seeds cannot establish a
+causal comparison; this is not a complete pass, fresh certification, or a
+basis for unbounded continuation. Checkpoint/native/full trace checksums, finite
+arrays and all complete gate criteria were independently verified; logs are
+empty of native errors. No active training process remains.
+
+V17 formal evaluation used **32,993** controls, global **2,271,001**; unused
+27,007 expire. Lineage consumed/optimized **9,420,800**, world collection
+**8,798,208**. Main **476,041,216**, BC **8,000**, cloned queries **6,349**,
+signed distances **960** and render forwards **2,947** remain separately retained.
+No rollback, main adoption, altered gate or forced resume.
+
+The user requested a fair comparison with the previous unassisted GPU approach
+and a path back to GPU throughput. Local historical Warp checkpoints exist:
+`runs/warp6/checkpoint/step-200212480.pkl` SHA-256
+`ed0c56e760bb74a63aaa35d8b5d5ed445fa745e66519e5008536548a17368937`, and
+`runs/warp7/checkpoint/step-200212480.pkl` SHA-256
+`b5a7e7bc837ff3938fcf0dbfd96fcdd74b0c32f711a1da05f7cb919a3be200fd`. They use
+different model/action/observation/termination contracts; neither may be loaded
+as the current actor or scored under current criteria without an explicit adapter
+and independently recorded measurement. Their old video/score alone is not a
+matched comparison. Preserve the original checkpoints and build a truthful
+shared-measurement comparison rather than assuming the new approach is superior.
+
+A GPU contact preflight used two previously saved v15 impact states, neutral and
+active. The initial exploratory `paired-warp-contact-preflight.json` produced a
+float-cast overflow and a three-iteration solver warning; its numbers are
+**superseded, not parity evidence**. A strict check localized the overflow to
+`efm_fluid`, an uninitialized MuJoCo binding scratch array with fluid density and
+viscosity both zero; repeated property reads do not share memory. Attempting to
+clear the property did not fix it. Two strict retries rejected the float overflow
+rather than silently proceeding. This is a transfer-path issue, not evidence that
+training data are nonfinite; no original physics state or policy was changed.
+
+The revised diagnostic uses fresh Warp data and copies only finite saved qpos,
+qvel, controls and time, with zeroed independent solver state. In both selected
+cold-start cases CPU and GPU found identical contact geom pairs (13/13 and 17/17)
+and constraints remained below reserved capacity (110/2048 and 126/2048). For
+the recorded fist-to-torso pairs, CPU/GPU normal forces were **51.62004/51.62005 N**
+and **66.62798/66.62788 N**. Body position maximum differences were below 1.5e-7 m.
+Results and limitations: `docs/results/striking-pilot/paired-warp-contact-forwarded.json`.
+The separate earlier solver-iteration warning remains unresolved. Two snapshots,
+cold-start forces and chosen capacity do not prove long-trajectory, solver,
+strike-cycle, reset, buffer-overflow or policy equivalence. There were six
+experimental GPU forwards in the contact work (two exploratory, one per rejected
+strict retry, two revised), plus the separate one-forward preflight; no GPU
+physical stepping, PPO updates or formal evaluation controls were spent.
+
+Decision: do not spend another long CPU PPO block on an unproven change while
+GPU compatibility and legacy comparison are outstanding. Continue the GPU port
+and equivalence work: quantify solver convergence, first dynamics steps, contact
+impulse and event timing, then implement batched current-model observations,
+rewards and recorded motion windows; benchmark on this card before adopting a
+backend. Keep native CPU full gates authoritative. This is not a GPU training
+launch, completed port or declaration that legacy policies pass current gates.

@@ -3,7 +3,19 @@
 Maintain the [trajectory and decision record](experiment-history.md) at every
 reviewed intervention, including failed results, accounting and pending evidence.
 
-**Current v17 decision (2026-10-28):** matched fresh-seed arm diagnostics yield
+**Latest v17 completed review (2026-10-28):** all 2,097,152 new PPO credits
+finished; no complete gate passed. Final fresh pair survival is 5/8, 7/8, 3/8;
+both actors struck in one surviving mirror episode. Formal total 2,271,001 and
+diagnostic PPO 9,504,000; no active training, adoption or unchanged extension.
+The user requested a fair legacy comparison and GPU throughput recovery. One
+current-model Warp forward showed a solver iteration warning. Two cold-start
+contact poses using fresh GPU data have matching CPU/GPU contact pairs and
+similar normal forces; these limited checks do not establish trajectory,
+solver or policy parity. An initial transfer test overflowed on uninitialized
+native scratch and is retained as superseded evidence. See the
+[completed review and GPU plan](results/striking-pilot/arm-effort-v17/README.md).
+
+**Earlier v17 decision (2026-10-28):** matched fresh-seed arm diagnostics yield
 8/8 pair survivors with both learned arm outputs zeroed, 7/8 at half output,
 and 1/8 unmodified; zero/half conditions contain no valid strikes and cannot
 promote. The [v17 protocol](results/striking-pilot/arm-effort-v17/README.md)
