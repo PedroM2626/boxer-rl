@@ -60,3 +60,50 @@ reward checks: **22 passed**. This is a finite integration check, not evidence
 of improved behavior. Supervisor has started the authorized next chunk toward
 the first full gate at 524,288 new credits. Integration payload and update audit
 are archived, without resetting the live job.
+
+## First full gate: reciprocal motion but incomplete survival, 2026-10-28
+
+At **524,288 new v16 credits**, checkpoint SHA-256
+`2d618717c1a1e3ccded77311d3bf45cd9a5737b30653836034337be019df20e3`
+produced **10 complete deterministic self-play cycles** (five per corner).
+Surviving episodes on known seeds **7 and 31** each include valid cycles by both
+actors, so all three motion subchecks pass. The independently reviewed native/full
+trace and checkpoint hashes, finite arrays, scored native impulse and full-cycle
+conjunction confirm these measurements. This is a first observed limited
+reciprocal motion milestone, not an overall gate pass or fresh-seed certification.
+
+Pair survival **5/8 neutral 0, 7/8 neutral 1, 4/8 self-play** misses the unchanged
+7/8, 8/8, 7/8 original thresholds. Relative to the inherited original baseline
+5/8, 5/8, 1/8, self-play survival and reciprocal cycles improve, but the two
+checkpoints are successive training snapshots, not a randomized causal comparison.
+Across the same four self-play seeds, all four **swapped** episodes survive and
+all four **unswapped** episodes fail, each before a scored contact. This striking
+asymmetry needs validation at the next full gate and fresh seeds; it does not by
+itself identify the cause. Avoid claiming reliable boxing or promoting the model.
+
+The gate consumed **8,907** formal controls; global formal **2,199,891**. At the
+completed gate, global diagnostic PPO **5,833,984**, lineage
+**5,750,784 consumed/optimized** and **5,128,192** collection controls. Main
+**476,041,216**, BC **8,000**, cloned **6,349**, signed distances **960** remain
+unchanged. First physical gate failed, streak zero. Continue the already approved
+next chunk to **1,048,576 new v16 credits**, without reset or change of gates;
+use its outcomes to test retention, survival and swap asymmetry. The live learner
+counter advances independently of this completed-gate snapshot.
+
+For user-visible evidence, select the **seed 31, swapped** ten-second self-play
+bout with three corner-0 and one corner-1 valid cycles. Render exactly 250 stored
+states at 25 fps, preserving the full bout and marking counts; this is a selected
+example from known seeds, not a success-rate estimate or fresh certification.
+Allocate **250** read-only renderer forwards, cumulative **2,947** from 2,697;
+no actor execution, physics integration, optimizer updates or formal controls.
+The separate saved-state renderer does not lock or interrupt the live learner.
+Save trace checksums, preview, video hash and decode all frames before publication.
+
+The selected reciprocal full-bout video completed: **250/250 frames decoded**,
+25 fps, 10 seconds; preview visually inspected. Source and video SHA-256 values,
+per-hand event descriptors, and the selected seed/swap are recorded in
+`reciprocal-seed31-video.json`. The known FFmpeg/JAX fork warning appeared, but
+the encoder exited and the resulting video fully decoded. The clip is
+`fights/striking-pilot/v16-reciprocal-seed31-swapped.mp4`. Renderer total is
+**2,947**; no added physical controls or learner updates. It illustrates a selected
+surviving episode while the complete survival gate remains failed.

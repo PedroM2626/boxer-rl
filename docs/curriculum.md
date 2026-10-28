@@ -17,6 +17,16 @@ See [the v16 protocol](results/striking-pilot/contact-rebalance-v16/README.md).
 Live output: `/home/pedro/boxing-runs/striking-contact-rebalance-v16/audit.json`.
 Inspect process/attempt ledger before any retry or change; no automatic adoption.
 
+**First v16 gate:** independent review verifies ten self-play valid cycles,
+five per corner, with reciprocal cycles on surviving known seeds 7 and 31.
+The motion subchecks pass, but original survival is 5/8, 7/8, 4/8; the full
+gate fails and no promotion occurs. All four swapped self-play episodes survive
+and all four unswapped fail before scoring; cause and generalization are unknown.
+The predeclared next chunk to 1,048,576 new credits remains active. Completed
+gate formal total 2,199,891; diagnostic PPO 5,833,984. A selected known-seed
+reciprocal video uses 250 additional read-only render forwards, cumulative 2,947.
+See [first-gate analysis](results/striking-pilot/contact-rebalance-v16/README.md).
+
 **Latest completed review (2026-10-26):** v15 exhausted its 2,097,152-credit
 allocation with exact final 9132ab4c. Original/fresh neutral valid cycles are
 13/23; mirror cycles 2/0. Original survival 5/5/1 and fresh 6/5/2 out of eight

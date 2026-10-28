@@ -5,8 +5,10 @@
 Current work (2026-10-27): [contact-rebalance PPO v16](docs/results/striking-pilot/contact-rebalance-v16/README.md)
 continues from the actual v15 final. It tests whether reducing partial-contact
 payments improves stability while retaining the full-cycle reward and independent
-physical gates. The finite 1,024-credit integration passed; the bounded job is
-running toward its first full evaluation. This is an experiment, not an adoption.
+physical gates. The first deterministic full gate verified reciprocal valid
+cycles in two surviving known-seed bouts; survival 5/8, 7/8, 4/8 still fails
+the full gate. The bounded job continues to the next independent evaluation;
+this result does not yet certify reliable boxing.
 
 Previous review (2026-10-26): v15 completed all 2,097,152 new credits. The final
 policy produces **23 complete neutral-practice strikes on fresh seeds**, but

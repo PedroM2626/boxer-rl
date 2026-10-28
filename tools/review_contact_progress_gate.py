@@ -22,20 +22,23 @@ def sha(path):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--label', required=True)
+    parser.add_argument('--rebalance-v16', action='store_true', help='review v16 without changing its thresholds')
     args = parser.parse_args()
     assert args.label == 'fresh-final' or (args.label.startswith('step-') and args.label[5:].isdigit())
-    archive = Path('docs/results/striking-pilot/contact-progress-v15')
+    experiment = 'contact-rebalance-v16' if args.rebalance_v16 else 'contact-progress-v15'
+    offset = 5226496 if args.rebalance_v16 else 3129344
+    archive = Path('docs/results/striking-pilot') / experiment
     folder = archive / 'gates' / args.label
     gate = json.loads((folder / 'motion-gate.json').read_text())
     prerequisites = verify_prerequisites()
     checkpoint_label = 'step-2097152' if args.label == 'fresh-final' else args.label
-    cp = Path('checkpoints/striking-validation/contact-progress-v15') / checkpoint_label
+    cp = Path('checkpoints/striking-validation') / experiment / checkpoint_label
     manifest = json.loads((cp / 'latest.json').read_text())
     payload = cp / manifest['file']
     assert sha(payload) == manifest['sha256'] == gate['sha256']
     saved = pickle.loads(payload.read_bytes())
     require_ppo_checkpoint(saved)
-    assert saved['consumed_steps'] == saved['optimized_steps'] == 3129344 + gate['new_ppo_steps']
+    assert saved['consumed_steps'] == saved['optimized_steps'] == offset + gate['new_ppo_steps']
     original, controls = full_profiles(folder, gate['seeds'], gate['sha256'])
     assert original == gate['original_contact_gate'] and controls == gate['controls']
     motion, all_events, episodes = {}, [], []
