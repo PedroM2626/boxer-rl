@@ -1,0 +1,5792 @@
+{
+  "kind": "striking_interface_evaluation",
+  "updated_utc": "2026-10-28T13:52:26.336816+00:00",
+  "assistance": false,
+  "source_sha256": "b39b1990945e8a374802c3a190e5ac5e026ae39e7fd5ef61c5c2b01ad291c6fc",
+  "striking_sha256": "1f4a1f5758ffb3e8c09caaa1a01d2b5737ba18339f57d35ed377f24b3d7b1668",
+  "opponent_sha256": null,
+  "evaluated_corner": null,
+  "diagnostic_base_yaw_scale": 1.0,
+  "simulated_world_transitions": 2730,
+  "optimization_transitions": 0,
+  "scorecard_version": 1,
+  "episode_seconds": 10.0,
+  "trials": [
+    {
+      "mode": "trained",
+      "seed": 7,
+      "swap": false,
+      "survived": false,
+      "elapsed": 1.6500000000000012,
+      "final_distance": 0.5489942131966115,
+      "scored_by_corner": [
+        0.0,
+        0.0
+      ],
+      "raw_legal_impulse": [
+        0.0,
+        0.0
+      ],
+      "fallen": [
+        true,
+        false
+      ],
+      "finite": true,
+      "minimum_hand_target_distance": [
+        0.4372514178107753,
+        0.1722813248879096
+      ],
+      "mean_abs_arm_residual": [
+        0.3247134536430469,
+        0.0
+      ],
+      "max_abs_arm_residual": [
+        0.8835730084678857,
+        0.0
+      ],
+      "impact_events": [],
+      "punch_trace_file": "/home/pedro/boxing-runs/striking-arm-effort-v17/gates/step-1048576/neutral-0/native/trained-seed-7-swap-0.npz",
+      "punch_trace_sha256": "5b2a089654d18e16396d08ab90b65b1b9b14a4bed894e483565fc0fb6f34a7ed",
+      "punch_measurements": [],
+      "first_observed_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        }
+      ],
+      "trace_file": "/home/pedro/boxing-runs/striking-arm-effort-v17/gates/step-1048576/neutral-0/full/trained-seed-7-swap-0.npz",
+      "trace_sha256": "92d36a7a1e0f6a596318433d9b2a11e55a002eed0c789cb7d7b834a30416e137",
+      "first_fall_time": 1.6500000000000012,
+      "terminal_state": {
+        "corners": [
+          {
+            "pelvis_height": 0.5483294852465176,
+            "upright": 0.9114870609931776,
+            "low_pelvis": true,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7562264770531401,
+            "upright": 0.9999174713959876,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ]
+        ]
+      }
+    },
+    {
+      "mode": "trained",
+      "seed": 7,
+      "swap": true,
+      "survived": true,
+      "elapsed": 10.000000000000009,
+      "final_distance": 0.4320327900421148,
+      "scored_by_corner": [
+        25.0,
+        0.0
+      ],
+      "raw_legal_impulse": [
+        42.36976615735426,
+        0.0
+      ],
+      "fallen": [
+        false,
+        false
+      ],
+      "finite": true,
+      "minimum_hand_target_distance": [
+        0.1450500213722415,
+        0.183810378377792
+      ],
+      "mean_abs_arm_residual": [
+        0.24505586154251915,
+        0.0
+      ],
+      "max_abs_arm_residual": [
+        0.757321043739553,
+        0.0
+      ],
+      "impact_events": [
+        {
+          "control_step": 136,
+          "elapsed": 2.73999999999992,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 2.7319999999999207,
+              "contact_window_impulse": 0.9977033348927067
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 150,
+          "elapsed": 3.019999999999889,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 3.0159999999998894,
+              "contact_window_impulse": 0.5641943628367824
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 170,
+          "elapsed": 3.419999999999845,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 3.4139999999998456,
+              "contact_window_impulse": 0.7857461265157899
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 192,
+          "elapsed": 3.8599999999997965,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 3.8599999999997965,
+              "contact_window_impulse": 0.5333920149074834
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 204,
+          "elapsed": 4.0999999999997705,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 4.089999999999772,
+              "contact_window_impulse": 0.8039201605631685
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 224,
+          "elapsed": 4.499999999999726,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 4.497999999999727,
+              "contact_window_impulse": 0.5921647131657292
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 238,
+          "elapsed": 4.779999999999696,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 4.7719999999996965,
+              "contact_window_impulse": 1.119360619790983
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 249,
+          "elapsed": 4.999999999999671,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 4.983999999999673,
+              "contact_window_impulse": 1.4174192131660979
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 261,
+          "elapsed": 5.239999999999645,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 5.227999999999646,
+              "contact_window_impulse": 0.7480767275548174
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 273,
+          "elapsed": 5.4799999999996185,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 5.46999999999962,
+              "contact_window_impulse": 1.2864545191146712
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 287,
+          "elapsed": 5.759999999999588,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 5.755999999999588,
+              "contact_window_impulse": 0.5393839512310117
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 305,
+          "elapsed": 6.119999999999548,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 6.10599999999955,
+              "contact_window_impulse": 1.0985651166292605
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 317,
+          "elapsed": 6.359999999999522,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 6.343999999999523,
+              "contact_window_impulse": 1.0426467955707606
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 329,
+          "elapsed": 6.599999999999495,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 6.593999999999496,
+              "contact_window_impulse": 0.6295859414968744
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 340,
+          "elapsed": 6.819999999999471,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 6.817999999999471,
+              "contact_window_impulse": 0.6603982230729124
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 352,
+          "elapsed": 7.0599999999994445,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 7.057999999999445,
+              "contact_window_impulse": 0.6755580521177269
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 369,
+          "elapsed": 7.399999999999407,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 7.389999999999408,
+              "contact_window_impulse": 0.63061753808915
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 383,
+          "elapsed": 7.679999999999376,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 7.661999999999378,
+              "contact_window_impulse": 2.3577727153079744
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 397,
+          "elapsed": 7.959999999999345,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 7.941999999999347,
+              "contact_window_impulse": 1.5741195832488246
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 410,
+          "elapsed": 8.219999999999414,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 8.203999999999409,
+              "contact_window_impulse": 1.2301480094695343
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 448,
+          "elapsed": 8.979999999999668,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 8.979999999999668,
+              "contact_window_impulse": 0.5032322504241109
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 460,
+          "elapsed": 9.219999999999748,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 9.207999999999744,
+              "contact_window_impulse": 1.3997911141792243
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 472,
+          "elapsed": 9.459999999999829,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 9.451999999999826,
+              "contact_window_impulse": 0.703453237986054
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 486,
+          "elapsed": 9.739999999999922,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 9.721999999999916,
+              "contact_window_impulse": 1.2790884120507375
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 496,
+          "elapsed": 9.939999999999989,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 9.937999999999988,
+              "contact_window_impulse": 0.7587151503206471
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        }
+      ],
+      "punch_trace_file": "/home/pedro/boxing-runs/striking-arm-effort-v17/gates/step-1048576/neutral-0/native/trained-seed-7-swap-1.npz",
+      "punch_trace_sha256": "61ac45ec58e2d828f5795bf0f8ce43c73dc720b7d127baaae370692a6f998875",
+      "punch_measurements": [
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 2.7259999999999214,
+          "event_time": 2.7319999999999207,
+          "onset_relative_speed": 1.0827579028029366,
+          "onset_forward_cosine": 0.8661699069439148,
+          "onset_contact_closing": 0.975697046305692,
+          "onset_contact_advancing": 0.9839182380876773,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 1.9154088122456128,
+          "pre_max_displacement_m": 0.10703062792328605,
+          "pre_path_length_m": 0.32743503954673864,
+          "pre_elbow_excursion_rad": 0.5042700121377716,
+          "event_window_impulse_ns": 0.5040963463080872,
+          "native_contact_window_impulse_ns": 0.5040963463080872,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.088,
+          "return_toward_pre_window_position_m": 0.011208222320365847,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 2.9959999999998916,
+          "event_time": 3.0159999999998894,
+          "onset_relative_speed": 1.3036892689484667,
+          "onset_forward_cosine": 0.7460453188365355,
+          "onset_contact_closing": 1.1666899108355584,
+          "onset_contact_advancing": 1.1765566326028416,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.6750714261211415,
+          "pre_max_displacement_m": 0.21627561102212317,
+          "pre_path_length_m": 0.4216086912472624,
+          "pre_elbow_excursion_rad": 0.4639200639216633,
+          "event_window_impulse_ns": 0.5204943240390233,
+          "native_contact_window_impulse_ns": 0.5204943240390233,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.058,
+          "return_toward_pre_window_position_m": 0.07182575796942021,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 3.4059999999998465,
+          "event_time": 3.4139999999998456,
+          "onset_relative_speed": 1.076904671662022,
+          "onset_forward_cosine": 0.7079186698383362,
+          "onset_contact_closing": 0.5553275491831957,
+          "onset_contact_advancing": 0.5118588372666644,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.0926715689907636,
+          "pre_max_displacement_m": 0.10982118241924418,
+          "pre_path_length_m": 0.3278142946722942,
+          "pre_elbow_excursion_rad": 0.4321662728244394,
+          "event_window_impulse_ns": 0.5904135314237771,
+          "native_contact_window_impulse_ns": 0.5904135314237771,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.054,
+          "return_toward_pre_window_position_m": 0.022713041647798617,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 3.845999999999798,
+          "event_time": 3.8599999999997965,
+          "onset_relative_speed": 2.4327966490164936,
+          "onset_forward_cosine": 0.45555215659232506,
+          "onset_contact_closing": 1.4716114896517034,
+          "onset_contact_advancing": 1.533434088209932,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.5654385997330604,
+          "pre_max_displacement_m": 0.14274291460206495,
+          "pre_path_length_m": 0.3903541607685258,
+          "pre_elbow_excursion_rad": 0.43722126866984595,
+          "event_window_impulse_ns": 0.5333920149074834,
+          "native_contact_window_impulse_ns": 0.5333920149074834,
+          "post_window_seconds": 0.4999999999999454,
+          "post_contact_seconds": 0.07200000000000001,
+          "return_toward_pre_window_position_m": 0.0012444963641641965,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 4.0819999999997725,
+          "event_time": 4.089999999999772,
+          "onset_relative_speed": 1.3431045262720898,
+          "onset_forward_cosine": 0.6630073697331377,
+          "onset_contact_closing": 0.6963965296427047,
+          "onset_contact_advancing": 0.6381417236329707,
+          "pre_window_seconds": 0.2499999999999729,
+          "pre_peak_relative_speed": 2.5654385997330604,
+          "pre_max_displacement_m": 0.08818467158022346,
+          "pre_path_length_m": 0.26696177282771794,
+          "pre_elbow_excursion_rad": 0.5264279756778347,
+          "event_window_impulse_ns": 0.5673316431253859,
+          "native_contact_window_impulse_ns": 0.5673316431253859,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.092,
+          "return_toward_pre_window_position_m": 0.0461492715322546,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 4.4899999999997275,
+          "event_time": 4.497999999999727,
+          "onset_relative_speed": 1.8967921300995971,
+          "onset_forward_cosine": 0.5255522669288147,
+          "onset_contact_closing": 1.2813504945386538,
+          "onset_contact_advancing": 1.4803953417406241,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.052665560966459,
+          "pre_max_displacement_m": 0.1024148685618582,
+          "pre_path_length_m": 0.29400546497708907,
+          "pre_elbow_excursion_rad": 0.38956825393102007,
+          "event_window_impulse_ns": 0.5324553282186802,
+          "native_contact_window_impulse_ns": 0.5324553282186802,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.066,
+          "return_toward_pre_window_position_m": 0.10191697307930045,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 4.765999999999697,
+          "event_time": 4.7719999999996965,
+          "onset_relative_speed": 1.109566859139267,
+          "onset_forward_cosine": 0.8347700875583979,
+          "onset_contact_closing": 1.0391518348823034,
+          "onset_contact_advancing": 1.08115692957663,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 1.6403782368579525,
+          "pre_max_displacement_m": 0.08250600383352652,
+          "pre_path_length_m": 0.27201112434520175,
+          "pre_elbow_excursion_rad": 0.4001585650990956,
+          "event_window_impulse_ns": 0.5667243987007708,
+          "native_contact_window_impulse_ns": 0.5667243987007708,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.084,
+          "return_toward_pre_window_position_m": 0.06290707460721362,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 4.975999999999674,
+          "event_time": 4.983999999999673,
+          "onset_relative_speed": 1.8644690317650028,
+          "onset_forward_cosine": 0.6941068661021437,
+          "onset_contact_closing": 1.8531079148577696,
+          "onset_contact_advancing": 1.8182094987928898,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.7640745340809847,
+          "pre_max_displacement_m": 0.15627193228818814,
+          "pre_path_length_m": 0.409292382731296,
+          "pre_elbow_excursion_rad": 0.46093625249834713,
+          "event_window_impulse_ns": 0.5099277559745086,
+          "native_contact_window_impulse_ns": 0.5099277559745086,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.082,
+          "return_toward_pre_window_position_m": 0.04893664830278163,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 5.217999999999647,
+          "event_time": 5.227999999999646,
+          "onset_relative_speed": 2.7027433743085667,
+          "onset_forward_cosine": 0.5592046692927731,
+          "onset_contact_closing": 2.015011184498378,
+          "onset_contact_advancing": 1.9849736938707305,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.761147265701188,
+          "pre_max_displacement_m": 0.14207346151881978,
+          "pre_path_length_m": 0.3552109190695972,
+          "pre_elbow_excursion_rad": 0.4221543141621243,
+          "event_window_impulse_ns": 0.5458664461764529,
+          "native_contact_window_impulse_ns": 0.5458664461764529,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.052000000000000005,
+          "return_toward_pre_window_position_m": 0.014445474197798853,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 5.46399999999962,
+          "event_time": 5.46999999999962,
+          "onset_relative_speed": 1.6919229818683479,
+          "onset_forward_cosine": 0.43294983768946776,
+          "onset_contact_closing": 0.7122516744128581,
+          "onset_contact_advancing": 0.7337784356222047,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.756950920518864,
+          "pre_max_displacement_m": 0.1576993132208007,
+          "pre_path_length_m": 0.34263286083936195,
+          "pre_elbow_excursion_rad": 0.3710932334319095,
+          "event_window_impulse_ns": 0.5634655998178539,
+          "native_contact_window_impulse_ns": 0.5634655998178539,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.108,
+          "return_toward_pre_window_position_m": 0.14517985458778424,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 5.73599999999959,
+          "event_time": 5.755999999999588,
+          "onset_relative_speed": 0.9475512217783699,
+          "onset_forward_cosine": 0.7830138055824439,
+          "onset_contact_closing": 0.8164592242322986,
+          "onset_contact_advancing": 0.7221110544105657,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 3.1341561240167857,
+          "pre_max_displacement_m": 0.2307324390067582,
+          "pre_path_length_m": 0.38655679558917494,
+          "pre_elbow_excursion_rad": 0.43929993750013296,
+          "event_window_impulse_ns": 0.5009408264803153,
+          "native_contact_window_impulse_ns": 0.5009408264803153,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.076,
+          "return_toward_pre_window_position_m": 0.1039133427432947,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 6.0979999999995504,
+          "event_time": 6.10599999999955,
+          "onset_relative_speed": 1.2499162867007452,
+          "onset_forward_cosine": 0.9000673555499217,
+          "onset_contact_closing": 0.9813507013332803,
+          "onset_contact_advancing": 1.148106676702526,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 1.9980113135542916,
+          "pre_max_displacement_m": 0.10418477637146248,
+          "pre_path_length_m": 0.29505661027394203,
+          "pre_elbow_excursion_rad": 0.4098877749709022,
+          "event_window_impulse_ns": 0.5702732578241629,
+          "native_contact_window_impulse_ns": 0.5702732578241629,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.07200000000000001,
+          "return_toward_pre_window_position_m": 0.08471120556825991,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 6.335999999999524,
+          "event_time": 6.343999999999523,
+          "onset_relative_speed": 1.063404581606229,
+          "onset_forward_cosine": 0.8137548648931061,
+          "onset_contact_closing": 0.9377043799885044,
+          "onset_contact_advancing": 0.9648805437368997,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.8745034853502127,
+          "pre_max_displacement_m": 0.13599431009289123,
+          "pre_path_length_m": 0.3606330596280058,
+          "pre_elbow_excursion_rad": 0.547601407307756,
+          "event_window_impulse_ns": 0.5159913170182159,
+          "native_contact_window_impulse_ns": 0.5159913170182159,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.098,
+          "return_toward_pre_window_position_m": 0.012479819539955535,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 6.579999999999497,
+          "event_time": 6.593999999999496,
+          "onset_relative_speed": 1.8054538236319695,
+          "onset_forward_cosine": 0.685956062620065,
+          "onset_contact_closing": 1.658251238312428,
+          "onset_contact_advancing": 1.6598043223327106,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.624143177878485,
+          "pre_max_displacement_m": 0.18627117287912828,
+          "pre_path_length_m": 0.3829414561389483,
+          "pre_elbow_excursion_rad": 0.4113978925103605,
+          "event_window_impulse_ns": 0.5408550763124228,
+          "native_contact_window_impulse_ns": 0.5408550763124228,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.096,
+          "return_toward_pre_window_position_m": 0.04422072333178123,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 6.811999999999472,
+          "event_time": 6.817999999999471,
+          "onset_relative_speed": 1.2734799950347855,
+          "onset_forward_cosine": 0.7744521837555873,
+          "onset_contact_closing": 1.0914662363344796,
+          "onset_contact_advancing": 1.1836047942233663,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.0463725173399587,
+          "pre_max_displacement_m": 0.15097580144121994,
+          "pre_path_length_m": 0.3112951598883636,
+          "pre_elbow_excursion_rad": 0.39968821560235407,
+          "event_window_impulse_ns": 0.5174872290508998,
+          "native_contact_window_impulse_ns": 0.5174872290508998,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.052000000000000005,
+          "return_toward_pre_window_position_m": 0.1403473749429462,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 7.047999999999446,
+          "event_time": 7.057999999999445,
+          "onset_relative_speed": 0.9759532870019062,
+          "onset_forward_cosine": 0.9319222853177362,
+          "onset_contact_closing": 0.9088219814764286,
+          "onset_contact_advancing": 0.599204946368064,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.741678976121916,
+          "pre_max_displacement_m": 0.1455033391490998,
+          "pre_path_length_m": 0.3372710215354269,
+          "pre_elbow_excursion_rad": 0.44262105727353995,
+          "event_window_impulse_ns": 0.5163035177886564,
+          "native_contact_window_impulse_ns": 0.5163035177886564,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.048,
+          "return_toward_pre_window_position_m": 0.013011045931142232,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 7.37599999999941,
+          "event_time": 7.389999999999408,
+          "onset_relative_speed": 2.392046145248449,
+          "onset_forward_cosine": 0.443852936725128,
+          "onset_contact_closing": 1.5046448273468795,
+          "onset_contact_advancing": 1.6203648238005506,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.4153617321226966,
+          "pre_max_displacement_m": 0.1280063947696873,
+          "pre_path_length_m": 0.3283169783090188,
+          "pre_elbow_excursion_rad": 0.28499287906474036,
+          "event_window_impulse_ns": 0.5283226732001711,
+          "native_contact_window_impulse_ns": 0.5283226732001711,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.064,
+          "return_toward_pre_window_position_m": 0.016636325453865432,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 7.655999999999379,
+          "event_time": 7.661999999999378,
+          "onset_relative_speed": 1.2768716464422643,
+          "onset_forward_cosine": 0.7125803770084287,
+          "onset_contact_closing": 0.6798206578345101,
+          "onset_contact_advancing": 0.8976701559788062,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.5326788684357577,
+          "pre_max_displacement_m": 0.10974439986779339,
+          "pre_path_length_m": 0.37062497747037765,
+          "pre_elbow_excursion_rad": 0.4778487823646205,
+          "event_window_impulse_ns": 0.7164681609477038,
+          "native_contact_window_impulse_ns": 0.7164681609477038,
+          "post_window_seconds": 0.4980000000000162,
+          "post_contact_seconds": 0.08,
+          "return_toward_pre_window_position_m": 0.040058632715133644,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 7.933999999999348,
+          "event_time": 7.941999999999347,
+          "onset_relative_speed": 1.1345597686544338,
+          "onset_forward_cosine": 0.9415641148229438,
+          "onset_contact_closing": 0.8526202077736968,
+          "onset_contact_advancing": 1.1104844412798613,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 3.2471878749531125,
+          "pre_max_displacement_m": 0.23136927710848917,
+          "pre_path_length_m": 0.41961171245826373,
+          "pre_elbow_excursion_rad": 0.4459719745331245,
+          "event_window_impulse_ns": 0.8601055607848025,
+          "native_contact_window_impulse_ns": 0.8601055607848025,
+          "post_window_seconds": 0.49800000000014055,
+          "post_contact_seconds": 0.06,
+          "return_toward_pre_window_position_m": 0.07711569957830974,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 8.193999999999406,
+          "event_time": 8.203999999999409,
+          "onset_relative_speed": 1.071016553084914,
+          "onset_forward_cosine": 0.9281220523544778,
+          "onset_contact_closing": 0.7391669647866024,
+          "onset_contact_advancing": 0.9296606381845615,
+          "pre_window_seconds": 0.24800000000005884,
+          "pre_peak_relative_speed": 1.9802402460023532,
+          "pre_max_displacement_m": 0.11187780106851469,
+          "pre_path_length_m": 0.32424725096951107,
+          "pre_elbow_excursion_rad": 0.4073159404690963,
+          "event_window_impulse_ns": 0.5551856850284528,
+          "native_contact_window_impulse_ns": 0.5551856850284528,
+          "post_window_seconds": 0.4980000000001663,
+          "post_contact_seconds": 0.028,
+          "return_toward_pre_window_position_m": 0.02105644358669076,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 8.967999999999664,
+          "event_time": 8.979999999999668,
+          "onset_relative_speed": 1.7284125778589756,
+          "onset_forward_cosine": 0.6246745889019174,
+          "onset_contact_closing": 1.2667034156494847,
+          "onset_contact_advancing": 1.2384042974915186,
+          "pre_window_seconds": 0.24800000000008282,
+          "pre_peak_relative_speed": 2.397936905802495,
+          "pre_max_displacement_m": 0.0999453998285145,
+          "pre_path_length_m": 0.3880265634801312,
+          "pre_elbow_excursion_rad": 0.40247127444873576,
+          "event_window_impulse_ns": 0.5032322504241109,
+          "native_contact_window_impulse_ns": 0.5032322504241109,
+          "post_window_seconds": 0.4980000000001663,
+          "post_contact_seconds": 0.092,
+          "return_toward_pre_window_position_m": 0.0813534719651844,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 9.201999999999742,
+          "event_time": 9.207999999999744,
+          "onset_relative_speed": 2.0070014512152605,
+          "onset_forward_cosine": 0.5933978521977757,
+          "onset_contact_closing": 1.738698409942398,
+          "onset_contact_advancing": 1.775091908558116,
+          "pre_window_seconds": 0.24800000000008282,
+          "pre_peak_relative_speed": 2.39579220714278,
+          "pre_max_displacement_m": 0.11937834161979162,
+          "pre_path_length_m": 0.36183692025913095,
+          "pre_elbow_excursion_rad": 0.5175442886820163,
+          "event_window_impulse_ns": 0.6110043114422306,
+          "native_contact_window_impulse_ns": 0.6110043114422306,
+          "post_window_seconds": 0.4980000000001663,
+          "post_contact_seconds": 0.066,
+          "return_toward_pre_window_position_m": -0.0016049860134582311,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 9.443999999999823,
+          "event_time": 9.451999999999826,
+          "onset_relative_speed": 2.61425597089148,
+          "onset_forward_cosine": 0.4795225474302003,
+          "onset_contact_closing": 1.4809105170468548,
+          "onset_contact_advancing": 1.6571717095169674,
+          "pre_window_seconds": 0.24800000000008282,
+          "pre_peak_relative_speed": 2.6833803363024726,
+          "pre_max_displacement_m": 0.1473522245033682,
+          "pre_path_length_m": 0.3754574039960543,
+          "pre_elbow_excursion_rad": 0.4126342234196983,
+          "event_window_impulse_ns": 0.503079012396006,
+          "native_contact_window_impulse_ns": 0.503079012396006,
+          "post_window_seconds": 0.4980000000001663,
+          "post_contact_seconds": 0.062,
+          "return_toward_pre_window_position_m": 0.0054864428686212975,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 9.715999999999914,
+          "event_time": 9.721999999999916,
+          "onset_relative_speed": 1.0431727051607824,
+          "onset_forward_cosine": 0.9605821501580603,
+          "onset_contact_closing": 0.6815884592440149,
+          "onset_contact_advancing": 0.8188464776081095,
+          "pre_window_seconds": 0.24800000000008282,
+          "pre_peak_relative_speed": 2.3558012449113344,
+          "pre_max_displacement_m": 0.09881740721095672,
+          "pre_path_length_m": 0.33690508532952906,
+          "pre_elbow_excursion_rad": 0.4630215192978517,
+          "event_window_impulse_ns": 0.5754552807603311,
+          "native_contact_window_impulse_ns": 0.5754552807603311,
+          "post_window_seconds": 0.27600000000009217,
+          "post_contact_seconds": 0.046,
+          "return_toward_pre_window_position_m": 0.06083874769869305,
+          "post_window_complete": false
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 9.929999999999986,
+          "event_time": 9.937999999999988,
+          "onset_relative_speed": 1.5119868717776945,
+          "onset_forward_cosine": 0.8196802634560763,
+          "onset_contact_closing": 1.4585895991465547,
+          "onset_contact_advancing": 1.435931773194346,
+          "pre_window_seconds": 0.24800000000008282,
+          "pre_peak_relative_speed": 2.459430392200982,
+          "pre_max_displacement_m": 0.15499222473232085,
+          "pre_path_length_m": 0.404247147391423,
+          "pre_elbow_excursion_rad": 0.5350505591975143,
+          "event_window_impulse_ns": 0.6343538234642077,
+          "native_contact_window_impulse_ns": 0.6343538234642077,
+          "post_window_seconds": 0.06000000000002004,
+          "post_contact_seconds": 0.026000000000000002,
+          "return_toward_pre_window_position_m": -0.00029651700594029995,
+          "post_window_complete": false
+        }
+      ],
+      "first_observed_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 1.8260000000000014
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 1.8600000000000014
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 2.585999999999937
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 2.6979999999999245
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/torso_collision"
+          ],
+          "elapsed": 2.727999999999921
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 3.0959999999998806
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_elbow_yaw_collision"
+          ],
+          "elapsed": 3.773999999999806
+        },
+        {
+          "geoms": [
+            "red/left_wrist_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 3.989999999999782
+        },
+        {
+          "geoms": [
+            "red/left_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 4.027999999999778
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/left_shin"
+          ],
+          "elapsed": 6.515999999999504
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 6.885999999999464
+        }
+      ],
+      "trace_file": "/home/pedro/boxing-runs/striking-arm-effort-v17/gates/step-1048576/neutral-0/full/trained-seed-7-swap-1.npz",
+      "trace_sha256": "69acfa2106063d0e3b666c7cdcd7568e01f91c834709b70b22da9a56a60d70f8",
+      "first_fall_time": null,
+      "terminal_state": {
+        "corners": [
+          {
+            "pelvis_height": 0.758793527728943,
+            "upright": 0.9940038141100942,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7571966487914201,
+            "upright": 0.9998854082352925,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ]
+        ]
+      }
+    },
+    {
+      "mode": "trained",
+      "seed": 23,
+      "swap": false,
+      "survived": true,
+      "elapsed": 10.000000000000009,
+      "final_distance": 0.4444854189326027,
+      "scored_by_corner": [
+        23.0,
+        2.0
+      ],
+      "raw_legal_impulse": [
+        81.14650719420362,
+        7.13128273281543
+      ],
+      "fallen": [
+        false,
+        false
+      ],
+      "finite": true,
+      "minimum_hand_target_distance": [
+        0.13511210223141093,
+        0.1361535529679146
+      ],
+      "mean_abs_arm_residual": [
+        0.2494531604978273,
+        0.0
+      ],
+      "max_abs_arm_residual": [
+        0.8515729003206833,
+        0.0
+      ],
+      "impact_events": [
+        {
+          "control_step": 70,
+          "elapsed": 1.420000000000001,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 1.404000000000001,
+              "contact_window_impulse": 3.5104249137072605
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 88,
+          "elapsed": 1.7800000000000014,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 1.7660000000000013,
+              "contact_window_impulse": 1.3728474192383402
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 107,
+          "elapsed": 2.1599999999999837,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 2.1439999999999855,
+              "contact_window_impulse": 1.3322734714525621
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 140,
+          "elapsed": 2.819999999999911,
+          "scored_by_corner": [
+            0.0,
+            1.0
+          ],
+          "hands": [
+            {
+              "corner": 1,
+              "hand": 1,
+              "score_time": 2.803999999999913,
+              "contact_window_impulse": 0.8520704733778547
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 154,
+          "elapsed": 3.09999999999988,
+          "scored_by_corner": [
+            0.0,
+            1.0
+          ],
+          "hands": [
+            {
+              "corner": 1,
+              "hand": 1,
+              "score_time": 3.091999999999881,
+              "contact_window_impulse": 0.801090611415881
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 206,
+          "elapsed": 4.139999999999766,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 4.127999999999767,
+              "contact_window_impulse": 1.0882561042347318
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 218,
+          "elapsed": 4.37999999999974,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 4.363999999999741,
+              "contact_window_impulse": 0.9907794131631287
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 229,
+          "elapsed": 4.599999999999715,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 4.593999999999716,
+              "contact_window_impulse": 0.9677404296156069
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 274,
+          "elapsed": 5.499999999999616,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 5.481999999999618,
+              "contact_window_impulse": 1.1687958148426745
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 286,
+          "elapsed": 5.73999999999959,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 5.7339999999995905,
+              "contact_window_impulse": 0.6664519156870232
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 297,
+          "elapsed": 5.959999999999566,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 5.9519999999995665,
+              "contact_window_impulse": 0.9361537511322667
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 309,
+          "elapsed": 6.199999999999539,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 6.19599999999954,
+              "contact_window_impulse": 0.7524457897518572
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 331,
+          "elapsed": 6.639999999999491,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 6.637999999999491,
+              "contact_window_impulse": 0.5755811525706681
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 343,
+          "elapsed": 6.879999999999464,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 6.871999999999465,
+              "contact_window_impulse": 1.3055859633497198
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 355,
+          "elapsed": 7.119999999999438,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 7.10399999999944,
+              "contact_window_impulse": 1.3928241153647176
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 366,
+          "elapsed": 7.339999999999414,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 7.327999999999415,
+              "contact_window_impulse": 2.153253943237754
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 379,
+          "elapsed": 7.599999999999385,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 7.593999999999386,
+              "contact_window_impulse": 0.9737506202756087
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 390,
+          "elapsed": 7.819999999999361,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 7.815999999999361,
+              "contact_window_impulse": 0.7703869934652111
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 414,
+          "elapsed": 8.299999999999441,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 8.283999999999436,
+              "contact_window_impulse": 1.6508393818443945
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 425,
+          "elapsed": 8.519999999999515,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 8.519999999999515,
+              "contact_window_impulse": 0.538952327574069
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 437,
+          "elapsed": 8.759999999999595,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 8.74799999999959,
+              "contact_window_impulse": 0.6717327990478316
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 449,
+          "elapsed": 8.999999999999675,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 8.993999999999673,
+              "contact_window_impulse": 1.1240080506427277
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 462,
+          "elapsed": 9.259999999999762,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 9.25399999999976,
+              "contact_window_impulse": 0.8426636814242241
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 473,
+          "elapsed": 9.479999999999835,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 9.477999999999835,
+              "contact_window_impulse": 0.6409665702785109
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 497,
+          "elapsed": 9.959999999999996,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 9.951999999999993,
+              "contact_window_impulse": 0.7982641428355558
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        }
+      ],
+      "punch_trace_file": "/home/pedro/boxing-runs/striking-arm-effort-v17/gates/step-1048576/neutral-0/native/trained-seed-23-swap-0.npz",
+      "punch_trace_sha256": "fbe326515408db07b5855ca5236ae826a0ff5bb1075700830e5c205b94780d80",
+      "punch_measurements": [
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 1.402000000000001,
+          "event_time": 1.404000000000001,
+          "onset_relative_speed": 0.9883735248804664,
+          "onset_forward_cosine": 0.8151020476209212,
+          "onset_contact_closing": 1.2364807845090608,
+          "onset_contact_advancing": 0.6777978291570124,
+          "pre_window_seconds": 0.24800000000000022,
+          "pre_peak_relative_speed": 3.3303653221666085,
+          "pre_max_displacement_m": 0.17471327373353238,
+          "pre_path_length_m": 0.4190015946337528,
+          "pre_elbow_excursion_rad": 0.5461785463586621,
+          "event_window_impulse_ns": 0.5345443025680722,
+          "native_contact_window_impulse_ns": 0.5345443025680722,
+          "post_window_seconds": 0.49800000000000044,
+          "post_contact_seconds": 0.114,
+          "return_toward_pre_window_position_m": 0.0762211651139675,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 1.7600000000000013,
+          "event_time": 1.7660000000000013,
+          "onset_relative_speed": 0.3583192126202126,
+          "onset_forward_cosine": 0.6548795323966858,
+          "onset_contact_closing": 0.9586564299780631,
+          "onset_contact_advancing": 0.27348801113187976,
+          "pre_window_seconds": 0.24800000000000022,
+          "pre_peak_relative_speed": 1.4519878749837023,
+          "pre_max_displacement_m": 0.07876624317391225,
+          "pre_path_length_m": 0.24702050104113382,
+          "pre_elbow_excursion_rad": 0.33378113480393573,
+          "event_window_impulse_ns": 0.8805945540631059,
+          "native_contact_window_impulse_ns": 0.8805945540631059,
+          "post_window_seconds": 0.4999999999999707,
+          "post_contact_seconds": 0.168,
+          "return_toward_pre_window_position_m": 0.004392997802777854,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 2.137999999999986,
+          "event_time": 2.1439999999999855,
+          "onset_relative_speed": 1.1051734995487232,
+          "onset_forward_cosine": 0.3016960216271123,
+          "onset_contact_closing": 1.4795286246337214,
+          "onset_contact_advancing": 0.8964912407035378,
+          "pre_window_seconds": 0.24999999999998468,
+          "pre_peak_relative_speed": 2.2885805734241633,
+          "pre_max_displacement_m": 0.14561677474828774,
+          "pre_path_length_m": 0.27080269219308056,
+          "pre_elbow_excursion_rad": 0.3558226323605014,
+          "event_window_impulse_ns": 0.545103504397997,
+          "native_contact_window_impulse_ns": 0.545103504397997,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.264,
+          "return_toward_pre_window_position_m": 0.0855032472883368,
+          "post_window_complete": true
+        },
+        {
+          "corner": 1,
+          "hand": 1,
+          "onset_time": 2.793999999999914,
+          "event_time": 2.803999999999913,
+          "onset_relative_speed": 0.311273512004019,
+          "onset_forward_cosine": 0.6904599867838356,
+          "onset_contact_closing": 0.7184211903949715,
+          "onset_contact_advancing": 0.26401318344559416,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 0.556589306112355,
+          "pre_max_displacement_m": 0.03382175692719174,
+          "pre_path_length_m": 0.08937460172198158,
+          "pre_elbow_excursion_rad": 0.07644900128356458,
+          "event_window_impulse_ns": 0.5155200022966768,
+          "native_contact_window_impulse_ns": 0.5155200022966768,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.07,
+          "return_toward_pre_window_position_m": 0.0061180236347433015,
+          "post_window_complete": true
+        },
+        {
+          "corner": 1,
+          "hand": 1,
+          "onset_time": 3.0799999999998824,
+          "event_time": 3.091999999999881,
+          "onset_relative_speed": 0.36522100910964667,
+          "onset_forward_cosine": 0.777015631996718,
+          "onset_contact_closing": 0.7109289602976916,
+          "onset_contact_advancing": 0.31633337419227103,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 0.6371409897059339,
+          "pre_max_displacement_m": 0.03990477001134268,
+          "pre_path_length_m": 0.10780640182188025,
+          "pre_elbow_excursion_rad": 0.10621644906941896,
+          "event_window_impulse_ns": 0.5711287681757993,
+          "native_contact_window_impulse_ns": 0.5711287681757993,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.026000000000000002,
+          "return_toward_pre_window_position_m": 0.008721800869945312,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 4.1179999999997685,
+          "event_time": 4.127999999999767,
+          "onset_relative_speed": 1.2315912841043206,
+          "onset_forward_cosine": 0.6084570850688086,
+          "onset_contact_closing": 1.2242796054592056,
+          "onset_contact_advancing": 1.1507301536099042,
+          "pre_window_seconds": 0.2499999999999729,
+          "pre_peak_relative_speed": 1.7098426737834822,
+          "pre_max_displacement_m": 0.10391509215431619,
+          "pre_path_length_m": 0.2306017032830878,
+          "pre_elbow_excursion_rad": 0.406164342645717,
+          "event_window_impulse_ns": 0.5258353746966242,
+          "native_contact_window_impulse_ns": 0.5258353746966242,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.14200000000000002,
+          "return_toward_pre_window_position_m": -0.00014162884348556393,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 4.3539999999997425,
+          "event_time": 4.363999999999741,
+          "onset_relative_speed": 1.738749209086277,
+          "onset_forward_cosine": 0.6058820746341497,
+          "onset_contact_closing": 1.3142167323413327,
+          "onset_contact_advancing": 1.0299743359714124,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.218924752466747,
+          "pre_max_displacement_m": 0.14484695913053552,
+          "pre_path_length_m": 0.325965263423013,
+          "pre_elbow_excursion_rad": 0.3008537325963401,
+          "event_window_impulse_ns": 0.5074993259608531,
+          "native_contact_window_impulse_ns": 0.5074993259608531,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.20400000000000001,
+          "return_toward_pre_window_position_m": 0.05223996519048786,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 4.581999999999717,
+          "event_time": 4.593999999999716,
+          "onset_relative_speed": 1.113931454052886,
+          "onset_forward_cosine": 0.6006283599835552,
+          "onset_contact_closing": 0.9043772760498382,
+          "onset_contact_advancing": 0.7852447849031341,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 1.7458780198076578,
+          "pre_max_displacement_m": 0.11069940850984673,
+          "pre_path_length_m": 0.2605404957852578,
+          "pre_elbow_excursion_rad": 0.35180666464064303,
+          "event_window_impulse_ns": 0.5774452030690407,
+          "native_contact_window_impulse_ns": 0.5774452030690407,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.14400000000000002,
+          "return_toward_pre_window_position_m": 0.11164400003139978,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 5.473999999999619,
+          "event_time": 5.481999999999618,
+          "onset_relative_speed": 1.1256877543358332,
+          "onset_forward_cosine": 0.4948599482068726,
+          "onset_contact_closing": 0.838143819374955,
+          "onset_contact_advancing": 0.7739033724352877,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 1.5031575442898208,
+          "pre_max_displacement_m": 0.05918824530590928,
+          "pre_path_length_m": 0.24622256727177813,
+          "pre_elbow_excursion_rad": 0.290106859882642,
+          "event_window_impulse_ns": 0.5476769964160189,
+          "native_contact_window_impulse_ns": 0.5476769964160189,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.126,
+          "return_toward_pre_window_position_m": 0.03297098981899066,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 5.721999999999592,
+          "event_time": 5.7339999999995905,
+          "onset_relative_speed": 1.5990853079423595,
+          "onset_forward_cosine": 0.7883084538645123,
+          "onset_contact_closing": 1.5362159815455014,
+          "onset_contact_advancing": 1.5279144980140713,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.478224305100246,
+          "pre_max_displacement_m": 0.1641993564181978,
+          "pre_path_length_m": 0.34909370357678876,
+          "pre_elbow_excursion_rad": 0.3863507009822952,
+          "event_window_impulse_ns": 0.5270823621235518,
+          "native_contact_window_impulse_ns": 0.5270823621235518,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.096,
+          "return_toward_pre_window_position_m": 0.06921701485416559,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 5.941999999999568,
+          "event_time": 5.9519999999995665,
+          "onset_relative_speed": 1.8729175632711395,
+          "onset_forward_cosine": 0.6122197513017422,
+          "onset_contact_closing": 1.0151799257965834,
+          "onset_contact_advancing": 1.1673431207382683,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.389265526320672,
+          "pre_max_displacement_m": 0.1230616172699088,
+          "pre_path_length_m": 0.3781589389699551,
+          "pre_elbow_excursion_rad": 0.4667149801135395,
+          "event_window_impulse_ns": 0.5834288179821127,
+          "native_contact_window_impulse_ns": 0.5834288179821127,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.096,
+          "return_toward_pre_window_position_m": 0.10799365040233716,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 6.18999999999954,
+          "event_time": 6.19599999999954,
+          "onset_relative_speed": 1.0890037130732113,
+          "onset_forward_cosine": 0.8829824791320996,
+          "onset_contact_closing": 0.9791189364249712,
+          "onset_contact_advancing": 0.9511628786757176,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 1.9685586756562234,
+          "pre_max_displacement_m": 0.10440965302890028,
+          "pre_path_length_m": 0.280922403524747,
+          "pre_elbow_excursion_rad": 0.49992852331827947,
+          "event_window_impulse_ns": 0.5024258872231397,
+          "native_contact_window_impulse_ns": 0.5024258872231397,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.088,
+          "return_toward_pre_window_position_m": 0.013323716142839165,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 6.6239999999994925,
+          "event_time": 6.637999999999491,
+          "onset_relative_speed": 2.086574385565269,
+          "onset_forward_cosine": 0.5713383839656274,
+          "onset_contact_closing": 1.29518885364311,
+          "onset_contact_advancing": 1.4757289078107951,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.3971599003492208,
+          "pre_max_displacement_m": 0.0874588686547251,
+          "pre_path_length_m": 0.3499053415239926,
+          "pre_elbow_excursion_rad": 0.36077103077673606,
+          "event_window_impulse_ns": 0.5357631027434993,
+          "native_contact_window_impulse_ns": 0.5357631027434993,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.082,
+          "return_toward_pre_window_position_m": 0.06094805914069222,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 6.865999999999466,
+          "event_time": 6.871999999999465,
+          "onset_relative_speed": 1.1139711821379656,
+          "onset_forward_cosine": 0.7958443863692991,
+          "onset_contact_closing": 1.1007652288984051,
+          "onset_contact_advancing": 1.066112527405838,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.277599564838249,
+          "pre_max_displacement_m": 0.0830636365830635,
+          "pre_path_length_m": 0.29899027149402985,
+          "pre_elbow_excursion_rad": 0.4727550083930946,
+          "event_window_impulse_ns": 0.664022317090029,
+          "native_contact_window_impulse_ns": 0.664022317090029,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.108,
+          "return_toward_pre_window_position_m": 0.07106629560062619,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 7.09799999999944,
+          "event_time": 7.10399999999944,
+          "onset_relative_speed": 1.739019659247608,
+          "onset_forward_cosine": 0.8885591617772746,
+          "onset_contact_closing": 1.7193860146409619,
+          "onset_contact_advancing": 1.7212340193469877,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.884475526149714,
+          "pre_max_displacement_m": 0.20942851290540035,
+          "pre_path_length_m": 0.4342670109698854,
+          "pre_elbow_excursion_rad": 0.4229716538167509,
+          "event_window_impulse_ns": 0.518304760521875,
+          "native_contact_window_impulse_ns": 0.518304760521875,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.1,
+          "return_toward_pre_window_position_m": 0.09634081897198724,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 7.321999999999416,
+          "event_time": 7.327999999999415,
+          "onset_relative_speed": 2.1692949460313184,
+          "onset_forward_cosine": 0.4052447416667355,
+          "onset_contact_closing": 1.040690971848186,
+          "onset_contact_advancing": 1.1454001280838715,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.353385904061688,
+          "pre_max_displacement_m": 0.08587882722214468,
+          "pre_path_length_m": 0.3486058527156745,
+          "pre_elbow_excursion_rad": 0.4206876386957251,
+          "event_window_impulse_ns": 0.6659274289670918,
+          "native_contact_window_impulse_ns": 0.6659274289670918,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.08,
+          "return_toward_pre_window_position_m": 0.08525340715150505,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 7.587999999999386,
+          "event_time": 7.593999999999386,
+          "onset_relative_speed": 1.0283108347037697,
+          "onset_forward_cosine": 0.8965807924713977,
+          "onset_contact_closing": 0.9509275654923004,
+          "onset_contact_advancing": 0.9288499716006254,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.168274489278752,
+          "pre_max_displacement_m": 0.11671947405428236,
+          "pre_path_length_m": 0.3152383992413199,
+          "pre_elbow_excursion_rad": 0.4550383265630784,
+          "event_window_impulse_ns": 0.5541010216735762,
+          "native_contact_window_impulse_ns": 0.5541010216735762,
+          "post_window_seconds": 0.4999999999999867,
+          "post_contact_seconds": 0.11,
+          "return_toward_pre_window_position_m": 0.037143515846518094,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 7.807999999999362,
+          "event_time": 7.815999999999361,
+          "onset_relative_speed": 1.8132158076778668,
+          "onset_forward_cosine": 0.8204880681549576,
+          "onset_contact_closing": 1.9666908180755835,
+          "onset_contact_advancing": 1.7646556691544129,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 3.02611685161118,
+          "pre_max_displacement_m": 0.1995079675327564,
+          "pre_path_length_m": 0.43767786517397433,
+          "pre_elbow_excursion_rad": 0.4273388954400827,
+          "event_window_impulse_ns": 0.5619289976650618,
+          "native_contact_window_impulse_ns": 0.5619289976650618,
+          "post_window_seconds": 0.4980000000000846,
+          "post_contact_seconds": 0.11,
+          "return_toward_pre_window_position_m": 0.08768100783740213,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 8.277999999999434,
+          "event_time": 8.283999999999436,
+          "onset_relative_speed": 1.051221464636326,
+          "onset_forward_cosine": 0.840652659192816,
+          "onset_contact_closing": 1.0215235906409095,
+          "onset_contact_advancing": 1.037027178212703,
+          "pre_window_seconds": 0.24800000000008282,
+          "pre_peak_relative_speed": 1.9375416053617978,
+          "pre_max_displacement_m": 0.11898779934980165,
+          "pre_path_length_m": 0.3235835889901374,
+          "pre_elbow_excursion_rad": 0.47287026050121894,
+          "event_window_impulse_ns": 0.5326360535387471,
+          "native_contact_window_impulse_ns": 0.5326360535387471,
+          "post_window_seconds": 0.4980000000001663,
+          "post_contact_seconds": 0.074,
+          "return_toward_pre_window_position_m": 0.03860901091333606,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 8.50799999999951,
+          "event_time": 8.519999999999515,
+          "onset_relative_speed": 1.513225361629907,
+          "onset_forward_cosine": 0.6985031822364658,
+          "onset_contact_closing": 1.1936942232266423,
+          "onset_contact_advancing": 1.07694715518389,
+          "pre_window_seconds": 0.24800000000008282,
+          "pre_peak_relative_speed": 2.8446218960057283,
+          "pre_max_displacement_m": 0.1786214913306056,
+          "pre_path_length_m": 0.4055108512976548,
+          "pre_elbow_excursion_rad": 0.5229325119805512,
+          "event_window_impulse_ns": 0.538952327574069,
+          "native_contact_window_impulse_ns": 0.538952327574069,
+          "post_window_seconds": 0.4980000000001663,
+          "post_contact_seconds": 0.076,
+          "return_toward_pre_window_position_m": 0.09490271830231715,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 8.731999999999585,
+          "event_time": 8.74799999999959,
+          "onset_relative_speed": 2.485358855794005,
+          "onset_forward_cosine": 0.4216730226152874,
+          "onset_contact_closing": 1.4334390657221407,
+          "onset_contact_advancing": 1.5294399279485982,
+          "pre_window_seconds": 0.24800000000008282,
+          "pre_peak_relative_speed": 2.5161143793849154,
+          "pre_max_displacement_m": 0.09544830326664581,
+          "pre_path_length_m": 0.36123133594568135,
+          "pre_elbow_excursion_rad": 0.3265058829299915,
+          "event_window_impulse_ns": 0.5630408770295148,
+          "native_contact_window_impulse_ns": 0.5630408770295148,
+          "post_window_seconds": 0.4980000000001663,
+          "post_contact_seconds": 0.052000000000000005,
+          "return_toward_pre_window_position_m": 0.04309580066096172,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 8.987999999999671,
+          "event_time": 8.993999999999673,
+          "onset_relative_speed": 1.203065002426892,
+          "onset_forward_cosine": 0.7776241052300189,
+          "onset_contact_closing": 0.9580464827036147,
+          "onset_contact_advancing": 1.0026084487657518,
+          "pre_window_seconds": 0.24800000000008282,
+          "pre_peak_relative_speed": 2.2662313696084193,
+          "pre_max_displacement_m": 0.11458600330963312,
+          "pre_path_length_m": 0.3482772770835402,
+          "pre_elbow_excursion_rad": 0.4707144378382111,
+          "event_window_impulse_ns": 0.6192648791200509,
+          "native_contact_window_impulse_ns": 0.6192648791200509,
+          "post_window_seconds": 0.4980000000001663,
+          "post_contact_seconds": 0.1,
+          "return_toward_pre_window_position_m": 0.04575065002994819,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 9.241999999999756,
+          "event_time": 9.25399999999976,
+          "onset_relative_speed": 1.250114799826175,
+          "onset_forward_cosine": 0.7708776079566578,
+          "onset_contact_closing": 1.3610036868938624,
+          "onset_contact_advancing": 1.2295394088849152,
+          "pre_window_seconds": 0.24800000000008282,
+          "pre_peak_relative_speed": 2.971704804783605,
+          "pre_max_displacement_m": 0.23385144966363494,
+          "pre_path_length_m": 0.430467434787586,
+          "pre_elbow_excursion_rad": 0.4633236704378485,
+          "event_window_impulse_ns": 0.5113845132221454,
+          "native_contact_window_impulse_ns": 0.5113845132221454,
+          "post_window_seconds": 0.4980000000001663,
+          "post_contact_seconds": 0.07200000000000001,
+          "return_toward_pre_window_position_m": 0.09153100814020272,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 9.46599999999983,
+          "event_time": 9.477999999999835,
+          "onset_relative_speed": 1.568498694551365,
+          "onset_forward_cosine": 0.6404949846171775,
+          "onset_contact_closing": 0.6891538061121539,
+          "onset_contact_advancing": 0.9323504999019817,
+          "pre_window_seconds": 0.24800000000008282,
+          "pre_peak_relative_speed": 2.27735711325878,
+          "pre_max_displacement_m": 0.10716955674002791,
+          "pre_path_length_m": 0.35459406940984756,
+          "pre_elbow_excursion_rad": 0.4195745742308454,
+          "event_window_impulse_ns": 0.5646044050318553,
+          "native_contact_window_impulse_ns": 0.5646044050318553,
+          "post_window_seconds": 0.4980000000001663,
+          "post_contact_seconds": 0.064,
+          "return_toward_pre_window_position_m": 0.07889183613590747,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 9.94199999999999,
+          "event_time": 9.951999999999993,
+          "onset_relative_speed": 1.338910804707407,
+          "onset_forward_cosine": 0.6466966598352691,
+          "onset_contact_closing": 1.0655818148578367,
+          "onset_contact_advancing": 0.9740282581492429,
+          "pre_window_seconds": 0.24800000000008282,
+          "pre_peak_relative_speed": 2.593420656147964,
+          "pre_max_displacement_m": 0.12628584583911873,
+          "pre_path_length_m": 0.3654913015253455,
+          "pre_elbow_excursion_rad": 0.4635972621203999,
+          "event_window_impulse_ns": 0.5485255498617343,
+          "native_contact_window_impulse_ns": 0.5485255498617343,
+          "post_window_seconds": 0.04600000000001536,
+          "post_contact_seconds": 0.022,
+          "return_toward_pre_window_position_m": -0.0010928658126996144,
+          "post_window_complete": false
+        }
+      ],
+      "first_observed_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.04200000000000002
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 1.262000000000001
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 1.302000000000001
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 1.308000000000001
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 1.340000000000001
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/torso_collision"
+          ],
+          "elapsed": 1.404000000000001
+        },
+        {
+          "geoms": [
+            "red/left_wrist_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 1.5540000000000012
+        },
+        {
+          "geoms": [
+            "red/left_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 1.7340000000000013
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_elbow_yaw_collision"
+          ],
+          "elapsed": 1.8540000000000014
+        },
+        {
+          "geoms": [
+            "red/torso_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 2.10399999999999
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/left_shin"
+          ],
+          "elapsed": 2.137999999999986
+        },
+        {
+          "geoms": [
+            "red/left_wrist_collision",
+            "blue/right_elbow_yaw_collision"
+          ],
+          "elapsed": 2.139999999999986
+        },
+        {
+          "geoms": [
+            "red/right_wrist_collision",
+            "blue/torso_collision"
+          ],
+          "elapsed": 2.9539999999998963
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_shoulder_yaw_collision"
+          ],
+          "elapsed": 3.4059999999998465
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 3.529999999999833
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_elbow_yaw_collision"
+          ],
+          "elapsed": 3.807999999999802
+        }
+      ],
+      "trace_file": "/home/pedro/boxing-runs/striking-arm-effort-v17/gates/step-1048576/neutral-0/full/trained-seed-23-swap-0.npz",
+      "trace_sha256": "bf8cc5134923583408eb23f0e17f0885f26b4db765cb1093e0ba681729127329",
+      "first_fall_time": null,
+      "terminal_state": {
+        "corners": [
+          {
+            "pelvis_height": 0.7590727670657377,
+            "upright": 0.9968974082040765,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7563077999671297,
+            "upright": 0.9999949524876941,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "red/left_shin",
+            "blue/right_shin"
+          ]
+        ]
+      }
+    },
+    {
+      "mode": "trained",
+      "seed": 23,
+      "swap": true,
+      "survived": true,
+      "elapsed": 10.000000000000009,
+      "final_distance": 0.45723929720762085,
+      "scored_by_corner": [
+        21.0,
+        0.0
+      ],
+      "raw_legal_impulse": [
+        38.23655706323714,
+        0.0
+      ],
+      "fallen": [
+        false,
+        false
+      ],
+      "finite": true,
+      "minimum_hand_target_distance": [
+        0.14398423178926598,
+        0.1976607715265862
+      ],
+      "mean_abs_arm_residual": [
+        0.24722038827420675,
+        0.0
+      ],
+      "max_abs_arm_residual": [
+        0.8102828565734165,
+        0.0
+      ],
+      "impact_events": [
+        {
+          "control_step": 88,
+          "elapsed": 1.7800000000000014,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 1.7740000000000014,
+              "contact_window_impulse": 1.431349524448321
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 189,
+          "elapsed": 3.799999999999803,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 3.789999999999804,
+              "contact_window_impulse": 0.6382505763525872
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 201,
+          "elapsed": 4.039999999999777,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 4.023999999999779,
+              "contact_window_impulse": 0.5363484532032905
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 267,
+          "elapsed": 5.359999999999632,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 5.353999999999632,
+              "contact_window_impulse": 0.9946388711195311
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 279,
+          "elapsed": 5.599999999999605,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 5.591999999999606,
+              "contact_window_impulse": 0.8427394100144158
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 291,
+          "elapsed": 5.839999999999579,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 5.82999999999958,
+              "contact_window_impulse": 0.7436283726735476
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 303,
+          "elapsed": 6.079999999999552,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 6.063999999999554,
+              "contact_window_impulse": 1.541734930019999
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 315,
+          "elapsed": 6.319999999999526,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 6.307999999999527,
+              "contact_window_impulse": 0.8134720818333593
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 326,
+          "elapsed": 6.539999999999502,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 6.531999999999503,
+              "contact_window_impulse": 0.6253181386622626
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 338,
+          "elapsed": 6.779999999999475,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 6.7779999999994756,
+              "contact_window_impulse": 0.870516167503895
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 351,
+          "elapsed": 7.039999999999447,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 7.033999999999447,
+              "contact_window_impulse": 0.8185114363317747
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 364,
+          "elapsed": 7.299999999999418,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 7.28399999999942,
+              "contact_window_impulse": 1.186532199171176
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 375,
+          "elapsed": 7.519999999999394,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 7.517999999999394,
+              "contact_window_impulse": 0.9081427580011375
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 387,
+          "elapsed": 7.759999999999367,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 7.7499999999993685,
+              "contact_window_impulse": 0.9428041911471458
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 399,
+          "elapsed": 7.999999999999341,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 7.983999999999343,
+              "contact_window_impulse": 1.0661103789516866
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 418,
+          "elapsed": 8.379999999999468,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 8.373999999999466,
+              "contact_window_impulse": 0.8955309063653705
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 445,
+          "elapsed": 8.919999999999648,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 8.919999999999648,
+              "contact_window_impulse": 0.6491879367728931
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 457,
+          "elapsed": 9.159999999999728,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 9.143999999999723,
+              "contact_window_impulse": 1.2906891163462315
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 469,
+          "elapsed": 9.399999999999809,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 9.395999999999807,
+              "contact_window_impulse": 0.819767506872965
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 481,
+          "elapsed": 9.639999999999889,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 9.635999999999887,
+              "contact_window_impulse": 0.9065011828153836
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 492,
+          "elapsed": 9.859999999999962,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 9.85399999999996,
+              "contact_window_impulse": 0.851805640681698
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        }
+      ],
+      "punch_trace_file": "/home/pedro/boxing-runs/striking-arm-effort-v17/gates/step-1048576/neutral-0/native/trained-seed-23-swap-1.npz",
+      "punch_trace_sha256": "298a3ce3dca55dce11d6cdcb8739eeffcc4220c7064ef0d39cd02580438e5770",
+      "punch_measurements": [
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 1.7700000000000014,
+          "event_time": 1.7740000000000014,
+          "onset_relative_speed": 1.567522922681075,
+          "onset_forward_cosine": 0.3504548792398272,
+          "onset_contact_closing": 0.947712542476947,
+          "onset_contact_advancing": 1.3875398137569381,
+          "pre_window_seconds": 0.24800000000000022,
+          "pre_peak_relative_speed": 2.325317032730723,
+          "pre_max_displacement_m": 0.11329840823785131,
+          "pre_path_length_m": 0.35352839802301833,
+          "pre_elbow_excursion_rad": 0.5401899454366217,
+          "event_window_impulse_ns": 0.6341113308813027,
+          "native_contact_window_impulse_ns": 0.6341113308813027,
+          "post_window_seconds": 0.4999999999999698,
+          "post_contact_seconds": 0.1,
+          "return_toward_pre_window_position_m": 0.06442912072657783,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 3.7799999999998053,
+          "event_time": 3.789999999999804,
+          "onset_relative_speed": 0.9938473229089325,
+          "onset_forward_cosine": 0.9483900619511924,
+          "onset_contact_closing": 1.0332999547228428,
+          "onset_contact_advancing": 0.9697190796850598,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.2152417302378775,
+          "pre_max_displacement_m": 0.1336880302107009,
+          "pre_path_length_m": 0.36363743407091054,
+          "pre_elbow_excursion_rad": 0.5189593441949387,
+          "event_window_impulse_ns": 0.5001752750688164,
+          "native_contact_window_impulse_ns": 0.5001752750688164,
+          "post_window_seconds": 0.4999999999999454,
+          "post_contact_seconds": 0.06,
+          "return_toward_pre_window_position_m": 0.0240082038708754,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 4.01399999999978,
+          "event_time": 4.023999999999779,
+          "onset_relative_speed": 1.065016117596284,
+          "onset_forward_cosine": 0.7253048800858549,
+          "onset_contact_closing": 0.5455504314219226,
+          "onset_contact_advancing": 0.5592543690054004,
+          "pre_window_seconds": 0.2499999999999729,
+          "pre_peak_relative_speed": 2.2988113365945857,
+          "pre_max_displacement_m": 0.1127426531156991,
+          "pre_path_length_m": 0.36283423388838254,
+          "pre_elbow_excursion_rad": 0.4327212753334491,
+          "event_window_impulse_ns": 0.5224314879285631,
+          "native_contact_window_impulse_ns": 0.5224314879285631,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.056,
+          "return_toward_pre_window_position_m": 0.0556419810144719,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 5.347999999999633,
+          "event_time": 5.353999999999632,
+          "onset_relative_speed": 1.610035364390821,
+          "onset_forward_cosine": 0.7900676084347227,
+          "onset_contact_closing": 1.0541188775304815,
+          "onset_contact_advancing": 1.0461204875394208,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.416648199068989,
+          "pre_max_displacement_m": 0.13777093149834313,
+          "pre_path_length_m": 0.4061694867421681,
+          "pre_elbow_excursion_rad": 0.4639732682934441,
+          "event_window_impulse_ns": 0.572437708661062,
+          "native_contact_window_impulse_ns": 0.572437708661062,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.08600000000000001,
+          "return_toward_pre_window_position_m": 0.1362020879357507,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 5.583999999999607,
+          "event_time": 5.591999999999606,
+          "onset_relative_speed": 1.0139405652721258,
+          "onset_forward_cosine": 0.6996944907403352,
+          "onset_contact_closing": 0.6793141381644733,
+          "onset_contact_advancing": 0.6453100197975984,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.254459854386143,
+          "pre_max_displacement_m": 0.09977311441018821,
+          "pre_path_length_m": 0.33413125710080654,
+          "pre_elbow_excursion_rad": 0.5967276863960683,
+          "event_window_impulse_ns": 0.5392276264043203,
+          "native_contact_window_impulse_ns": 0.5392276264043203,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.088,
+          "return_toward_pre_window_position_m": 0.012753685282630982,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 5.817999999999581,
+          "event_time": 5.82999999999958,
+          "onset_relative_speed": 2.0439807049337233,
+          "onset_forward_cosine": 0.6944414973203047,
+          "onset_contact_closing": 1.7893416117564103,
+          "onset_contact_advancing": 1.788605223872462,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.50930884309816,
+          "pre_max_displacement_m": 0.18763896228992274,
+          "pre_path_length_m": 0.4250402978962089,
+          "pre_elbow_excursion_rad": 0.45937504897057263,
+          "event_window_impulse_ns": 0.5182098141221583,
+          "native_contact_window_impulse_ns": 0.5182098141221583,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.098,
+          "return_toward_pre_window_position_m": 0.020460796084087005,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 6.057999999999555,
+          "event_time": 6.063999999999554,
+          "onset_relative_speed": 1.2208994737091041,
+          "onset_forward_cosine": 0.9408276255445314,
+          "onset_contact_closing": 1.0366792002598182,
+          "onset_contact_advancing": 1.1789915886139486,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.258904125779562,
+          "pre_max_displacement_m": 0.12120397069453709,
+          "pre_path_length_m": 0.35023074539343957,
+          "pre_elbow_excursion_rad": 0.5244796912731554,
+          "event_window_impulse_ns": 0.5861671487207215,
+          "native_contact_window_impulse_ns": 0.5861671487207215,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.1,
+          "return_toward_pre_window_position_m": 0.10583774181408377,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 6.295999999999529,
+          "event_time": 6.307999999999527,
+          "onset_relative_speed": 1.284506868854795,
+          "onset_forward_cosine": 0.9602968336416806,
+          "onset_contact_closing": 1.338333487022462,
+          "onset_contact_advancing": 1.141660150437758,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.84387396721032,
+          "pre_max_displacement_m": 0.19875199210813696,
+          "pre_path_length_m": 0.41703478789696313,
+          "pre_elbow_excursion_rad": 0.5265570126585982,
+          "event_window_impulse_ns": 0.5540055578000754,
+          "native_contact_window_impulse_ns": 0.5540055578000754,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.088,
+          "return_toward_pre_window_position_m": 0.059935667295142755,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 6.513999999999505,
+          "event_time": 6.531999999999503,
+          "onset_relative_speed": 1.6668223088577108,
+          "onset_forward_cosine": 0.7578632692042353,
+          "onset_contact_closing": 1.416908552014207,
+          "onset_contact_advancing": 1.516686721795684,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.048639288289695,
+          "pre_max_displacement_m": 0.09888166037209238,
+          "pre_path_length_m": 0.3628452271655022,
+          "pre_elbow_excursion_rad": 0.4702970044803453,
+          "event_window_impulse_ns": 0.5087489260693222,
+          "native_contact_window_impulse_ns": 0.5087489260693222,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.054,
+          "return_toward_pre_window_position_m": 0.04486554789177537,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 6.771999999999476,
+          "event_time": 6.7779999999994756,
+          "onset_relative_speed": 0.9655683164891051,
+          "onset_forward_cosine": 0.8214730886020971,
+          "onset_contact_closing": 0.7300432573997361,
+          "onset_contact_advancing": 0.9304635637784926,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.738606332793904,
+          "pre_max_displacement_m": 0.13401908455470746,
+          "pre_path_length_m": 0.37399137286155226,
+          "pre_elbow_excursion_rad": 0.48595398273922996,
+          "event_window_impulse_ns": 0.6675016613154843,
+          "native_contact_window_impulse_ns": 0.6675016613154843,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.046,
+          "return_toward_pre_window_position_m": 0.11668861834449377,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 7.027999999999448,
+          "event_time": 7.033999999999447,
+          "onset_relative_speed": 1.007112487778315,
+          "onset_forward_cosine": 0.7001251800131465,
+          "onset_contact_closing": 0.6031288267561923,
+          "onset_contact_advancing": 0.5416647978035476,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.803056001027115,
+          "pre_max_displacement_m": 0.21943508519673854,
+          "pre_path_length_m": 0.4266968534382665,
+          "pre_elbow_excursion_rad": 0.5198220933829043,
+          "event_window_impulse_ns": 0.5224109753151283,
+          "native_contact_window_impulse_ns": 0.5224109753151283,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.074,
+          "return_toward_pre_window_position_m": 0.0869388008467313,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 7.273999999999421,
+          "event_time": 7.28399999999942,
+          "onset_relative_speed": 1.9447144857033962,
+          "onset_forward_cosine": 0.6024342307296678,
+          "onset_contact_closing": 1.359709944774874,
+          "onset_contact_advancing": 1.416717990750926,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.3764776824013016,
+          "pre_max_displacement_m": 0.1758975502871694,
+          "pre_path_length_m": 0.3998931133106327,
+          "pre_elbow_excursion_rad": 0.43459792357564025,
+          "event_window_impulse_ns": 0.5572398116656392,
+          "native_contact_window_impulse_ns": 0.5572398116656392,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.08600000000000001,
+          "return_toward_pre_window_position_m": 0.0002669977403028821,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 7.511999999999395,
+          "event_time": 7.517999999999394,
+          "onset_relative_speed": 1.1813696861545222,
+          "onset_forward_cosine": 0.8765734088926748,
+          "onset_contact_closing": 1.0182798186424982,
+          "onset_contact_advancing": 1.1614406720582395,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.1598628063302376,
+          "pre_max_displacement_m": 0.1234128442508047,
+          "pre_path_length_m": 0.34230139706617885,
+          "pre_elbow_excursion_rad": 0.4145855635058135,
+          "event_window_impulse_ns": 0.7001116994220034,
+          "native_contact_window_impulse_ns": 0.7001116994220034,
+          "post_window_seconds": 0.4999999999999529,
+          "post_contact_seconds": 0.092,
+          "return_toward_pre_window_position_m": 0.11865928087493038,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 7.741999999999369,
+          "event_time": 7.7499999999993685,
+          "onset_relative_speed": 1.4051582640266216,
+          "onset_forward_cosine": 0.7699239315630523,
+          "onset_contact_closing": 1.4946957580011553,
+          "onset_contact_advancing": 1.3961474328333474,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 3.0558148662945968,
+          "pre_max_displacement_m": 0.21199738856384243,
+          "pre_path_length_m": 0.4301040879220664,
+          "pre_elbow_excursion_rad": 0.48707337188241745,
+          "event_window_impulse_ns": 0.5929531632025737,
+          "native_contact_window_impulse_ns": 0.5929531632025737,
+          "post_window_seconds": 0.4980000000000553,
+          "post_contact_seconds": 0.076,
+          "return_toward_pre_window_position_m": 0.05293992759534046,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 7.973999999999344,
+          "event_time": 7.983999999999343,
+          "onset_relative_speed": 1.7276304642485574,
+          "onset_forward_cosine": 0.7534209020177516,
+          "onset_contact_closing": 1.3370775512793476,
+          "onset_contact_advancing": 1.462735795758701,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.0269756743492193,
+          "pre_max_displacement_m": 0.1075059024239166,
+          "pre_path_length_m": 0.37022465787762593,
+          "pre_elbow_excursion_rad": 0.4992684241658748,
+          "event_window_impulse_ns": 0.5658902030904919,
+          "native_contact_window_impulse_ns": 0.5658902030904919,
+          "post_window_seconds": 0.4980000000001592,
+          "post_contact_seconds": 0.078,
+          "return_toward_pre_window_position_m": 0.011984511553457873,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 8.367999999999464,
+          "event_time": 8.373999999999466,
+          "onset_relative_speed": 1.2413739048706398,
+          "onset_forward_cosine": 0.5181015338769712,
+          "onset_contact_closing": 1.062613550174447,
+          "onset_contact_advancing": 1.0984613194703576,
+          "pre_window_seconds": 0.24800000000008282,
+          "pre_peak_relative_speed": 1.5793551563773376,
+          "pre_max_displacement_m": 0.09340054196345936,
+          "pre_path_length_m": 0.28674117472009375,
+          "pre_elbow_excursion_rad": 0.4755923094496766,
+          "event_window_impulse_ns": 0.5267797751665242,
+          "native_contact_window_impulse_ns": 0.5267797751665242,
+          "post_window_seconds": 0.4980000000001663,
+          "post_contact_seconds": 0.044,
+          "return_toward_pre_window_position_m": 0.037599420840473685,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 8.915999999999647,
+          "event_time": 8.919999999999648,
+          "onset_relative_speed": 1.2370125349482664,
+          "onset_forward_cosine": 0.8752158273079712,
+          "onset_contact_closing": 1.2177465001301584,
+          "onset_contact_advancing": 1.1674997668570535,
+          "pre_window_seconds": 0.24800000000008282,
+          "pre_peak_relative_speed": 1.7857974305359199,
+          "pre_max_displacement_m": 0.09373066476714477,
+          "pre_path_length_m": 0.2982553520651757,
+          "pre_elbow_excursion_rad": 0.5542640031321251,
+          "event_window_impulse_ns": 0.6491879367728931,
+          "native_contact_window_impulse_ns": 0.6491879367728931,
+          "post_window_seconds": 0.4980000000001663,
+          "post_contact_seconds": 0.092,
+          "return_toward_pre_window_position_m": 0.024461795938108273,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 9.131999999999719,
+          "event_time": 9.143999999999723,
+          "onset_relative_speed": 1.9796159726458653,
+          "onset_forward_cosine": 0.800639889659832,
+          "onset_contact_closing": 1.7211838245947257,
+          "onset_contact_advancing": 1.9573243767599187,
+          "pre_window_seconds": 0.24800000000008282,
+          "pre_peak_relative_speed": 2.879722334581098,
+          "pre_max_displacement_m": 0.2175898568718001,
+          "pre_path_length_m": 0.4535533380158578,
+          "pre_elbow_excursion_rad": 0.4295375525222744,
+          "event_window_impulse_ns": 0.6214736268609041,
+          "native_contact_window_impulse_ns": 0.6214736268609041,
+          "post_window_seconds": 0.4980000000001663,
+          "post_contact_seconds": 0.076,
+          "return_toward_pre_window_position_m": 0.08902485995014636,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 9.389999999999805,
+          "event_time": 9.395999999999807,
+          "onset_relative_speed": 1.4228057990188816,
+          "onset_forward_cosine": 0.8783677517981785,
+          "onset_contact_closing": 1.0234682830686868,
+          "onset_contact_advancing": 1.3055897382594306,
+          "pre_window_seconds": 0.24800000000008282,
+          "pre_peak_relative_speed": 2.211343210403592,
+          "pre_max_displacement_m": 0.1099720366796426,
+          "pre_path_length_m": 0.3331043213627725,
+          "pre_elbow_excursion_rad": 0.46371321091744433,
+          "event_window_impulse_ns": 0.517442643160069,
+          "native_contact_window_impulse_ns": 0.517442643160069,
+          "post_window_seconds": 0.4980000000001663,
+          "post_contact_seconds": 0.07200000000000001,
+          "return_toward_pre_window_position_m": 0.016550940593384914,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 9.629999999999885,
+          "event_time": 9.635999999999887,
+          "onset_relative_speed": 1.4888175063298115,
+          "onset_forward_cosine": 0.5676702120382321,
+          "onset_contact_closing": 0.65923250030308,
+          "onset_contact_advancing": 0.6690958594346893,
+          "pre_window_seconds": 0.24800000000008282,
+          "pre_peak_relative_speed": 1.6931306354952596,
+          "pre_max_displacement_m": 0.085059298600443,
+          "pre_path_length_m": 0.3090745876495831,
+          "pre_elbow_excursion_rad": 0.3875567936720014,
+          "event_window_impulse_ns": 0.6247226852326381,
+          "native_contact_window_impulse_ns": 0.6247226852326381,
+          "post_window_seconds": 0.3620000000001209,
+          "post_contact_seconds": 0.04,
+          "return_toward_pre_window_position_m": 0.0146486421696327,
+          "post_window_complete": false
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 9.845999999999957,
+          "event_time": 9.85399999999996,
+          "onset_relative_speed": 1.2798139301995402,
+          "onset_forward_cosine": 0.8991196806655364,
+          "onset_contact_closing": 1.375844825704625,
+          "onset_contact_advancing": 1.274148869121651,
+          "pre_window_seconds": 0.24800000000008282,
+          "pre_peak_relative_speed": 2.673252518810419,
+          "pre_max_displacement_m": 0.19697441822528788,
+          "pre_path_length_m": 0.42425287908240444,
+          "pre_elbow_excursion_rad": 0.3881002684647105,
+          "event_window_impulse_ns": 0.5561404378348519,
+          "native_contact_window_impulse_ns": 0.5561404378348519,
+          "post_window_seconds": 0.1440000000000481,
+          "post_contact_seconds": 0.026000000000000002,
+          "return_toward_pre_window_position_m": -0.00055569594350377,
+          "post_window_complete": false
+        }
+      ],
+      "first_observed_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.19600000000000015
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 1.472000000000001
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_wrist_collision"
+          ],
+          "elapsed": 1.5020000000000011
+        },
+        {
+          "geoms": [
+            "red/left_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 1.5800000000000012
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 1.5980000000000012
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/left_shin"
+          ],
+          "elapsed": 1.6040000000000012
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_elbow_yaw_collision"
+          ],
+          "elapsed": 1.7020000000000013
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/torso_collision"
+          ],
+          "elapsed": 1.7720000000000014
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_elbow_yaw_collision"
+          ],
+          "elapsed": 2.321999999999966
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 3.135999999999876
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 3.91999999999979
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 4.3719999999997405
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 4.541999999999722
+        },
+        {
+          "geoms": [
+            "red/left_wrist_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 5.963999999999565
+        }
+      ],
+      "trace_file": "/home/pedro/boxing-runs/striking-arm-effort-v17/gates/step-1048576/neutral-0/full/trained-seed-23-swap-1.npz",
+      "trace_sha256": "282db1f5f5e89eb954f9fb0ed20109de26813bd1a978a2cf0ab5f627b5038d66",
+      "first_fall_time": null,
+      "terminal_state": {
+        "corners": [
+          {
+            "pelvis_height": 0.7533034389930391,
+            "upright": 0.9940364613306811,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7558847945525927,
+            "upright": 0.9994270382191695,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "red/right_shin",
+            "blue/right_shin"
+          ]
+        ]
+      }
+    },
+    {
+      "mode": "trained",
+      "seed": 31,
+      "swap": false,
+      "survived": false,
+      "elapsed": 2.403999999999957,
+      "final_distance": 1.9139339892074412,
+      "scored_by_corner": [
+        0.0,
+        0.0
+      ],
+      "raw_legal_impulse": [
+        0.0,
+        0.0
+      ],
+      "fallen": [
+        true,
+        false
+      ],
+      "finite": true,
+      "minimum_hand_target_distance": [
+        1.5707430695852915,
+        1.6459930065119737
+      ],
+      "mean_abs_arm_residual": [
+        0.3619833353452401,
+        0.0
+      ],
+      "max_abs_arm_residual": [
+        0.9350584912954737,
+        0.0
+      ],
+      "impact_events": [],
+      "punch_trace_file": "/home/pedro/boxing-runs/striking-arm-effort-v17/gates/step-1048576/neutral-0/native/trained-seed-31-swap-0.npz",
+      "punch_trace_sha256": "f7433c328f26aced135315936fda1fb2fe007408108a31bf88ee44f850bfaba6",
+      "punch_measurements": [],
+      "first_observed_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.032000000000000015
+        }
+      ],
+      "trace_file": "/home/pedro/boxing-runs/striking-arm-effort-v17/gates/step-1048576/neutral-0/full/trained-seed-31-swap-0.npz",
+      "trace_sha256": "cc1441670bc3bc73c3d18f6e43cf414804cce2737419cdf28012f372acbffd40",
+      "first_fall_time": 2.403999999999957,
+      "terminal_state": {
+        "corners": [
+          {
+            "pelvis_height": 0.5479818393001553,
+            "upright": 0.8092955440044052,
+            "low_pelvis": true,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.758361305133309,
+            "upright": 0.9984677087400101,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ]
+        ]
+      }
+    },
+    {
+      "mode": "trained",
+      "seed": 31,
+      "swap": true,
+      "survived": true,
+      "elapsed": 10.000000000000009,
+      "final_distance": 0.4377217318587619,
+      "scored_by_corner": [
+        31.0,
+        0.0
+      ],
+      "raw_legal_impulse": [
+        49.731362034992266,
+        0.0
+      ],
+      "fallen": [
+        false,
+        false
+      ],
+      "finite": true,
+      "minimum_hand_target_distance": [
+        0.1435031137823693,
+        0.19976845207639954
+      ],
+      "mean_abs_arm_residual": [
+        0.23964274810708508,
+        0.0
+      ],
+      "max_abs_arm_residual": [
+        0.7389721059168778,
+        0.0
+      ],
+      "impact_events": [
+        {
+          "control_step": 91,
+          "elapsed": 1.8400000000000014,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 1.8400000000000014,
+              "contact_window_impulse": 0.5566562062620888
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 105,
+          "elapsed": 2.119999999999988,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 2.1179999999999883,
+              "contact_window_impulse": 0.5483149362230872
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 119,
+          "elapsed": 2.3999999999999573,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 2.383999999999959,
+              "contact_window_impulse": 0.5631848791593352
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 129,
+          "elapsed": 2.5999999999999353,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 2.5979999999999355,
+              "contact_window_impulse": 0.6181201016714051
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 149,
+          "elapsed": 2.999999999999891,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 2.983999999999893,
+              "contact_window_impulse": 0.6695119696584519
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 163,
+          "elapsed": 3.2799999999998604,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 3.265999999999862,
+              "contact_window_impulse": 1.7623062494676636
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 174,
+          "elapsed": 3.499999999999836,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 3.4859999999998377,
+              "contact_window_impulse": 0.8901225907516259
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 185,
+          "elapsed": 3.719999999999812,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 3.719999999999812,
+              "contact_window_impulse": 0.5194316495562505
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 198,
+          "elapsed": 3.9799999999997833,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 3.9619999999997852,
+              "contact_window_impulse": 1.7602915428168922
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 208,
+          "elapsed": 4.179999999999762,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 4.171999999999763,
+              "contact_window_impulse": 1.0764391612445106
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 220,
+          "elapsed": 4.419999999999735,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 4.401999999999737,
+              "contact_window_impulse": 1.364399083982138
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 232,
+          "elapsed": 4.659999999999709,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 4.64999999999971,
+              "contact_window_impulse": 1.2295648680785543
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 244,
+          "elapsed": 4.899999999999682,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 4.895999999999683,
+              "contact_window_impulse": 0.7061583731009808
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 255,
+          "elapsed": 5.119999999999658,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 5.10599999999966,
+              "contact_window_impulse": 1.3552099140385485
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 278,
+          "elapsed": 5.5799999999996075,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 5.571999999999608,
+              "contact_window_impulse": 0.7583735574183252
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 289,
+          "elapsed": 5.799999999999583,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 5.7979999999995835,
+              "contact_window_impulse": 0.5566650732479995
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 302,
+          "elapsed": 6.059999999999555,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 6.047999999999556,
+              "contact_window_impulse": 1.4773208803939395
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 314,
+          "elapsed": 6.299999999999528,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 6.2879999999995295,
+              "contact_window_impulse": 1.8909551033134728
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 325,
+          "elapsed": 6.519999999999504,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 6.511999999999505,
+              "contact_window_impulse": 1.1223481126026351
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 338,
+          "elapsed": 6.779999999999475,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 6.767999999999477,
+              "contact_window_impulse": 0.8887483340384463
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 358,
+          "elapsed": 7.179999999999431,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 7.165999999999433,
+              "contact_window_impulse": 1.1202781973498823
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 371,
+          "elapsed": 7.439999999999403,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 7.425999999999404,
+              "contact_window_impulse": 1.0770030079586537
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 382,
+          "elapsed": 7.659999999999378,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 7.653999999999379,
+              "contact_window_impulse": 0.5963013836793477
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 393,
+          "elapsed": 7.879999999999354,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 7.879999999999354,
+              "contact_window_impulse": 0.553398893506081
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 417,
+          "elapsed": 8.359999999999461,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 8.343999999999456,
+              "contact_window_impulse": 1.1725226490469436
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 427,
+          "elapsed": 8.559999999999528,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 8.557999999999527,
+              "contact_window_impulse": 1.2330535559459983
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 441,
+          "elapsed": 8.839999999999621,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 8.839999999999621,
+              "contact_window_impulse": 0.5511666041040216
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 454,
+          "elapsed": 9.099999999999708,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 9.081999999999702,
+              "contact_window_impulse": 1.5842780144529252
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 466,
+          "elapsed": 9.339999999999788,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 9.327999999999784,
+              "contact_window_impulse": 0.9944007072755131
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 479,
+          "elapsed": 9.599999999999875,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 9.58399999999987,
+              "contact_window_impulse": 0.7815200604715387
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 490,
+          "elapsed": 9.819999999999949,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 9.817999999999948,
+              "contact_window_impulse": 0.6137681007014579
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        }
+      ],
+      "punch_trace_file": "/home/pedro/boxing-runs/striking-arm-effort-v17/gates/step-1048576/neutral-0/native/trained-seed-31-swap-1.npz",
+      "punch_trace_sha256": "a09ce1a8ad7db4156fd12324902389b947f0a862624564299f6a63c42a30c936",
+      "punch_measurements": [
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 1.8320000000000014,
+          "event_time": 1.8400000000000014,
+          "onset_relative_speed": 1.280166874434653,
+          "onset_forward_cosine": 0.4274826900190524,
+          "onset_contact_closing": 0.4738603618398478,
+          "onset_contact_advancing": 0.5558419847275777,
+          "pre_window_seconds": 0.24800000000000022,
+          "pre_peak_relative_speed": 2.324316475018766,
+          "pre_max_displacement_m": 0.13208765621353236,
+          "pre_path_length_m": 0.3205077977334863,
+          "pre_elbow_excursion_rad": 0.3199756815927305,
+          "event_window_impulse_ns": 0.5566562062620888,
+          "native_contact_window_impulse_ns": 0.5566562062620888,
+          "post_window_seconds": 0.4999999999999625,
+          "post_contact_seconds": 0.062,
+          "return_toward_pre_window_position_m": 0.017533384312477664,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 2.10199999999999,
+          "event_time": 2.1179999999999883,
+          "onset_relative_speed": 0.5416602111232209,
+          "onset_forward_cosine": 0.9527730654222538,
+          "onset_contact_closing": 0.4382152398841465,
+          "onset_contact_advancing": 0.43212199828254305,
+          "pre_window_seconds": 0.24999999999998868,
+          "pre_peak_relative_speed": 2.4663174971516377,
+          "pre_max_displacement_m": 0.1603603101660047,
+          "pre_path_length_m": 0.30788744969890036,
+          "pre_elbow_excursion_rad": 0.39157737023308004,
+          "event_window_impulse_ns": 0.5131248412243664,
+          "native_contact_window_impulse_ns": 0.5131248412243663,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.038,
+          "return_toward_pre_window_position_m": 0.03243118324036842,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 2.3699999999999606,
+          "event_time": 2.383999999999959,
+          "onset_relative_speed": 0.8598503783169756,
+          "onset_forward_cosine": 0.8976606843541491,
+          "onset_contact_closing": 0.48748400594978514,
+          "onset_contact_advancing": 0.577967781189254,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.165548455329081,
+          "pre_max_displacement_m": 0.1239481396487836,
+          "pre_path_length_m": 0.3681846825499372,
+          "pre_elbow_excursion_rad": 0.5328628510311375,
+          "event_window_impulse_ns": 0.5631848791593352,
+          "native_contact_window_impulse_ns": 0.5631848791593352,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.05,
+          "return_toward_pre_window_position_m": 0.024773651223707466,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 2.5899999999999364,
+          "event_time": 2.5979999999999355,
+          "onset_relative_speed": 1.0009748954500899,
+          "onset_forward_cosine": 0.745375162928433,
+          "onset_contact_closing": 0.5916054355951335,
+          "onset_contact_advancing": 0.4623760992132226,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.4443044958649676,
+          "pre_max_displacement_m": 0.10173310093695917,
+          "pre_path_length_m": 0.31330617240619596,
+          "pre_elbow_excursion_rad": 0.4821820414965172,
+          "event_window_impulse_ns": 0.5311623099517755,
+          "native_contact_window_impulse_ns": 0.5311623099517755,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.082,
+          "return_toward_pre_window_position_m": 0.030650718955650025,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 2.9719999999998943,
+          "event_time": 2.983999999999893,
+          "onset_relative_speed": 2.6393113485703386,
+          "onset_forward_cosine": 0.44017371377989145,
+          "onset_contact_closing": 1.680798903987728,
+          "onset_contact_advancing": 1.7784551089866767,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.6393113485703386,
+          "pre_max_displacement_m": 0.08958289840630125,
+          "pre_path_length_m": 0.31353324227478346,
+          "pre_elbow_excursion_rad": 0.3503518991535824,
+          "event_window_impulse_ns": 0.5010169970168552,
+          "native_contact_window_impulse_ns": 0.5010169970168552,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.058,
+          "return_toward_pre_window_position_m": 0.020331725620316897,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 3.2619999999998623,
+          "event_time": 3.265999999999862,
+          "onset_relative_speed": 1.382782418145306,
+          "onset_forward_cosine": 0.8427530754720071,
+          "onset_contact_closing": 1.2658668030606868,
+          "onset_contact_advancing": 1.2930251577285838,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 1.7080327785886495,
+          "pre_max_displacement_m": 0.08177408101654532,
+          "pre_path_length_m": 0.26147162445133604,
+          "pre_elbow_excursion_rad": 0.4586522675027209,
+          "event_window_impulse_ns": 0.5597922305098978,
+          "native_contact_window_impulse_ns": 0.5597922305098978,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.094,
+          "return_toward_pre_window_position_m": 0.0004004928571366001,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 3.4759999999998388,
+          "event_time": 3.4859999999998377,
+          "onset_relative_speed": 1.4914337211225224,
+          "onset_forward_cosine": 0.9275839367490959,
+          "onset_contact_closing": 1.2410845238538506,
+          "onset_contact_advancing": 1.3025504134297243,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.6765858285127933,
+          "pre_max_displacement_m": 0.16954157445521165,
+          "pre_path_length_m": 0.42124681449418355,
+          "pre_elbow_excursion_rad": 0.46567508062990565,
+          "event_window_impulse_ns": 0.5592782787781565,
+          "native_contact_window_impulse_ns": 0.5592782787781565,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.08600000000000001,
+          "return_toward_pre_window_position_m": 0.09584400409988461,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 3.7059999999998134,
+          "event_time": 3.719999999999812,
+          "onset_relative_speed": 2.070756626208842,
+          "onset_forward_cosine": 0.6044741264300295,
+          "onset_contact_closing": 1.3839833832470192,
+          "onset_contact_advancing": 1.5771411198454515,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.2822932665167404,
+          "pre_max_displacement_m": 0.08700922442134704,
+          "pre_path_length_m": 0.34753663840990423,
+          "pre_elbow_excursion_rad": 0.35606579565167884,
+          "event_window_impulse_ns": 0.5194316495562505,
+          "native_contact_window_impulse_ns": 0.5194316495562505,
+          "post_window_seconds": 0.4999999999999454,
+          "post_contact_seconds": 0.082,
+          "return_toward_pre_window_position_m": 0.05140947232956586,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 3.955999999999786,
+          "event_time": 3.9619999999997852,
+          "onset_relative_speed": 1.3018595089150233,
+          "onset_forward_cosine": 0.6791297948545887,
+          "onset_contact_closing": 0.7733982921978623,
+          "onset_contact_advancing": 0.7609517410013376,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.070756626208842,
+          "pre_max_displacement_m": 0.07584094837958316,
+          "pre_path_length_m": 0.24808418172281743,
+          "pre_elbow_excursion_rad": 0.38668634831415566,
+          "event_window_impulse_ns": 0.5334321368133653,
+          "native_contact_window_impulse_ns": 0.5334321368133653,
+          "post_window_seconds": 0.4999999999999454,
+          "post_contact_seconds": 0.09,
+          "return_toward_pre_window_position_m": 0.037445332116726925,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 4.1639999999997634,
+          "event_time": 4.171999999999763,
+          "onset_relative_speed": 1.5409161583348208,
+          "onset_forward_cosine": 0.8329841826365789,
+          "onset_contact_closing": 1.6232727111902694,
+          "onset_contact_advancing": 1.48811483739044,
+          "pre_window_seconds": 0.2499999999999729,
+          "pre_peak_relative_speed": 2.3848696663109434,
+          "pre_max_displacement_m": 0.14833973692389563,
+          "pre_path_length_m": 0.3843553091174882,
+          "pre_elbow_excursion_rad": 0.4622368094917861,
+          "event_window_impulse_ns": 0.5914721312454844,
+          "native_contact_window_impulse_ns": 0.5914721312454844,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.096,
+          "return_toward_pre_window_position_m": 0.05843868073149082,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 4.391999999999738,
+          "event_time": 4.401999999999737,
+          "onset_relative_speed": 2.221984492452304,
+          "onset_forward_cosine": 0.5375199028950889,
+          "onset_contact_closing": 1.2886027006630396,
+          "onset_contact_advancing": 1.4528190748919552,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.3859692932794343,
+          "pre_max_displacement_m": 0.09018186895284187,
+          "pre_path_length_m": 0.36378968938818496,
+          "pre_elbow_excursion_rad": 0.4225833921620516,
+          "event_window_impulse_ns": 0.7238335593668983,
+          "native_contact_window_impulse_ns": 0.7238335593668983,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.078,
+          "return_toward_pre_window_position_m": 0.04306780298526203,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 4.643999999999711,
+          "event_time": 4.64999999999971,
+          "onset_relative_speed": 0.8202317819128658,
+          "onset_forward_cosine": 0.8943780694653182,
+          "onset_contact_closing": 0.7627510414725073,
+          "onset_contact_advancing": 0.810156802253258,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.154339986485987,
+          "pre_max_displacement_m": 0.11336904466363043,
+          "pre_path_length_m": 0.30752008975507295,
+          "pre_elbow_excursion_rad": 0.42021674981531537,
+          "event_window_impulse_ns": 0.5599143361320329,
+          "native_contact_window_impulse_ns": 0.5599143361320329,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.096,
+          "return_toward_pre_window_position_m": 0.030511549991811708,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 4.883999999999684,
+          "event_time": 4.895999999999683,
+          "onset_relative_speed": 1.4739489062138609,
+          "onset_forward_cosine": 0.8395755442088833,
+          "onset_contact_closing": 1.4423858692020315,
+          "onset_contact_advancing": 1.4499845883761746,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.541913019477787,
+          "pre_max_displacement_m": 0.182905551269627,
+          "pre_path_length_m": 0.3991894170148721,
+          "pre_elbow_excursion_rad": 0.42093014265701056,
+          "event_window_impulse_ns": 0.569350921261814,
+          "native_contact_window_impulse_ns": 0.569350921261814,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.07,
+          "return_toward_pre_window_position_m": 0.060767635835016945,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 5.097999999999661,
+          "event_time": 5.10599999999966,
+          "onset_relative_speed": 1.547937105293252,
+          "onset_forward_cosine": 0.7748072063142399,
+          "onset_contact_closing": 1.0123814259647186,
+          "onset_contact_advancing": 1.2832679617464986,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.20902603599318,
+          "pre_max_displacement_m": 0.12029954709063619,
+          "pre_path_length_m": 0.3768537377808462,
+          "pre_elbow_excursion_rad": 0.4450897929748576,
+          "event_window_impulse_ns": 0.6179847399711627,
+          "native_contact_window_impulse_ns": 0.6179847399711627,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.064,
+          "return_toward_pre_window_position_m": 0.10443787497868459,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 5.5619999999996095,
+          "event_time": 5.571999999999608,
+          "onset_relative_speed": 1.2312194869482884,
+          "onset_forward_cosine": 0.6864140420370572,
+          "onset_contact_closing": 1.084343712997351,
+          "onset_contact_advancing": 0.9218422282132018,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.2883746781247005,
+          "pre_max_displacement_m": 0.1200453892133499,
+          "pre_path_length_m": 0.37028841383677136,
+          "pre_elbow_excursion_rad": 0.44498340799099495,
+          "event_window_impulse_ns": 0.5149613851956597,
+          "native_contact_window_impulse_ns": 0.5149613851956597,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.084,
+          "return_toward_pre_window_position_m": 0.06697738136669996,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 5.785999999999585,
+          "event_time": 5.7979999999995835,
+          "onset_relative_speed": 1.994171102033514,
+          "onset_forward_cosine": 0.5937059452430004,
+          "onset_contact_closing": 1.0962194833578416,
+          "onset_contact_advancing": 1.1889949438225704,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.582913752387124,
+          "pre_max_displacement_m": 0.0975154965636811,
+          "pre_path_length_m": 0.3814248349110536,
+          "pre_elbow_excursion_rad": 0.3994193545199709,
+          "event_window_impulse_ns": 0.5009703921944937,
+          "native_contact_window_impulse_ns": 0.5009703921944937,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.07,
+          "return_toward_pre_window_position_m": 0.05923916426262184,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 6.041999999999557,
+          "event_time": 6.047999999999556,
+          "onset_relative_speed": 1.4427809877623887,
+          "onset_forward_cosine": 0.6101089966750609,
+          "onset_contact_closing": 1.1206368788722896,
+          "onset_contact_advancing": 1.1163961854985855,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.2720607974146163,
+          "pre_max_displacement_m": 0.1310300807455525,
+          "pre_path_length_m": 0.3406060071398883,
+          "pre_elbow_excursion_rad": 0.557990401192276,
+          "event_window_impulse_ns": 0.6510441498503448,
+          "native_contact_window_impulse_ns": 0.6510441498503448,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.106,
+          "return_toward_pre_window_position_m": 0.011550562422086862,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 6.28199999999953,
+          "event_time": 6.2879999999995295,
+          "onset_relative_speed": 1.8894322135292028,
+          "onset_forward_cosine": 0.6350304570923931,
+          "onset_contact_closing": 1.726844815743553,
+          "onset_contact_advancing": 1.6345417920322616,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.737587132773997,
+          "pre_max_displacement_m": 0.20968265678606884,
+          "pre_path_length_m": 0.44158552387183403,
+          "pre_elbow_excursion_rad": 0.4838898242302839,
+          "event_window_impulse_ns": 0.7091832253131443,
+          "native_contact_window_impulse_ns": 0.7091832253131443,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.096,
+          "return_toward_pre_window_position_m": 0.06103435895531257,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 6.5059999999995055,
+          "event_time": 6.511999999999505,
+          "onset_relative_speed": 1.319627150109566,
+          "onset_forward_cosine": 0.8381944826117645,
+          "onset_contact_closing": 0.9501170949758339,
+          "onset_contact_advancing": 1.0915547463382198,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.34572940890364,
+          "pre_max_displacement_m": 0.1256524698727129,
+          "pre_path_length_m": 0.3785971000090678,
+          "pre_elbow_excursion_rad": 0.4594225436358295,
+          "event_window_impulse_ns": 0.571926516833013,
+          "native_contact_window_impulse_ns": 0.571926516833013,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.07200000000000001,
+          "return_toward_pre_window_position_m": 0.11229602099547112,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 6.757999999999478,
+          "event_time": 6.767999999999477,
+          "onset_relative_speed": 0.9331596980892675,
+          "onset_forward_cosine": 0.8420547622319032,
+          "onset_contact_closing": 0.7243561755662654,
+          "onset_contact_advancing": 0.6091705255138147,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.369870620636988,
+          "pre_max_displacement_m": 0.16819707587701932,
+          "pre_path_length_m": 0.36759996035794246,
+          "pre_elbow_excursion_rad": 0.4153881782614073,
+          "event_window_impulse_ns": 0.6285206645431705,
+          "native_contact_window_impulse_ns": 0.6285206645431705,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.078,
+          "return_toward_pre_window_position_m": 0.043494554944241176,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 7.155999999999434,
+          "event_time": 7.165999999999433,
+          "onset_relative_speed": 1.893044223967236,
+          "onset_forward_cosine": 0.6078888560013441,
+          "onset_contact_closing": 1.0529289172016991,
+          "onset_contact_advancing": 1.1966558193250694,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.453843603453706,
+          "pre_max_displacement_m": 0.08989239827594689,
+          "pre_path_length_m": 0.39169278775176475,
+          "pre_elbow_excursion_rad": 0.3937519076755703,
+          "event_window_impulse_ns": 0.5484319750558717,
+          "native_contact_window_impulse_ns": 0.5484319750558717,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.08600000000000001,
+          "return_toward_pre_window_position_m": 0.08380018590917884,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 7.417999999999405,
+          "event_time": 7.425999999999404,
+          "onset_relative_speed": 1.095477862794911,
+          "onset_forward_cosine": 0.7550172201615779,
+          "onset_contact_closing": 1.0041299165437516,
+          "onset_contact_advancing": 0.8928605877014221,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.3429002099070044,
+          "pre_max_displacement_m": 0.1555197872786289,
+          "pre_path_length_m": 0.3419301149249645,
+          "pre_elbow_excursion_rad": 0.5101796462247634,
+          "event_window_impulse_ns": 0.5540926508756971,
+          "native_contact_window_impulse_ns": 0.5540926508756971,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.096,
+          "return_toward_pre_window_position_m": 0.013169035393742066,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 7.639999999999381,
+          "event_time": 7.653999999999379,
+          "onset_relative_speed": 1.7887614730702077,
+          "onset_forward_cosine": 0.7999513731495934,
+          "onset_contact_closing": 1.6424101992314784,
+          "onset_contact_advancing": 1.6853198199753054,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.6236774216263874,
+          "pre_max_displacement_m": 0.15853712179465201,
+          "pre_path_length_m": 0.3948382537516806,
+          "pre_elbow_excursion_rad": 0.43375150734775697,
+          "event_window_impulse_ns": 0.5034760617159497,
+          "native_contact_window_impulse_ns": 0.5034760617159497,
+          "post_window_seconds": 0.49800000000001265,
+          "post_contact_seconds": 0.064,
+          "return_toward_pre_window_position_m": 0.04380943285491642,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 7.871999999999355,
+          "event_time": 7.879999999999354,
+          "onset_relative_speed": 1.2276896654792213,
+          "onset_forward_cosine": 0.7855731806170494,
+          "onset_contact_closing": 0.6179010506865896,
+          "onset_contact_advancing": 0.7705881940828081,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 2.0826336617397625,
+          "pre_max_displacement_m": 0.1238029730897272,
+          "pre_path_length_m": 0.33248359964362323,
+          "pre_elbow_excursion_rad": 0.380783015670321,
+          "event_window_impulse_ns": 0.553398893506081,
+          "native_contact_window_impulse_ns": 0.553398893506081,
+          "post_window_seconds": 0.498000000000113,
+          "post_contact_seconds": 0.07200000000000001,
+          "return_toward_pre_window_position_m": 0.12425609481338289,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 8.331999999999452,
+          "event_time": 8.343999999999456,
+          "onset_relative_speed": 2.044461135036139,
+          "onset_forward_cosine": 0.6841086079791513,
+          "onset_contact_closing": 1.9130575423209837,
+          "onset_contact_advancing": 1.8311205322724806,
+          "pre_window_seconds": 0.24800000000008282,
+          "pre_peak_relative_speed": 2.226332318904499,
+          "pre_max_displacement_m": 0.1336206021045487,
+          "pre_path_length_m": 0.3779875121362313,
+          "pre_elbow_excursion_rad": 0.40046988978628517,
+          "event_window_impulse_ns": 0.6861347038671216,
+          "native_contact_window_impulse_ns": 0.6861347038671216,
+          "post_window_seconds": 0.4980000000001663,
+          "post_contact_seconds": 0.1,
+          "return_toward_pre_window_position_m": 0.03143459888381572,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 8.551999999999525,
+          "event_time": 8.557999999999527,
+          "onset_relative_speed": 1.952942934558205,
+          "onset_forward_cosine": 0.4624110028256142,
+          "onset_contact_closing": 0.6401388799134591,
+          "onset_contact_advancing": 0.7362399110669336,
+          "pre_window_seconds": 0.24800000000008282,
+          "pre_peak_relative_speed": 2.237215006565697,
+          "pre_max_displacement_m": 0.13370894205796127,
+          "pre_path_length_m": 0.3437101344629697,
+          "pre_elbow_excursion_rad": 0.40369688200512294,
+          "event_window_impulse_ns": 1.0054957980478247,
+          "native_contact_window_impulse_ns": 1.0054957980478247,
+          "post_window_seconds": 0.4980000000001663,
+          "post_contact_seconds": 0.078,
+          "return_toward_pre_window_position_m": 0.11686866410718727,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 8.83399999999962,
+          "event_time": 8.839999999999621,
+          "onset_relative_speed": 1.6448950715269108,
+          "onset_forward_cosine": 0.5245439629217283,
+          "onset_contact_closing": 1.1013337720146175,
+          "onset_contact_advancing": 1.0481280224217089,
+          "pre_window_seconds": 0.24800000000008282,
+          "pre_peak_relative_speed": 2.4544100990298072,
+          "pre_max_displacement_m": 0.18538878208157136,
+          "pre_path_length_m": 0.3918341665399904,
+          "pre_elbow_excursion_rad": 0.5087141572187011,
+          "event_window_impulse_ns": 0.5511666041040216,
+          "native_contact_window_impulse_ns": 0.5511666041040216,
+          "post_window_seconds": 0.4980000000001663,
+          "post_contact_seconds": 0.08,
+          "return_toward_pre_window_position_m": 0.03602033275373703,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 9.0739999999997,
+          "event_time": 9.081999999999702,
+          "onset_relative_speed": 2.597449213728131,
+          "onset_forward_cosine": 0.4847251397301131,
+          "onset_contact_closing": 1.8873064755902433,
+          "onset_contact_advancing": 1.8464557934623735,
+          "pre_window_seconds": 0.24800000000008282,
+          "pre_peak_relative_speed": 2.597449213728131,
+          "pre_max_displacement_m": 0.1743622944258599,
+          "pre_path_length_m": 0.3852166075521264,
+          "pre_elbow_excursion_rad": 0.4067438275926469,
+          "event_window_impulse_ns": 0.6792755796030465,
+          "native_contact_window_impulse_ns": 0.6792755796030465,
+          "post_window_seconds": 0.4980000000001663,
+          "post_contact_seconds": 0.074,
+          "return_toward_pre_window_position_m": 0.0234725836910193,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 9.317999999999781,
+          "event_time": 9.327999999999784,
+          "onset_relative_speed": 0.9813214286702844,
+          "onset_forward_cosine": 0.6905453538879429,
+          "onset_contact_closing": 0.9188689641232052,
+          "onset_contact_advancing": 0.6658695717192197,
+          "pre_window_seconds": 0.24800000000008282,
+          "pre_peak_relative_speed": 2.599556930722886,
+          "pre_max_displacement_m": 0.13157984176466658,
+          "pre_path_length_m": 0.32614925482412954,
+          "pre_elbow_excursion_rad": 0.3247328209137351,
+          "event_window_impulse_ns": 0.5664747250752811,
+          "native_contact_window_impulse_ns": 0.5664747250752811,
+          "post_window_seconds": 0.4980000000001663,
+          "post_contact_seconds": 0.092,
+          "return_toward_pre_window_position_m": 0.11390356450244558,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 9.571999999999866,
+          "event_time": 9.58399999999987,
+          "onset_relative_speed": 1.3632899118197783,
+          "onset_forward_cosine": 0.983592936789044,
+          "onset_contact_closing": 1.2961552211925647,
+          "onset_contact_advancing": 1.1677270226105037,
+          "pre_window_seconds": 0.24800000000008282,
+          "pre_peak_relative_speed": 2.9380837795258175,
+          "pre_max_displacement_m": 0.2244201772638391,
+          "pre_path_length_m": 0.41522032705838646,
+          "pre_elbow_excursion_rad": 0.4826822913221789,
+          "event_window_impulse_ns": 0.5078025012714426,
+          "native_contact_window_impulse_ns": 0.5078025012714426,
+          "post_window_seconds": 0.41400000000013826,
+          "post_contact_seconds": 0.068,
+          "return_toward_pre_window_position_m": 0.08411500748662024,
+          "post_window_complete": false
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 9.805999999999944,
+          "event_time": 9.817999999999948,
+          "onset_relative_speed": 1.9292316351187713,
+          "onset_forward_cosine": 0.6090282294307522,
+          "onset_contact_closing": 1.0221764025352449,
+          "onset_contact_advancing": 1.1346264643923845,
+          "pre_window_seconds": 0.24800000000008282,
+          "pre_peak_relative_speed": 2.540257542664698,
+          "pre_max_displacement_m": 0.10119050696535108,
+          "pre_path_length_m": 0.3803807722069346,
+          "pre_elbow_excursion_rad": 0.4575712772930619,
+          "event_window_impulse_ns": 0.5414338607776816,
+          "native_contact_window_impulse_ns": 0.5414338607776816,
+          "post_window_seconds": 0.1800000000000601,
+          "post_contact_seconds": 0.028,
+          "return_toward_pre_window_position_m": 0.03188535140914905,
+          "post_window_complete": false
+        }
+      ],
+      "first_observed_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.09000000000000007
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 1.346000000000001
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 1.350000000000001
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 1.468000000000001
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 1.7040000000000013
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/torso_collision"
+          ],
+          "elapsed": 1.8340000000000014
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_elbow_yaw_collision"
+          ],
+          "elapsed": 2.7139999999999227
+        },
+        {
+          "geoms": [
+            "red/left_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 2.783999999999915
+        },
+        {
+          "geoms": [
+            "red/left_wrist_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 3.127999999999877
+        },
+        {
+          "geoms": [
+            "red/right_wrist_collision",
+            "blue/left_wrist_collision"
+          ],
+          "elapsed": 5.589999999999606
+        },
+        {
+          "geoms": [
+            "red/right_wrist_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 5.591999999999606
+        }
+      ],
+      "trace_file": "/home/pedro/boxing-runs/striking-arm-effort-v17/gates/step-1048576/neutral-0/full/trained-seed-31-swap-1.npz",
+      "trace_sha256": "07b424cc10e2630b7383bc59d479b64f3af0829c22e2627cc2b57441d8fd66c1",
+      "first_fall_time": null,
+      "terminal_state": {
+        "corners": [
+          {
+            "pelvis_height": 0.7504301922363946,
+            "upright": 0.9997467429183032,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7543142994959451,
+            "upright": 0.9998184949659558,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ]
+        ]
+      }
+    },
+    {
+      "mode": "trained",
+      "seed": 47,
+      "swap": false,
+      "survived": false,
+      "elapsed": 0.5140000000000003,
+      "final_distance": 2.017118698316212,
+      "scored_by_corner": [
+        0.0,
+        0.0
+      ],
+      "raw_legal_impulse": [
+        0.0,
+        0.0
+      ],
+      "fallen": [
+        true,
+        false
+      ],
+      "finite": true,
+      "minimum_hand_target_distance": [
+        1.7722292667406363,
+        1.6666502223363373
+      ],
+      "mean_abs_arm_residual": [
+        0.33114815638657685,
+        0.0
+      ],
+      "max_abs_arm_residual": [
+        0.8409289320580047,
+        0.0
+      ],
+      "impact_events": [],
+      "punch_trace_file": "/home/pedro/boxing-runs/striking-arm-effort-v17/gates/step-1048576/neutral-0/native/trained-seed-47-swap-0.npz",
+      "punch_trace_sha256": "ec9f1cfaebd3f1991cd350fbf6fb1e9102e52953205c5732903b784d711fcb67",
+      "punch_measurements": [],
+      "first_observed_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.2700000000000002
+        },
+        {
+          "geoms": [
+            "red/left_foot",
+            "red/right_foot"
+          ],
+          "elapsed": 0.5140000000000003
+        }
+      ],
+      "trace_file": "/home/pedro/boxing-runs/striking-arm-effort-v17/gates/step-1048576/neutral-0/full/trained-seed-47-swap-0.npz",
+      "trace_sha256": "f5a66675e1e944516049fe0f9d77cd7c91b5daa65a978cae01c97e6c6c0402cf",
+      "first_fall_time": 0.5140000000000003,
+      "terminal_state": {
+        "corners": [
+          {
+            "pelvis_height": 0.74111526855672,
+            "upright": 0.9271316083488019,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": true
+          },
+          {
+            "pelvis_height": 0.7445003368767047,
+            "upright": 0.9736379479041544,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "red/left_foot",
+            "red/right_foot"
+          ]
+        ]
+      }
+    },
+    {
+      "mode": "trained",
+      "seed": 47,
+      "swap": true,
+      "survived": true,
+      "elapsed": 10.000000000000009,
+      "final_distance": 0.4602058326303573,
+      "scored_by_corner": [
+        2.0,
+        0.0
+      ],
+      "raw_legal_impulse": [
+        12.984723920818846,
+        0.5761500158863725
+      ],
+      "fallen": [
+        false,
+        false
+      ],
+      "finite": true,
+      "minimum_hand_target_distance": [
+        0.15966291860991344,
+        0.17298996510002243
+      ],
+      "mean_abs_arm_residual": [
+        0.2429439953379329,
+        0.0
+      ],
+      "max_abs_arm_residual": [
+        0.8135460142598309,
+        0.0
+      ],
+      "impact_events": [
+        {
+          "control_step": 233,
+          "elapsed": 4.679999999999707,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 0,
+              "score_time": 4.6719999999997075,
+              "contact_window_impulse": 0.9767486008636795
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        },
+        {
+          "control_step": 491,
+          "elapsed": 9.839999999999955,
+          "scored_by_corner": [
+            1.0,
+            0.0
+          ],
+          "hands": [
+            {
+              "corner": 0,
+              "hand": 1,
+              "score_time": 9.82399999999995,
+              "contact_window_impulse": 1.066702161395549
+            }
+          ],
+          "fallen": [
+            false,
+            false
+          ]
+        }
+      ],
+      "punch_trace_file": "/home/pedro/boxing-runs/striking-arm-effort-v17/gates/step-1048576/neutral-0/native/trained-seed-47-swap-1.npz",
+      "punch_trace_sha256": "4ceb73a1b646c367a84f7d7b099c76fb967e5e08b8a468bf604d23581d564f4a",
+      "punch_measurements": [
+        {
+          "corner": 0,
+          "hand": 0,
+          "onset_time": 4.661999999999709,
+          "event_time": 4.6719999999997075,
+          "onset_relative_speed": 0.7946166888819618,
+          "onset_forward_cosine": 0.20808898533900314,
+          "onset_contact_closing": 0.5855129126332368,
+          "onset_contact_advancing": 0.3727493772375545,
+          "pre_window_seconds": 0.24999999999997247,
+          "pre_peak_relative_speed": 1.656962337579245,
+          "pre_max_displacement_m": 0.12411332053628245,
+          "pre_path_length_m": 0.24955124614493587,
+          "pre_elbow_excursion_rad": 0.2514667980873717,
+          "event_window_impulse_ns": 0.5875938615474577,
+          "native_contact_window_impulse_ns": 0.5875938615474577,
+          "post_window_seconds": 0.49999999999994493,
+          "post_contact_seconds": 0.062,
+          "return_toward_pre_window_position_m": 0.046602518430985534,
+          "post_window_complete": true
+        },
+        {
+          "corner": 0,
+          "hand": 1,
+          "onset_time": 9.807999999999945,
+          "event_time": 9.82399999999995,
+          "onset_relative_speed": 1.356217069408788,
+          "onset_forward_cosine": 0.6322038893117248,
+          "onset_contact_closing": 1.2690815186044888,
+          "onset_contact_advancing": 1.1245652534424817,
+          "pre_window_seconds": 0.24800000000008282,
+          "pre_peak_relative_speed": 2.2304296626661073,
+          "pre_max_displacement_m": 0.1768067434224974,
+          "pre_path_length_m": 0.4052919004898744,
+          "pre_elbow_excursion_rad": 0.35840008757992076,
+          "event_window_impulse_ns": 0.5461594664321276,
+          "native_contact_window_impulse_ns": 0.5461594664321276,
+          "post_window_seconds": 0.1740000000000581,
+          "post_contact_seconds": 0.028,
+          "return_toward_pre_window_position_m": -0.00015690109672493457,
+          "post_window_complete": false
+        }
+      ],
+      "first_observed_contacts": [
+        {
+          "geoms": [
+            "floor",
+            "red/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/left_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "blue/right_foot"
+          ],
+          "elapsed": 0.002
+        },
+        {
+          "geoms": [
+            "floor",
+            "red/right_foot"
+          ],
+          "elapsed": 0.032000000000000015
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 1.7100000000000013
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/torso_collision"
+          ],
+          "elapsed": 1.8660000000000014
+        },
+        {
+          "geoms": [
+            "red/right_shin",
+            "blue/left_shin"
+          ],
+          "elapsed": 1.8780000000000014
+        },
+        {
+          "geoms": [
+            "red/left_shin",
+            "blue/right_shin"
+          ],
+          "elapsed": 1.8800000000000014
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_elbow_yaw_collision"
+          ],
+          "elapsed": 1.8820000000000014
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ],
+          "elapsed": 1.8840000000000015
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/left_wrist_collision"
+          ],
+          "elapsed": 2.1779999999999817
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/right_hand_collision"
+          ],
+          "elapsed": 2.9339999999998985
+        },
+        {
+          "geoms": [
+            "red/left_hand_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 4.315999999999747
+        },
+        {
+          "geoms": [
+            "red/left_shin",
+            "blue/left_shin"
+          ],
+          "elapsed": 4.761999999999698
+        },
+        {
+          "geoms": [
+            "red/right_wrist_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 4.839999999999689
+        },
+        {
+          "geoms": [
+            "red/torso_collision",
+            "blue/left_hand_collision"
+          ],
+          "elapsed": 4.899999999999682
+        },
+        {
+          "geoms": [
+            "red/right_hand_collision",
+            "blue/torso_collision"
+          ],
+          "elapsed": 9.809999999999945
+        }
+      ],
+      "trace_file": "/home/pedro/boxing-runs/striking-arm-effort-v17/gates/step-1048576/neutral-0/full/trained-seed-47-swap-1.npz",
+      "trace_sha256": "6066337409ebc4f1abe5464acc1c69fc8cd51442aaf5238457605bfcce820eec",
+      "first_fall_time": null,
+      "terminal_state": {
+        "corners": [
+          {
+            "pelvis_height": 0.7560882612813625,
+            "upright": 0.992217765507352,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          },
+          {
+            "pelvis_height": 0.7562321039034822,
+            "upright": 0.9994563623178455,
+            "low_pelvis": false,
+            "tilted": false,
+            "self_leg_contact": false
+          }
+        ],
+        "contact_pairs": [
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/left_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "red/right_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/left_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "floor",
+            "blue/right_foot"
+          ],
+          [
+            "red/left_hand_collision",
+            "blue/right_wrist_collision"
+          ]
+        ]
+      }
+    }
+  ],
+  "engagement_distance": 0.45,
+  "engagement_reward_distance": 0.45,
+  "actor_inputs": 148,
+  "actions": 17,
+  "body_residual_radians": 0.0,
+  "contact_history": true,
+  "sampled_policy": false,
+  "policy_sampling_log_std_offset": 0.0,
+  "diagnostic_arm_noise_scale": 1.0,
+  "diagnostic_arm_noise_hold": 1,
+  "neutral_partner_learner_corner": 0,
+  "diagnostic_zero_command_offsets": false,
+  "diagnostic_zero_arm_residuals": false,
+  "diagnostic_arm_residual_scale": 1.0,
+  "diagnostic_approach_gain": null,
+  "diagnostic_profile_override": false,
+  "certification": false
+}
