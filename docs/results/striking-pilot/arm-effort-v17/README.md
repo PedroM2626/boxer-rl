@@ -94,3 +94,31 @@ the next complete gate, then reassess before the bounded final. Exactly one
 supervisor and one learner are active, native error logs empty, and latest live
 checkpoint hash/finite state verified. No main adoption or promotion. Evidence:
 `step-524288-independent-review.json`.
+
+## Current paired model GPU preflight, 2026-10-28
+
+The user correctly noted that previous versions achieved thousands of steps per
+second on the GPU. Current native paired PPO explicitly forces CPU and iterates
+native MuJoCo worlds; this was an implementation choice, not a GPU hardware
+failure. The existing GPU Warp boxer is a different scene/observation/reward
+contract; its historical throughput cannot be assumed for the current model.
+The actual WSL runtime exposes the RTX 3060 and installed `mujoco_warp`.
+
+A bounded one-world read-only preflight loaded the actual current paired model
+(two free roots, 72 qpos, 70 velocities, 58 actuators, no equality constraints
+or gravity compensation) to CUDA and performed one Warp forward. At reset seed
+34002003, CPU/GPU max absolute differences were **2.94e-8 qpos**, **1.01e-8
+qvel**, **2.34e-7 body positions**. The paired native object performed two resets;
+no physics steps, learner updates or formal evaluation controls were consumed.
+Source and executable: `paired-warp-preflight.json` and
+`tools/probe_paired_warp_forward.py`.
+
+Warp emitted **solver iterations limit reached at 3 iterations** during the
+forward. The matching positions are a useful compatibility signal, not proof
+of solver convergence or force parity. Contact/constraint capacity, actual
+contact impulse forces and native substep punch trace, recurrent PPO observations,
+reward/termination behavior, randomized resets, rollout trajectory drift and
+buffer-overflow handling must be compared before using a GPU backend for training.
+Benchmark the validated batched implementation on this GPU; do not promise the
+legacy environment's throughput or silently transplant its incompatible policy.
+The live CPU learner was not interrupted by this small preflight.
