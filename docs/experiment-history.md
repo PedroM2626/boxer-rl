@@ -601,3 +601,29 @@ durable attempted controls. Output:
 `/home/pedro/boxing-runs/striking-v15-navigation-ablation/state.json`.
 Do not start another job while this diagnostic is active. Main/BC/geometry/render
 and consumed PPO counters stay unchanged. No open-ended training extension.
+
+## Deterministic neutral bout videos, 2026-10-27
+
+Render two previously reviewed, complete fresh deterministic 10-second episodes:
+neutral learner corner 0 / seed 34000004 / unswapped (six valid cycles) and
+corner 1 / seed 34000006 / unswapped (four). These are selected examples, not an
+unbiased performance estimate; all evaluation outcomes are retained in the full
+fresh gate. At 25 fps, saved 50 Hz control states are sampled every other state,
+250 frames per episode. Explicitly label deterministic neutral practice and the
+role; the neutral partner is still a free body. Model/data are separate and only
+mj_forward is used to render stored positions and velocities: no actor execution,
+physics stepping, learning or formal evaluation controls. Allocate at most 500
+additional render forwards, cumulative **2,697**, from 2,197. Verify trace and
+checkpoint hashes, recompute event criteria, decode all frames, inspect visual
+previews, and preserve source and per-video metadata. These examples do not
+certify active-opponent stability or reciprocal boxing.
+
+Both saved-state renders completed: **250 decoded frames each**, 25 fps, 10 seconds
+per video, 500 render forwards in total; cumulative visualization count **2,697**.
+Impact previews were visually inspected. The files are
+`fights/striking-pilot/v15-neutral-corner-0-fresh-bout.mp4` and
+`fights/striking-pilot/v15-neutral-corner-1-fresh-bout.mp4`. The evaluation
+checkpoint, event measurements, both source-trace checksums, output hashes, and
+exact selected episodes are in `deterministic-neutral-videos.json`. Both are
+selected surviving examples, not full gate performance; visual contacts alone do
+not replace the independent native-motion criteria.
