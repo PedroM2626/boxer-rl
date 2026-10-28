@@ -3,6 +3,18 @@
 Maintain the [trajectory and decision record](experiment-history.md) at every
 reviewed intervention, including failed results, accounting and pending evidence.
 
+**Current v17 decision (2026-10-28):** matched fresh-seed arm diagnostics yield
+8/8 pair survivors with both learned arm outputs zeroed, 7/8 at half output,
+and 1/8 unmodified; zero/half conditions contain no valid strikes and cannot
+promote. The [v17 protocol](results/striking-pilot/arm-effort-v17/README.md)
+tests a smooth training-only arm-effort cost while retaining complete-cycle
+incentives and full action/physics authority, starting from the exact v16 final.
+At most 2,097,152 new PPO credits (global ceiling 9,504,000) and 60,000 formal
+controls (global ceiling 2,298,008), no budget rollover. One integration block,
+original gates every 524,288 credits and a new fresh final; require two distinct
+complete consecutive full passes. Inspect live state and process before retry:
+`/home/pedro/boxing-runs/striking-arm-effort-v17/audit.json`.
+
 **Latest v16 completed review (2026-10-28):** final checkpoint 5bbf6a38 has
 original pair survival 5/8, 6/8, 3/8 and fresh 3/8, 7/8, 1/8. Fresh neutral
 cycles total 42; the one surviving fresh mirror bout has valid cycles for both

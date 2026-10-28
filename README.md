@@ -2,7 +2,13 @@
 
 ## Current experiment: unassisted paired boxing diagnostics
 
-Current work (2026-10-28): [contact-rebalance PPO v16](docs/results/striking-pilot/contact-rebalance-v16/README.md)
+Current work (2026-10-28): [arm-effort PPO v17](docs/results/striking-pilot/arm-effort-v17/README.md)
+tests a training-only effort cost, with full arm authority, to combine stability
+and valid punches. Matched diagnostics with zero or half learned arm outputs
+improve survival but produce no valid strikes; the unmodified v16 policy strikes
+but frequently falls. Independent physical gates remain unchanged.
+
+Previous work (2026-10-28): [contact-rebalance PPO v16](docs/results/striking-pilot/contact-rebalance-v16/README.md)
 completed its 2,097,152-credit allocation. The final policy has 42 valid neutral
 cycles on fresh seeds, and both agents strike in one surviving fresh mirror bout.
 Fresh survival 3/8, 7/8, 1/8 fails the independent full gate. A separately

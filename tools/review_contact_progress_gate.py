@@ -23,10 +23,12 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--label', required=True)
     parser.add_argument('--rebalance-v16', action='store_true', help='review v16 without changing its thresholds')
+    parser.add_argument('--arm-effort-v17', action='store_true', help='review v17 without changing its thresholds')
     args = parser.parse_args()
+    assert not (args.rebalance_v16 and args.arm_effort_v17)
     assert args.label == 'fresh-final' or (args.label.startswith('step-') and args.label[5:].isdigit())
-    experiment = 'contact-rebalance-v16' if args.rebalance_v16 else 'contact-progress-v15'
-    offset = 5226496 if args.rebalance_v16 else 3129344
+    experiment = 'arm-effort-v17' if args.arm_effort_v17 else 'contact-rebalance-v16' if args.rebalance_v16 else 'contact-progress-v15'
+    offset = 7323648 if args.arm_effort_v17 else 5226496 if args.rebalance_v16 else 3129344
     archive = Path('docs/results/striking-pilot') / experiment
     folder = archive / 'gates' / args.label
     gate = json.loads((folder / 'motion-gate.json').read_text())

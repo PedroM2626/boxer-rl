@@ -1,4 +1,5 @@
 """Review both saved arms of the bounded v16 arm-residual comparison."""
+import argparse
 import collections
 import hashlib
 import json
@@ -15,8 +16,9 @@ ARCHIVE = Path('docs/results/striking-pilot/v16-arm-ablation')
 BASELINE = Path('docs/results/striking-pilot/contact-rebalance-v16/gates/fresh-final')
 
 
-def review_report(report, directory, expected_mask):
+def review_report(report, directory, expected_mask, expected_scale=1.):
     assert report['striking_sha256'] == SHA and report['diagnostic_zero_arm_residuals'] == expected_mask
+    assert report.get('diagnostic_arm_residual_scale', 1.) == expected_scale
     assert not report['diagnostic_zero_command_offsets'] and not report['assistance'] and not report['sampled_policy']
     assert len(report['trials']) == 8
     assert {(r['seed'], r['swap']) for r in report['trials']} == {(s, w) for s in range(34001003, 34001007) for w in (False, True)}
@@ -49,25 +51,30 @@ def review_report(report, directory, expected_mask):
 
 
 def main():
-    state = json.loads((ROOT / 'state.json').read_text())
-    progress = json.loads((ROOT / 'zero-arms-progress.json').read_text())
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--half-arm', action='store_true')
+    args = parser.parse_args()
+    root = Path('/home/pedro/boxing-runs/striking-v16-half-arm') if args.half_arm else ROOT
+    archive = Path('docs/results/striking-pilot/v16-half-arm') if args.half_arm else ARCHIVE
+    state = json.loads((root / 'state.json').read_text())
+    progress = json.loads((root / 'zero-arms-progress.json').read_text())
     assert state['status'] == progress['status'] == 'completed' and state['new_ppo_steps'] == 0
     assert state['source_sha256'] == SHA and state['prerequisites'] == verify_prerequisites()
-    assert not (ROOT / 'zero-arms-errors.log').read_text().strip()
-    masked = json.loads((ROOT / 'zero-arms.json').read_text())
+    assert not (root / 'zero-arms-errors.log').read_text().strip()
+    masked = json.loads((root / 'zero-arms.json').read_text())
     baseline = json.loads((BASELINE / 'selfplay.json').read_text())
     assert state['new_controls'] == progress['simulated_world_transitions'] == masked['simulated_world_transitions'] <= 4000
-    assert state['formal_total'] == 2230238 + state['new_controls']
+    assert state['formal_total'] == (2234238 if args.half_arm else 2230238) + state['new_controls']
     result = dict(status='independently_reviewed', source_sha256=SHA,
                   unmasked=review_report(baseline, BASELINE / 'selfplay', False),
-                  masked=review_report(masked, ROOT, True), new_controls=state['new_controls'],
+                  masked=review_report(masked, root, not args.half_arm, .5 if args.half_arm else 1.), new_controls=state['new_controls'],
                   formal_total=state['formal_total'], new_ppo_steps=0, promotion=False, main_adoption=False,
                   limitation='Masking both actors changes the full trajectory; this is neither a promotable gate nor proof of a unique cause.')
     for sub in ('native', 'full'):
-        shutil.copytree(ROOT / sub, ARCHIVE / sub, dirs_exist_ok=True)
+        shutil.copytree(root / sub, archive / sub, dirs_exist_ok=True)
     for name in ('state.json', 'zero-arms.json', 'zero-arms-progress.json', 'zero-arms.log', 'zero-arms-errors.log'):
-        shutil.copy2(ROOT / name, ARCHIVE / name)
-    (ARCHIVE / 'review.json').write_text(json.dumps(result, indent=2) + '\n')
+        shutil.copy2(root / name, archive / name)
+    (archive / 'review.json').write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps({k: result[k] for k in ('new_controls', 'formal_total')}))
     print(json.dumps({k: {x: v for x, v in result[k].items() if x != 'episodes'} for k in ('unmasked', 'masked')}))
 

@@ -112,6 +112,9 @@ def require_ppo_checkpoint(saved):
     if 'contact_rebalance_transition' in saved or 'contact_rebalance_profile' in saved or saved.get('contact_rebalance_ppo'):
         from boxer.striking_contact_rebalance import validate_rebalance_metadata
         validate_rebalance_metadata(saved)
+    if 'arm_effort_transition' in saved or 'arm_effort_profile' in saved or saved.get('arm_effort_ppo'):
+        from boxer.striking_arm_effort import validate_arm_effort_metadata
+        validate_arm_effort_metadata(saved)
     kind=saved.get('optimizer_kind')
     if kind is not None:
         from boxer.striking_ppo_warmstart import OPTIMIZER_KIND,validate_split_checkpoint
@@ -203,6 +206,7 @@ def main(argv=None):
     parser.add_argument('--long-gae-ppo',action='store_true',help='explicit lambda .99 over latest original fixed-opponent control')
     parser.add_argument('--contact-progress-ppo',action='store_true',help='v15 target-coupled potential and physical per-hand contact subgoals')
     parser.add_argument('--contact-rebalance-ppo',action='store_true',help='v16 reduced partial-contact payment with complete-cycle reward retained')
+    parser.add_argument('--arm-effort-ppo',action='store_true',help='v17 smooth training-only cost for learned arm residuals')
     parser.add_argument('--motion-cycle-ppo',action='store_true',help='versioned complete-cycle reward with obsolete touch-teacher loss disabled')
     parser.add_argument('--pool-opponent-ppo',action='store_true',help='explicit immutable archived opponent pool over the latest long-GAE source')
     parser.add_argument('--conservative-actor-ppo',action='store_true')
@@ -248,6 +252,8 @@ def main(argv=None):
         raise ValueError('contact progress requires the retained explicit motion-cycle task')
     if args.contact_rebalance_ppo and not args.contact_progress_ppo:
         raise ValueError('contact rebalance requires the inherited explicit contact-progress path')
+    if args.arm_effort_ppo and not args.contact_rebalance_ppo:
+        raise ValueError('arm effort requires the inherited contact-rebalance path')
     if args.motion_cycle_ppo and (not args.long_gae_ppo or args.pool_opponent_ppo or args.retention_loss_weight!=0.):
         raise ValueError('motion-cycle training requires original long-GAE fixed task and zero teacher loss')
     if args.pool_opponent_ppo and not args.long_gae_ppo:
@@ -307,6 +313,7 @@ def train(args):
     motion_cycle_ppo=getattr(args,'motion_cycle_ppo',False)
     contact_progress_ppo=getattr(args,'contact_progress_ppo',False)
     contact_rebalance_ppo=getattr(args,'contact_rebalance_ppo',False)
+    arm_effort_ppo=getattr(args,'arm_effort_ppo',False)
     env_class=StrikingEnv
     if contact_ppo:
         from boxer.striking_contact import ContactAwareStrikingEnv
@@ -394,6 +401,10 @@ def train(args):
         from boxer.striking_contact_rebalance import PROFILE as REBALANCE_PROFILE
         interface_metadata.update(contact_rebalance_ppo=True,contact_rebalance_profile=REBALANCE_PROFILE)
         config.update(interface_metadata,version=16)
+    if arm_effort_ppo:
+        from boxer.striking_arm_effort import PROFILE as ARM_EFFORT_PROFILE
+        interface_metadata.update(arm_effort_ppo=True,arm_effort_profile=ARM_EFFORT_PROFILE)
+        config.update(interface_metadata,version=17)
     checkpoint_path=args.output/'checkpoint/latest.json'
     if previous:
         if not args.resume:
@@ -420,6 +431,8 @@ def train(args):
             raise ValueError('contact progress checkpoint and explicit training reward must agree')
         if contact_rebalance_ppo != saved.get('contact_rebalance_ppo',False):
             raise ValueError('contact rebalance checkpoint and explicit training reward must agree')
+        if arm_effort_ppo != saved.get('arm_effort_ppo',False):
+            raise ValueError('arm effort checkpoint and explicit training reward must agree')
         if motion_cycle_ppo != saved.get('motion_cycle_ppo',False):
             raise ValueError('motion-cycle checkpoint and explicit training reward must agree')
         if demonstration_ppo != saved.get('demonstration_ppo',False):
@@ -574,6 +587,7 @@ def train(args):
     progress_potential=0.;progress_contact=0.
     motion_dense=0.
     posture_cost_sum=0.
+    arm_effort_sum=0.
     def record(status='running',**extra):
         progress=dict(consumed_steps=consumed,optimized_steps=optimized,
             world_control_steps=world_controls,combined_project_consumed_steps=metadata['total_steps']+consumed,
@@ -592,6 +606,7 @@ def train(args):
         if motion_cycle_ppo:progress.update(motion_cycles_by_corner=motion_cycles.tolist(),motion_learner_cycles_total=motion_own,motion_opponent_cycles_total=motion_other,session_motion_dense_reward=motion_dense)
         if contact_progress_ppo:progress.update(session_target_potential_reward=progress_potential,session_physical_contact_progress_reward=progress_contact)
         if posture_cost_ppo:progress['session_posture_cost']=posture_cost_sum
+        if arm_effort_ppo:progress['session_arm_effort_cost']=arm_effort_sum
         if kl_guard_ppo:progress.update(kl_guard_actor_steps_total=sum(guard_steps),last_kl_guard=last_guard)
         atomic_json(args.output/'progress.json',progress)
         atomic_json(args.output/'state.json',dict(state,status=status,**progress))
@@ -662,6 +677,10 @@ def train(args):
                     from boxer.striking_posture_cost import learner_cost
                     cost=learner_cost(env);posture_cost_sum+=cost
                     reward=reward-cost
+                if arm_effort_ppo:
+                    from boxer.striking_arm_effort import effort_cost
+                    cost=effort_cost(outcome,env.learner_corner,env.env.pair.dt)
+                    arm_effort_sum+=cost;reward=reward-cost
                 rewards.extend(reward);dones.extend([done]*learners_per_world)
                 scored+=outcome['scored']
                 if done:
