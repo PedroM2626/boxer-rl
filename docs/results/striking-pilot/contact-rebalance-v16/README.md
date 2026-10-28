@@ -107,3 +107,42 @@ the encoder exited and the resulting video fully decoded. The clip is
 `fights/striking-pilot/v16-reciprocal-seed31-swapped.mp4`. Renderer total is
 **2,947**; no added physical controls or learner updates. It illustrates a selected
 surviving episode while the complete survival gate remains failed.
+
+## Second and third full gates: reciprocal consistency remains open, 2026-10-28
+
+Independent saved-trace review of both checkpoints verifies all native/full
+trace hashes, finite arrays, native impulse, unchanged complete-cycle rules,
+checkpoint provenance and original physical criteria. Neither is a full pass;
+no consecutive pass or promotion. Results, each out of eight pair episodes:
+
+| New v16 credits | Neutral 0 / neutral 1 / self-play survivors | Valid self-play cycles by corner | Surviving reciprocal seeds |
+| --- | --- | --- | --- |
+| 524,288 | 5 / 7 / 4 | 5 / 5 | 7, 31 |
+| 1,048,576 | 5 / 5 / 3 | 1 / 1 | 31 |
+| 1,572,864 | 4 / 5 / 5 | 2 / 3 | 47 |
+
+Only one surviving seed in each later gate has valid cycles by both agents, below
+the unchanged two-seed motion criterion. Self-play survival improved from 3/8 to
+5/8 between these checkpoints but still misses 7/8, while neutral survival is
+4/8 and 5/8. At the latest gate all four swapped episodes survive, but only one
+of four unswapped episodes survives; all three unswapped failures occur before
+scored contact. This continues the observed swap asymmetry without identifying
+its cause. Results on four known seeds are limited and do not establish fresh
+robustness or a causal effect of the reward change.
+
+The second and third gates consumed **7,409 and 8,130** formal controls,
+respectively. At the third completed gate: v16 new formal **24,446**, global
+formal **2,215,430**; v16 learner/collection credits **1,572,864**, global
+diagnostic PPO **6,882,560**, lineage consumed/optimized **6,799,360** and
+lineage world controls **6,176,768**. Main **476,041,216**, standalone BC
+**8,000**, cloned queries **6,349**, signed distances **960**, render forwards
+**2,947** remain separately retained. Live final-chunk counters advance beyond
+this snapshot. No nonfinite checkpoint data, overflow warnings or native errors
+were found; exactly one supervisor and one learner continue.
+
+Decision: complete the already authorized final chunk at 2,097,152 new credits,
+then run both original and fresh evaluations within the existing 60,000-control
+cap. Review stability, reciprocal cycles and swap asymmetry across all checkpoints
+before deciding a bounded next intervention. Do not reset Adam, roll back, promote
+or weaken gates. Reviews: `step-1048576-independent-review.json` and
+`step-1572864-independent-review.json`.
