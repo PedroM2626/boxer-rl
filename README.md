@@ -31,8 +31,8 @@ corner 0 and two in corner 1, on two surviving known seeds per corner. The
 verifies checkpoint/native/full hashes, finite arrays and unchanged criteria.
 However, mirror pair survival regresses from 5/8 to **0/8**, with no scored contacts
 or valid cycles before termination. Neither full gate passes; no promotion or
-main adoption. The approved v15 job continues toward its next scheduled gate,
-within the existing 2,097,152-credit allocation, without resets or weaker gates.
+main adoption. V15 subsequently completed its remaining scheduled gates within
+the 2,097,152-credit allocation without resets or weaker gates.
 
 Earlier outcome (2026-10-26): [motion-cycle PPO v14 completed](docs/results/striking-pilot/motion-cycle-v14/README.md)
 all 1,048,576 new learner credits and six full evaluations before the computer
