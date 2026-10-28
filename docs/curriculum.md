@@ -15,6 +15,13 @@ original gates every 524,288 credits and a new fresh final; require two distinct
 complete consecutive full passes. Inspect live state and process before retry:
 `/home/pedro/boxing-runs/striking-arm-effort-v17/audit.json`.
 
+**First v17 gate:** independent review finds pair survival 3/8, 6/8, 1/8
+versus 5/8, 6/8, 3/8 on the inherited baseline. Self-play has one valid cycle
+in one corner, none in the other, and no surviving reciprocal seed. The full
+gate fails. This early regression does not isolate causation; continue the
+already approved second chunk to 1,048,576 new credits and review its full gate.
+Completed-gate totals: formal 2,244,135 and diagnostic PPO 7,931,136.
+
 **Latest v16 completed review (2026-10-28):** final checkpoint 5bbf6a38 has
 original pair survival 5/8, 6/8, 3/8 and fresh 3/8, 7/8, 1/8. Fresh neutral
 cycles total 42; the one surviving fresh mirror bout has valid cycles for both

@@ -925,3 +925,35 @@ critic, optimizer, RNG, normalizer, samplers and frozen opponent were preserved.
 This confirms implementation integration, not improved boxing. The hidden
 supervisor has started the next chunk toward the first 524,288-credit full gate;
 all physical and promotion criteria remain unchanged.
+
+## First v17 full gate: early regression, 2026-10-28
+
+At **524,288 new learner credits**, checkpoint SHA-256
+`f0efe32821b70ecf7bf2d44f8f7c1c294a911b3990f3ae91ebdee2830fc9909c`
+was independently reviewed against all 24 archived native/full trajectories.
+Trace and checkpoint hashes, finite data, native impulse, original complete-cycle
+criteria and all foundation histories verify; no numerical/overflow errors.
+
+Pair survival is **3/8 neutral 0, 6/8 neutral 1, 1/8 self-play**, versus
+**5/8, 6/8, 3/8** on the inherited v16 final baseline. Neutral valid cycles
+are 5 and 13; self-play has one cycle in corner 1, none in corner 0, and zero
+surviving reciprocal seeds (versus three on the inherited baseline). Six of seven
+mirror failures occur before any scored event. The original physical gate and
+self-play motion check both fail; full-pass streak zero. This is an early
+regression relative to the frozen predecessor on these known seeds, not proof
+that the reward change cannot learn or evidence of generalization.
+
+The full gate consumed **6,127 formal controls**, global formal **2,244,135**;
+global diagnostic PPO at the checkpoint **7,931,136**. Lineage consumed and
+optimized **7,847,936**, world controls **7,225,344**. Main **476,041,216**,
+standalone BC **8,000**, cloned queries **6,349**, signed distances **960**,
+renderer forwards **2,947** remain separate. The independently reviewed
+checkpoint and trajectories remain preserved; live next-chunk counters advance.
+
+Decision: continue the already approved second chunk to 1,048,576 new credits,
+without lowering thresholds or restoring a policy. The single early gate does
+not isolate a cause; compare strike retention, early falls and both corners at
+the next complete gate, then reassess before the bounded final. Exactly one
+supervisor and one learner are active, native error logs empty, and latest live
+checkpoint hash/finite state verified. No main adoption or promotion. Evidence:
+`step-524288-independent-review.json`.
