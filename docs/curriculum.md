@@ -3,7 +3,20 @@
 Maintain the [trajectory and decision record](experiment-history.md) at every
 reviewed intervention, including failed results, accounting and pending evidence.
 
-**Current v16 decision (2026-10-27):** the completed navigation ablation has
+**Latest v16 completed review (2026-10-28):** final checkpoint 5bbf6a38 has
+original pair survival 5/8, 6/8, 3/8 and fresh 3/8, 7/8, 1/8. Fresh neutral
+cycles total 42; the one surviving fresh mirror bout has valid cycles for both
+agents. Full gates fail and the approved PPO allocation has ended. All seven
+fresh mirror failures occur before scoring, four before any inter-body contact;
+terminal predicates include low pelvis and self-leg contacts. These observations
+do not establish causation. A separately bounded 4,000-control diagnostic masks
+only learned arm residuals in both actors, on the same fresh resets, with full
+physics and no PPO. It cannot promote a checkpoint. Global formal ceiling is
+2,234,238 from 2,230,238; diagnostic PPO remains 7,406,848. Inspect
+`/home/pedro/boxing-runs/striking-v16-arm-ablation/state.json` and the
+[protocol](results/striking-pilot/v16-arm-ablation/README.md) before any new job.
+
+**Earlier v16 decision (2026-10-27):** the completed navigation ablation has
 3/8 masked survivors and no valid mirror cycles versus 2/8 unmasked; unchanged
 physics and unmodified original gates remain authoritative. Based on v15's
 repeated partial-contact incentives, prospectively test one training reward

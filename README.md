@@ -2,13 +2,12 @@
 
 ## Current experiment: unassisted paired boxing diagnostics
 
-Current work (2026-10-27): [contact-rebalance PPO v16](docs/results/striking-pilot/contact-rebalance-v16/README.md)
-continues from the actual v15 final. It tests whether reducing partial-contact
-payments improves stability while retaining the full-cycle reward and independent
-physical gates. The first deterministic full gate verified reciprocal valid
-cycles in two surviving known-seed bouts; survival 5/8, 7/8, 4/8 still fails
-the full gate. The bounded job continues to the next independent evaluation;
-this result does not yet certify reliable boxing.
+Current work (2026-10-28): [contact-rebalance PPO v16](docs/results/striking-pilot/contact-rebalance-v16/README.md)
+completed its 2,097,152-credit allocation. The final policy has 42 valid neutral
+cycles on fresh seeds, and both agents strike in one surviving fresh mirror bout.
+Fresh survival 3/8, 7/8, 1/8 fails the independent full gate. A separately
+bounded [arm-residual diagnostic](docs/results/striking-pilot/v16-arm-ablation/README.md)
+investigates early balance failures; masked actions cannot certify a policy.
 
 Previous review (2026-10-26): v15 completed all 2,097,152 new credits. The final
 policy produces **23 complete neutral-practice strikes on fresh seeds**, but

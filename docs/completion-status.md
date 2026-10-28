@@ -23,6 +23,11 @@ These results strengthen the isolated learned-strike evidence without closing
 the stable reciprocal-fight gap. No complete gate passes. Unchanged training is
 stopped at the approved ceiling; a bounded frozen-opponent diagnostic is active.
 
+V16 is now complete: its final produced 42 valid neutral cycles on fresh seeds,
+and both actors made valid strikes in one surviving fresh mirror episode. Fresh
+pair survival of 3/8, 7/8, 1/8 fails the complete gate. PPO is stopped at its
+approved ceiling while a separate arm-residual diagnostic investigates balance.
+
 The first deterministic neutral-practice strikes are now supported by native
 motion/contact/recovery measurements. At the subsequent 1,572,864-credit gate,
 neutral valid cycles fall from six to two; mirror survival recovers to 2/8 but
