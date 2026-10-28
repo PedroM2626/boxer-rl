@@ -7,7 +7,7 @@ reviewed intervention, including failed results, accounting and pending evidence
 original pair survival 5/8, 6/8, 3/8 and fresh 3/8, 7/8, 1/8. Fresh neutral
 cycles total 42; the one surviving fresh mirror bout has valid cycles for both
 agents. Full gates fail and the approved PPO allocation has ended. All seven
-fresh mirror failures occur before scoring, four before any inter-body contact;
+fresh mirror failures occur before scoring, three before any inter-body contact;
 terminal predicates include low pelvis and self-leg contacts. These observations
 do not establish causation. A separately bounded 4,000-control diagnostic masks
 only learned arm residuals in both actors, on the same fresh resets, with full
@@ -15,6 +15,16 @@ physics and no PPO. It cannot promote a checkpoint. Global formal ceiling is
 2,234,238 from 2,230,238; diagnostic PPO remains 7,406,848. Inspect
 `/home/pedro/boxing-runs/striking-v16-arm-ablation/state.json` and the
 [protocol](results/striking-pilot/v16-arm-ablation/README.md) before any new job.
+
+The arm ablation is completed and independently reviewed: disabling both
+learned arm residuals yields 8/8 pair survivors on the same fresh seeds, versus
+1/8 unmasked, but zero valid strikes. The earlier count of pre-contact failures
+is corrected to three, not four. This identifies a strong interaction without
+isolating individual actors or joints. A separately bounded 4,000-control
+half-arm diagnostic is now active; current formal total 2,234,238, diagnostic
+ceiling 2,238,238. It preserves physical dynamics but cannot promote a policy.
+Inspect `/home/pedro/boxing-runs/striking-v16-half-arm/state.json` and the
+[protocol](results/striking-pilot/v16-half-arm/README.md) before any new job.
 
 **Earlier v16 decision (2026-10-27):** the completed navigation ablation has
 3/8 masked survivors and no valid mirror cycles versus 2/8 unmasked; unchanged

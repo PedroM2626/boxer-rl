@@ -23,11 +23,14 @@ def arm_perturbation(noise, held, step, hold=1, scale=1.):
     return noise,held
 
 
-def ablate_action(action,zero_commands=False,zero_arms=False):
-    if not zero_commands and not zero_arms:return action
+def ablate_action(action,zero_commands=False,zero_arms=False,arm_scale=1.):
+    if not np.isfinite(arm_scale) or not 0. <= arm_scale <= 1.:
+        raise ValueError('diagnostic arm scale must be finite in [0, 1]')
+    if not zero_commands and not zero_arms and arm_scale==1.:return action
     result=action.copy()
     if zero_commands:result[:,:3]=0.
     if zero_arms:result[:,3:17]=0.
+    else:result[:,3:17]*=arm_scale
     return result
 
 
@@ -56,6 +59,8 @@ def main(argv=None):
                         help='diagnostic ablation: keep learned motor navigation, remove high-level command offsets')
     parser.add_argument('--zero-arm-residuals',action='store_true',
                         help='diagnostic ablation: zero only high-level fourteen arm residual outputs')
+    parser.add_argument('--arm-residual-scale',type=float,default=1.,
+                        help='diagnostic-only scale for both actors high-level arm outputs')
     parser.add_argument('--approach-gain',type=float,
                         help='diagnostic navigation proportional gain; original default is 0.8')
     parser.add_argument('--engagement-distance',type=float,
@@ -63,8 +68,12 @@ def main(argv=None):
     args=parser.parse_args(argv)
     if (args.opponent_checkpoint is None)!=(args.evaluated_corner is None):
         raise ValueError('mixed-policy diagnostics require both opposing checkpoint and evaluated corner')
-    if args.opponent_checkpoint is not None and (args.checkpoint is None or args.sampled or args.neutral_partner is not None or args.zero_command_offsets or args.zero_arm_residuals or args.base_yaw_scale!=1. or args.approach_gain is not None or args.engagement_distance is not None):
+    if args.opponent_checkpoint is not None and (args.checkpoint is None or args.sampled or args.neutral_partner is not None or args.zero_command_offsets or args.zero_arm_residuals or args.arm_residual_scale!=1. or args.base_yaw_scale!=1. or args.approach_gain is not None or args.engagement_distance is not None):
         raise ValueError('mixed-policy diagnostics require deterministic unchanged contact control with no ablation')
+    if not np.isfinite(args.arm_residual_scale) or not 0. <= args.arm_residual_scale <= 1.:
+        raise ValueError('diagnostic arm residual scale must be finite in [0, 1]')
+    if args.zero_arm_residuals and args.arm_residual_scale!=1.:
+        raise ValueError('choose either zero arms or a diagnostic arm scale')
     if args.progress and args.progress.exists():raise ValueError('evaluation progress exists; inspect before rerun')
     if args.trace_directory:args.trace_directory.mkdir(parents=True,exist_ok=False)
     if args.punch_trace_directory:
@@ -242,7 +251,7 @@ def main(argv=None):
                     if args.neutral_partner is not None:
                         action=action.copy()
                         action[1-args.neutral_partner]=0.
-                    action=ablate_action(action,args.zero_command_offsets,args.zero_arm_residuals)
+                    action=ablate_action(action,args.zero_command_offsets,args.zero_arm_residuals,args.arm_residual_scale)
                     previous_scores=env.pair.scorecard.last_score.copy()
                     if trace:trace.before(env,obs,action)
                     transitions+=1
@@ -311,6 +320,7 @@ def main(argv=None):
         neutral_partner_learner_corner=args.neutral_partner,
         diagnostic_zero_command_offsets=args.zero_command_offsets,
         diagnostic_zero_arm_residuals=args.zero_arm_residuals,
+        diagnostic_arm_residual_scale=args.arm_residual_scale,
         diagnostic_approach_gain=args.approach_gain,
         diagnostic_profile_override=args.engagement_distance is not None,
         certification=False))

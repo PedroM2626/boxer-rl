@@ -14,3 +14,14 @@ def test_masked_report_cannot_certify_original_gate(tmp_path,marker):
     path.write_text(json.dumps(report))
     with pytest.raises(AssertionError,match='Masked actions'):
         full_profiles(tmp_path,[7,23,31,47],report['striking_sha256'])
+
+
+def test_scaled_arm_report_cannot_certify_original_gate(tmp_path):
+    source=Path('docs/results/striking-pilot/fixed-repeat-1908736/gate-8192/screen')
+    for name in ('neutral-0.json','neutral-0-progress.json'):
+        (tmp_path/name).write_bytes((source/name).read_bytes())
+    path=tmp_path/'neutral-0.json'; report=json.loads(path.read_text())
+    report['diagnostic_arm_residual_scale']=.5
+    path.write_text(json.dumps(report))
+    with pytest.raises(AssertionError,match='Scaled arm actions'):
+        full_profiles(tmp_path,[7,23,31,47],report['striking_sha256'])

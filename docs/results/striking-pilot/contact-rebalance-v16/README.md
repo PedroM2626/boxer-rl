@@ -165,8 +165,8 @@ active opponents, while reliable balance and reciprocal boxing remain incomplete
 The fresh and original seed sets differ, so their scores are not a matched causal
 comparison, and no weak gate, promotion or rollback is authorized.
 
-All seven fresh mirror failures occur before a scored legal contact; four occur
-before any recorded inter-body contact, while three follow other physical contact.
+All seven fresh mirror failures occur before a scored legal contact; three occur
+before any recorded inter-body contact, while four follow other physical contact.
 Their fallen-body terminal flags are **two low-pelvis and five self-leg contacts**,
 zero tilt. The original mirror has five failures before scoring, including two
 before any inter-body contact. Thus contact incentives alone cannot explain all
