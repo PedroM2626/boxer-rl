@@ -2,13 +2,18 @@
 
 ## Current experiment: unassisted paired boxing diagnostics
 
-Latest review (2026-10-26): v15 completed all 2,097,152 new credits. The final
+Current work (2026-10-27): [contact-rebalance PPO v16](docs/results/striking-pilot/contact-rebalance-v16/README.md)
+continues from the actual v15 final. It tests whether reducing partial-contact
+payments improves stability while retaining the full-cycle reward and independent
+physical gates. The finite 1,024-credit integration passed; the bounded job is
+running toward its first full evaluation. This is an experiment, not an adoption.
+
+Previous review (2026-10-26): v15 completed all 2,097,152 new credits. The final
 policy produces **23 complete neutral-practice strikes on fresh seeds**, but
 only 2/8 fresh mirror pairs survive, with zero fresh mirror valid cycles.
 No full gate passes or general boxing completion. Unchanged PPO is stopped at
 its ceiling. A [bounded opponent-distribution diagnostic](docs/results/striking-pilot/v15-opponent-gap/README.md)
-now checks the exact frozen training adversary against the existing mirror result,
-with no learning or weakened criteria. See the
+found persistent falls against the exact frozen training adversary. See the
 [completed trajectory](docs/results/striking-pilot/contact-progress-v15/README.md).
 
 Earlier intervention (2026-10-26): [target-coupled contact-progress PPO v15](docs/striking-contact-progress-training.md)

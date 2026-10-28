@@ -674,3 +674,18 @@ persistent WSL launcher and normal warm starts. All progress and evaluation
 attempts are counted; do not repeat an interrupted partial gate blindly. Output:
 `/home/pedro/boxing-runs/striking-contact-rebalance-v16/audit.json`.
 Independent gates remain mandatory; no automatic adoption or boxing completion.
+
+### V16 integration completed
+
+The ordinary 1,024-credit integration completed with **5,227,520** lineage
+consumed/optimized and **4,604,928** collection controls. Checkpoint SHA-256
+`3c0be5dd77eea17080a717c4402cfff685c98b1b84dae95cbc69d2a9f3139b8a`;
+actor/critic Adam counters **64,152 / 87,824** match the retained source plus 16
+updates. The payload and all numeric leaves are finite; the 18 update-audit
+records have first-rollout clipped fraction **0.0**. No native error output.
+The initial transition retained actor, critic, both Adam states, normalization,
+RNG, samplers and fixed-opponent payload exactly. Focused v16/v15 cycle and
+reward checks: **22 passed**. This is a finite integration check, not evidence
+of improved behavior. Supervisor has started the authorized next chunk toward
+the first full gate at 524,288 new credits. Integration payload and update audit
+are archived, without resetting the live job.
