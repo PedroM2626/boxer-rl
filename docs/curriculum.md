@@ -3,6 +3,20 @@
 Maintain the [trajectory and decision record](experiment-history.md) at every
 reviewed intervention, including failed results, accounting and pending evidence.
 
+**Current v16 decision (2026-10-27):** the completed navigation ablation has
+3/8 masked survivors and no valid mirror cycles versus 2/8 unmasked; unchanged
+physics and unmodified original gates remain authoritative. Based on v15's
+repeated partial-contact incentives, prospectively test one training reward
+change: reduce graded partial-contact payment from 2 to 0.25 while retaining
+the full-cycle reward, target potential, terminal fall cost, action interface,
+and actual v15 final actor/critic/Adam/RNG. Allocate at most 2,097,152 new PPO
+credits (global 7,406,848) and 60,000 new physical evaluation controls (global
+2,250,984); no rollover. One integration block, performance gates at 524,288
+intervals and fresh final; two distinct consecutive complete passes required.
+See [the v16 protocol](results/striking-pilot/contact-rebalance-v16/README.md).
+Live output: `/home/pedro/boxing-runs/striking-contact-rebalance-v16/audit.json`.
+Inspect process/attempt ledger before any retry or change; no automatic adoption.
+
 **Latest completed review (2026-10-26):** v15 exhausted its 2,097,152-credit
 allocation with exact final 9132ab4c. Original/fresh neutral valid cycles are
 13/23; mirror cycles 2/0. Original survival 5/5/1 and fresh 6/5/2 out of eight

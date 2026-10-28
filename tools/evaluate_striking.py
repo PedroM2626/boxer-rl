@@ -152,7 +152,7 @@ def main(argv=None):
             require_ppo_checkpoint(saved)
         if saved.get('motion_cycle_ppo') or manifest.get('motion_cycle_ppo') or config.get('motion_cycle_ppo'):
             from boxer.striking_motion_reward import PROFILE as MOTION_PROFILE
-            if (not all(x.get('motion_cycle_ppo') for x in (saved,manifest,config)) or config.get('version')!=(15 if saved.get('contact_progress_ppo') else 14)
+            if (not all(x.get('motion_cycle_ppo') for x in (saved,manifest,config)) or config.get('version')!=(16 if saved.get('contact_rebalance_ppo') else 15 if saved.get('contact_progress_ppo') else 14)
                     or any(x.get('motion_reward_profile')!=MOTION_PROFILE for x in (saved,manifest,config))):
                 raise ValueError('manifest, configuration and saved motion reward disagree')
         if saved.get('contact_progress_ppo') or manifest.get('contact_progress_ppo') or config.get('contact_progress_ppo'):
@@ -160,6 +160,11 @@ def main(argv=None):
             if (not all(x.get('contact_progress_ppo') for x in (saved,manifest,config))
                     or any(x.get('contact_progress_profile')!=PROGRESS_PROFILE for x in (saved,manifest,config))):
                 raise ValueError('manifest, configuration and saved contact-progress profile disagree')
+        if saved.get('contact_rebalance_ppo') or manifest.get('contact_rebalance_ppo') or config.get('contact_rebalance_ppo'):
+            from boxer.striking_contact_rebalance import PROFILE as REBALANCE_PROFILE
+            if (not all(x.get('contact_rebalance_ppo') for x in (saved,manifest,config))
+                    or any(x.get('contact_rebalance_profile')!=REBALANCE_PROFILE for x in (saved,manifest,config))):
+                raise ValueError('manifest, configuration and saved contact-rebalance profile disagree')
         if manifest.get('kl_guard_ppo',False)!=saved.get('kl_guard_ppo',False) or manifest.get('kl_guard_target')!=saved.get('kl_guard_target'):
             raise ValueError('manifest and saved KL guard profile disagree')
         if manifest.get('long_gae_ppo',False)!=saved.get('long_gae_ppo',False) or manifest.get('training_gae_lambda')!=saved.get('training_gae_lambda'):
