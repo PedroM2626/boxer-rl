@@ -1,11 +1,19 @@
 # Functional completion estimate and remaining evidence
 
-Reviewed 2026-10-26. **Approximately 40%** is a subjective estimate of demonstrated
+Reviewed 2026-10-29. **Approximately 40%** is a subjective estimate of demonstrated
 functional scope, not a measured learning-convergence percentage, fraction of
 remaining work hours, or promise that the rest is routine implementation.
 The core learned boxing behavior is still unresolved despite substantial
 infrastructure and certified locomotion. Do not label the project near-complete
 because code, reports and checkpoints exist.
+
+Current evidence supersedes the historical notes below: final v17 has 33 fresh
+neutral valid cycles, 5 fresh mirror cycles and reciprocal strikes in one
+surviving fresh episode, but pair survival is only 5/8, 7/8, 3/8. No complete
+recent gate or reliable reciprocal boxing. No PPO job is active. The bounded
+[GPU recovery comparison](gpu-training-recovery.md) is running; its prototype
+throughput is not yet validated PPO throughput. GPU integration/legacy comparison,
+stable two-sided exchanges and broader/longer fresh validation remain outstanding.
 
 | Capability | Evidence/status |
 | --- | --- |

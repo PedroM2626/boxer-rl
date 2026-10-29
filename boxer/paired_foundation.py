@@ -230,7 +230,7 @@ class PairedFoundation:
             punch_trace = getattr(self, 'diagnostic_punch_trace', None)
             if punch_trace is not None:
                 punch_trace.before_substep(self, positions, velocities, torso_motion)
-            mujoco.mj_step(self.model, self.data)
+            self._physics_step()
             for name in ('mjWARN_BADQPOS', 'mjWARN_BADQVEL', 'mjWARN_BADQACC',
                          'mjWARN_CNSTRFULL', 'mjWARN_CONTACTFULL'):
                 warning = getattr(mujoco.mjtWarning, name, None)
@@ -286,3 +286,7 @@ class PairedFoundation:
         self.elapsed = float(self.data.time)
         return dict(done=self.done, fallen=self.fallen(), legal_contact_impulse=impulses,
                     scored=scored)
+
+    def _physics_step(self):
+        """Native production dynamics; experimental backends override this hook."""
+        mujoco.mj_step(self.model, self.data)

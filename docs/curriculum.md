@@ -3,6 +3,26 @@
 Maintain the [trajectory and decision record](experiment-history.md) at every
 reviewed intervention, including failed results, accounting and pending evidence.
 
+**Current work (2026-10-29):** [GPU recovery](gpu-training-recovery.md) has
+implemented a current-model CUDA dynamics primitive, matching batched policy
+feature ordering, a measurement reference adapter and bounded diagnostics.
+No new PPO allocation. Closed-loop comparison is active at
+`/home/pedro/boxing-runs/gpu-closed-loop-v1/state.json`: native 30/20, Warp 3/5,
+Warp 30/20, same final v17 and original fresh seeds/roles. Maximum 36,000 new
+formal world controls; before 2,271,001, ceiling 2,307,001. Main 476,041,216 and
+diagnostic PPO 9,504,000 retained. No experimental physics promotion.
+Inspect actual process/child progress and all completed profiles before another
+job. After completion, independently review all arms, then run the separately
+declared retained Warp6/7 own-engine punch-cycle diagnostic (maximum 7,680 new
+controls, formal before equals the actual completed comparison total). Preserve
+all limits, failures and expired allowances. Detailed protocol and limitations
+are in the GPU recovery document; do not resume an old reward experiment.
+The persistent coordinator at
+`/home/pedro/boxing-runs/gpu-validation-followthrough/state.json` already owns
+that follow-through sequence; inspect its PID/child before launching the legacy
+diagnostic independently. It publishes completed owned evidence and stops on
+failures. No second physical job should overlap it.
+
 **Latest v17 completed review (2026-10-28):** all 2,097,152 new PPO credits
 finished; no complete gate passed. Final fresh pair survival is 5/8, 7/8, 3/8;
 both actors struck in one surviving mirror episode. Formal total 2,271,001 and

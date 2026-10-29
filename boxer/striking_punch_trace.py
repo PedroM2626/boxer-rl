@@ -51,13 +51,15 @@ class PunchTrace:
         data=io.BytesIO();np.savez_compressed(data,**self.arrays());atomic_bytes(path,data.getvalue())
 
 
-def describe_events(arrays, pre_seconds=.25, post_seconds=.5):
+def describe_events(arrays, pre_seconds=.25, post_seconds=.5, native_timestep=.002):
     """Descriptive windows, not prospective punch acceptance thresholds.
 
     Onset speed is measured before the solver at the contact's first substep.
     Retraction is approach back toward that onset's pre-window hand position;
     it does not assert that the reference position is a competent guard.
     """
+    if not np.isfinite(native_timestep) or native_timestep <= 0:
+        raise ValueError('positive measured native timestep required')
     times=arrays['time_before'];positions=arrays['local_position']
     velocities=arrays['local_velocity'];events=[]
     for index,corner,hand in zip(*np.nonzero(arrays['event'])):
@@ -86,7 +88,7 @@ def describe_events(arrays, pre_seconds=.25, post_seconds=.5):
             event_window_impulse_ns=float(arrays['window_impulse'][index,corner,hand]),
             native_contact_window_impulse_ns=float(arrays['impulse'][onset:index+1,corner,hand].sum()),
             post_window_seconds=float(times[post[-1]]-event_time) if len(post) else 0.,
-            post_contact_seconds=float(arrays['present'][post,corner,hand].sum()*.002),
+            post_contact_seconds=float(arrays['present'][post,corner,hand].sum()*native_timestep),
             return_toward_pre_window_position_m=float(impact_distance-after.min()) if len(after) else None,
-            post_window_complete=bool(len(post) and times[post[-1]]>=event_time+post_seconds-.0021)))
+            post_window_complete=bool(len(post) and times[post[-1]]>=event_time+post_seconds-(native_timestep+.0001))))
     return events

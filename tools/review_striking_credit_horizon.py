@@ -27,6 +27,7 @@ def full_profiles(folder, seeds, sha):
         assert report['striking_sha256'] == progress['striking_sha256'] == sha
         assert len(rows) == 8 and {(r['seed'], r['swap']) for r in rows} == {(s, w) for s in seeds for w in (False, True)}
         assert not report['assistance'] and not report['sampled_policy']
+        assert report.get('physics_backend', 'native') == 'native' and not report.get('diagnostic_solver_override', False), 'Experimental physics cannot replace the unchanged native full gate'
         assert not report.get('diagnostic_zero_command_offsets', False) and not report.get('diagnostic_zero_arm_residuals', False), 'Masked actions are diagnostic, not a promotable full gate'
         assert report.get('diagnostic_arm_residual_scale', 1.) == 1., 'Scaled arm actions are diagnostic, not a promotable full gate'
         assert not report.get('diagnostic_profile_override', False) and report.get('diagnostic_approach_gain') is None, 'Modified approach profile is diagnostic'

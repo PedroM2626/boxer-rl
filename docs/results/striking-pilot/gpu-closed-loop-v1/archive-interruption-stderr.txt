@@ -1,0 +1,14 @@
+wsl: Failed to translate 'D:\IBM Bob\bin'
+Traceback (most recent call last):
+  File "/mnt/e/boxer-agent/tools/run_gpu_closed_loop.py", line 115, in <module>
+    account()
+
+  File "/mnt/e/boxer-agent/tools/run_gpu_closed_loop.py", line 103, in main
+    state.update(active_arm=name, active_profile=label, updated_utc=utc())
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pedro/.local/share/uv/python/cpython-3.12.15-linux-x86_64-gnu/lib/python3.12/shutil.py", line 600, in copytree
+    return _copytree(entries=entries, src=src, dst=dst, symlinks=symlinks,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pedro/.local/share/uv/python/cpython-3.12.15-linux-x86_64-gnu/lib/python3.12/shutil.py", line 554, in _copytree
+    raise Error(errors)
+shutil.Error: [('/home/pedro/boxing-runs/gpu-closed-loop-v1/warp-3-5/neutral-0/full/trained-seed-34002006-swap-1.npz', 'docs/results/striking-pilot/gpu-closed-loop-v1/warp-3-5/neutral-0/full/trained-seed-34002006-swap-1.npz', "[Errno 22] Invalid argument: 'docs/results/striking-pilot/gpu-closed-loop-v1/warp-3-5/neutral-0/full/trained-seed-34002006-swap-1.npz'")]

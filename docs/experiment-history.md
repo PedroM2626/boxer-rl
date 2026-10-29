@@ -1051,3 +1051,87 @@ impulse and event timing, then implement batched current-model observations,
 rewards and recorded motion windows; benchmark on this card before adopting a
 backend. Keep native CPU full gates authoritative. This is not a GPU training
 launch, completed port or declaration that legacy policies pass current gates.
+
+## Current-model CUDA recovery and bounded comparisons, 2026-10-29
+
+The user authorized reviewing the full project and taking the necessary steps
+toward actual boxing without additional permission requests. Source/state review
+confirmed v17 had finished and no training process was active. Its final fresh
+pair survival remains 5/8, 7/8, 3/8 with 33 neutral cycles and five mirror cycles,
+reciprocal in one surviving fresh episode. Historical contact certifications do
+not certify complete punches. No unchanged CPU PPO extension or rollback.
+
+Implemented an experimental current-model CUDA physics primitive, batched 103/148
+input construction with the inherited engagement profile, and a reference adapter
+that preserves native scoring/trace code while advancing GPU physics. Four
+asymmetric observation tests match native inputs. The native production step is
+unchanged behind a narrow backend hook. Experimental engine/solver reports are
+explicitly rejected by the native promotion reviewer. The 41-test focused suite
+passed; after adding explicit legacy timestep handling, eight relevant tests passed
+with one dependency deprecation warning. Two saved impact poses verify GPU-to-native
+force export; a pinned-memory prefetch version also matches direct export exactly.
+
+Nine original-limit/iteration counterfactuals and nine line-search counterfactuals
+replay identical controls on both engines for 0.5 s per case. At 30/20, saved impact
+windows agree to approximately 6e-6 qpos and 6.2e-4 qvel without solver flags; random
+reset drift remains (maximum ankle difference about 0.039 rad). Raising iterations
+alone did not resolve line-search limits. This is a measured numerical sensitivity,
+not permission to change training physics or weaken native gates. All raw arrays,
+source/checksum evidence and the independent saved-array review are retained.
+
+A 45-control current-model prototype includes the actual v17 actor, certified
+frozen motor, CPU inference, GPU physics, observations/transfers and per-substep
+overflow reads. It measures about 2,239/7,260/14,368 world controls/s at 32/128/512
+worlds. These are not PPO training rates: cycle rewards/history, random autoresets
+and updates remain to be integrated/validated. The original solver flags are
+retained; only repetitive solver printing is disabled in timing, not checks.
+
+The initial dynamics attempt failed an atomic Windows/WSL repository JSON rename;
+80 native/GPU attempted substeps are preserved separately. Durable live writes now
+use the WSL filesystem. The completed preflight set retains 4,580 native experimental
+substeps and 308,109 GPU experimental world substeps, including that failed attempt
+and benchmark warmups. Historical plus new GPU world forwards total 1,382. Main
+476,041,216, diagnostic PPO 9,504,000 and formal 2,271,001 are the retained before
+counters; preflights consumed no new formal controls or learner updates.
+
+The [prospective protocol](gpu-training-recovery.md) declares at most 36,000 new
+formal controls (ceiling 2,307,001) for native 30/20, CUDA 3/5 and CUDA 30/20 under
+all three unchanged role profiles, exact v17 final and existing fresh seeds.
+Historical native 3/5 is reused without debit. The hidden persistent comparison is
+running. At the interim review, native 30/20 survival is 6/8, 4/8, 3/8; no complete
+pass. CUDA 3/5 neutral-0 matches native 3/5 aggregate 5/8 survival and 17 cycles,
+while neutral-1 has 4/8 survival and nine cycles. Full comparison remains pending.
+
+A persistent coordinator waits without running physics, then independently reviews
+all complete profiles and publishes owned evidence before a separate legacy
+measurement. Retained Warp6/7 200,212,480-step policies will be measured in their
+reconstructed own engine at original 0.75 m and separate 2 m spawns on four seeds.
+At most 7,680 additional formal controls, with its before counter set to the
+completed comparison's actual total; unused previous allowance expires. Explicit
+4 ms contact-duration measurement preserves the common impulse/travel/return
+criteria. Legacy damage termination and different self-leg geometry limit survival
+comparability; no incompatible checkpoint transplant or automatic adoption.
+
+Next decision depends on both complete comparisons. Validate batched scorecard,
+motion-cycle rewards/history, full resets and PPO before claiming GPU training
+throughput; retain native gates. Then choose a justified bounded learning change
+to improve stable repeated reciprocal striking, rather than assuming the latest
+frozen-motor architecture or an old policy is inherently superior. Broader fresh
+conditions and longer rounds still remain before project completion. Existing
+monitoring schedule, checkpoint lineage and all consumed accounting are retained.
+
+The comparison later completed all six native-30/20 and CUDA-3/5 profiles:
+CUDA-3/5 mirror has 5/8 pair survivors and valid cycles 3/5, reciprocal on two
+surviving fresh seeds, still below full survival criteria. At 16,267 new formal
+controls (global 2,287,268), archive overwrite/copy metadata failed during Windows
+Git access to an existing trace. Source hashes and all completed profile arrays
+were verified intact; this was publication I/O, not a physical evaluation failure.
+Added an archive helper that skips identical files, atomically copies changed
+results and retries transient Windows access failures. A fault-injection test
+passes. Per-profile archive failures no longer stop productive physics. The
+explicit resume retains all six completed profiles/counters and runs only the
+three remaining CUDA-30/20 profiles. The coordinator's initial early restart saw
+the old failed state during verification and stopped without running legacy
+physics; it was resumed after the physical supervisor was confirmed running.
+Both failure/recovery records are retained. No checkpoint rollback, repeated
+evaluation debit, weaker gate or budget extension.

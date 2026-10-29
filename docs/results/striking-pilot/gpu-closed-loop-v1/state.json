@@ -1,0 +1,171 @@
+{
+  "status": "running",
+  "pid": 347,
+  "started_utc": "2026-10-29T17:56:32.821950+00:00",
+  "diagnostic_output": "/home/pedro/boxing-runs/gpu-closed-loop-v1",
+  "source_sha256": "f311640d78941546938412f5802cff872e0a3611c392f49a3b4719eefaa1f26a",
+  "maximum_new_controls": 36000,
+  "formal_before": 2271001,
+  "formal_ceiling": 2307001,
+  "main_retained": 476041216,
+  "diagnostic_ppo_retained": 9504000,
+  "new_ppo_steps": 0,
+  "prerequisites": {
+    "foundation": {
+      "balance": {
+        "records": 29,
+        "sha256": "8cea6a2f62ae68fd9a3118b881301785900df7d3af73322fccacfa0e2e3bc1f6"
+      },
+      "walk_easy": {
+        "records": 41,
+        "sha256": "f1e0e6f023ff4ac477171382069fe132af9180ae818b509a18c2572eca0200ee"
+      },
+      "walk": {
+        "records": 13,
+        "sha256": "d547d60455be5d8b6f9f49c7bec256cb0b0d6963e3345a7160a16f974d0c531c"
+      },
+      "approach": {
+        "records": 2,
+        "sha256": "b39b1990945e8a374802c3a190e5ac5e026ae39e7fd5ef61c5c2b01ad291c6fc"
+      }
+    },
+    "main_sha256": "efad0ccd1051ee5305d4ccf8ebbd7d0e402211f12ecd0cdf175b473b24a7b5b0"
+  },
+  "profiles": [
+    {
+      "arm": "native-30-20",
+      "profile": "neutral-0",
+      "pair_survivors": 6,
+      "surviving_valid_cycles": [
+        11,
+        0
+      ],
+      "reciprocal_surviving_episodes": [],
+      "native_certification": false
+    },
+    {
+      "arm": "native-30-20",
+      "profile": "neutral-1",
+      "pair_survivors": 4,
+      "surviving_valid_cycles": [
+        0,
+        5
+      ],
+      "reciprocal_surviving_episodes": [],
+      "native_certification": false
+    },
+    {
+      "arm": "native-30-20",
+      "profile": "selfplay",
+      "pair_survivors": 3,
+      "surviving_valid_cycles": [
+        2,
+        4
+      ],
+      "reciprocal_surviving_episodes": [
+        {
+          "seed": 34002004,
+          "swap": true
+        },
+        {
+          "seed": 34002005,
+          "swap": false
+        }
+      ],
+      "native_certification": false
+    },
+    {
+      "arm": "warp-3-5",
+      "profile": "neutral-0",
+      "pair_survivors": 5,
+      "surviving_valid_cycles": [
+        17,
+        0
+      ],
+      "reciprocal_surviving_episodes": [],
+      "native_certification": false
+    },
+    {
+      "arm": "warp-3-5",
+      "profile": "neutral-1",
+      "pair_survivors": 4,
+      "surviving_valid_cycles": [
+        0,
+        9
+      ],
+      "reciprocal_surviving_episodes": [],
+      "native_certification": false
+    },
+    {
+      "arm": "warp-3-5",
+      "profile": "selfplay",
+      "pair_survivors": 5,
+      "surviving_valid_cycles": [
+        3,
+        5
+      ],
+      "reciprocal_surviving_episodes": [
+        {
+          "seed": 34002004,
+          "swap": true
+        },
+        {
+          "seed": 34002005,
+          "swap": false
+        }
+      ],
+      "native_certification": false
+    }
+  ],
+  "baseline": {
+    "neutral-0": {
+      "report_sha256": "6ad8d81c69357469ef9cdc460432a9b9f582e792067829455f01d0c5dfe2de8e",
+      "pair_survivors": 5,
+      "surviving_valid_cycles": [
+        17,
+        0
+      ],
+      "reciprocal_surviving_episodes": [],
+      "native_certification": false
+    },
+    "neutral-1": {
+      "report_sha256": "7d744d627c72b1561736d3131ad50ee6776d7b1c47525d5e5d6a041df3d0b104",
+      "pair_survivors": 7,
+      "surviving_valid_cycles": [
+        0,
+        16
+      ],
+      "reciprocal_surviving_episodes": [],
+      "native_certification": false
+    },
+    "selfplay": {
+      "report_sha256": "658149db6e15eb448d28de02ecc1dd3dda05d9528f05432c6c5439a9722a34ad",
+      "pair_survivors": 3,
+      "surviving_valid_cycles": [
+        4,
+        1
+      ],
+      "reciprocal_surviving_episodes": [
+        {
+          "seed": 34002004,
+          "swap": true
+        }
+      ],
+      "native_certification": false
+    }
+  },
+  "active_arm": "warp-30-20",
+  "active_profile": "neutral-0",
+  "updated_utc": "2026-10-29T18:19:00.677499+00:00",
+  "child_pid": 602,
+  "new_controls": 16267,
+  "formal_total": 2287268,
+  "recoveries": [
+    {
+      "reviewed_utc": "2026-10-29T18:19:00.672705+00:00",
+      "previous_error": "Error([('/home/pedro/boxing-runs/gpu-closed-loop-v1/warp-3-5/neutral-0/full/trained-seed-34002006-swap-1.npz', 'docs/results/striking-pilot/gpu-closed-loop-v1/warp-3-5/neutral-0/full/trained-seed-34002006-swap-1.npz', \"[Errno 22] Invalid argument: 'docs/results/striking-pilot/gpu-closed-loop-v1/warp-3-5/neutral-0/full/trained-seed-34002006-swap-1.npz'\")])",
+      "completed_profiles_retained": 6,
+      "decision": "Resume remaining profiles only; no repeated physical controls"
+    }
+  ]
+}

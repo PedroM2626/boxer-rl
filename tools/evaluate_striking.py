@@ -37,6 +37,10 @@ def ablate_action(action,zero_commands=False,zero_arms=False,arm_scale=1.):
 def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--checkpoint',type=Path)
+    parser.add_argument('--physics-backend', choices=('native', 'warp'), default='native',
+                        help='Warp is an experimental reference adapter, never a native certification')
+    parser.add_argument('--solver-iterations', type=int, help='diagnostic override on the selected engine')
+    parser.add_argument('--solver-ls-iterations', type=int, help='diagnostic line-search override')
     parser.add_argument('--opponent-checkpoint',type=Path,help='diagnostic learned opposing policy, independently normalized')
     parser.add_argument('--evaluated-corner',type=int,choices=(0,1),help='corner controlled by the main checkpoint in mixed-policy diagnostics')
     parser.add_argument('--output',type=Path,default=Path('runs/striking-validation/evaluation.json'))
@@ -66,6 +70,8 @@ def main(argv=None):
     parser.add_argument('--engagement-distance',type=float,
                         help='explicit diagnostic profile override; impact criteria remain fixed')
     args=parser.parse_args(argv)
+    if any(value is not None and not 1 <= value <= 100 for value in (args.solver_iterations, args.solver_ls_iterations)):
+        raise ValueError('diagnostic solver limits must be in [1, 100]')
     if (args.opponent_checkpoint is None)!=(args.evaluated_corner is None):
         raise ValueError('mixed-policy diagnostics require both opposing checkpoint and evaluated corner')
     if args.opponent_checkpoint is not None and (args.checkpoint is None or args.sampled or args.neutral_partner is not None or args.zero_command_offsets or args.zero_arm_residuals or args.arm_residual_scale!=1. or args.base_yaw_scale!=1. or args.approach_gain is not None or args.engagement_distance is not None):
@@ -117,23 +123,34 @@ def main(argv=None):
         raise ValueError('contact history and interface dimensions disagree')
     if args.base_yaw_scale!=1. and ((inputs,actions)!=(148,17) or args.checkpoint is None or args.sampled or args.zero_command_offsets or args.zero_arm_residuals):
         raise ValueError('base-yaw probe requires deterministic contact checkpoint and no other controller ablation')
+    pair = None
+    if args.physics_backend == 'warp':
+        from boxer.paired_warp_reference import WarpPairedReference
+        pair = WarpPairedReference(foundation, iterations=args.solver_iterations,
+                                   ls_iterations=args.solver_ls_iterations)
+    elif args.solver_iterations is not None or args.solver_ls_iterations is not None:
+        from boxer.paired_foundation import PairedFoundation
+        pair = PairedFoundation(foundation)
+        if args.solver_iterations is not None: pair.model.opt.iterations = args.solver_iterations
+        if args.solver_ls_iterations is not None: pair.model.opt.ls_iterations = args.solver_ls_iterations
+        pair.reset()
     if (inputs,actions)==(146,17):
         if body_bound!=0.:raise ValueError('legacy interface cannot carry body residual authority')
-        env=StrikingEnv(foundation,params,engagement_distance=distance,
+        env=StrikingEnv(foundation,params,pair=pair,engagement_distance=distance,
                        engagement_reward_distance=reward_distance)
     elif (inputs,actions)==(148,17):
         if body_bound!=0.:raise ValueError('contact interface cannot carry body residual authority')
         from boxer.striking_contact import ContactAwareStrikingEnv
         if args.base_yaw_scale==1.:
-            env=ContactAwareStrikingEnv(foundation,params,engagement_distance=distance,
+            env=ContactAwareStrikingEnv(foundation,params,pair=pair,engagement_distance=distance,
                 engagement_reward_distance=reward_distance)
         else:
             from boxer.striking_yaw_diagnostic import BaseYawDiagnosticEnv
-            env=BaseYawDiagnosticEnv(foundation,params,engagement_distance=distance,
+            env=BaseYawDiagnosticEnv(foundation,params,pair=pair,engagement_distance=distance,
                 engagement_reward_distance=reward_distance,base_yaw_scale=args.base_yaw_scale)
     elif (inputs,actions)==(161,32):
         from boxer.striking_body import WholeBodyStrikingEnv
-        env=WholeBodyStrikingEnv(foundation,params,engagement_distance=distance,
+        env=WholeBodyStrikingEnv(foundation,params,pair=pair,engagement_distance=distance,
             engagement_reward_distance=reward_distance,body_residual_radians=body_bound)
     else:
         raise ValueError('unsupported striking interface dimensions')
@@ -314,6 +331,13 @@ def main(argv=None):
         assistance=False,source_sha256=source['sha256'],striking_sha256=residual_hash,
         opponent_sha256=opponent_hash,evaluated_corner=args.evaluated_corner,
         diagnostic_base_yaw_scale=args.base_yaw_scale,
+        physics_backend=args.physics_backend,
+        diagnostic_solver_override=args.solver_iterations is not None or args.solver_ls_iterations is not None,
+        physics_solver_iterations=env.pair.model.opt.iterations,
+        physics_solver_ls_iterations=env.pair.model.opt.ls_iterations,
+        experimental_gpu_substeps=getattr(env.pair,'gpu_substeps',0),
+        experimental_gpu_solver_flags=getattr(env.pair,'solver_flag_observations',0),
+        physics_readback='prefetched_upstream_export' if hasattr(env.pair,'readback') else 'native_or_direct_upstream_export',
         simulated_world_transitions=transitions,optimization_transitions=0,
         scorecard_version=1,episode_seconds=args.seconds,trials=results,
         engagement_distance=distance,engagement_reward_distance=reward_distance,

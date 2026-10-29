@@ -2,12 +2,20 @@
 
 ## Current experiment: unassisted paired boxing diagnostics
 
-Current work (2026-10-28): [arm-effort PPO v17](docs/results/striking-pilot/arm-effort-v17/README.md)
+Current work (2026-10-29): [GPU recovery and physical validation](docs/gpu-training-recovery.md).
+A batched current-model prototype reaches thousands of world controls/s including
+both actors and the frozen motor; this excludes PPO and full cycle rewards.
+Open-loop contact agreement improves with explicit solver/line-search diagnostics,
+but random-reset drift remains. A bounded frozen-policy closed-loop comparison
+is active; experimental backend/solver reports cannot replace native gates.
+Inspect `/home/pedro/boxing-runs/gpu-closed-loop-v1/state.json` before any launch.
+Legacy Warp6/7 comparison is the next separately bounded diagnostic.
+
+Previous work (2026-10-28): [arm-effort PPO v17](docs/results/striking-pilot/arm-effort-v17/README.md)
 completed its allocation without a full pass. Its final fresh self-play survives
 3/8 pairs; both actors strike in one surviving episode. No PPO job is active.
 The user requested GPU throughput recovery and a fair legacy-policy comparison;
-small current-model GPU preflights show promising contact measurements but an
-unresolved solver warning. Independent physical gates remain unchanged.
+current-model GPU investigations are recorded above. Independent physical gates remain unchanged.
 
 Previous work (2026-10-28): [contact-rebalance PPO v16](docs/results/striking-pilot/contact-rebalance-v16/README.md)
 completed its 2,097,152-credit allocation. The final policy has 42 valid neutral

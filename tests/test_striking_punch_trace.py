@@ -38,6 +38,7 @@ def test_descriptive_windows_find_onset_and_mark_censored_recovery():
     arrays['local_velocity'][:,0,0,0]=1.
     arrays['elbow'][:,0,0]=time*2
     arrays['present'][125:165,0,0]=True
+    arrays['present'][200:225,0,0]=True
     arrays['engaged_before'][126:200,0,0]=True
     arrays['impulse'][125:165,0,0]=.013
     arrays['event'][164,0,0]=True
@@ -52,6 +53,8 @@ def test_descriptive_windows_find_onset_and_mark_censored_recovery():
     np.testing.assert_allclose(event['native_contact_window_impulse_ns'],.52)
     assert not event['post_window_complete']
     assert event['return_toward_pre_window_position_m']<0  # moving away, not recovery
+    assert event['post_contact_seconds'] == .05
+    assert describe_events(arrays, native_timestep=.004)[0]['post_contact_seconds'] == .1
 
 
 def test_body_translation_and_rotation_are_not_measured_as_arm_motion(foundation):

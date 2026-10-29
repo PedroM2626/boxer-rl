@@ -3,7 +3,17 @@
 The [trajectory and experiment index](experiment-history.md) records reviewed
 successes, failed approaches and the documentation protocol for every continuation.
 
-Current status: the foundation is certified; paired physical boxing exists,
+Current status, 2026-10-29: the foundation is certified and complete individual
+punches are demonstrated in both roles. Stable repeated reciprocal boxing still
+fails full gates. V17 stopped at its cap. The immediate engineering prerequisite
+is [GPU training recovery](gpu-training-recovery.md), now with measured fast
+batched physics/inference and a running frozen-policy comparison. Then validate
+batched complete-cycle rewards/resets/PPO, measure retained legacy policies fairly,
+and train with native physical gates. Completion requires robust reciprocal
+strikes/guard recovery, varied opponents and longer fresh rounds. The detailed
+chronology below describes earlier work, not an active job or current certification.
+
+Historical investigation summary: the foundation is certified; paired physical boxing exists,
 but reliable reciprocal combat is not certified. Two distinct consecutive
 original ten-second full screens passed earlier; independent reset generalization
 still fails across all four new full groups. The complete cross-policy audit is
