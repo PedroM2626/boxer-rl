@@ -10,10 +10,17 @@ because code, reports and checkpoints exist.
 Current evidence supersedes the historical notes below: final v17 has 33 fresh
 neutral valid cycles, 5 fresh mirror cycles and reciprocal strikes in one
 surviving fresh episode, but pair survival is only 5/8, 7/8, 3/8. No complete
-recent gate or reliable reciprocal boxing. No PPO job is active. The bounded
-[GPU recovery comparison](gpu-training-recovery.md) is complete; its prototype
-throughput is not yet validated PPO throughput. Complete GPU PPO integration,
-stable two-sided exchanges and broader/longer fresh validation remain outstanding.
+recent gate or reliable reciprocal boxing. The bounded
+[GPU recovery comparison](gpu-training-recovery.md), batched mechanics and
+[one-block GPU PPO integration](results/striking-pilot/gpu-batched-integration-v1/README.md)
+are complete. The finite integration checkpoint preserves all learned state and
+consumes exactly 1,024 credits; it establishes implementation correctness rather
+than improved boxing. Complete collection measured 601.5 world controls/s at 128
+worlds, excluding PPO; eight worlds still show no throughput benefit. No PPO job
+is active after the mandatory integration review. Collector optimization,
+validated larger-batch learning, stable two-sided exchanges and broader/longer
+fresh validation remain outstanding. Functional scope is still approximately
+40%; an engineering integration does not change the learned-behavior estimate.
 
 | Capability | Evidence/status |
 | --- | --- |

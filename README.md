@@ -2,7 +2,18 @@
 
 ## Current experiment: unassisted paired boxing diagnostics
 
-Current work (2026-10-29): [GPU recovery and physical validation](docs/gpu-training-recovery.md).
+Latest reviewed work (2026-10-29): [batched CUDA mechanics](docs/results/striking-pilot/batched-gpu-mechanics-v1/README.md)
+and the [1,024-credit warm-start PPO integration](docs/results/striking-pilot/gpu-batched-integration-v1/README.md)
+are complete. Full contacts, cycle rewards, first falls and independent randomized
+resets are implemented and checked; all original learned state is retained.
+Complete frozen collection measured 85.5 / 601.5 world controls/s at 8 / 128 worlds,
+excluding PPO. The original eight-world integration does not recover historical
+training speed. Its finite checkpoint is archived; no full boxing gate passes.
+Next optimize collection and validate explicit larger-batch/update scaling before
+a bounded longer GPU learning allocation. Diagnostic PPO is 9,505,024 at its
+reviewed ceiling; formal/main counters and physical gates are unchanged.
+
+Earlier work (2026-10-29): [GPU recovery and physical validation](docs/gpu-training-recovery.md).
 A batched current-model prototype reaches thousands of world controls/s including
 both actors and the frozen motor; this excludes PPO and full cycle rewards.
 Open-loop contact agreement improves with solver/line-search diagnostics, but

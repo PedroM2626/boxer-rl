@@ -149,3 +149,18 @@ See the [next implementation/integration protocol](gpu-batched-training-next.md)
 Do not repeat completed comparisons or leave the authorized code backlog idle.
 The existing three-hour monitor was found paused and reactivated under the user's
 request for autonomous project continuation; frequency/name/target are retained.
+
+## Completed batched mechanics and conditional integration
+
+The [mechanics review](results/striking-pilot/batched-gpu-mechanics-v1/README.md)
+and [1,024-credit integration](results/striking-pilot/gpu-batched-integration-v1/README.md)
+are complete. Exact same-state native control/measurement/reward checks and
+selective first-fall/reset tests pass; the source's complete learned state is
+retained. Global diagnostic PPO is now **9,505,024**, with no new formal controls
+or native gate pass. Current dynamics/contact-force extraction use CUDA;
+kinematics, impact/cycle history and rewards still use CPU NumPy readbacks.
+The measured complete collector reaches 601.5 world controls/s at 128 worlds,
+excluding PPO, rather than its bare-path thousands/s. Next fuse/bulk the measured
+overhead and explicitly validate larger-batch/update accounting before further
+bounded GPU learning. Do not repeat the consumed one-time integration or reset
+the latest experimental GPU prefix on a routine resume.

@@ -5,10 +5,10 @@ conditional and why the next experiment was authorized. Detailed protocols,
 full physical results, limitations, checkpoints and accounting remain in the
 linked reports. This index does not replace those records or the live state.
 
-Last consolidated review: **2026-10-25**, through completed consolidation, limited
-ten-second readiness, reviewed broader/pool audits, guard/cycle diagnostics,
-signed collision surfaces and the failed lateral-bow comparison. Reliable general boxing is **not yet
-certified**. The foundation is certified; paired physical exchanges exist.
+Last consolidated review: **2026-10-29**, including retained-policy comparisons,
+complete batched GPU mechanics and the conditional warm-start integration.
+Reliable general boxing is **not yet certified**. The foundation is certified;
+learned complete strikes exist, while stable reciprocal combat remains unresolved.
 
 ## Historical corrections and retained capabilities
 
@@ -1189,3 +1189,41 @@ schedule and meaningful-change-only notifications. The prompt now explicitly
 requires implementing the remaining GPU mechanics rather than stopping at an
 idle-training report. Official OpenAI automation guidance was checked with the
 OpenAI Docs skill; actual saved configuration/status was verified locally.
+
+## Complete batched mechanics and GPU PPO integration, 2026-10-29
+
+[Mechanics review](results/striking-pilot/batched-gpu-mechanics-v1/README.md):
+implemented unordered per-hand legal contacts, native-equivalent relative
+kinematics/impact windows, cycle histories, all v17 rewards, first-fall snapshots
+and full independent randomized per-world resets. The failed first comparison
+retains 22 GPU substeps. Comparing original native control/measurement/reward on
+the same actual CUDA trajectory then passed five checks (zero observation error),
+including bitwise survivor invariance and both immutable positive-cycle windows.
+Thirty-five focused/regression tests pass. This is semantic parity on identical
+states, not proof of independent native/CUDA dynamics equivalence.
+
+The complete frozen collector, including rewards, evidence and resets, measures
+85.5 / 601.5 world controls/s at 8 / 128 worlds, excluding Gaussian sampling,
+critic/PPO and formal gates. The bare-path thousands/s figure did not include
+these costs. One positive learner complete-cycle history against an active
+opponent was captured and independently classified; 36/128 worlds fall/reset in
+that bounded benchmark. Frozen diagnostics are not new learned progress. Total
+development compute is 174,941 GPU world substeps, including the failed attempt.
+
+[The conditional integration](results/striking-pilot/gpu-batched-integration-v1/README.md)
+used exactly 1,024 new PPO credits and 10,248 separately counted GPU substeps.
+Every source leaf was preserved before updates; final payload/source/RNG/actions/
+log probabilities/optimizer counts and metadata independently verify. Final SHA
+`be1b5a8d64d88ac5ae2a266f1b975dc79ac39f90f95df1082d438fc86d5327e9`
+is the latest experimental GPU prefix: consumed/optimized 9,421,824, world
+8,799,232, Adam 129,688/153,360. Global diagnostic PPO **9,505,024** is at ceiling;
+main **476,041,216**, formal **2,298,509**, prior BC/cloning/geometry/render counters
+and all expired allowances remain retained. No new renderer calls or formal gate.
+
+Collection took 11.588 s and PPO 0.735 s including their first JIT. Only original
+solver-limit bits 512/1024 occur; there is no capacity/float/nonfinite failure.
+The hidden persistent job stopped for the mandated review, with no duplicate or
+unchanged CPU PPO restart. No boxing gate passes. Next optimize complete collector
+overhead and test explicit larger-batch/update scaling before declaring a bounded
+longer GPU run. Preserve the integration prefix on ordinary continuation and the
+native physical gates for advancement. Monitoring frequency remains unchanged.

@@ -1,5 +1,18 @@
 # Next action: complete the batched GPU training mechanics
 
+**Completed 2026-10-29:** [mechanics and complete collector review](results/striking-pilot/batched-gpu-mechanics-v1/README.md)
+and the [conditional 1,024-credit PPO integration](results/striking-pilot/gpu-batched-integration-v1/README.md)
+both passed their engineering checks. Global diagnostic PPO is now **9,505,024**,
+at its ceiling; no formal/main counter change or new physical certification.
+The latest experimental GPU prefix is `gpu-batched-integration-v1/step-9421824.pkl`,
+SHA `be1b5a8d64d88ac5ae2a266f1b975dc79ac39f90f95df1082d438fc86d5327e9`.
+Do not rerun the one-time migration or its completed allocation on routine wakes.
+Next optimize complete collection and explicitly validate larger-batch/update
+scaling before declaring a bounded longer GPU interval with unchanged native
+gates. Detailed measured bottlenecks and the 256-updates/16,384-credits schedule
+are in the completed integration report. The prospective protocol below is
+retained as history; its single integration allowance has been fully consumed.
+
 Decision after both completed comparisons, 2026-10-29. Do useful implementation
 work when no physical job is active; the project is not complete and a stopped
 PPO job is not a reason to leave this backlog untouched.

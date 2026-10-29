@@ -1,0 +1,61 @@
+{
+  "status": "reviewed",
+  "source_sha256": "f311640d78941546938412f5802cff872e0a3611c392f49a3b4719eefaa1f26a",
+  "initial_sha256": "d84c0440f0b5bdaaba1b70b9fc4c4a1847e292ed08f11c198438fd859a6bb39b",
+  "final_sha256": "be1b5a8d64d88ac5ae2a266f1b975dc79ac39f90f95df1082d438fc86d5327e9",
+  "all_source_leaves_preserved_at_transition": true,
+  "unchanged_metadata_and_frozen_opponent_preserved": true,
+  "stochastic_raw_and_logp_replayed_exactly": true,
+  "rng_splits_replayed_exactly": true,
+  "optimizer_counts": {
+    "actor": {
+      "before": 129672,
+      "after": 129688,
+      "updates": 16
+    },
+    "critic": {
+      "before": 153344,
+      "after": 153360,
+      "updates": 16
+    }
+  },
+  "retained_consumed": 9421824,
+  "retained_optimized": 9421824,
+  "retained_world_controls": 8799232,
+  "diagnostic_ppo_total": 9505024,
+  "mixed_mode_corner_credits": [
+    [
+      204,
+      308
+    ],
+    [
+      256,
+      256
+    ]
+  ],
+  "completed_episodes": 1,
+  "finite_rollout_and_parameters": true,
+  "engine_ledger": {
+    "world_controls": 1024,
+    "gpu_world_substeps": 10248,
+    "gpu_active_world_substeps": 10235,
+    "gpu_discarded_terminal_world_substeps": 5,
+    "gpu_warmup_world_substeps": 8,
+    "gpu_reset_world_forwards": 32,
+    "native_reset_forwards": 26
+  },
+  "physics_health": {
+    "checks": 1285,
+    "solver_limit_world_checks": 10279,
+    "overflow_flags_seen": 1536,
+    "peak_contacts": 96,
+    "peak_constraints": 138
+  },
+  "collection_seconds": 11.587951079999996,
+  "ppo_seconds": 0.7348953360000081,
+  "new_simulation_controls_for_review": 0,
+  "new_formal_controls": 0,
+  "main_adoption": false,
+  "limitation": "One integration block is not a convergence test or a native boxing gate. The original 3/5 solver limits still occur; backend dynamics are not certified equivalent.",
+  "decision": "Preserve the finite integration checkpoint. Optimize collection and explicitly validate batch/update scaling before any larger GPU allocation."
+}

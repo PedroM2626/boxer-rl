@@ -53,6 +53,10 @@ updates and native evaluation. The earlier thousands/s bare-path measurement did
 not include this work. The current eight-world collector does not recover the
 old training throughput. Bulk readback/history overhead and a separately validated
 larger-batch optimizer schedule remain necessary before long GPU training.
+Physics/contact forces run on CUDA; the vectorized kinematics, impact windows
+and history/reward calculations currently use CPU NumPy after readback. Fusing
+those operations on the GPU is an optimization still to be implemented and
+validated against this semantic oracle, not an accomplished throughput claim.
 
 The 128-world frozen benchmark captured one independently reclassified valid
 learner straight-punch cycle against an active frozen opponent. Its raw window,
