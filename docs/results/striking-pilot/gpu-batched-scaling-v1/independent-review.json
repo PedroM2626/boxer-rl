@@ -1,0 +1,62 @@
+{
+  "status": "reviewed",
+  "source_sha256": "be1b5a8d64d88ac5ae2a266f1b975dc79ac39f90f95df1082d438fc86d5327e9",
+  "initial_sha256": "01701411873f20b346316c95176d8e27d635756a9fe482f3e65d2fdd671ff8fc",
+  "final_sha256": "6432029087cb00e73e39bee3a974e07f47f598771bae05c519e1bcad616c2103",
+  "all_source_leaves_preserved_at_transition": true,
+  "unchanged_metadata_and_frozen_opponent_preserved": true,
+  "stochastic_raw_and_logp_replayed_exactly": true,
+  "rng_splits_replayed_exactly": true,
+  "optimizer_counts": {
+    "actor": {
+      "before": 129688,
+      "after": 129944,
+      "updates": 256
+    },
+    "critic": {
+      "before": 153360,
+      "after": 153616,
+      "updates": 256
+    }
+  },
+  "full_update_and_sampler_replayed_exactly": true,
+  "retained_consumed": 9438208,
+  "retained_optimized": 9438208,
+  "retained_world_controls": 8815616,
+  "diagnostic_ppo_total": 9521408,
+  "mixed_mode_corner_credits": [
+    [
+      3900,
+      4292
+    ],
+    [
+      4212,
+      3980
+    ]
+  ],
+  "completed_episodes": 23,
+  "finite_rollout_and_parameters": true,
+  "engine_ledger": {
+    "world_controls": 16384,
+    "gpu_world_substeps": 163968,
+    "gpu_active_world_substeps": 163717,
+    "gpu_discarded_terminal_world_substeps": 123,
+    "gpu_warmup_world_substeps": 128,
+    "gpu_reset_world_forwards": 3072,
+    "native_reset_forwards": 408
+  },
+  "physics_health": {
+    "checks": 1305,
+    "solver_limit_world_checks": 167009,
+    "overflow_flags_seen": 1536,
+    "peak_contacts": 1504,
+    "peak_constraints": 154
+  },
+  "collection_seconds": 17.29904073099999,
+  "ppo_seconds": 1.5367811810000376,
+  "new_simulation_controls_for_review": 0,
+  "new_formal_controls": 0,
+  "main_adoption": false,
+  "limitation": "One integration block is not a convergence test or a native boxing gate. The original 3/5 solver limits still occur; backend dynamics are not certified equivalent.",
+  "decision": "Preserve the finite scaled checkpoint. A longer GPU interval requires a prospective bounded learning/native-gate protocol."
+}

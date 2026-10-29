@@ -1,0 +1,67 @@
+{
+  "status": "completed",
+  "phase": "awaiting_independent_review",
+  "started_utc": "2026-10-29T22:55:41.481905+00:00",
+  "pid": 334,
+  "source_sha256": "be1b5a8d64d88ac5ae2a266f1b975dc79ac39f90f95df1082d438fc86d5327e9",
+  "maximum_new_ppo_steps": 16384,
+  "new_ppo_steps": 16384,
+  "diagnostic_ppo_before": 9505024,
+  "diagnostic_ppo_ceiling": 9521408,
+  "diagnostic_ppo_total": 9521408,
+  "consumed_steps": 9438208,
+  "optimized_steps": 9438208,
+  "world_control_steps": 8815616,
+  "main_retained": 476041216,
+  "formal_retained": 2298509,
+  "new_formal_controls": 0,
+  "optimizer_reset": false,
+  "physics_state_saved": false,
+  "prerequisites": {
+    "foundation": {
+      "balance": {
+        "records": 29,
+        "sha256": "8cea6a2f62ae68fd9a3118b881301785900df7d3af73322fccacfa0e2e3bc1f6"
+      },
+      "walk_easy": {
+        "records": 41,
+        "sha256": "f1e0e6f023ff4ac477171382069fe132af9180ae818b509a18c2572eca0200ee"
+      },
+      "walk": {
+        "records": 13,
+        "sha256": "d547d60455be5d8b6f9f49c7bec256cb0b0d6963e3345a7160a16f974d0c531c"
+      },
+      "approach": {
+        "records": 2,
+        "sha256": "b39b1990945e8a374802c3a190e5ac5e026ae39e7fd5ef61c5c2b01ad291c6fc"
+      }
+    },
+    "main_sha256": "efad0ccd1051ee5305d4ccf8ebbd7d0e402211f12ecd0cdf175b473b24a7b5b0"
+  },
+  "engine_ledger": {
+    "world_controls": 16384,
+    "gpu_world_substeps": 163968,
+    "gpu_active_world_substeps": 163717,
+    "gpu_discarded_terminal_world_substeps": 123,
+    "gpu_warmup_world_substeps": 128,
+    "gpu_reset_world_forwards": 3072,
+    "native_reset_forwards": 408
+  },
+  "initial_sha256": "01701411873f20b346316c95176d8e27d635756a9fe482f3e65d2fdd671ff8fc",
+  "physics_health": {
+    "checks": 1305,
+    "solver_limit_world_checks": 167009,
+    "overflow_flags_seen": 1536,
+    "peak_contacts": 1504,
+    "peak_constraints": 154
+  },
+  "collection_seconds_including_initial_jit": 17.29904073099999,
+  "ppo_update_seconds_including_initial_jit": 1.5367811810000376,
+  "final_sha256": "6432029087cb00e73e39bee3a974e07f47f598771bae05c519e1bcad616c2103",
+  "actor_adam_count": 129944,
+  "critic_adam_count": 153616,
+  "mean_loss": 3.896036877296865,
+  "elapsed_seconds": 26.89836442799998,
+  "completed_utc": "2026-10-29T22:56:10.162635+00:00",
+  "decision": "Review integration; no larger allocation or native promotion implied"
+}
