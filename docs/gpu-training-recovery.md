@@ -111,8 +111,14 @@ Its formal before counter is the completed comparison's actual total; unused
 comparison allocation expires rather than rolling over. Retain a separate
 legacy counter, every GPU substep, overflow flags, complete event traces and
 checkpoint/config hashes. No PPO or historical executable equivalence claim.
+Historical source inspection found another compatibility trap: Warp6's 128 inputs
+predate damage/stun (introduced in Git `b123d8e` with 131 inputs). Applying current
+defaults would unfairly add knockouts and stun to that old policy's evaluation.
+The new diagnostic explicitly restores no stun and an unreachable damage cap for
+Warp6, while preserving Warp7's recorded cap 3 / stun 10. A focused contract test
+checks both cases. This is historical reconstruction, not a gate relaxation.
 The old 4 ms step must be supplied explicitly when measuring contact duration;
-using the new engine's 2 ms would undercount it by half. Original legacy damage
+using the new engine's 2 ms would undercount it by half. Warp7 damage
 termination and different self-leg collision geometry limit comparisons of pair
 survival. Do not issue current full-gate certification from these results.
 

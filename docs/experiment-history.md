@@ -1135,3 +1135,12 @@ the old failed state during verification and stopped without running legacy
 physics; it was resumed after the physical supervisor was confirmed running.
 Both failure/recovery records are retained. No checkpoint rollback, repeated
 evaluation debit, weaker gate or budget extension.
+
+Before the queued legacy comparison, Git/config inspection identified a historical
+compatibility trap: Warp6 uses 128 inputs and predates damage/stun; commit b123d8e
+introduced those mechanics and the 131-input state used by Warp7. The current
+constructor defaults would retroactively add them to Warp6. The diagnostic now
+explicitly disables Warp6 stun and uses a damage cap unreachable within 480 controls,
+while retaining Warp7's saved cap 3 / stun 10. This restores the recorded historical
+contract and leaves all common punch thresholds intact. The focused contract test
+passes; no legacy physical controls had yet been consumed.

@@ -32,6 +32,20 @@ SOURCES = {'warp6': 'ed0c56e760bb74a63aaa35d8b5d5ed445fa745e66519e5008536548a173
            'warp7': 'b5a7e7bc837ff3938fcf0dbfd96fcdd74b0c32f711a1da05f7cb919a3be200fd'}
 
 
+def historical_fight_state(config):
+    """Warp6 predates damage/stun; current defaults must not be retrofitted.
+
+    Git b123d8e introduced those mechanics and expanded 128 inputs to 131.
+    A 1e9 cap is unreachable in a <=480-control evaluation (<=480 hit value),
+    and zero stun preserves the pre-damage policy's original fight mechanics.
+    """
+    if config['obs_size'] == 128 and 'damage_cap' not in config and 'stun_steps' not in config:
+        return dict(damage_cap=1e9, stun_steps=0)
+    if config['obs_size'] == 131 and 'damage_cap' in config and 'stun_steps' in config:
+        return dict(damage_cap=config['damage_cap'], stun_steps=config['stun_steps'])
+    raise ValueError('Unrecognized historical fight-state contract; inspect before evaluation')
+
+
 class LegacyTraceAdapter:
     def __init__(self, env):
         self.env = env
@@ -140,11 +154,12 @@ def main():
                     params, _, _, norm, trained = pickle.load(handle)
                 assert trained == 200212480 and config['action_size'] == 29 and config['n_frames'] == 5
                 predict = numpy_forward(config, params, norm, False)
+                fight_state = historical_fight_state(config)
                 for separation in (.75, 2.):
                     for seed in (7, 23, 31, 47):
                         adapter = None
                         episode_substeps_before = state['gpu_world_substeps']
-                        env = make_env(config, nworld=1, spawn_distance=separation)
+                        env = make_env(config, nworld=1, spawn_distance=separation, **fight_state)
                         # Fresh initialized physical state, avoiding uninitialized
                         # host scratch transfer and episode warm-start leakage.
                         env._d = mjwarp.make_data(env._model, nworld=1, nconmax=384, njmax=2048)
@@ -170,6 +185,7 @@ def main():
                             separation=separation, controls=control+1, gpu_substeps=adapter.steps,
                             physics_dt=env._model.opt.timestep, own_engine_terminal=bool(done[0]),
                             config_sha256=hashlib.sha256((Path('runs')/name/'warp_config.json').read_bytes()).hexdigest(),
+                            historical_fight_state=fight_state,
                             common_posture_first_fall=adapter.first_fall, legacy_scored_value=original_hits.tolist(),
                             fist_only_events=adapter.scored.tolist(), complete_cycles=cycles,
                             solver_flag_observations=adapter.solver_flags, file=file.name,
