@@ -41,9 +41,9 @@ class MotionCycleMonitor(PunchTrace):
         for corner,hand in zip(*np.nonzero(row['event'])):
             self.pending_events.add((int(corner),int(hand),float(row['time_after'])))
 
-    def after_substep(self,*args):
-        super().after_substep(*args);self.new_rows+=1
-        self._capture_events(self.rows[-1])
+    def append_row(self,row):
+        super().append_row(row);self.new_rows+=1
+        self._capture_events(row)
         if len(self.rows)>PROFILE['retained_native_samples']:del self.rows[0]
 
     def consume(self,dt=.02,terminal=False):

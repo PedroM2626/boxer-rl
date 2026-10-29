@@ -1,0 +1,72 @@
+{
+  "status": "completed",
+  "source_sha256": "f311640d78941546938412f5802cff872e0a3611c392f49a3b4719eefaa1f26a",
+  "cases": [
+    {
+      "worlds": 8,
+      "controls_per_world": 128,
+      "measured_controls": 120,
+      "warmup_controls": 8,
+      "measured_seconds": 11.228391709000025,
+      "full_collection_world_controls_per_second": 85.49755164228193,
+      "reset_episodes": 1,
+      "fall_episodes": 1,
+      "valid_cycles": [
+        0.0,
+        0.0
+      ],
+      "captured_valid_events": 0,
+      "includes": "Both actor means, motor, physics, substep metrics, histories, v17 rewards, full randomized resets, evidence handling and durable accounting",
+      "excludes": "Gaussian sampling, critic/PPO updates and independent native promotion gates",
+      "solver_iterations": 3,
+      "line_search_iterations": 5
+    },
+    {
+      "worlds": 128,
+      "controls_per_world": 128,
+      "measured_controls": 120,
+      "warmup_controls": 8,
+      "measured_seconds": 25.53455787700002,
+      "full_collection_world_controls_per_second": 601.5377307094617,
+      "reset_episodes": 36,
+      "fall_episodes": 36,
+      "valid_cycles": [
+        0.0,
+        1.0
+      ],
+      "captured_valid_events": 1,
+      "includes": "Both actor means, motor, physics, substep metrics, histories, v17 rewards, full randomized resets, evidence handling and durable accounting",
+      "excludes": "Gaussian sampling, critic/PPO updates and independent native promotion gates",
+      "solver_iterations": 3,
+      "line_search_iterations": 5
+    }
+  ],
+  "ledgers": [
+    {
+      "world_controls": 1024,
+      "gpu_world_substeps": 10248,
+      "gpu_active_world_substeps": 10238,
+      "gpu_discarded_terminal_world_substeps": 2,
+      "gpu_warmup_world_substeps": 8,
+      "gpu_reset_world_forwards": 32,
+      "native_reset_forwards": 26
+    },
+    {
+      "world_controls": 16384,
+      "gpu_world_substeps": 163968,
+      "gpu_active_world_substeps": 163632,
+      "gpu_discarded_terminal_world_substeps": 208,
+      "gpu_warmup_world_substeps": 128,
+      "gpu_reset_world_forwards": 4224,
+      "native_reset_forwards": 421
+    }
+  ],
+  "prior_development_gpu_substeps": 725,
+  "total_development_gpu_substep_ceiling": 200000,
+  "new_ppo_steps": 0,
+  "new_formal_controls": 0,
+  "main_retained": 476041216,
+  "diagnostic_ppo_retained": 9504000,
+  "formal_retained": 2298509,
+  "decision": "Review complete collection performance and correctness before the conditional 1,024-credit integration"
+}

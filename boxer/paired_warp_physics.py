@@ -20,6 +20,7 @@ class PairedWarpPhysics:
         self.native_model = model
         self.worlds = worlds
         self.step_graph = None
+        self.forward_graph = None
         self.device = wp.get_device('cuda:0')
         with wp.ScopedDevice(self.device):
             self.model = mjwarp.put_model(model)
@@ -46,7 +47,10 @@ class PairedWarpPhysics:
             for target, value in checked:
                 target.assign(value)
             self.data.time.assign(time)
-            mjwarp.forward(self.model, self.data)
+            if self.forward_graph is None:
+                mjwarp.forward(self.model, self.data)
+            else:
+                wp.capture_launch(self.forward_graph)
 
     def step(self, ctrl=None):
         if ctrl is not None:
@@ -66,6 +70,12 @@ class PairedWarpPhysics:
             mjwarp.step(self.model, self.data)
         self.step_graph = capture.graph
 
+    def capture_forward(self):
+        """Compile the initialized reset-forward path without physical stepping."""
+        with wp.ScopedCapture(device=self.device) as capture:
+            mjwarp.forward(self.model, self.data)
+        self.forward_graph = capture.graph
+
     def health(self):
         """Synchronize and reject physical corruption or dropped constraints."""
         wp.synchronize_device(self.device)
@@ -84,6 +94,8 @@ class PairedWarpPhysics:
         count = int(self.data.nacon.numpy()[0])
         if count > self.data.naconmax:
             raise FloatingPointError('contact capacity exceeded')
+        if count == 0:
+            return np.empty(0, np.int32), np.empty((0, 2), np.int32), np.empty(0, np.float32)
         with wp.ScopedDevice(self.device):
             force = wp.zeros(count, dtype=wp.spatial_vector)
             mjwarp.contact_force(self.model, self.data,

@@ -43,11 +43,16 @@ class ContactProgressMonitor(MotionCycleMonitor):
         self.pending['target_center_distance']=target_distances(pair,positions)
         self.current_pair=pair
 
-    def consume(self,dt=.02,terminal=False):
+    def consume(self,dt=.02,terminal=False,*,target_distances_after=None):
         if not self.rows or not self.new_rows:return np.zeros(2),np.zeros(2)
         recent=self.rows[-self.new_rows:]
         old_phi=potential(recent[0]['target_center_distance'])
-        new_phi=np.zeros(2) if terminal else potential(target_distances(self.current_pair,self.current_pair.data.geom_xpos))
+        if terminal:
+            new_phi=np.zeros(2)
+        else:
+            if target_distances_after is None:
+                target_distances_after=target_distances(self.current_pair,self.current_pair.data.geom_xpos)
+            new_phi=potential(target_distances_after)
         target_progress=PROFILE['potential_scale']*(PROFILE['gamma']*new_phi-old_phi)
         new_events={(int(c),int(h),float(r['time_after'])) for r in recent for c,h in zip(*np.nonzero(r['event']))}
         contact_progress=np.zeros(2)

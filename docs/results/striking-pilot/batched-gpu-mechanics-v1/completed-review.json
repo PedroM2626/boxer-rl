@@ -1,0 +1,80 @@
+{
+  "status": "reviewed",
+  "development_gpu_world_substeps_including_failed_attempt": 174941,
+  "positive_cycle_captures": [
+    {
+      "source_sha256": "f311640d78941546938412f5802cff872e0a3611c392f49a3b4719eefaa1f26a",
+      "native_sha256": "f58c06b40fccee24c708c4d0753298c2d5d16bea6b01cdfe22373be04767642b",
+      "event": {
+        "corner": 1,
+        "hand": 0,
+        "onset_time": 1.6719856262207031,
+        "event_time": 1.67598557472229,
+        "onset_relative_speed": 1.032707210098478,
+        "onset_forward_cosine": 0.9460567039728066,
+        "onset_contact_closing": 0.7567959120523414,
+        "onset_contact_advancing": 0.8561346564650505,
+        "pre_window_seconds": 0.24999678134918213,
+        "pre_peak_relative_speed": 1.6696341830151686,
+        "pre_max_displacement_m": 0.1514777435435598,
+        "pre_path_length_m": 0.26570006571057975,
+        "pre_elbow_excursion_rad": 0.1419733762741089,
+        "event_window_impulse_ns": 0.6699755249023438,
+        "native_contact_window_impulse_ns": 0.6699755249023438,
+        "post_window_seconds": 0.4980039596557617,
+        "post_contact_seconds": 0.082,
+        "return_toward_pre_window_position_m": 0.08400071488341503,
+        "post_window_complete": true
+      },
+      "learner_corner": 1,
+      "active_opponent": true
+    }
+  ],
+  "complete_collection_benchmark": [
+    {
+      "worlds": 8,
+      "controls_per_world": 128,
+      "measured_controls": 120,
+      "warmup_controls": 8,
+      "measured_seconds": 11.228391709000025,
+      "full_collection_world_controls_per_second": 85.49755164228193,
+      "reset_episodes": 1,
+      "fall_episodes": 1,
+      "valid_cycles": [
+        0.0,
+        0.0
+      ],
+      "captured_valid_events": 0,
+      "includes": "Both actor means, motor, physics, substep metrics, histories, v17 rewards, full randomized resets, evidence handling and durable accounting",
+      "excludes": "Gaussian sampling, critic/PPO updates and independent native promotion gates",
+      "solver_iterations": 3,
+      "line_search_iterations": 5
+    },
+    {
+      "worlds": 128,
+      "controls_per_world": 128,
+      "measured_controls": 120,
+      "warmup_controls": 8,
+      "measured_seconds": 25.53455787700002,
+      "full_collection_world_controls_per_second": 601.5377307094617,
+      "reset_episodes": 36,
+      "fall_episodes": 36,
+      "valid_cycles": [
+        0.0,
+        1.0
+      ],
+      "captured_valid_events": 1,
+      "includes": "Both actor means, motor, physics, substep metrics, histories, v17 rewards, full randomized resets, evidence handling and durable accounting",
+      "excludes": "Gaussian sampling, critic/PPO updates and independent native promotion gates",
+      "solver_iterations": 3,
+      "line_search_iterations": 5
+    }
+  ],
+  "new_ppo_steps": 0,
+  "new_formal_controls": 0,
+  "main_retained": 476041216,
+  "formal_retained": 2298509,
+  "diagnostic_ppo_retained": 9504000,
+  "limitation": "Identical-trajectory native measurement/control/reward parity is distinct from independent CPU/CUDA trajectory equivalence. No boxing gate passes or long-training adoption.",
+  "decision": "The predeclared one-block 1,024-credit warm-start integration may proceed; no larger allocation implied"
+}

@@ -1,0 +1,62 @@
+{
+  "status": "completed",
+  "checks": [
+    {
+      "name": "identical_cuda_trajectory_native_control_reward_and_termination",
+      "controls": 60,
+      "observation_error_max": 0.0
+    },
+    {
+      "name": "selective_reset_preserves_live_physics_controller_and_history"
+    },
+    {
+      "name": "first_fall_snapshot_partial_control_discard_and_timeout"
+    },
+    {
+      "name": "positive_recorded_cycle_history_and_potential",
+      "source_sha256": "12472a17f4d5b8682fd7c7d4f8b9a8e3cd5599b51eaa4b4f7298a3d2180015e0",
+      "cycles": [
+        1.0,
+        0.0
+      ]
+    },
+    {
+      "name": "positive_recorded_cycle_history_and_potential",
+      "source_sha256": "b9679bd3f9b7b6639f13563ffdc41affa986388cc7762ffa7b7ff4e13d528a28",
+      "cycles": [
+        0.0,
+        1.0
+      ]
+    }
+  ],
+  "engine_ledgers": [
+    {
+      "world_controls": 60,
+      "gpu_world_substeps": 601,
+      "gpu_active_world_substeps": 600,
+      "gpu_discarded_terminal_world_substeps": 0,
+      "gpu_warmup_world_substeps": 1,
+      "gpu_reset_world_forwards": 4,
+      "native_reset_forwards": 5
+    },
+    {
+      "world_controls": 10,
+      "gpu_world_substeps": 102,
+      "gpu_active_world_substeps": 91,
+      "gpu_discarded_terminal_world_substeps": 9,
+      "gpu_warmup_world_substeps": 2,
+      "gpu_reset_world_forwards": 12,
+      "native_reset_forwards": 11
+    }
+  ],
+  "reference_gpu_substeps": 0,
+  "prior_attempt_gpu_substeps": 22,
+  "manual_gpu_world_forwards": 2,
+  "maximum_development_gpu_substeps": 200000,
+  "new_ppo_steps": 0,
+  "new_formal_controls": 0,
+  "main_retained": 476041216,
+  "diagnostic_ppo_retained": 9504000,
+  "formal_retained": 2298509,
+  "decision": "Mechanical checks passed; validate learned collection/benchmark before any PPO integration"
+}

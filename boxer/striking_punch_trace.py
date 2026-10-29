@@ -38,7 +38,11 @@ class PunchTrace:
             contact_closing=closing.copy(),contact_advancing=advancing.copy(),
             event=pair.scorecard.last_score>previous,
             window_impulse=pair.scorecard.impulse.copy())
-        self.rows.append(row);del self.pending
+        self.append_row(row);del self.pending
+
+    def append_row(self, row):
+        """Accept an independently measured native-substep row, including batches."""
+        self.rows.append(row)
 
     def arrays(self):
         if not self.rows:raise ValueError('nonempty native punch trace required')
