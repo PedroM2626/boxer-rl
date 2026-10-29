@@ -1,0 +1,51 @@
+{
+  "scope": "qualified_training_cycle_pending_independent_policy_evaluation",
+  "event": {
+    "corner": 0,
+    "hand": 1,
+    "onset_time": 9.087706565856934,
+    "event_time": 9.099705696105957,
+    "onset_relative_speed": 1.7063135542254295,
+    "onset_forward_cosine": 0.9175268200961926,
+    "onset_contact_closing": 1.475372491801925,
+    "onset_contact_advancing": 1.6268370250261313,
+    "pre_window_seconds": 0.24998188018798828,
+    "pre_peak_relative_speed": 2.3837108938870646,
+    "pre_max_displacement_m": 0.17559496560414348,
+    "pre_path_length_m": 0.33189834579203464,
+    "pre_elbow_excursion_rad": 0.5849301517009735,
+    "event_window_impulse_ns": 0.5187840042114258,
+    "native_contact_window_impulse_ns": 0.5187840042114258,
+    "post_window_seconds": 0.49996376037597656,
+    "post_contact_seconds": 0.074,
+    "return_toward_pre_window_position_m": 0.08528811208669683,
+    "post_window_complete": true
+  },
+  "controlled_by": "learner",
+  "learner_corner": 0,
+  "consumed_at_recognition": 9751296,
+  "world": 87,
+  "reset_seed": 161578,
+  "swap": false,
+  "active_opponent": false,
+  "foundation_sha256": "b39b1990945e8a374802c3a190e5ac5e026ae39e7fd5ef61c5c2b01ad291c6fc",
+  "policy_checkpoints_in_window": [
+    {
+      "optimized_steps": 9733120,
+      "file": "/home/pedro/boxing-runs/gpu-learning-v1/checkpoint/step-9733120.pkl",
+      "sha256": "7dd0d3ac23852b25bffd30b0c54bdf912d5bce468365f98b98a53c661e1aaf60"
+    },
+    {
+      "optimized_steps": 9749504,
+      "file": "/home/pedro/boxing-runs/gpu-learning-v1/checkpoint/step-9749504.pkl",
+      "sha256": "7a1df30209350dfee7a9ae88a0d6ff70e6a6829a2fe5d9a18824578459877798"
+    }
+  ],
+  "native_file": "/home/pedro/boxing-runs/gpu-learning-v1/event-evidence/step-9751296-world-87-corner-0-hand-1-time-9099705696.npz",
+  "native_sha256": "807f0424104dd51afc80c69fae4c7d8c0262e7ff349a724ece67d1e20a5949e4",
+  "new_physical_controls_for_capture": 0,
+  "new_optimizer_updates_for_capture": 0,
+  "new_geometry_queries": 0,
+  "main_adoption": false,
+  "limitation": "A stochastic training event is not a deterministic held-out gate pass; the window may span PPO updates."
+}
