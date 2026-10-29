@@ -5,11 +5,14 @@
 Current work (2026-10-29): [GPU recovery and physical validation](docs/gpu-training-recovery.md).
 A batched current-model prototype reaches thousands of world controls/s including
 both actors and the frozen motor; this excludes PPO and full cycle rewards.
-Open-loop contact agreement improves with explicit solver/line-search diagnostics,
-but random-reset drift remains. A bounded frozen-policy closed-loop comparison
-is active; experimental backend/solver reports cannot replace native gates.
-Inspect `/home/pedro/boxing-runs/gpu-closed-loop-v1/state.json` before any launch.
-Legacy Warp6/7 comparison is the next separately bounded diagnostic.
+Open-loop contact agreement improves with solver/line-search diagnostics, but
+reset drift remains. The nine-profile frozen-policy comparison is complete;
+none passes complete physical criteria. Solver convergence alone is not a remedy.
+The legacy Warp6/7 comparison is also complete: no complete straight cycles in
+sixteen reconstructed episodes, and no common-posture survivors from 2 m.
+This does not rule out hooks/other punch types. No PPO job is active. Next
+[complete batched scoring/rewards/resets and validate GPU PPO integration](docs/gpu-batched-training-next.md).
+Inspect live state before launches; experimental physics cannot replace native gates.
 
 Previous work (2026-10-28): [arm-effort PPO v17](docs/results/striking-pilot/arm-effort-v17/README.md)
 completed its allocation without a full pass. Its final fresh self-play survives

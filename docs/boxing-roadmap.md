@@ -7,8 +7,8 @@ Current status, 2026-10-29: the foundation is certified and complete individual
 punches are demonstrated in both roles. Stable repeated reciprocal boxing still
 fails full gates. V17 stopped at its cap. The immediate engineering prerequisite
 is [GPU training recovery](gpu-training-recovery.md), now with measured fast
-batched physics/inference and a running frozen-policy comparison. Then validate
-batched complete-cycle rewards/resets/PPO, measure retained legacy policies fairly,
+batched physics/inference and completed backend/legacy comparisons. Then validate
+batched complete-cycle rewards/resets/PPO, use the completed legacy measurements,
 and train with native physical gates. Completion requires robust reciprocal
 strikes/guard recovery, varied opponents and longer fresh rounds. The detailed
 chronology below describes earlier work, not an active job or current certification.

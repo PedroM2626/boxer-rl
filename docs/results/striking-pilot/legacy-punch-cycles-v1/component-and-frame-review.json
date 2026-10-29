@@ -1,0 +1,104 @@
+{
+  "status": "reviewed",
+  "fist_only_events": 236,
+  "component_failures": {
+    "speed_below_1": 25,
+    "forward_cosine_below_07": 229,
+    "travel_below_12cm": 133,
+    "return_missing_or_below_6cm": 150,
+    "incomplete_post_window": 11,
+    "contact_longer_than_100ms": 121
+  },
+  "components_overlap": true,
+  "posed_model_frames": [
+    {
+      "model": "legacy",
+      "corner": "red/",
+      "imu_to_torso_body": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "model": "legacy",
+      "corner": "blue/",
+      "imu_to_torso_body": [
+        [
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "model": "current",
+      "corner": "red/",
+      "imu_to_torso_body": [
+        [
+          0.9999999999999998,
+          0.0,
+          -3.397897951964596e-18
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          -3.397897951964596e-18,
+          0.0,
+          0.9999999999999998
+        ]
+      ]
+    },
+    {
+      "model": "current",
+      "corner": "blue/",
+      "imu_to_torso_body": [
+        [
+          1.0000000000000002,
+          0.0,
+          3.2387499585916047e-18
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          3.2387499585916047e-18,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ],
+  "native_physics_substeps": 0,
+  "new_formal_controls": 0,
+  "new_ppo_steps": 0,
+  "interpretation": "Most legacy events fail the forward straight-punch reference; short travel and return also occur. This does not rule out hooks or other punch types. The tested IMU forward axes agree with their torso body frames, so a fixed frame-axis rotation does not explain these component failures.",
+  "decision": "Do not retroactively weaken straight-cycle gates or declare all historical contacts fake. Retain the separate range/posture transfer deficit and validate batched GPU mechanics before further PPO."
+}

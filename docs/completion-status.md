@@ -11,8 +11,8 @@ Current evidence supersedes the historical notes below: final v17 has 33 fresh
 neutral valid cycles, 5 fresh mirror cycles and reciprocal strikes in one
 surviving fresh episode, but pair survival is only 5/8, 7/8, 3/8. No complete
 recent gate or reliable reciprocal boxing. No PPO job is active. The bounded
-[GPU recovery comparison](gpu-training-recovery.md) is running; its prototype
-throughput is not yet validated PPO throughput. GPU integration/legacy comparison,
+[GPU recovery comparison](gpu-training-recovery.md) is complete; its prototype
+throughput is not yet validated PPO throughput. Complete GPU PPO integration,
 stable two-sided exchanges and broader/longer fresh validation remain outstanding.
 
 | Capability | Evidence/status |

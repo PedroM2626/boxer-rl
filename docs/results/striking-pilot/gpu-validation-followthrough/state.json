@@ -1,5 +1,5 @@
 {
-  "status": "waiting_for_comparison",
+  "status": "completed_awaiting_training_design",
   "pid": 893,
   "started_utc": "2026-10-29T18:19:32.028407+00:00",
   "diagnostic_output": "/home/pedro/boxing-runs/gpu-validation-followthrough",
@@ -13,6 +13,23 @@
     {
       "previous_error": "RuntimeError('Comparison failed; inspect before continuation')",
       "decision": "Wait for reviewed comparison resume; no legacy controls previously attempted"
+    }
+  ],
+  "publication_pending": [],
+  "formal_before_legacy": 2295150,
+  "child_pid": 3684,
+  "completed_utc": "2026-10-29T18:33:49.642726+00:00",
+  "formal_total": 2298509,
+  "decision": "Read both complete comparisons, implement and validate batched cycle/reset/reward parity before bounded GPU PPO",
+  "published": [
+    "Record retained legacy punch-cycle measurements"
+  ],
+  "publication_incidents": [
+    {
+      "error": "CalledProcessError(1, ['/mnt/c/Program Files/Git/cmd/git.exe', '-C', 'E:\\\\boxer-agent', 'push'])",
+      "resolved": true,
+      "resolution": "Verified comparison commit is already an ancestor of the successfully pushed remote head",
+      "remote_head": "8dbd5d16e8d54e64e492bbe258d2e6edbb11be5e"
     }
   ]
 }

@@ -130,3 +130,22 @@ falling. The coordinator archives and publishes those results together.
 Completion still requires stable repeated strikes in both corners, reciprocal
 exchanges against active/varied opponents, fresh-condition generalization and
 longer rounds, with reproducible videos and independent physical evidence.
+
+## Completed comparisons and concrete next implementation
+
+Both diagnostics are complete. The backend comparison used 24,149 formal controls;
+the legacy comparison used 3,359, giving **2,298,509** cumulative formal controls.
+Both unused allowances expired. No new PPO, main adoption, solver change or
+completed boxing certification. Legacy Warp6/7 complete 1/4 and 3/4 original-range
+rounds without common-posture failure; from 2 m neither completes a round on four
+seeds each. All sixteen have zero complete straight cycles under the fixed rules.
+There are 236 independent fist-impact events: 229 fail the forward straight-punch
+cosine reference, 133 short-travel and 150 return components fail (overlapping).
+This does not establish that all contacts are mere touches or rule out hooks.
+Posed-model checks verify identical IMU/torso forward-frame conventions in both
+models; a fixed axis rotation does not explain those measurements.
+
+See the [next implementation/integration protocol](gpu-batched-training-next.md).
+Do not repeat completed comparisons or leave the authorized code backlog idle.
+The existing three-hour monitor was found paused and reactivated under the user's
+request for autonomous project continuation; frequency/name/target are retained.

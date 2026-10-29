@@ -1144,3 +1144,48 @@ explicitly disables Warp6 stun and uses a damage cap unreachable within 480 cont
 while retaining Warp7's saved cap 3 / stun 10. This restores the recorded historical
 contract and leaves all common punch thresholds intact. The focused contract test
 passes; no legacy physical controls had yet been consumed.
+
+The frozen-policy backend comparison is now complete and independently reviewed:
+new formal controls 24,149, total 2,295,150; unused 11,851 expire. Native 30/20
+pair survival is 6/8, 4/8, 3/8; CUDA 3/5 is 5/8, 4/8, 5/8; CUDA 30/20 is 6/8,
+4/8, 3/8. Mirror valid cycles are respectively 2/4, 3/5 and 0/0. Every complete
+criterion set fails. CUDA 3/5 has reciprocal cycles on two surviving fresh seed
+conditions but insufficient survival; convergence alone does not solve learned
+boxing. No backend/solver adoption or new PPO follows from these small samples.
+The coordinator started the declared legacy measurement with formal before
+2,295,150 and separate ceiling 2,302,830. An automatic push raced a foreground
+push and got a stale-ref rejection; online verification shows the successful
+foreground descendant already contains comparison commit 235630b. No data or
+commit loss, rollback, force push, altered gate or budget extension.
+
+The retained legacy comparison completed sixteen episodes and an independent
+hash/array/event/counter review. Warp6/Warp7 complete 1/4 and 3/4 original-range
+rounds without common-posture failure. From 2 m, neither completes a round in four
+seeds each. Zero complete straight cycles occur across all sixteen cases. The
+236 independent fist impacts include 229 below the forward cosine reference,
+133 below 12 cm pre-travel and 150 below/missing 6 cm return; these overlapping
+component failures do not rule out hooks or all other punch types. A separately
+recorded, non-stepping posed-model audit verifies that both models' torso IMU
+and body forward frames agree, ruling out a fixed frame rotation as explanation.
+These are reconstructed own-engine observations, not a current-model full gate
+or proof that an architecture is globally superior. All raw traces and reviews
+are archived and published by the coordinator (commit 8dbd5d1).
+
+Legacy formal use is 3,359, total **2,298,509**; unused 4,321 expire. The full
+reviewed source-v17 checkpoint is retained, with lineage consumed/optimized
+9,420,800, world 8,798,208, actor/critic Adam 129,672/153,344. Global diagnostic
+PPO remains 9,504,000, main 476,041,216. No active physical job remains. The next
+action is implementing complete batched GPU scoring, motion/reward and per-world
+reset parity; only after validation is a single 1,024-credit, original-profile
+warm-start integration prospectively allowed (global PPO ceiling 9,505,024).
+This engineering test is not a convergence judgment or long allocation. See
+`gpu-batched-training-next.md`. Longer productive GPU learning remains downstream
+of that verified integration; no unchanged CPU restart or rollback.
+
+The existing heartbeat configuration was actually PAUSED when inspected, despite
+earlier context reporting it active. It was reactivated under the user's latest
+autonomous-continuation request, preserving its name, target and 180-minute
+schedule and meaningful-change-only notifications. The prompt now explicitly
+requires implementing the remaining GPU mechanics rather than stopping at an
+idle-training report. Official OpenAI automation guidance was checked with the
+OpenAI Docs skill; actual saved configuration/status was verified locally.

@@ -3,7 +3,33 @@
 Maintain the [trajectory and decision record](experiment-history.md) at every
 reviewed intervention, including failed results, accounting and pending evidence.
 
-**Current work (2026-10-29):** [GPU recovery](gpu-training-recovery.md) has
+**Current work (2026-10-29):** both comparisons are completed/reviewed. Legacy
+Warp6/7 have zero complete straight cycles across sixteen reconstructed episodes;
+at 2 m all eight transfer episodes fail the common posture test. Other punch
+types are not ruled out. Legacy formal use 3,359; cumulative **2,298,509**;
+unused 4,321 expire. No physical training job remains active and no full boxing
+gate passes. Next implement [batched GPU training mechanics](gpu-batched-training-next.md),
+including complete scoring/reward/reset parity, rather than reporting idle state.
+Only after those checks pass is one explicitly bounded 1,024-credit source-v17
+integration allowed (diagnostic PPO ceiling 9,505,024). Current PPO remains
+9,504,000 and main remains 476,041,216. The existing monitor was found paused
+and reactivated for the user's authorized continuation, preserving its three-hour
+interval/target and quiet notifications. Inspect actual newer state before any
+launch; do not repeat completed comparisons or expired allowances.
+
+**Completed GPU comparison (2026-10-29):** the nine-profile frozen-policy backend comparison
+is complete and independently reviewed; none passes the complete criteria. CUDA
+3/5 mirror has 5/8 survivors and cycles 3/5; CUDA 30/20 has 3/8 and zero cycles.
+New formal controls 24,149; cumulative **2,295,150**, unused 11,851 expire.
+See [completed comparison](results/striking-pilot/gpu-closed-loop-v1/README.md).
+At that point the coordinator started the legacy diagnostic, ceiling **2,302,830** (actual
+before + 7,680). Inspect `/home/pedro/boxing-runs/legacy-punch-cycles-v1/state.json`
+and `/home/pedro/boxing-runs/gpu-validation-followthrough/state.json`, including
+their PID/child, before launching anything else. Main/PPO counters unchanged;
+no duplicate physics job or experimental promotion. Review all legacy conditions
+before choosing the next bounded GPU integration/training intervention.
+
+**Earlier protocol (2026-10-29):** [GPU recovery](gpu-training-recovery.md) has
 implemented a current-model CUDA dynamics primitive, matching batched policy
 feature ordering, a measurement reference adapter and bounded diagnostics.
 No new PPO allocation. Closed-loop comparison is active at
