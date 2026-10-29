@@ -103,7 +103,7 @@ def validate_resume_config(previous, current, explicit_profile_change=False):
 def require_ppo_checkpoint(saved):
     if saved.get('training_kind','ppo')!='ppo' or saved.get('ppo_optimizer_compatible') is False:
         raise ValueError('non-PPO checkpoint requires an explicit validated optimizer migration before PPO resume')
-    if 'gpu_batched_ppo' in saved or 'gpu_collection_profile' in saved or 'gpu_collection_transition' in saved:
+    if any(k in saved for k in ('gpu_batched_ppo', 'gpu_collection_profile', 'gpu_collection_transition', 'gpu_batch_transition')):
         from boxer.striking_gpu_profile import validate_gpu_metadata
         validate_gpu_metadata(saved)
     if 'motion_cycle_transition' in saved or 'motion_reward_profile' in saved or saved.get('motion_cycle_ppo'):

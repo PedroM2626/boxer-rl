@@ -76,26 +76,54 @@ class PairedWarpPhysics:
             mjwarp.forward(self.model, self.data)
         self.forward_graph = capture.graph
 
-    def health(self):
+    def health(self, readback=None, synchronized=False):
         """Synchronize and reject physical corruption or dropped constraints."""
-        wp.synchronize_device(self.device)
-        flags = self.data.overflow.numpy()
+        if not synchronized: wp.synchronize_device(self.device)
+        data = self.data if readback is None else readback
+        flags = data.overflow.numpy()
         solver_mask = int(mjwarp.OverflowType.ITERATIONS | mjwarp.OverflowType.LS_ITERATIONS)
         if np.any(flags & ~solver_mask):
             raise FloatingPointError(f'Warp capacity/physics overflow: {flags.tolist()}')
         for key in ('qpos', 'qvel', 'qacc', 'sensordata'):
-            if not np.isfinite(getattr(self.data, key).numpy()).all():
+            if not np.isfinite(getattr(data, key).numpy()).all():
                 raise FloatingPointError(f'nonfinite Warp {key}')
         return dict(overflow_flags=flags.tolist(), solver_limit_worlds=int(np.count_nonzero(flags & solver_mask)),
-                    contacts=int(self.data.nacon.numpy()[0]), contact_capacity=int(self.data.naconmax),
-                    max_constraints=int(self.data.nefc.numpy().max()))
+                    contacts=int(data.nacon.numpy()[0]), contact_capacity=int(self.data.naconmax),
+                    max_constraints=int(data.nefc.numpy().max()))
 
-    def normal_forces(self):
-        count = int(self.data.nacon.numpy()[0])
+    def prepare_packed_readback(self):
+        """Allocate reusable contact extraction and explicit pinned state views."""
+        from boxer.warp_readback import SelectedWarpReadback
+        capacity = int(self.data.naconmax)
+        with wp.ScopedDevice(self.device):
+            self._packed_force = wp.zeros(capacity, dtype=wp.spatial_vector)
+            self._packed_contact_ids = wp.array(np.arange(capacity, dtype=np.int32))
+        self._packed = SelectedWarpReadback(self.data,
+            ('qpos', 'qvel', 'sensordata', 'geom_xpos', 'site_xmat', 'site_xpos',
+             'cvel', 'subtree_com', 'time', 'qacc', 'overflow', 'nacon', 'nefc',
+             'qfrc_applied', 'xfrc_applied', 'contact.worldid', 'contact.geom'),
+            extras=dict(normal_force=self._packed_force))
+
+    def packed_readback(self):
+        """Extract actual solver forces then read all required arrays in one sync.
+
+        Upstream contact_force_kernel guards contactid >= nacon. Stale unused
+        force entries are never read; capacity/finite checks still run every step.
+        """
+        with wp.ScopedDevice(self.device):
+            mjwarp.contact_force(self.model, self.data, self._packed_contact_ids, False, self._packed_force)
+        return self._packed.refresh()
+
+    def normal_forces(self, readback=None):
+        data = self.data if readback is None else readback
+        count = int(data.nacon.numpy()[0])
         if count > self.data.naconmax:
             raise FloatingPointError('contact capacity exceeded')
         if count == 0:
             return np.empty(0, np.int32), np.empty((0, 2), np.int32), np.empty(0, np.float32)
+        if readback is not None:
+            return (data.contact.worldid.numpy()[:count], data.contact.geom.numpy()[:count],
+                    np.maximum(0., data.normal_force.numpy()[:count, 0]))
         with wp.ScopedDevice(self.device):
             force = wp.zeros(count, dtype=wp.spatial_vector)
             mjwarp.contact_force(self.model, self.data,

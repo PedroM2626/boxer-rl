@@ -1,5 +1,6 @@
 """One predeclared 1,024-credit warm-start integration, never an open-ended trainer."""
 from contextlib import ExitStack
+import argparse
 import copy
 import fcntl
 import hashlib
@@ -19,6 +20,7 @@ from boxer.curriculum_env import UnassistedG1
 from boxer.curriculum_train import load_policy_params, utc
 from boxer.result_archive import archive_tree
 from boxer.striking_gpu_profile import SOURCE, SOURCE_SHA, PROFILE, prepare_gpu_state
+from boxer.striking_gpu_profile import BATCH_SOURCE, BATCH_SOURCE_SHA, BATCH_PROFILE, prepare_scaled_state
 from boxer.striking_train import (Actor, Critic, normalize, log_probability, advantages,
     make_ppo_update, update_norm, require_ppo_checkpoint)
 from boxer.striking_ppo_warmstart import SplitAdam
@@ -37,6 +39,15 @@ BLOCK = 1024
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--scaled', action='store_true', help='conditional one-block 128-world/256-update integration')
+    args = parser.parse_args()
+    output_name = 'gpu-batched-scaling-v1' if args.scaled else 'gpu-batched-integration-v1'
+    OUT = Path('/home/pedro/boxing-runs')/output_name
+    ARCHIVE = Path('docs/results/striking-pilot')/output_name
+    MODELS = Path('checkpoints/striking-validation')/output_name
+    GLOBAL_BEFORE, BLOCK, worlds = (9505024, 16384, 128) if args.scaled else (9504000, 1024, 8)
+    source_path, source_sha, profile = (BATCH_SOURCE, BATCH_SOURCE_SHA, BATCH_PROFILE) if args.scaled else (SOURCE, SOURCE_SHA, PROFILE)
     OUT.mkdir(parents=True, exist_ok=True)
     with ExitStack() as stack:
         for path in (OUT/'.lock', Path('runs/striking_diagnostic_supervisor.lock'), Path('runs/unassisted_boxing.lock')):
@@ -46,16 +57,26 @@ def main():
         bench = json.loads(Path('/home/pedro/boxing-runs/batched-gpu-benchmark-v1/progress.json').read_text())
         assert mechanics['status'] == bench['status'] == 'completed' and len(mechanics['checks']) == 5
         assert [r['worlds'] for r in bench['cases']] == [8, 128]
-        original, manifest = load_checked(Path(SOURCE), SOURCE_SHA)
-        initial = prepare_gpu_state(original, SOURCE_SHA)
-        config = json.loads((Path(SOURCE)/'config.json').read_text())
+        if args.scaled:
+            scale = Path('/home/pedro/boxing-runs/gpu-collection-scaling-v1')
+            checks = json.loads((scale/'semantics-attempt-2/progress.json').read_text())
+            baseline = json.loads((scale/'baseline/progress.json').read_text())
+            packed = json.loads((scale/'packed/progress.json').read_text())
+            reviewed = json.loads(Path('docs/results/striking-pilot/gpu-batched-integration-v1/independent-review.json').read_text())
+            assert checks['status'] == baseline['status'] == packed['status'] == 'completed'
+            assert reviewed['status'] == 'reviewed' and len(checks['checks']) == 5
+            assert packed['collection_world_controls_per_second'] > baseline['collection_world_controls_per_second']*1.15
+        original, manifest = load_checked(Path(source_path), source_sha)
+        initial = prepare_scaled_state(original, source_sha) if args.scaled else prepare_gpu_state(original, source_sha)
+        config = json.loads((Path(source_path)/'config.json').read_text())
         assert config['worlds'] == 8 and config['unroll'] == 128 and not original.get('kl_guard_ppo')
         assert config['anchor_loss_weight'] == config['retention_loss_weight'] == 0.
         assert (config['learning_rate'], config['epochs'], config['minibatches'],
                 config['gamma'], config['gae_lambda']) == (.0001, 4, 4, .999, .99)
-        config = dict(config, collection_backend='batched_mujoco_warp', gpu_collection_profile=PROFILE)
+        config = dict(config, worlds=worlds, minibatches=BLOCK//256, minibatch_rows=256,
+            collection_backend='batched_mujoco_warp', gpu_collection_profile=profile)
         state = dict(status='running', phase='initializing', started_utc=utc(), pid=os.getpid(),
-            source_sha256=SOURCE_SHA, maximum_new_ppo_steps=BLOCK, new_ppo_steps=0,
+            source_sha256=source_sha, maximum_new_ppo_steps=BLOCK, new_ppo_steps=0,
             diagnostic_ppo_before=GLOBAL_BEFORE, diagnostic_ppo_ceiling=GLOBAL_BEFORE+BLOCK,
             diagnostic_ppo_total=GLOBAL_BEFORE, consumed_steps=original['consumed_steps'],
             optimized_steps=original['optimized_steps'], world_control_steps=original['world_control_steps'],
@@ -71,6 +92,7 @@ def main():
                 consumed_steps=saved['consumed_steps'], optimized_steps=saved['optimized_steps'],
                 world_control_steps=saved['world_control_steps'], gpu_batched_ppo=True,
                 gpu_collection_profile=saved['gpu_collection_profile'], gpu_collection_transition=saved['gpu_collection_transition'])
+            if 'gpu_batch_transition' in saved: metadata['gpu_batch_transition'] = saved['gpu_batch_transition']
             atomic_json(cp/'latest.json', metadata)
             return metadata
         initial_manifest = save_checkpoint(initial, 'initial.pkl')
@@ -100,42 +122,42 @@ def main():
             retention_rng = np.random.default_rng(); retention_rng.bit_generator.state = copy.deepcopy(initial['retention_sampler_state'])
             def account(ledger):
                 state['engine_ledger'] = ledger
-                assert ledger['gpu_world_substeps'] <= 10248
+                assert ledger['gpu_world_substeps'] <= BLOCK*10+worlds
                 atomic_json(OUT/'progress.json', state)
-            env = BatchedStrikingEnv(foundation, motor, worlds=8,
+            env = BatchedStrikingEnv(foundation, motor, worlds=worlds, packed_readback=args.scaled,
                 engagement_distance=config['engagement_distance'],
                 engagement_reward_distance=config['engagement_reward_distance'], account=account)
-            episode = np.full(8, initial['consumed_steps']//8, np.int64)
-            seed = config['seed']+1009*np.arange(8)+episode
-            swaps = np.arange(8) % 2 == 1
-            obs = env.reset(np.arange(8), seed, swaps)
+            episode = np.full(worlds, initial['consumed_steps']//worlds, np.int64)
+            seed = config['seed']+1009*np.arange(worlds)+episode
+            swaps = np.arange(worlds) % 2 == 1
+            obs = env.reset(np.arange(worlds), seed, swaps)
             corner = seed % 2
-            active = np.isin(np.arange(8), config['active_world_indices'])
+            active = np.isin(np.arange(worlds)%8, config['active_world_indices'])
             mixed = np.asarray(initial['mixed_credits_by_mode_and_corner'], np.int64).copy()
             storage = {k: [] for k in ('obs', 'raw', 'logp', 'reward', 'done', 'value')}
             collection_start = time.perf_counter(); state['phase'] = 'collecting'
             for control in range(128):
-                own = obs[np.arange(8), corner]
+                own = obs[np.arange(worlds), corner]
                 normalized = normalize(own, norm)
                 key, sub = jax.random.split(key)
                 action, raw, logp = sample(ap, jp.asarray(normalized), sub)
                 predicted = np.asarray(value(vp, jp.asarray(normalized)))
-                other = obs[np.arange(8), 1-corner]
+                other = obs[np.arange(worlds), 1-corner]
                 opponent = np.asarray(predict(initial['frozen_opponent']['actor'],
                     jp.asarray(normalize(other, initial['frozen_opponent']['norm']))))
-                paired = np.zeros((8, 2, 17), np.float32)
-                paired[np.arange(8), corner] = np.asarray(action)
+                paired = np.zeros((worlds, 2, 17), np.float32)
+                paired[np.arange(worlds), corner] = np.asarray(action)
                 paired[np.flatnonzero(active), 1-corner[active]] = opponent[active]
                 # A CUDA batch is one concurrent attempted group. Debit all
                 # submitted learner/world transitions before physics, never refund.
-                state['new_ppo_steps'] += 8
+                state['new_ppo_steps'] += worlds
                 state['diagnostic_ppo_total'] = GLOBAL_BEFORE+state['new_ppo_steps']
-                state['consumed_steps'] += 8; state['world_control_steps'] += 8
+                state['consumed_steps'] += worlds; state['world_control_steps'] += worlds
                 np.add.at(mixed, (active.astype(int), corner), 1)
                 atomic_json(OUT/'progress.json', state)
                 following, reward, done, outcome = env.step(paired, optimized_steps=initial['optimized_steps'])
                 state['physics_health'] = dict(env.health_summary)
-                selected_reward = reward[np.arange(8), corner]
+                selected_reward = reward[np.arange(worlds), corner]
                 for world, monitor in enumerate(env.monitors):
                     save_completed_evidence(monitor, OUT/'event-evidence', cp, consumed=state['consumed_steps'],
                         world=world, learner_corner=int(corner[world]), reset_seed=int(seed[world]), swap=bool(swaps[world]),
@@ -154,8 +176,8 @@ def main():
             state['collection_seconds_including_initial_jit'] = time.perf_counter()-collection_start
             state['phase'] = 'updating'; atomic_json(OUT/'progress.json', state)
             rollout = {k: np.asarray(v) for k, v in storage.items()}
-            buffer = io_bytes(rollout); atomic_bytes(OUT/'rollout.npz', buffer)
-            bootstrap = np.asarray(value(vp, jp.asarray(normalize(obs[np.arange(8), corner], norm))))
+            bootstrap = np.asarray(value(vp, jp.asarray(normalize(obs[np.arange(worlds), corner], norm))))
+            buffer = io_bytes(dict(rollout, bootstrap=bootstrap)); atomic_bytes(OUT/'rollout.npz', buffer)
             adv, returns = advantages(rollout['reward'], rollout['done'], rollout['value'], bootstrap,
                 gamma=config['gamma'], lam=config['gae_lambda'])
             flat = rollout['obs'].reshape(BLOCK, 148)
@@ -166,7 +188,7 @@ def main():
             for _ in range(4):
                 key, sub = jax.random.split(key)
                 order = np.asarray(jax.random.permutation(sub, BLOCK))
-                for indices in np.split(order, 4):
+                for indices in np.split(order, BLOCK//256):
                     mini = {k: jp.asarray(v[indices]) for k, v in batch.items()}
                     ai = aux_rng.integers(0, len(anchors['observation']), 64)
                     mini.update(anchor_obs=jp.asarray(normalize(anchors['observation'][ai], norm)),

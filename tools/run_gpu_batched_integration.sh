@@ -4,4 +4,4 @@ cd "$(dirname "$0")/.."
 export PYTHONPATH=.
 export JAX_PLATFORMS=cpu
 export MUJOCO_GL=egl
-exec "$HOME/venvs/boxing_curriculum/bin/python" -u tools/integrate_batched_gpu_ppo.py
+exec "$HOME/venvs/boxing_curriculum/bin/python" -u tools/integrate_batched_gpu_ppo.py "$@"

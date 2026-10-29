@@ -35,20 +35,35 @@ def zero_motor(obs, key):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--attempt', type=int, default=1)
+    parser.add_argument('--scaling-check', action='store_true', help='new bounded packed-readback regression; never rewrite prior results')
     args = parser.parse_args()
     if args.attempt < 1: raise ValueError('positive reviewed attempt number required')
-    OUT = BASE if args.attempt == 1 else BASE/f'attempt-{args.attempt}'
-    ARCHIVE = ARCHIVE_BASE if args.attempt == 1 else ARCHIVE_BASE/f'attempt-{args.attempt}'
+    validation_root, archive_base = BASE, ARCHIVE_BASE
+    if args.scaling_check:
+        validation_root = Path('/home/pedro/boxing-runs/gpu-collection-scaling-v1')
+        archive_base = Path('docs/results/striking-pilot/gpu-collection-scaling-v1')
+    name = 'semantics' if args.attempt == 1 else f'semantics-attempt-{args.attempt}'
+    OUT = validation_root/name if args.scaling_check else validation_root if args.attempt == 1 else validation_root/f'attempt-{args.attempt}'
+    ARCHIVE = archive_base/name if args.scaling_check else archive_base if args.attempt == 1 else archive_base/f'attempt-{args.attempt}'
     prior = 0
-    for n in range(1, args.attempt):
+    if args.scaling_check:
+        for p in validation_root.glob('*/progress.json'):
+            previous = json.loads(p.read_text())
+            prior += previous.get('engine_ledger', {}).get('gpu_world_substeps', 0)
+            prior += sum(e['gpu_world_substeps'] for e in previous.get('engine_ledgers', []))
+            prior += previous.get('reference_gpu_substeps', 0)
+        for n in range(1, args.attempt):
+            previous_name = 'semantics' if n == 1 else f'semantics-attempt-{n}'
+            assert json.loads((validation_root/previous_name/'progress.json').read_text())['status'] == 'failed'
+    for n in range(1, args.attempt) if not args.scaling_check else []:
         path = BASE/'progress.json' if n == 1 else BASE/f'attempt-{n}/progress.json'
         old = json.loads(path.read_text()); assert old['status'] == 'failed'
         prior += sum(e['gpu_world_substeps'] for e in old['engine_ledgers'])+old['reference_gpu_substeps']
     OUT.mkdir(parents=True, exist_ok=False)
     state = dict(status='running', checks=[], engine_ledgers=[], reference_gpu_substeps=0,
         prior_attempt_gpu_substeps=prior, manual_gpu_world_forwards=0,
-        maximum_development_gpu_substeps=200000, new_ppo_steps=0, new_formal_controls=0,
-        main_retained=476041216, diagnostic_ppo_retained=9504000, formal_retained=2298509)
+        maximum_development_gpu_substeps=300000 if args.scaling_check else 200000, new_ppo_steps=0, new_formal_controls=0,
+        main_retained=476041216, diagnostic_ppo_retained=9505024 if args.scaling_check else 9504000, formal_retained=2298509)
     atomic_json(OUT/'progress.json', state)
     with Path('runs/unassisted_boxing.lock').open('a') as lock:
         fcntl.flock(lock, fcntl.LOCK_EX|fcntl.LOCK_NB)
@@ -57,16 +72,17 @@ def main():
                 while len(state['engine_ledgers']) <= index: state['engine_ledgers'].append({})
                 state['engine_ledgers'][index] = value
                 used = prior+sum(r.get('gpu_world_substeps', 0) for r in state['engine_ledgers'])+state['reference_gpu_substeps']
-                assert used <= 200000
+                assert used <= state['maximum_development_gpu_substeps']
                 atomic_json(OUT/'progress.json', state)
-                atomic_json(BASE/'current.json', dict(attempt=args.attempt, output=str(OUT), status=state['status']))
+                atomic_json(validation_root/'current.json', dict(attempt=args.attempt, output=str(OUT), status=state['status']))
             return account
         def checked(name, **details):
             state['checks'].append(dict(name=name, **details)); atomic_json(OUT/'progress.json', state)
             print(json.dumps(state['checks'][-1]), flush=True)
         try:
             foundation = UnassistedG1('approach', impl='jax')
-            env = BatchedStrikingEnv(foundation, worlds=1, motor=zero_motor, account=ledger(0), capture_evidence=False)
+            env = BatchedStrikingEnv(foundation, worlds=1, motor=zero_motor, account=ledger(0), capture_evidence=False,
+                                     packed_readback=args.scaling_check)
             reference_pair = PairedFoundation(foundation)
             reference = ContactAwareStrikingEnv(foundation, None, pair=reference_pair, motor=zero_motor,
                 engagement_distance=.45, engagement_reward_distance=.45)
@@ -112,7 +128,8 @@ def main():
                     controls += 1
                     if rdone: break
             checked('identical_cuda_trajectory_native_control_reward_and_termination', controls=controls, observation_error_max=max_error)
-            batch = BatchedStrikingEnv(foundation, worlds=2, motor=zero_motor, account=ledger(1), capture_evidence=False)
+            batch = BatchedStrikingEnv(foundation, worlds=2, motor=zero_motor, account=ledger(1), capture_evidence=False,
+                                       packed_readback=args.scaling_check)
             batch.reset([0, 1], [47, 73], [False, True])
             for _ in range(3): batch.step(rng.uniform(-.2, .2, (2, 2, 17)))
             physics_before = {k: getattr(batch.physics.data, k).numpy()[0].copy() for k in batch.reset_fields}
@@ -171,7 +188,7 @@ def main():
             state.update(status='failed', error=repr(error)); raise
         finally:
             atomic_json(OUT/'progress.json', state)
-            atomic_json(BASE/'current.json', dict(attempt=args.attempt, output=str(OUT), status=state['status']))
+            atomic_json(validation_root/'current.json', dict(attempt=args.attempt, output=str(OUT), status=state['status']))
             archive_tree(OUT, ARCHIVE)
 
 

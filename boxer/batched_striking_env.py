@@ -45,7 +45,7 @@ class BatchedStrikingEnv:
 
     def __init__(self, foundation, params=None, *, worlds=8, motor=None,
                  engagement_distance=.45, engagement_reward_distance=.45,
-                 account=None, capture_evidence=True):
+                 account=None, capture_evidence=True, packed_readback=False):
         self.worlds = worlds
         self.pair = PairedFoundation(foundation)
         self.model = self.pair.model
@@ -62,6 +62,7 @@ class BatchedStrikingEnv:
         if not np.isfinite(engagement_reward_distance) or engagement_reward_distance <= 0:
             raise ValueError('positive finite engagement reward distance required')
         self.capture_evidence = capture_evidence
+        self.packed_readback = bool(packed_readback)
         self.substep_observer = None
         self.arm_indices = np.array([i for i in range(29) if any(x in foundation.mj_model.actuator(i).name
             for x in ('shoulder', 'elbow', 'wrist'))])
@@ -69,6 +70,7 @@ class BatchedStrikingEnv:
             raise ValueError('unchanged 14-arm/10-substep current task required')
         self.physics = PairedWarpPhysics(self.model, worlds)
         self.reset_physics = PairedWarpPhysics(self.model, worlds)
+        if self.packed_readback: self.physics.prepare_packed_readback()
         for engine in (self.physics, self.reset_physics):
             # Preserve machine flags and all capacity warnings. Avoid printing
             # an expected original-solver limit once per world/substep.
@@ -90,15 +92,16 @@ class BatchedStrikingEnv:
         for key, value in deltas.items(): self.accounting[key] += int(value)
         if self.account_callback is not None: self.account_callback(dict(self.accounting))
 
-    def _health(self):
-        health = self.physics.health()
+    def _health(self, readback=None):
+        health = self.physics.health(readback, synchronized=readback is not None)
         self.health_summary['checks'] += 1
         self.health_summary['solver_limit_world_checks'] += health['solver_limit_worlds']
         for flags in health['overflow_flags']:
             self.health_summary['overflow_flags_seen'] |= flags
         self.health_summary['peak_contacts'] = max(self.health_summary['peak_contacts'], health['contacts'])
         self.health_summary['peak_constraints'] = max(self.health_summary['peak_constraints'], health['max_constraints'])
-        if np.any(self.physics.data.qfrc_applied.numpy()) or np.any(self.physics.data.xfrc_applied.numpy()):
+        data = self.physics.data if readback is None else readback
+        if np.any(data.qfrc_applied.numpy()) or np.any(data.xfrc_applied.numpy()):
             raise FloatingPointError('external support is forbidden')
         return health
 
@@ -170,19 +173,23 @@ class BatchedStrikingEnv:
         scored, impulse_total = np.zeros((self.worlds, 2)), np.zeros((self.worlds, 2))
         fallen = np.zeros((self.worlds, 2), bool)
         terminal = {}
+        cached_state = self.state
         for _ in range(10):
             if not active.any(): break
-            pre_state = metric_snapshot(self.physics.data, gpu=True)
+            pre_state = cached_state if self.packed_readback else metric_snapshot(self.physics.data, gpu=True)
             before = self.metrics.before(pre_state)
             engaged = self.scorecard.engaged.copy(); previous_score = self.scorecard.last_score.copy()
             count = int(active.sum())
             self._account(gpu_world_substeps=self.worlds, gpu_active_world_substeps=count,
                           gpu_discarded_terminal_world_substeps=self.worlds-count)
-            self.physics.step(); self._health()
-            after = metric_snapshot(self.physics.data, gpu=True)
+            self.physics.step()
+            readback = self.physics.packed_readback() if self.packed_readback else None
+            self._health(readback)
+            after = metric_snapshot(self.physics.data if readback is None else readback, gpu=True)
+            cached_state = after
             if self.substep_observer is not None:
                 self.substep_observer(self.physics)
-            world, geometry, force = self.physics.normal_forces()
+            world, geometry, force = self.physics.normal_forces(readback)
             contacts = self.metrics.contacts(before, world, geometry, force)
             flags = self.metrics.fallen(after, world, geometry)
             up = ~flags.any(axis=1)

@@ -1,0 +1,53 @@
+         6165439 function calls (6093527 primitive calls) in 7.963 seconds
+
+   Ordered by: cumulative time
+   List reduced from 816 to 45 due to restriction <45>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+      560    0.004    0.000    2.283    0.004 paired_warp_physics.py:107(packed_readback)
+      560    0.013    0.000    2.156    0.004 warp_readback.py:88(refresh)
+      586    1.970    0.003    1.974    0.003 context.py:12340(synchronize_device)
+      629    0.453    0.001    1.149    0.002 paired_batch_metrics.py:29(before)
+      644    0.004    0.000    1.117    0.002 batched_striking_env.py:91(_account)
+      644    0.003    0.000    1.114    0.002 profile_batched_collection.py:46(account)
+      644    0.007    0.000    1.100    0.002 checkpoint_io.py:31(atomic_json)
+      644    0.014    0.000    1.031    0.002 checkpoint_io.py:14(atomic_bytes)
+      644    0.784    0.001    0.784    0.001 {built-in method posix.fsync}
+     7168    0.147    0.000    0.664    0.000 striking_contact_progress.py:46(consume)
+     1887    0.258    0.000    0.536    0.000 numeric.py:1567(cross)
+       26    0.002    0.000    0.384    0.015 io.py:2677(reset_data)
+   951886    0.357    0.000    0.357    0.000 {method 'copy' of 'numpy.ndarray' objects}
+    71602    0.065    0.000    0.336    0.000 striking_motion_reward.py:44(append_row)
+      156    0.002    0.000    0.335    0.002 context.py:2076(wrapper)
+     7168    0.068    0.000    0.274    0.000 striking_motion_reward.py:49(consume)
+      560    0.112    0.000    0.271    0.000 paired_batch_metrics.py:58(contacts)
+    10785    0.202    0.000    0.268    0.000 context.py:14342(copy)
+    76492    0.255    0.000    0.255    0.000 {method 'astype' of 'numpy.ndarray' objects}
+   139081    0.230    0.000    0.239    0.000 {built-in method numpy.asarray}
+   153839    0.231    0.000    0.231    0.000 {method 'reduce' of 'numpy.ufunc' objects}
+       13    0.001    0.000    0.224    0.017 paired_warp_physics.py:30(load)
+    71602    0.110    0.000    0.222    0.000 striking_motion_reward.py:40(_capture_events)
+   162938    0.056    0.000    0.211    0.000 fromnumeric.py:48(_wrapfunc)
+    14336    0.066    0.000    0.205    0.000 striking_arm_effort.py:14(effort_cost)
+      586    0.038    0.000    0.202    0.000 paired_warp_physics.py:79(health)
+   146676    0.035    0.000    0.198    0.000 fromnumeric.py:1993(nonzero)
+     1030    0.060    0.000    0.176    0.000 context.py:11607(launch)
+      573    0.008    0.000    0.175    0.000 batched_striking_env.py:95(_health)
+      156    0.002    0.000    0.168    0.001 context.py:1314(__init__)
+1336/1180    0.003    0.000    0.166    0.000 codegen.py:1819(locked_call)
+     1174    0.003    0.000    0.162    0.000 context.py:4471(get_module_hash)
+      156    0.005    0.000    0.158    0.001 codegen.py:1888(__init__)
+      156    0.003    0.000    0.154    0.001 context.py:3110(__init__)
+      156    0.000    0.000    0.149    0.001 context.py:3179(hash_kernel)
+      156    0.001    0.000    0.148    0.001 context.py:3195(_hash_kernel_identity)
+      156    0.004    0.000    0.147    0.001 context.py:3304(hash_adjoint)
+    14321    0.070    0.000    0.144    0.000 striking_contact_progress.py:23(potential)
+    12658    0.032    0.000    0.144    0.000 types.py:4521(numpy)
+      573    0.006    0.000    0.139    0.000 paired_batch_metrics.py:96(metric_snapshot)
+    21560    0.015    0.000    0.132    0.000 fromnumeric.py:3699(mean)
+      156    0.012    0.000    0.122    0.001 codegen.py:7033(get_references)
+      560    0.005    0.000    0.118    0.000 support.py:440(contact_force)
+    21560    0.050    0.000    0.116    0.000 _methods.py:115(_mean)
+    33857    0.019    0.000    0.108    0.000 fromnumeric.py:2436(any)
+
+
