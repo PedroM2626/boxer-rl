@@ -184,6 +184,8 @@ def main():
                         result = dict(run=name, checkpoint_sha256=expected, trained_steps=int(trained), seed=seed,
                             separation=separation, controls=control+1, gpu_substeps=adapter.steps,
                             physics_dt=env._model.opt.timestep, own_engine_terminal=bool(done[0]),
+                            elapsed_seconds=float(adapter.data.time),
+                            terminal_reasons={key: bool(metrics[key][0]) for key in ('fell', 'judged_out', 'left_ring', 'too_far', 'timed_out')},
                             config_sha256=hashlib.sha256((Path('runs')/name/'warp_config.json').read_bytes()).hexdigest(),
                             historical_fight_state=fight_state,
                             common_posture_first_fall=adapter.first_fall, legacy_scored_value=original_hits.tolist(),
@@ -204,6 +206,9 @@ def main():
             state.update(status='failed', error=repr(error)); raise
         finally:
             atomic_json(ROOT/'state.json', state)
+        if state['status'] == 'completed':
+            from tools.review_legacy_punch_cycles import review_saved
+            review_saved(ROOT)
 
 
 if __name__ == '__main__':

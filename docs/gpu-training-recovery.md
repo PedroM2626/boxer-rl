@@ -121,6 +121,11 @@ The old 4 ms step must be supplied explicitly when measuring contact duration;
 using the new engine's 2 ms would undercount it by half. Warp7 damage
 termination and different self-leg collision geometry limit comparisons of pair
 survival. Do not issue current full-gate certification from these results.
+The legacy worker independently rechecks saved trace hashes, finite arrays,
+all sixteen episode counters and complete-cycle conjunctions before returning.
+It writes `completed-review.json` and a compact English README separating valid
+cycles before an early stop from reciprocal rounds actually completed without
+falling. The coordinator archives and publishes those results together.
 
 Completion still requires stable repeated strikes in both corners, reciprocal
 exchanges against active/varied opponents, fresh-condition generalization and
