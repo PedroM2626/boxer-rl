@@ -1227,3 +1227,39 @@ unchanged CPU PPO restart. No boxing gate passes. Next optimize complete collect
 overhead and test explicit larger-batch/update scaling before declaring a bounded
 longer GPU run. Preserve the integration prefix on ordinary continuation and the
 native physical gates for advancement. Monitoring frequency remains unchanged.
+
+## Optimized collector, scaled replay and productive GPU continuation
+
+2026-10-29: [the scaling protocol](gpu-collection-scaling.md) measured a complete
+frozen-collector improvement from 620.6 to 835.1 world controls/s in a matched
+128-world profile. Persistent pinned buffers, grouped readback and cached
+pre-substep snapshots remove redundant transfers. No dynamics, action, reward,
+first-fall or gate change. Kinematics/history/rewards remain on CPU NumPy; this
+is not a claim of fully fused GPU rewards or historical thousands/s recovery.
+
+The test-harness path-variable failure is retained (eleven GPU substeps), followed
+by a separate successful five-check semantic regression. Development compute is
+164,810 GPU world substeps, plus separately counted reset/boundary forwards and
+three exact-readback test forwards. Thirty-six focused tests and the additional
+GPU readback/force/snapshot-lifetime test pass. No thresholds were relaxed.
+
+The [scaled integration](results/striking-pilot/gpu-batched-scaling-v1/README.md)
+uses 16,384 credits, 256 updates per optimizer and preserves the actual latest
+GPU source. All Gaussian samples and all optimizer updates/moments, normalizer,
+RNG and samplers reproduce exactly from its stored rollout. Final SHA
+`6432029087cb00e73e39bee3a974e07f47f598771bae05c519e1bcad616c2103`,
+consumed/optimized 9,438,208, world 8,815,616, Adam 129,944/153,616.
+Global diagnostic PPO is 9,521,408 before the next job. Collection/update timing
+17.299/1.537 seconds gives about 870 credits/s excluding startup/checkpoint/native
+evaluation. No formal gate or learned-behavior improvement follows from integration.
+
+The separately declared [bounded GPU learning protocol](gpu-bounded-learning.md)
+now permits 1,048,576 credits (global ceiling 10,569,984) and 72,000 new native
+controls (formal ceiling 2,370,509). The hidden persistent job at
+`/home/pedro/boxing-runs/gpu-learning-v1/state.json` starts with a new native source
+baseline, continues ordinary warm starts on CUDA, evaluates every 262,144 credits
+and finishes with a fresh group. Exact counters/processes/partial evaluations in
+live state supersede these launch values. Checkpoints/evidence publish at gates.
+No budget extension, main adoption, rollback, weaker gate or schedule change.
+Hours of learning may still be necessary; a small integration is not convergence
+evidence. Stable reciprocal fighting and broader/longer fresh rounds remain open.

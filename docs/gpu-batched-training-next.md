@@ -1,5 +1,15 @@
 # Next action: complete the batched GPU training mechanics
 
+**Latest 2026-10-29:** [collection scaling](gpu-collection-scaling.md) and the
+[16,384-credit integration](results/striking-pilot/gpu-batched-scaling-v1/README.md)
+are reviewed, including exact replay of every PPO update. Packed readback raises
+the matched profiled collection rate 620.6 to 835.1 world controls/s. The scaled
+block measures about 870 credits/s across collection and PPO, excluding startup
+and native gates. A [bounded longer GPU interval](gpu-bounded-learning.md) now
+uses the actual scaled final as an ordinary warm start; inspect its live
+`gpu-learning-v1/state.json` before intervention. Global diagnostic before that
+job is 9,521,408; declared ceiling 10,569,984. No new physical pass or main adoption.
+
 **Completed 2026-10-29:** [mechanics and complete collector review](results/striking-pilot/batched-gpu-mechanics-v1/README.md)
 and the [conditional 1,024-credit PPO integration](results/striking-pilot/gpu-batched-integration-v1/README.md)
 both passed their engineering checks. Global diagnostic PPO is now **9,505,024**,

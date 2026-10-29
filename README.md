@@ -2,6 +2,16 @@
 
 ## Current experiment: unassisted paired boxing diagnostics
 
+Current continuation (2026-10-29): [optimized collection](docs/gpu-collection-scaling.md)
+and [scaled PPO integration](docs/results/striking-pilot/gpu-batched-scaling-v1/README.md)
+are reviewed. Pinned readback improves matched complete collection from 621 to
+835 world controls/s; the larger block measures about 870 learner credits/s
+across collection and PPO, excluding initialization/evaluation. All 256 updates
+replay exactly. The [persistent bounded GPU job](docs/gpu-bounded-learning.md)
+starts with a native baseline, then at most 1,048,576 new credits with full native
+gates every 262,144 and a fresh final group. Inspect live state before any restart.
+No complete boxing gate passes or reliable reciprocal boxing are newly claimed.
+
 Latest reviewed work (2026-10-29): [batched CUDA mechanics](docs/results/striking-pilot/batched-gpu-mechanics-v1/README.md)
 and the [1,024-credit warm-start PPO integration](docs/results/striking-pilot/gpu-batched-integration-v1/README.md)
 are complete. Full contacts, cycle rewards, first falls and independent randomized

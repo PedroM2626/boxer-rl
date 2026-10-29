@@ -3,6 +3,19 @@
 Maintain the [trajectory and decision record](experiment-history.md) at every
 reviewed intervention, including failed results, accounting and pending evidence.
 
+**Latest continuation (2026-10-29):** complete GPU semantics, packed readback and
+both bounded PPO integrations are reviewed. The 128-world block exactly replays
+all 256 updates from stored rollout/source state. Diagnostic PPO is **9,521,408**
+before the [new bounded GPU job](gpu-bounded-learning.md), which prospectively
+allows 1,048,576 new credits and 72,000 native controls. Source is scaled GPU
+final SHA `6432029087cb00e73e39bee3a974e07f47f598771bae05c519e1bcad616c2103`.
+Inspect `/home/pedro/boxing-runs/gpu-learning-v1/state.json` and its child/progress
+before any launch. It starts with a new native baseline, then GPU PPO and native
+gates every 262,144 credits, followed by a fresh group. Do not repeat completed
+migrations/integrations or restart eight-world CPU PPO. Source formal/main are
+2,298,509 / 476,041,216; current totals must include this job's live attempts.
+No new boxing certification is established. The older entries below are history.
+
 **Current work (2026-10-29):** both comparisons are completed/reviewed. Legacy
 Warp6/7 have zero complete straight cycles across sixteen reconstructed episodes;
 at 2 m all eight transfer episodes fail the common posture test. Other punch

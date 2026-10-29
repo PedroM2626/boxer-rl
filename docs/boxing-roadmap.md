@@ -3,6 +3,13 @@
 The [trajectory and experiment index](experiment-history.md) records reviewed
 successes, failed approaches and the documentation protocol for every continuation.
 
+Latest engineering milestone: packed collection and the explicitly scaled GPU
+PPO integration are verified, including exact replay of all optimizer updates.
+The [first bounded scaled-GPU continuation](gpu-bounded-learning.md) now exercises
+unchanged native gates before, throughout and after learning. Inspect its live
+state; ordinary continuation preserves its newest checkpoint. Stable reciprocal
+combat, defense and broader fresh/long-round evidence remain the functional gap.
+
 Current status, 2026-10-29: the foundation is certified and complete individual
 punches are demonstrated in both roles. Stable repeated reciprocal boxing still
 fails full gates. V17 stopped at its cap. [GPU training recovery](gpu-training-recovery.md)

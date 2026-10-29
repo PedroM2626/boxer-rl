@@ -7,6 +7,13 @@ The core learned boxing behavior is still unresolved despite substantial
 infrastructure and certified locomotion. Do not label the project near-complete
 because code, reports and checkpoints exist.
 
+Latest engineering continuation: scaled GPU integration now exactly replays all
+256 updates; a separate [bounded GPU learning job](gpu-bounded-learning.md) uses
+its actual final, with a new native baseline and repeated unchanged physical
+gates. Collection+PPO measured about 870 credits/s in one block, excluding startup
+and evaluations. Live totals/process state supersede the historical idle/budget
+notes below. No new functional boxing certification follows from this launch.
+
 Current evidence supersedes the historical notes below: final v17 has 33 fresh
 neutral valid cycles, 5 fresh mirror cycles and reciprocal strikes in one
 surviving fresh episode, but pair survival is only 5/8, 7/8, 3/8. No complete
