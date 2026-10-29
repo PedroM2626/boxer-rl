@@ -1,5 +1,5 @@
 {
-  "status": "running",
+  "status": "completed",
   "pid": 347,
   "started_utc": "2026-10-29T17:56:32.821950+00:00",
   "diagnostic_output": "/home/pedro/boxing-runs/gpu-closed-loop-v1",
@@ -115,6 +115,54 @@
         }
       ],
       "native_certification": false
+    },
+    {
+      "arm": "warp-30-20",
+      "profile": "neutral-0",
+      "pair_survivors": 6,
+      "surviving_valid_cycles": [
+        16,
+        0
+      ],
+      "reciprocal_surviving_episodes": [],
+      "own_surviving_valid_seeds": [
+        34002003,
+        34002004,
+        34002005,
+        34002006
+      ],
+      "passes_profile_diagnostic": false,
+      "native_certification": false
+    },
+    {
+      "arm": "warp-30-20",
+      "profile": "neutral-1",
+      "pair_survivors": 4,
+      "surviving_valid_cycles": [
+        0,
+        15
+      ],
+      "reciprocal_surviving_episodes": [],
+      "own_surviving_valid_seeds": [
+        34002003,
+        34002005,
+        34002006
+      ],
+      "passes_profile_diagnostic": false,
+      "native_certification": false
+    },
+    {
+      "arm": "warp-30-20",
+      "profile": "selfplay",
+      "pair_survivors": 3,
+      "surviving_valid_cycles": [
+        0,
+        0
+      ],
+      "reciprocal_surviving_episodes": [],
+      "own_surviving_valid_seeds": [],
+      "passes_profile_diagnostic": false,
+      "native_certification": false
     }
   ],
   "baseline": {
@@ -155,11 +203,11 @@
     }
   },
   "active_arm": "warp-30-20",
-  "active_profile": "neutral-0",
-  "updated_utc": "2026-10-29T18:19:00.677499+00:00",
-  "child_pid": 602,
-  "new_controls": 16267,
-  "formal_total": 2287268,
+  "active_profile": "selfplay",
+  "updated_utc": "2026-10-29T18:27:48.509794+00:00",
+  "child_pid": 2618,
+  "new_controls": 24149,
+  "formal_total": 2295150,
   "recoveries": [
     {
       "reviewed_utc": "2026-10-29T18:19:00.672705+00:00",
@@ -167,5 +215,7 @@
       "completed_profiles_retained": 6,
       "decision": "Resume remaining profiles only; no repeated physical controls"
     }
-  ]
+  ],
+  "completed_utc": "2026-10-29T18:27:53.201791+00:00",
+  "decision": "Review all arms before any GPU training or solver adoption"
 }
