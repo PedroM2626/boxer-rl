@@ -1,0 +1,59 @@
+"""The sparring stage drives the arms; the policy keeps legs, waist and balance."""
+import jax
+import jax.numpy as jp
+import numpy as np
+
+from boxer.curriculum_control import STAGES, TRAINABLE_STAGES, commands_for
+from boxer.curriculum_env import (LEFT_ARM, PUNCH_EXTEND, PUNCH_RETRACT,
+                                  UnassistedG1, stage_config)
+from boxer.spar_match import PunchArm, RingBrain
+
+
+def test_spar_stays_out_of_the_automatic_locomotion_sequence():
+    assert "spar" not in STAGES and "spar" in TRAINABLE_STAGES
+    assert commands_for("spar")[0] == (0.0, 0.0, 0.0) and len(commands_for("spar")) == 7
+    config = stage_config("spar")
+    assert config.push_config.enable and config.push_config.magnitude_range[1] > .3
+
+
+def test_generated_punches_override_only_the_arms_and_return_to_guard():
+    env = UnassistedG1("spar")
+    state = jax.jit(env.reset)(jax.random.PRNGKey(3))
+    step = jax.jit(env.step)
+    policy_arms = jp.full(29, .3)
+    moved, launched = False, False
+    for _ in range(120):
+        state = step(state, policy_arms)
+        applied = np.asarray(state.info["last_act"])
+        np.testing.assert_allclose(applied[:LEFT_ARM], .3)   # legs/waist untouched
+        launched |= float(state.info["punch_age"]) >= 0
+        moved |= np.abs(applied[LEFT_ARM:]).max() > 1.0
+    assert launched and moved
+    # Between punches, the arm command is exactly the guard (zero offset).
+    while float(state.info["punch_age"]) >= 0:
+        state = step(state, policy_arms)
+    state = step(state, policy_arms)
+    if float(state.info["punch_age"]) < 0:
+        np.testing.assert_allclose(np.asarray(state.info["last_act"])[LEFT_ARM:], 0, atol=1e-6)
+
+
+def test_match_punch_arm_extends_one_hand_and_retracts():
+    pose = np.zeros(29)
+    arm = PunchArm(pose, .5, .02)
+    arm.launch(1, 1.0, np.random.default_rng(0))
+    peaks = []
+    while not arm.ready:
+        a = arm.actions()
+        assert np.all(a[:7] == 0)                      # left arm stays at guard
+        peaks.append(np.abs(a[7:11]).max())
+    assert len(peaks) <= int(np.ceil((PUNCH_EXTEND + PUNCH_RETRACT) / .02 / .9)) + 1
+    assert max(peaks) > 2 and peaks[-1] < max(peaks) / 3
+
+
+def test_ring_brain_closes_distance_then_punches_only_in_range():
+    brain = RingBrain(np.random.default_rng(0))
+    arm = PunchArm(np.zeros(29), .5, .02)
+    command, punch = brain.decide(1.6, np.array([1.6, 0.]), arm)
+    assert command[0] > .2 and punch is None
+    punches = [brain.decide(.6, np.array([.6, 0.]), arm)[1] for _ in range(60)]
+    assert any(p is not None for p in punches)

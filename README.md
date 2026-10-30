@@ -1,5 +1,18 @@
 # boxer — two humanoids learning to fight each other in JAX
 
+## Latest: unassisted two-robot bouts (2026-10-30)
+
+The paired falls had one cause. The frozen leg controller had been trained
+with its arms locked in guard. While its arms punched, it survived only about
+6 % of solo 10 s trials. The new [`spar` stage](docs/spar-motor.md) trains the
+legs and waist while a generator throws randomized punches with the arms
+and the body gets shoved. After 10.8M fine-tuning steps (≈ 8 min), solo
+survival reaches 99.4 %. At 39.3M steps (≈ 30 min) it reaches 100 % and passes
+the full gate. In two-robot native MuJoCo bouts with scripted tactics,
+**8/8 bouts go the full 20 s with no falls**, averaging 18.6 clean punches
+per bout between both corners ([video](fights/spar_g1_vs_g1.mp4)).
+Next: replace the scripted tactics with a self-play policy.
+
 ## Current experiment: unassisted paired boxing diagnostics
 
 Current continuation (2026-10-29): [optimized collection](docs/gpu-collection-scaling.md)

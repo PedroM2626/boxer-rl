@@ -4,20 +4,23 @@ from __future__ import annotations
 import math
 
 STAGES = ("balance", "walk_easy", "walk", "approach")
+# Sparring footwork while a punch generator drives both arms. It follows the
+# locomotion job rather than joining its automatic promotion sequence.
+TRAINABLE_STAGES = STAGES + ("spar",)
 COMMANDS = [(0.0, 0.0, 0.0), (0.4, 0.0, 0.0), (-0.25, 0.0, 0.0),
             (0.0, 0.2, 0.0), (0.0, -0.2, 0.0),
             (0.0, 0.0, 0.4), (0.0, 0.0, -0.4)]
 
 
 def commands_for(stage):
-    if stage in ("walk_easy", "walk"):
-        scale = 0.25 if stage == "walk_easy" else 1.0
+    if stage in ("walk_easy", "walk", "spar"):
+        scale = {"walk_easy": 0.25, "walk": 1.0, "spar": 0.5}[stage]
         return [tuple(value * scale for value in command) for command in COMMANDS]
     return [COMMANDS[0]]
 
 
 def passes_gate(stage, trials):
-    if stage not in STAGES or not trials:
+    if stage not in TRAINABLE_STAGES or not trials:
         return False
     for trial in trials:
         if not all(math.isfinite(trial[key]) for key in (
@@ -44,7 +47,7 @@ def verified_gate(result, stage):
             or result.get("worlds_per_trial", 0) < 32
             or result.get("episode_seconds") != 10):
         return False
-    disturbances = (False, True) if stage == "balance" else (False,)
+    disturbances = (False, True) if stage in ("balance", "spar") else (False,)
     expected = {(seed, command, disturbed) for seed in (7, 23)
                 for command in commands_for(stage) for disturbed in disturbances}
     trials = result.get("trials", [])

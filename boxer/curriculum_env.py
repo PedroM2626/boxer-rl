@@ -18,10 +18,18 @@ from mujoco_playground._src import mjx_env
 from mujoco_playground._src.locomotion.g1 import joystick
 
 from boxer.scene import ARM_JOINTS, GUARD_ARMS_BOXING
-from boxer.curriculum_control import STAGES
+from boxer.curriculum_control import STAGES, TRAINABLE_STAGES
 
 PLAYGROUND_REVISION = "12ad7f3842791ced39f27e5ac96d066bbe361653"
 MENAGERIE_REVISION = "1b86ece576591213e2b666ebf59508454200ca97"
+
+# Left-hand (shoulder pitch, roll, yaw, elbow) strike endpoints at body and head
+# height: the FK-checked targets the skills controller already lands with. The
+# right hand mirrors roll and yaw. Extension/retraction timing matches it too.
+PUNCH_BODY = np.array([-1.18, .04, .10, 1.20])
+PUNCH_HEAD = np.array([-1.94, .065, .20, 1.51])
+PUNCH_EXTEND, PUNCH_RETRACT = .18, .26
+LEFT_ARM, RIGHT_ARM = 15, 22  # first shoulder actuator of each arm
 
 
 def configure_assets():
@@ -38,7 +46,7 @@ def configure_assets():
 
 
 def stage_config(stage, impl="warp"):
-    if stage not in STAGES:
+    if stage not in TRAINABLE_STAGES:
         raise ValueError(f"unknown curriculum stage {stage!r}")
     cfg = joystick.default_config()
     cfg.impl = impl
@@ -76,6 +84,10 @@ def stage_config(stage, impl="warp"):
             cfg.lin_vel_x = [v * 0.25 for v in cfg.lin_vel_x]
             cfg.lin_vel_y = [v * 0.25 for v in cfg.lin_vel_y]
             cfg.ang_vel_yaw = [v * 0.25 for v in cfg.ang_vel_yaw]
+        if stage == "spar":
+            # Received punches: more frequent and harder shoves than walking.
+            cfg.push_config.interval_range = [1.0, 3.0]
+            cfg.push_config.magnitude_range = [0.10, 0.50]
     return cfg
 
 
@@ -122,7 +134,7 @@ class UnassistedG1(joystick.Joystick):
         command = super().sample_command(motion_rng)
         # Retain standing practice as movement becomes harder. Upstream already
         # has a 10% zero-command branch: account for it in the total probability.
-        probability = 0.70 if self.stage == "balance" else 0.40
+        probability = {"balance": 0.70, "spar": 0.50}.get(self.stage, 0.40)
         extra_zero = (probability - 0.10) / 0.90
         command = jp.where(jax.random.bernoulli(standing_rng, extra_zero), jp.zeros(3), command)
         lateral_probability = self._config.get("lateral_practice_probability", 0.0)
@@ -145,6 +157,13 @@ class UnassistedG1(joystick.Joystick):
 
     def reset(self, rng):
         state = super().reset(rng)
+        if self.stage == "spar":
+            punch_rng = jax.random.fold_in(rng, 77)
+            state.info.update(
+                punch_rng=punch_rng, punch_age=jp.array(-1.0),
+                punch_hand=jp.array(0, jp.int32), punch_target=jp.zeros(4),
+                punch_speed=jp.array(1.0),
+                punch_wait=jax.random.randint(punch_rng, (), 10, 60))
         if self.stage == "approach":
             # The target is a navigation marker, never a physical support.
             forward = state.data.site_xmat[self._pelvis_imu_site_id][:2, 0]
@@ -158,7 +177,45 @@ class UnassistedG1(joystick.Joystick):
                 state.info["goal"] - state.data.qpos[:2])
         return state
 
+    def punch_arms(self, info):
+        """Arm actions for the generated punch; zero holds the guard (default pose).
+
+        The policy's own arm outputs are replaced: it only keeps balance and
+        footwork while the arms throw randomized straight punches at body/head
+        height, with combos, pauses, speed and endpoint variation.
+        """
+        rng, hand_rng, aim_rng, jitter_rng, speed_rng, wait_rng = jax.random.split(
+            info["punch_rng"], 6)
+        launch = (info["punch_age"] < 0) & (info["punch_wait"] <= 0)
+        aim = jax.random.uniform(aim_rng)
+        target = (PUNCH_BODY + aim * (PUNCH_HEAD - PUNCH_BODY)
+                  + jax.random.uniform(jitter_rng, (4,), minval=-.12, maxval=.12))
+        hand = jp.where(launch, jax.random.randint(hand_rng, (), 0, 2), info["punch_hand"])
+        target = jp.where(launch, target, info["punch_target"])
+        speed = jp.where(launch, jax.random.uniform(speed_rng, minval=.8, maxval=1.25),
+                         info["punch_speed"])
+        age = jp.where(launch, 0.0, info["punch_age"])
+        extend, retract = PUNCH_EXTEND / self.dt, PUNCH_RETRACT / self.dt
+        fraction = jp.where(age < extend, (age + 1) / extend, 1 - (age - extend) / retract)
+        fraction = jp.clip(fraction, 0, 1) * (age >= 0)
+        sign = jp.where(hand == 0, 1.0, -1.0)
+        start = jp.where(hand == 0, LEFT_ARM, RIGHT_ARM)
+        guard = jax.lax.dynamic_slice(self._default_pose, (start,), (4,))
+        offset = fraction * (target * jp.array([1, sign, sign, 1]) - guard)
+        arms = jax.lax.dynamic_update_slice(
+            jp.zeros(14), offset / self._config.action_scale, (start - LEFT_ARM,))
+        age = jp.where(age >= 0, age + speed, age)
+        finished = age >= extend + retract
+        wait = jp.where(age >= 0, info["punch_wait"], info["punch_wait"] - 1)
+        wait = jp.where(finished, jax.random.randint(wait_rng, (), 5, 60), wait)
+        info.update(punch_rng=rng, punch_hand=hand, punch_target=target,
+                    punch_speed=speed, punch_age=jp.where(finished, -1.0, age),
+                    punch_wait=wait.astype(jp.int32))
+        return arms
+
     def step(self, state, action):
+        if self.stage == "spar":
+            action = action.at[LEFT_ARM:].set(self.punch_arms(state.info))
         state = super().step(state, action)
         if self.stage == "approach":
             state = self._approach_command(state)

@@ -16,7 +16,7 @@ import numpy as np
 from boxer.checkpoint_io import atomic_json
 from boxer.curriculum_env import UnassistedG1, stage_config
 from boxer.curriculum_train import contract, inference, load_policy_params, utc
-from boxer.curriculum_control import STAGES, COMMANDS, commands_for, passes_gate
+from boxer.curriculum_control import TRAINABLE_STAGES, COMMANDS, commands_for, passes_gate
 
 
 def evaluate(checkpoint, stage=None, worlds=32, seeds=(7, 23), video=None, preview=False):
@@ -56,10 +56,10 @@ def evaluate(checkpoint, stage=None, worlds=32, seeds=(7, 23), video=None, previ
     commands = commands_for(stage)
     # Walking gate videos should show actual commanded footwork, rather than
     # always capturing the first (stationary) trial. Trial order is unchanged.
-    video_command = commands[1] if stage in ("walk_easy", "walk") else commands[0]
+    video_command = commands[1] if stage in ("walk_easy", "walk", "spar") else commands[0]
     # Balance includes a velocity impulse: this is an evaluation disturbance,
     # not a stabilizing root controller or a training assistance force.
-    disturbances = [False, True] if stage == "balance" else [False]
+    disturbances = [False, True] if stage in ("balance", "spar") else [False]
     if preview:
         seeds = (seeds[0],)
         commands = [commands[1]] if stage in ("walk_easy", "walk") else [COMMANDS[0]]
@@ -158,7 +158,7 @@ def render(env, frames, output, metadata):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("checkpoint", type=Path)
-    parser.add_argument("--stage", choices=STAGES)
+    parser.add_argument("--stage", choices=TRAINABLE_STAGES)
     parser.add_argument("--worlds", type=int, default=32)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--video", type=Path)

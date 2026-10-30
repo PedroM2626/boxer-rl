@@ -24,7 +24,7 @@ from brax.training.agents.ppo import networks, train as ppo
 from mujoco_playground import wrapper
 
 from boxer.checkpoint_io import atomic_bytes, atomic_json
-from boxer.curriculum_env import UnassistedG1, STAGES, PLAYGROUND_REVISION, MENAGERIE_REVISION, stage_config
+from boxer.curriculum_env import UnassistedG1, TRAINABLE_STAGES, PLAYGROUND_REVISION, MENAGERIE_REVISION, stage_config
 from boxer.curriculum_control import consecutive_passes, promotion_ready
 
 
@@ -94,7 +94,7 @@ def inference(env, params):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--stage", choices=STAGES, default="balance")
+    parser.add_argument("--stage", choices=TRAINABLE_STAGES, default="balance")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--steps", type=int, default=200_000_000)
     parser.add_argument("--worlds", type=int, default=1024)
