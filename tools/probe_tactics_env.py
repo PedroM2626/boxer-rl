@@ -14,11 +14,20 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--worlds", type=int, default=256)
     parser.add_argument("--steps", type=int, default=1000)
+    parser.add_argument("--randomize", type=float, default=0.0,
+                        help="domain randomization strength (0 = nominal physics)")
     args = parser.parse_args()
     motor, _ = load_policy_params("checkpoints/spar")
     env = TacticsEnv(motor, worlds_hint=args.worlds)
-    reset = jax.jit(jax.vmap(env.reset))
-    step = jax.jit(jax.vmap(env.step))
+    if args.randomize:
+        from mujoco_playground._src.wrapper import BraxDomainRandomizationVmapWrapper
+        keys = jax.random.split(jax.random.PRNGKey(99), args.worlds)
+        batched = BraxDomainRandomizationVmapWrapper(
+            env, lambda model: env.randomizer(args.randomize)(model, keys))
+        reset, step = jax.jit(batched.reset), jax.jit(batched.step)
+    else:
+        reset = jax.jit(jax.vmap(env.reset))
+        step = jax.jit(jax.vmap(env.step))
 
     @jax.jit
     def scripted(state, keys):

@@ -55,6 +55,7 @@ def train_generation(args, generation, motor, learner, pool):
         save_policy(root / "checkpoint", params, dict(stage="tactics", generation=generation,
                     stage_steps=int(step), opponents=["scripted"] + [f"pool-{g}" for g in range(len(pool))],
                     native_reset_fraction=args.native_reset_fraction, scoring=args.scoring,
+                    randomize=args.randomize,
                     pool_sources=[str(p) for p in args.pool], initialized_from=str(args.init_from),
                     scripted_fraction=env.scripted_fraction, updated_utc=utc()))
 
@@ -67,7 +68,8 @@ def train_generation(args, generation, motor, learner, pool):
         num_updates_per_batch=4, normalize_observations=True, max_grad_norm=1.0,
         network_factory=tactics_network_factory(), seed=args.seed + generation,
         num_evals=args.checkpoints + 1, num_eval_envs=64, run_evals=False,
-        restore_params=learner, policy_params_fn=checkpoint, progress_fn=progress)
+        restore_params=learner, policy_params_fn=checkpoint, progress_fn=progress,
+        randomization_fn=env.randomizer(args.randomize) if args.randomize else None)
     log.close()
     atomic_json(root / "done.json", dict(generation=generation, steps=args.steps_per_generation,
                                          seconds=time.monotonic() - started, updated_utc=utc()))
@@ -89,6 +91,8 @@ def main(argv=None):
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--scoring", choices=("punch", "native"), default="punch",
                         help="training hit rule; 'native' mirrors the native ImpactScorecard")
+    parser.add_argument("--randomize", type=float, default=0.0,
+                        help="domain randomization strength (TacticsEnv.randomizer); 0 = nominal physics")
     parser.add_argument("--init-from", type=Path, help="tactics checkpoint to warm-start generation 0")
     parser.add_argument("--pool", type=Path, nargs="*", default=[],
                         help="earlier tactics checkpoints that join every generation's opponent pool")

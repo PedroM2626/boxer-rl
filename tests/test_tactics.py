@@ -100,3 +100,20 @@ def test_native_scoring_counts_events_per_hand_and_rearms():
         total += float(state.metrics["hits"])
         assert float(state.metrics["hits"]) in (0., 1., 2.)   # whole events, at most one per hand
     assert np.isfinite(np.asarray(state.obs)).all() and total >= 0
+
+
+def test_domain_randomization_batches_physics_and_zero_strength_is_nominal():
+    motor, _ = load_policy_params("checkpoints/spar")
+    env = TacticsEnv(motor, worlds_hint=2)
+    keys = jax.random.split(jax.random.PRNGKey(0), 3)
+    model, in_axes = env.randomizer(1.0)(env.mjx_model, keys)
+    assert model.body_mass.shape == (3, env.mj_model.nbody) and in_axes.body_mass == 0
+    ratio = np.asarray(model.body_mass) / np.maximum(env.mj_model.body_mass, 1e-9)
+    light = env.mj_model.body_mass > 1.5            # +-1 kg on torsos dominates light links
+    assert np.all(ratio[:, light] > .5) and np.all(ratio[:, light] < 1.6)
+    friction = np.asarray(model.pair_friction)[:, :, 0]
+    assert friction.min() >= .3 - 1e-6 and friction.max() <= 1.0 + 1e-6
+    assert not np.allclose(friction[0], friction[1])
+    nominal, _ = env.randomizer(0.0)(env.mjx_model, keys)
+    np.testing.assert_allclose(np.asarray(nominal.actuator_gainprm)[0], env.mj_model.actuator_gainprm, rtol=1e-6)
+    np.testing.assert_allclose(np.asarray(nominal.body_mass)[1], env.mj_model.body_mass, rtol=1e-6)

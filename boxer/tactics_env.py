@@ -186,6 +186,69 @@ class TacticsEnv(mjx_env.MjxEnv):
     def observation_size(self):
         return OBS_SIZE
 
+    # --- domain randomization ---------------------------------------------
+    def randomizer(self, strength=1.0):
+        """``randomization_fn(model, rng)`` for ``wrap_for_brax_training``.
+
+        Per world: floor friction U(0.4, 1.0) and robot-robot friction
+        U(0.3, 0.9); contact time constants ×U(0.7, 1.5); joint friction
+        ×U(0.5, 2) and armature ×U(1, 1.05); link masses ×U(0.9, 1.1) and
+        torso +U(-1, 1) kg; position-actuator stiffness ×U(0.9, 1.1). The
+        ranges follow Playground's G1 randomizer and widen to cover contact,
+        where batched and native physics disagree. ``strength`` scales
+        every interval around its nominal value.
+        """
+        m = self._mj_model
+        floor = m.geom("floor").id
+        floor_pairs = np.array([k for k in range(m.npair)
+                                if floor in (m.pair_geom1[k], m.pair_geom2[k])])
+        robot_pairs = np.array([k for k in range(m.npair) if k not in set(floor_pairs)])
+        joint_dofs = np.concatenate(self.v)
+        torsos = np.array([m.body(side + "torso_link").id for side in scene.SIDES])
+        actuators = np.concatenate(self.act)
+
+        def span(low, high, nominal=1.0):
+            return nominal + strength * (low - nominal), nominal + strength * (high - nominal)
+
+        def randomize(model, rng):
+            @jax.vmap
+            def draw(rng):
+                keys = jax.random.split(rng, 8)
+                friction = model.pair_friction
+                lo, hi = span(.4, 1., .7)
+                friction = friction.at[floor_pairs, :2].set(
+                    jax.random.uniform(keys[0], (len(floor_pairs), 1), minval=lo, maxval=hi))
+                lo, hi = span(.3, .9, .6)
+                friction = friction.at[robot_pairs, :2].set(
+                    jax.random.uniform(keys[1], (len(robot_pairs), 1), minval=lo, maxval=hi))
+                lo, hi = span(.7, 1.5)
+                solref = model.pair_solref.at[:, 0].multiply(
+                    jax.random.uniform(keys[2], (m.npair,), minval=lo, maxval=hi))
+                lo, hi = span(.5, 2.)
+                frictionloss = model.dof_frictionloss.at[joint_dofs].multiply(
+                    jax.random.uniform(keys[3], (len(joint_dofs),), minval=lo, maxval=hi))
+                lo, hi = span(1., 1.05)
+                armature = model.dof_armature.at[joint_dofs].multiply(
+                    jax.random.uniform(keys[4], (len(joint_dofs),), minval=lo, maxval=hi))
+                lo, hi = span(.9, 1.1)
+                mass = model.body_mass * jax.random.uniform(keys[5], (m.nbody,), minval=lo, maxval=hi)
+                lo, hi = span(-1., 1., 0.)
+                mass = mass.at[torsos].add(jax.random.uniform(keys[6], (2,), minval=lo, maxval=hi))
+                lo, hi = span(.9, 1.1)
+                stiffness = jax.random.uniform(keys[7], (len(actuators),), minval=lo, maxval=hi)
+                gain = model.actuator_gainprm.at[actuators, 0].multiply(stiffness)
+                bias = model.actuator_biasprm.at[actuators, 1].multiply(stiffness)
+                return friction, solref, frictionloss, armature, mass, gain, bias
+
+            fields = ("pair_friction", "pair_solref", "dof_frictionloss", "dof_armature",
+                      "body_mass", "actuator_gainprm", "actuator_biasprm")
+            values = draw(rng)
+            in_axes = jax.tree_util.tree_map(lambda _: None, model)
+            in_axes = in_axes.tree_replace({name: 0 for name in fields})
+            return model.tree_replace(dict(zip(fields, values))), in_axes
+
+        return randomize
+
     # --- helpers ---------------------------------------------------------
     def _body(self, data, i):
         r = self.root[i]
