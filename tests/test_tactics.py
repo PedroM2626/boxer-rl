@@ -66,3 +66,22 @@ def test_batched_bout_runs_with_finite_observations_and_scripted_tactics():
     assert np.isfinite(np.asarray(state.obs)).all()
     assert float(state.done) == 1.0          # one-second episode ended on the clock
     assert float(state.metrics["fell"]) == 0
+
+
+def test_native_style_starts_and_an_opponent_pool():
+    motor, _ = load_policy_params("checkpoints/spar")
+    from boxer.tactics_env import tactics_network_factory
+    from brax.training.acme import running_statistics
+    net = tactics_network_factory()(OBS_SIZE, ACTION_SIZE)
+    key = jax.random.PRNGKey(0)
+    params = (running_statistics.init_state(jax.ShapeDtypeStruct((OBS_SIZE,), jp.float32)),
+              net.policy_network.init(key), net.value_network.init(key))
+    env = TacticsEnv(motor, [params, params], scripted_fraction=0.0, worlds_hint=2,
+                     episode_seconds=.5, native_reset_fraction=1.0)
+    state = jax.jit(env.reset)(jax.random.PRNGKey(3))
+    assert abs(float(state.obs[2]) - 2.0) < 1e-3          # PairedFoundation spawn distance
+    assert int(state.info["opponent"]) in (0, 1) and not bool(state.info["scripted"])
+    step = jax.jit(env.step)
+    for _ in range(10):
+        state = step(state, jp.zeros(ACTION_SIZE))
+    assert np.isfinite(np.asarray(state.obs)).all()

@@ -103,7 +103,16 @@ class TacticsEnv(mjx_env.MjxEnv):
     """Single-agent view (red) of two-robot boxing with a frozen opponent."""
 
     def __init__(self, motor_params, opponent_params=None, *, scripted_fraction=1.0,
-                 episode_seconds=20.0, worlds_hint=512, impl="warp"):
+                 episode_seconds=20.0, worlds_hint=512, impl="warp",
+                 opponent_deterministic=False, native_reset_fraction=0.0):
+        """``opponent_params``: one tactics checkpoint's params or a list (a pool).
+
+        Each bout draws its opponent at reset: the scripted brain with
+        ``scripted_fraction``, otherwise a uniformly chosen pool member.
+        ``native_reset_fraction`` of bouts start like ``PairedFoundation.reset``
+        (2 m apart, joints scaled by U(0.5, 1.5), random root velocity), the
+        states native evaluation starts from.
+        """
         super().__init__(config_dict.create(ctrl_dt=.02, sim_dt=.004))
         self.foundation = UnassistedG1("spar")
         self._mj_model = build_pair(self.foundation, strike_sensors=True)
@@ -111,9 +120,11 @@ class TacticsEnv(mjx_env.MjxEnv):
         self._impl = impl
         self.naconmax, self.njmax = worlds_hint * 64, 600
         self.motor = inference(self.foundation, motor_params)
-        self.opponent = (tactics_policy(opponent_params) if opponent_params is not None
-                         else None)
-        self.scripted_fraction = 1.0 if opponent_params is None else float(scripted_fraction)
+        if opponent_params is not None and not isinstance(opponent_params, list):
+            opponent_params = [opponent_params]
+        self.opponents = [tactics_policy(p, opponent_deterministic) for p in (opponent_params or [])]
+        self.scripted_fraction = 1.0 if not self.opponents else float(scripted_fraction)
+        self.native_reset_fraction = float(native_reset_fraction)
         self.episode_steps = int(round(episode_seconds / self.dt))
         self.pose = jp.asarray(self.foundation._default_pose)
         self.scale = float(self.foundation._config.action_scale)
@@ -245,11 +256,13 @@ class TacticsEnv(mjx_env.MjxEnv):
 
     # --- reset / step ----------------------------------------------------
     def reset(self, rng):
-        rng, place_rng, yaw_rng, center_rng, opp_rng, freq_rng, wait_rng = jax.random.split(rng, 7)
-        distance = jax.random.uniform(place_rng, minval=.9, maxval=1.7)
+        (rng, place_rng, yaw_rng, center_rng, opp_rng, freq_rng, wait_rng, native_rng, pool_rng,
+         joint_rng, vel_rng) = jax.random.split(rng, 11)
+        native = jax.random.bernoulli(native_rng, self.native_reset_fraction)
+        distance = jp.where(native, 2.0, jax.random.uniform(place_rng, minval=.9, maxval=1.7))
         theta = jax.random.uniform(yaw_rng, minval=-jp.pi, maxval=jp.pi)
         center = jax.random.uniform(center_rng, (2,), minval=-.5, maxval=.5)
-        noise = jax.random.uniform(yaw_rng, (2,), minval=-.25, maxval=.25)
+        noise = jax.random.uniform(yaw_rng, (2,), minval=-.25, maxval=.25) * ~native
         axis = jp.array([jp.cos(theta), jp.sin(theta)])
         qpos = jp.asarray(self._mj_model.qpos0)
         for i in range(2):
@@ -258,11 +271,17 @@ class TacticsEnv(mjx_env.MjxEnv):
             yaw = theta + (0. if i == 0 else jp.pi) + noise[i]
             qpos = qpos.at[r:r + 3].set(jp.concatenate([pos, jp.array([self.stand_height])]))
             qpos = qpos.at[r + 3:r + 7].set(jp.array([jp.cos(yaw / 2), 0., 0., jp.sin(yaw / 2)]))
-            qpos = qpos.at[self.q[i]].set(self.pose)
+            scale = jp.where(native, jax.random.uniform(jax.random.fold_in(joint_rng, i), (29,),
+                                                        minval=.5, maxval=1.5), 1.)
+            qpos = qpos.at[self.q[i]].set(self.pose * scale)
+        qvel = jp.zeros(self._mj_model.nv)
+        for i in range(2):
+            kick = jax.random.uniform(jax.random.fold_in(vel_rng, i), (6,), minval=-.5, maxval=.5)
+            qvel = qvel.at[self.rootv[i]:self.rootv[i] + 6].set(kick * native)
         ctrl = jp.zeros(self._mj_model.nu)
         for i in range(2):
-            ctrl = ctrl.at[self.act[i]].set(self.pose)
-        data = mjx_env.make_data(self._mj_model, qpos=qpos, qvel=jp.zeros(self._mj_model.nv),
+            ctrl = ctrl.at[self.act[i]].set(qpos[self.q[i]])
+        data = mjx_env.make_data(self._mj_model, qpos=qpos, qvel=qvel,
                                  ctrl=ctrl, impl=self._impl, naconmax=self.naconmax,
                                  njmax=self.njmax)
         data = mjx.forward(self._mjx_model, data)
@@ -273,6 +292,7 @@ class TacticsEnv(mjx_env.MjxEnv):
                     frequency=jax.random.uniform(freq_rng, (2, 1), minval=1.25, maxval=1.5),
                     landed=jp.zeros(2, bool), scripted_wait=jax.random.randint(wait_rng, (), 5, 30),
                     scripted=jax.random.bernoulli(opp_rng, self.scripted_fraction),
+                    opponent=jax.random.randint(pool_rng, (), 0, max(len(self.opponents), 1)),
                     previous_fists=data.geom_xpos[self.fists], previous_targets=data.geom_xpos[self.targets])
         obs = self._observations(data, info)
         metrics = {k: jp.zeros(()) for k in (
@@ -283,8 +303,9 @@ class TacticsEnv(mjx_env.MjxEnv):
         info, data = dict(state.info), state.data
         info["rng"], opp_rng, script_rng, arm_rng0, arm_rng1 = jax.random.split(info["rng"], 5)
         obs = self._observations(data, info)
-        if self.opponent is not None:
-            learned, _ = self.opponent(obs[1], opp_rng)
+        if self.opponents:
+            pool = jp.stack([policy(obs[1], opp_rng)[0] for policy in self.opponents])
+            learned = pool[info["opponent"]]
         else:
             learned = jp.zeros(ACTION_SIZE)
         scripted, wait = self._scripted(obs[1], script_rng, info["scripted_wait"])

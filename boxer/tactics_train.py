@@ -1,9 +1,11 @@
 """Self-play PPO for boxing tactics over the frozen sparring motor.
 
 Generation 0 trains red against the scripted ring brain. Each later
-generation trains against a frozen copy of the previous generation's policy,
-with a fraction of bouts still against the scripted brain so earlier skills
-are not forgotten. The learner warm-starts from its own latest weights; Adam
+generation trains against a pool: frozen copies of every earlier generation,
+plus the scripted brain in a fraction of bouts. Training only against the
+latest generation produced a policy that beat it in batched physics but lost
+to it natively (see docs/tactics.md); the pool and native-style starts
+target that gap. The learner warm-starts from its own latest weights; Adam
 is fresh each generation (Brax does not expose it).
 """
 from __future__ import annotations
@@ -28,9 +30,9 @@ def generation_dir(output, generation):
     return output / f"gen-{generation}"
 
 
-def train_generation(args, generation, motor, learner, opponent):
-    env = TacticsEnv(motor, opponent, scripted_fraction=1.0 if opponent is None else args.scripted_fraction,
-                     worlds_hint=args.worlds)
+def train_generation(args, generation, motor, learner, pool):
+    env = TacticsEnv(motor, pool or None, scripted_fraction=args.scripted_fraction if pool else 1.0,
+                     worlds_hint=args.worlds, native_reset_fraction=args.native_reset_fraction)
     root = generation_dir(args.output, generation)
     root.mkdir(parents=True, exist_ok=True)
     started = time.monotonic()
@@ -50,7 +52,8 @@ def train_generation(args, generation, motor, learner, opponent):
         if not all(np.isfinite(x).all() for x in leaves):
             raise FloatingPointError("non-finite tactics policy")
         save_policy(root / "checkpoint", params, dict(stage="tactics", generation=generation,
-                    stage_steps=int(step), opponent="scripted" if opponent is None else f"gen-{generation - 1}",
+                    stage_steps=int(step), opponents=["scripted"] + [f"gen-{g}" for g in range(len(pool))],
+                    native_reset_fraction=args.native_reset_fraction,
                     scripted_fraction=env.scripted_fraction, updated_utc=utc()))
 
     _, params, _ = ppo.train(
@@ -78,24 +81,22 @@ def main(argv=None):
     parser.add_argument("--worlds", type=int, default=512)
     parser.add_argument("--checkpoints", type=int, default=10)
     parser.add_argument("--scripted-fraction", type=float, default=.3)
+    parser.add_argument("--native-reset-fraction", type=float, default=.5)
     parser.add_argument("--learning-rate", type=float, default=3e-4)
     parser.add_argument("--entropy-cost", type=float, default=1e-2)
     parser.add_argument("--seed", type=int, default=0)
     args = parser.parse_args(argv)
     jax_compat()
     motor, _ = load_policy_params(args.motor)
-    learner = opponent = None
+    learner, pool = None, []
     for generation in range(args.generations):
         root = generation_dir(args.output, generation)
         if (root / "done.json").exists():
-            learner, _ = load_policy_params(root / "checkpoint")
-            opponent = learner
             print(f"generation {generation} already complete; resuming after it", flush=True)
-            continue
-        params = train_generation(args, generation, motor, learner, opponent)
+        else:
+            train_generation(args, generation, motor, learner, pool)
         learner, _ = load_policy_params(root / "checkpoint")
-        opponent = learner
-        del params
+        pool.append(learner)
     return 0
 
 
