@@ -23,6 +23,8 @@ learned complete strikes exist, while stable reciprocal combat remains unresolve
 | --- | --- | --- |
 | [Arm-motion diagnosis](spar-motor.md#diagnosis) | Certified `approach` motor with generated punching arms, solo, no opponent: mean survival 0.06, mean 2–5 s. | The frozen leg controller, not the arm objective, caused the v12–v17 paired falls. Arm residual PPO over it is retired. |
 | [`spar` stage fine-tune](spar-motor.md#change) | 39.3M steps from `approach`, ≈ 30 min on the RTX 3060. Gates: 10.8M 0.994 (tracking fail), 21.6M pass, 32.4M fail (one tracking error 0.216), 39.3M pass with 1.000 in all 28 trials. | `checkpoints/spar` is the new motor. One pass, not two consecutive; the gate is a solo test. |
+| [Learned tactics](tactics.md) | Batched MJX/Warp two-robot env, ≈ 25k PPO steps/s. Gen‑0 (vs scripted, 20M steps) beats scripted 16–0 natively (20.1 : 5.7 clean punches); learned mirror 37.6 clean punches / 20 s, no falls. | `checkpoints/tactics` is the champion. |
+| [Self-play league](tactics.md#results-native-mujoco-16-bouts-per-row) | Gen‑1 beats gen‑0 82–41 batched but loses 3–13 natively; pool + native-style starts: gen‑2 4–10–2, gen‑3 8–8 (10–22 on fresh seeds). Native-scorecard training (v2): 4–12, 3–12–1. | Batched→native transfer of policy-vs-policy skill is the open problem. Select by native evaluation only. |
 | [Two-robot bouts](spar-motor.md#results) | Native MuJoCo, free roots, scripted tactics: 8/8 go 20 s, 18.6 clean punches/bout, both corners win. Old motor: 0/4, 3 s. | First reliable unassisted reciprocal boxing in the project. Punch choice is scripted; clinching after ≈ 8 s. |
 
 ## Historical corrections and retained capabilities

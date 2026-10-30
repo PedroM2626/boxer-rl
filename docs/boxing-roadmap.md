@@ -8,10 +8,10 @@ successes, failed approaches and the documentation protocol for every continuati
 The [sparring motor](spar-motor.md) makes two free G1s box for 20 s without
 falling. The remaining work is the boxing brain and the move set:
 
-1. **Learned tactics.** Replace the scripted `RingBrain` with a self-play PPO
-   policy. It chooses footwork commands and when, with which hand and how high
-   to punch, while the sparring motor executes. This needs a batched GPU
-   two-robot environment (see [tactics](tactics.md)).
+1. **Learned tactics: first version done** ([tactics](tactics.md)). The
+   champion beats the scripted brain 16–0 natively. Next: make self-play
+   progress transfer to native physics (domain randomization, native or
+   `mujoco_warp` fine-tuning, native checkpoint selection).
 2. **Range control and clinch breaking.** Penalize chest contact and reward
    staying at punching range.
 3. **More moves.** Hooks, uppercuts and active guard/blocking primitives in the

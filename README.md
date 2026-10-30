@@ -11,7 +11,19 @@ survival reaches 99.4 %. At 39.3M steps (≈ 30 min) it reaches 100 % and passes
 the full gate. In two-robot native MuJoCo bouts with scripted tactics,
 **8/8 bouts go the full 20 s with no falls**, averaging 18.6 clean punches
 per bout between both corners ([video](fights/spar_g1_vs_g1.mp4)).
-Next: replace the scripted tactics with a self-play policy.
+
+**Learned tactics (2026-10-30).** [Self-play PPO](docs/tactics.md) now chooses
+footwork and punches in a batched GPU two-robot environment, about 25k
+steps/s on the RTX 3060. The champion (`checkpoints/tactics`, 14 minutes of
+training) beats the scripted tactics **16–0** in native MuJoCo, landing 20.1
+to 5.7 clean punches per bout. Learned-vs-learned bouts average 37.6 clean
+punches per 20 s with no falls ([video](fights/tactics_selfplay.mp4)). Later
+self-play generations improve in batched physics but not natively. That
+transfer gap is the next problem; see the report.
+
+```bash
+bash tools/run_spar.sh boxer.spar_match --red-tactics checkpoints/tactics   --blue-tactics checkpoints/tactics --seeds 0 1 2 3 --swap --video runs/fight.mp4
+```
 
 ## Current experiment: unassisted paired boxing diagnostics
 
