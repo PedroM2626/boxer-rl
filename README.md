@@ -15,6 +15,16 @@ Next: replace the scripted tactics with a self-play policy.
 
 ## Current experiment: unassisted paired boxing diagnostics
 
+Latest review (2026-10-29 local): the [first scaled GPU block](docs/results/striking-pilot/gpu-learning-v1/README.md)
+completed 1,048,576 credits with no complete native boxing pass. Final fresh
+neutral punches total 27; mirror has 5/1 valid cycles but only 3/8 pair survivors
+and no valid reciprocal surviving seed. All checkpoints/traces/evidence verify.
+Collection+PPO sustained rate falls from 510 to 371 credits/s by quarter;
+growing accounting/history I/O is being corrected without losing attempted steps.
+The [matched transfer follow-up](docs/gpu-throughput-and-transfer-followup.md)
+compares actual source/final CUDA behavior with retained native results before
+another PPO allocation. No weaker gate, rollback, solver change or main adoption.
+
 Current continuation (2026-10-29): [optimized collection](docs/gpu-collection-scaling.md)
 and [scaled PPO integration](docs/results/striking-pilot/gpu-batched-scaling-v1/README.md)
 are reviewed. Pinned readback improves matched complete collection from 621 to

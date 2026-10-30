@@ -1,5 +1,14 @@
 # Next action: complete the batched GPU training mechanics
 
+**Current review:** the first bounded scaled-GPU job is completed and independently
+audited; no complete native pass. Actual final SHA `639ccec99328b034d7d6c9f1ba08a7305a0edc3e67025aa01cedcc06cf979052`.
+Diagnostic PPO **10,569,984**, formal **2,340,326**. Do not resume its exhausted
+ceiling or repeat either integration. Read the [post-block follow-up](gpu-throughput-and-transfer-followup.md),
+including compact crash-safe accounting and the matched source/final CUDA
+diagnostic against immutable native data. Inspect that active diagnostic before
+any new physical job; only choose a longer bounded learning intervention after
+complete results. The earlier implementation/integration tasks below are history.
+
 **Latest 2026-10-29:** [collection scaling](gpu-collection-scaling.md) and the
 [16,384-credit integration](results/striking-pilot/gpu-batched-scaling-v1/README.md)
 are reviewed, including exact replay of every PPO update. Packed readback raises

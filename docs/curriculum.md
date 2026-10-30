@@ -3,6 +3,19 @@
 Maintain the [trajectory and decision record](experiment-history.md) at every
 reviewed intervention, including failed results, accounting and pending evidence.
 
+**Latest review (2026-10-29 local / 2026-10-30 UTC):** the first scaled GPU interval
+completed 1,048,576 credits, with all six complete native gate sets failing.
+Independent review verifies 65 checkpoints, 144 native/full pairs and 2,900
+training windows. Final fresh valid cycles are 27 neutral and 5/1 mirror, with
+pair survival 4/6/3; no stable reciprocal boxing or promotion. Diagnostic PPO is
+**10,569,984**, formal **2,340,326**, main **476,041,216**. Unused allowances expire.
+The [follow-up protocol](gpu-throughput-and-transfer-followup.md) investigates
+growing accounting I/O and matched native/CUDA transfer before any new PPO budget.
+Inspect `gpu-learning-transfer-v1/state.json`, child/progress/GPU ledgers and the
+completed review before launching. Preserve the actual final SHA `639ccec99328b034d7d6c9f1ba08a7305a0edc3e67025aa01cedcc06cf979052`.
+The existing three-hour monitor prompt is updated to this newer work; its interval
+and quiet notification policy are unchanged. Older entries below are history.
+
 **Latest continuation (2026-10-29):** complete GPU semantics, packed readback and
 both bounded PPO integrations are reviewed. The 128-world block exactly replays
 all 256 updates from stored rollout/source state. Diagnostic PPO is **9,521,408**

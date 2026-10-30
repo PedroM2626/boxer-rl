@@ -23,6 +23,7 @@ from boxer.checkpoint_io import atomic_bytes, atomic_json
 from boxer.curriculum_env import UnassistedG1
 from boxer.curriculum_train import load_policy_params, utc
 from boxer.result_archive import archive_tree
+from boxer.gpu_training_ledger import write_progress, reconcile_prefix
 from boxer.striking_event_evidence import save_completed_evidence
 from boxer.striking_gpu_profile import BATCH_PROFILE
 from boxer.striking_punch_trace import describe_events
@@ -71,7 +72,8 @@ def main():
             assert state['prerequisites'] == prerequisites
             current_manifest = json.loads((cp/'latest.json').read_text())
             saved, _ = load_checked(cp, current_manifest['sha256'])
-            assert state['consumed_steps'] == state['optimized_steps'] == saved['optimized_steps']
+            hot = json.loads((ROOT/'progress.json').read_text()) if (ROOT/'progress.json').exists() else None
+            state = reconcile_prefix(state, hot, saved)
             prior_engine = state['engine_ledger'].copy()
             state.setdefault('past_process_physics_health', []).append(state.get('physics_health', {}))
             state['resumes'] += 1
@@ -96,15 +98,16 @@ def main():
             state['retained_auxiliary_counters'] = dict(standalone_bc_updates=8000,
                 cloned_queries=6349, surface_queries=960, render_forwards=2947)
         state.update(status='running', pid=os.getpid(), updated_utc=utc())
-        def record():
+        def record(full=False, refresh_formal=False):
             state['new_ppo_steps'] = state['consumed_steps']-OFFSET
             state['diagnostic_ppo_total'] = PPO_BEFORE+state['new_ppo_steps']
-            state['formal_new'] = sum(json.loads(p.read_text())['simulated_world_transitions']
-                for p in (ROOT/'gates').rglob('*-progress.json'))
+            if refresh_formal:
+                state['formal_new'] = sum(json.loads(p.read_text())['simulated_world_transitions']
+                    for p in (ROOT/'gates').rglob('*-progress.json'))
             state['formal_total'] = EVAL_BEFORE+state['formal_new']
             assert 0 <= state['new_ppo_steps'] <= MAX_PPO and 0 <= state['formal_new'] <= MAX_EVAL
-            state['updated_utc'] = utc(); atomic_json(state_path, state)
-        record()
+            state['updated_utc'] = utc(); write_progress(ROOT, state, full=full)
+        record(full=True, refresh_formal=True)
         def stop(signum, frame):
             if child[0] is not None and child[0].poll() is None: os.killpg(child[0].pid, signal.SIGTERM)
             raise InterruptedError('stopped; retain attempted data and inspect before ordinary resume')
@@ -125,7 +128,7 @@ def main():
             atomic_json(cp/'latest.json', metadata)
             return metadata
         def publish(label):
-            record()
+            record(full=True, refresh_formal=True)
             try:
                 archive_tree(ROOT/'gates', ARCHIVE/'gates')
                 archive_tree(ROOT/'event-evidence', ARCHIVE/'event-evidence') if (ROOT/'event-evidence').exists() else None
@@ -143,7 +146,7 @@ def main():
                     subprocess.run(GIT+['push'], check=True)
                 state.pop('publication_error', None)
             except Exception as error:
-                state['publication_error'] = repr(error); record()
+                state['publication_error'] = repr(error); record(full=True, refresh_formal=True)
         def evaluate(label, seeds, value):
             if any(g['label'] == label for g in state['gates']): return
             assert state['formal_new']+12000 <= MAX_EVAL
@@ -158,7 +161,7 @@ def main():
                 if (destination/(name+'.json')).exists(): continue
                 if (destination/(name+'-progress.json')).exists():
                     raise RuntimeError('partial native evaluation requires consumed-attempt review; never overwrite')
-                state.update(phase='native_evaluation', active_gate=label, active_role=name); record()
+                state.update(phase='native_evaluation', active_gate=label, active_role=name); record(full=True)
                 cmd = [sys.executable, '-u', 'tools/evaluate_striking.py', '--checkpoint', str(point),
                     '--seeds', *map(str, seeds), '--output', str(destination/(name+'.json')),
                     '--progress', str(destination/(name+'-progress.json')),
@@ -167,7 +170,7 @@ def main():
                 with (destination/(name+'.log')).open('w') as stdout, (destination/(name+'-errors.log')).open('w') as stderr:
                     child[0] = subprocess.Popen(cmd, stdout=stdout, stderr=stderr, start_new_session=True)
                     state['active_child_pid'] = child[0].pid; record()
-                    code = child[0].wait(); child[0] = None; state.pop('active_child_pid', None); record()
+                    code = child[0].wait(); child[0] = None; state.pop('active_child_pid', None); record(full=True, refresh_formal=True)
                 if code or (destination/(name+'-errors.log')).read_text().strip():
                     raise RuntimeError(f'native evaluation failed/warned; inspect {destination/name}')
             original, controls = full_profiles(destination, seeds, latest['sha256'])
@@ -226,7 +229,7 @@ def main():
                 obs = env.reset(np.arange(128), seed, swap); corner = seed%2
                 active = np.isin(np.arange(128)%8, config['active_world_indices'])
                 while state['optimized_steps']-OFFSET < MAX_PPO:
-                    state.update(phase='gpu_collection'); record()
+                    state.update(phase='gpu_collection'); record(full=True)
                     storage = {k: [] for k in ('obs', 'raw', 'logp', 'reward', 'done', 'value')}
                     mixed = np.asarray(saved['mixed_credits_by_mode_and_corner'], np.int64).copy()
                     key = saved['key']; begun = time.perf_counter(); cycles = np.zeros(2)
@@ -262,7 +265,7 @@ def main():
                     bootstrap = np.asarray(critic(saved['critic'], jp.asarray(normalize(obs[np.arange(128), corner], saved['norm']))))
                     buffer = io.BytesIO(); np.savez_compressed(buffer, **rollout, bootstrap=bootstrap)
                     atomic_bytes(ROOT/'latest-rollout.npz', buffer.getvalue())
-                    state['phase'] = 'ppo_update'; record(); begun = time.perf_counter()
+                    state['phase'] = 'ppo_update'; record(full=True); begun = time.perf_counter()
                     changes, losses = updater.apply(saved, rollout, bootstrap, key)
                     saved = dict(saved, **changes, consumed_steps=state['consumed_steps'],
                         optimized_steps=saved['optimized_steps']+BLOCK, world_control_steps=state['world_control_steps'],
@@ -274,7 +277,7 @@ def main():
                         collection_seconds=collection_seconds, ppo_seconds=time.perf_counter()-begun,
                         mean_loss=float(np.mean(losses)), completed_episodes=int(rollout['done'].sum()),
                         valid_training_cycles_by_corner=cycles.tolist(), sha256=metadata['sha256']))
-                    record(); print(json.dumps(state['rollouts'][-1]), flush=True)
+                    record(full=True); print(json.dumps(state['rollouts'][-1]), flush=True)
                     if (state['optimized_steps']-OFFSET)%262144 == 0:
                         evaluate(f"step-{state['optimized_steps']-OFFSET}", SEEDS, saved)
                         trained = [g for g in state['gates'] if g['label'].startswith('step-')]
@@ -283,7 +286,7 @@ def main():
             state.update(status='completed', phase='awaiting_budget_and_physical_review', completed_utc=utc())
             publish('final')
         except BaseException as error:
-            state.update(status='failed', phase='requires_investigation', error=repr(error)); record()
+            state.update(status='failed', phase='requires_investigation', error=repr(error)); record(full=True, refresh_formal=True)
             publish('failed'); raise
 
 

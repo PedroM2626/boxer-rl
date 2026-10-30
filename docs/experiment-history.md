@@ -1263,3 +1263,37 @@ live state supersede these launch values. Checkpoints/evidence publish at gates.
 No budget extension, main adoption, rollback, weaker gate or schedule change.
 Hours of learning may still be necessary; a small integration is not convergence
 evidence. Stable reciprocal fighting and broader/longer fresh rounds remain open.
+
+## Completed first scaled GPU interval and audited next diagnostic
+
+Reviewed 2026-10-29 local / 2026-10-30 UTC. The full 1,048,576-credit interval
+completes with six failing complete native sets. Known neutral cycles 22 to 36;
+survival 5/4/3 to 5/5/3. One intermediate has reciprocal valid strikes on one
+surviving seed, below the unchanged gate; it is not restored. Final fresh has
+27 neutral cycles and mirror 5/1, survival 4/6/3, and no valid reciprocal surviving
+seed. This is not robust boxing or a proof that further learning cannot help.
+
+Independent review validates 65 checkpoint hashes, learned-state/Adam prefixes,
+144 native/full trajectory pairs and 2,900 training windows (1.7 GB of local
+event evidence), including no applied support forces in captures. Final SHA
+`639ccec99328b034d7d6c9f1ba08a7305a0edc3e67025aa01cedcc06cf979052`,
+lineage consumed/optimized 10,486,784, world 9,864,192, Adam 146,328/170,000.
+Global PPO 10,569,984, formal 2,340,326, main 476,041,216; unused 30,183 controls
+expire. GPU/forward/discarded/warm-up ledgers are retained; no renderer or promotion.
+
+Collection+PPO rate declines 510/433/395/371 by quarter. Full-history JSON and
+native progress rescans occur at every substep in the old supervisor. Stored-data
+accounting benchmark: 128 old writes/scans 0.924 s, compact durable writes 0.155 s;
+254,077 to 1,356 bytes/write. A small durable frontier plus boundary audit flushes
+retains history and tests interrupted-frontier/identity safety. This CPU/disk-only
+comparison does not establish a sixfold overall GPU training speedup.
+
+The [follow-up protocol](gpu-throughput-and-transfer-followup.md) prospectively
+allows at most 24,000 new CUDA diagnostic controls, formal ceiling 2,364,326,
+zero PPO/rendering, using actual source/final, original 3/5 limits and matched
+known seeds/placements/roles. Original native observations/contact/motion criteria
+remain authoritative; historical native data are reused, not resimulated. New
+per-kernel/reset-forward ledgers retain even failed initialization/steps. Inspect
+the hidden persistent comparison before any new launch and review every arm
+before a bounded learning decision. The existing automation prompt was brought
+up to date without changing its three-hour interval or notification intent.

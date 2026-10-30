@@ -48,6 +48,7 @@ def main(argv=None):
     parser.add_argument('--seconds',type=float,default=10.)
     parser.add_argument('--video',type=Path)
     parser.add_argument('--progress',type=Path,help='durable attempted controls for diagnostic recovery')
+    parser.add_argument('--gpu-ledger',type=Path,help='optional durable per-kernel/forward accounting for the Warp reference')
     parser.add_argument('--trace-directory',type=Path,help='passive observations/actions and first-contact timing')
     parser.add_argument('--punch-trace-directory',type=Path,help='passive native-substep punch kinematics; not punch certification')
     parser.add_argument('--base-yaw-scale',type=float,choices=(1.,.5),default=1.,help='diagnostic-only scale of automatic approach yaw; learned offsets remain intact')
@@ -81,6 +82,8 @@ def main(argv=None):
     if args.zero_arm_residuals and args.arm_residual_scale!=1.:
         raise ValueError('choose either zero arms or a diagnostic arm scale')
     if args.progress and args.progress.exists():raise ValueError('evaluation progress exists; inspect before rerun')
+    if args.gpu_ledger and (args.physics_backend != 'warp' or args.gpu_ledger.exists()):
+        raise ValueError('new GPU ledger requires the Warp reference; never overwrite prior diagnostic compute')
     if args.trace_directory:args.trace_directory.mkdir(parents=True,exist_ok=False)
     if args.punch_trace_directory:
         if args.checkpoint is None or args.progress is None or args.sampled:
@@ -126,8 +129,10 @@ def main(argv=None):
     pair = None
     if args.physics_backend == 'warp':
         from boxer.paired_warp_reference import WarpPairedReference
+        def gpu_account(value):
+            if args.gpu_ledger: atomic_json(args.gpu_ledger, dict(value, updated_utc=utc()))
         pair = WarpPairedReference(foundation, iterations=args.solver_iterations,
-                                   ls_iterations=args.solver_ls_iterations)
+                                   ls_iterations=args.solver_ls_iterations, account=gpu_account)
     elif args.solver_iterations is not None or args.solver_ls_iterations is not None:
         from boxer.paired_foundation import PairedFoundation
         pair = PairedFoundation(foundation)
@@ -327,6 +332,7 @@ def main(argv=None):
                  f'{manifest["consumed_steps"]:,} lineage steps') if manifest else 'Unassisted striking interface | Evaluation'
         render(env.pair,frames,args.video,caption=caption,frame_times=frame_times,
                impact_events=results[0]['impact_events'])
+    if args.gpu_ledger: env.pair._account()
     atomic_json(args.output,dict(kind='striking_interface_evaluation',updated_utc=utc(),
         assistance=False,source_sha256=source['sha256'],striking_sha256=residual_hash,
         opponent_sha256=opponent_hash,evaluated_corner=args.evaluated_corner,
@@ -337,6 +343,9 @@ def main(argv=None):
         physics_solver_ls_iterations=env.pair.model.opt.ls_iterations,
         experimental_gpu_substeps=getattr(env.pair,'gpu_substeps',0),
         experimental_gpu_solver_flags=getattr(env.pair,'solver_flag_observations',0),
+        experimental_gpu_overflow_bits=getattr(env.pair,'solver_flag_bits_seen',0),
+        experimental_gpu_forward_calls=getattr(env.pair,'gpu_forward_calls',0),
+        experimental_native_reset_forward_calls=getattr(env.pair,'native_reset_forward_calls',0),
         physics_readback='prefetched_upstream_export' if hasattr(env.pair,'readback') else 'native_or_direct_upstream_export',
         simulated_world_transitions=transitions,optimization_transitions=0,
         scorecard_version=1,episode_seconds=args.seconds,trials=results,

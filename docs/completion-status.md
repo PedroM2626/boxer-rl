@@ -7,6 +7,14 @@ The core learned boxing behavior is still unresolved despite substantial
 infrastructure and certified locomotion. Do not label the project near-complete
 because code, reports and checkpoints exist.
 
+Latest reviewed outcome: the [first scaled GPU block](results/striking-pilot/gpu-learning-v1/README.md)
+completed with all six complete native sets failing. Final fresh 27 neutral valid
+cycles and mirror 5/1 cycles establish retained isolated striking, while 4/6/3
+pair survival and no valid reciprocal surviving seed leave the core stability/
+two-sided boxing gap open. Scope remains approximately 40%; training compute is
+not functional completion. A separately bounded matched native/CUDA follow-up
+and crash-safe accounting optimization precede any new learning allocation.
+
 Latest engineering continuation: scaled GPU integration now exactly replays all
 256 updates; a separate [bounded GPU learning job](gpu-bounded-learning.md) uses
 its actual final, with a new native baseline and repeated unchanged physical
