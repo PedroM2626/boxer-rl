@@ -19,7 +19,10 @@ training) beats the scripted tactics **16–0** in native MuJoCo, landing 20.1
 to 5.7 clean punches per bout. Learned-vs-learned bouts average 37.6 clean
 punches per 20 s with no falls ([video](fights/tactics_selfplay.mp4)). Later
 self-play generations improve in batched physics but not natively. That
-transfer gap is the next problem; see the report.
+transfer gap is the next problem; see the report. With physics randomization, the
+first randomized generation reaches rough parity with the champion natively
+(21–23–4 over 48 bouts). Further generations drift toward risky play that only
+pays off in batched physics.
 
 ```bash
 bash tools/run_spar.sh boxer.spar_match --red-tactics checkpoints/tactics   --blue-tactics checkpoints/tactics --seeds 0 1 2 3 --swap --video runs/fight.mp4

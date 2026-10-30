@@ -105,6 +105,46 @@ What this shows:
   3–12–1 and 4–12 over three generations.
   The remaining gap is more likely the physics backend than the reward.
 
+## Domain randomization (v3)
+
+`TacticsEnv.randomizer` draws a separate physics model for each world. Floor
+friction U(0.4, 1.0), robot-robot friction U(0.3, 0.9), contact time constants
+×U(0.7, 1.5), joint friction ×U(0.5, 2), armature ×U(1, 1.05), link masses
+×U(0.9, 1.1), torso ±1 kg and actuator stiffness ×U(0.9, 1.1). It plugs into
+`ppo.train` through Playground's randomization wrapper (`--randomize 1.0`).
+Scripted bouts under full randomization still run at 10.5k world-steps/s.
+The frozen motor falls in 23/256 of them, against 4/256 nominal.
+
+v3 started from the champion, kept punch-style scoring and half native-style
+starts, and used a pool of the champion plus v1 gen 1–3. It ran 3 generations
+× 20M steps. Each row is native, 48 bouts against the champion: seeds 0–7 plus
+fresh seeds 8–23, corners swapped.
+
+| Policy | vs champion, seeds 0–7 | fresh 8–23 | Total W–L–D | Clean punches / bout | vs scripted |
+| --- | --- | --- | --- | --- | --- |
+| v1 gen‑3 (no randomization) | 8–8–0 | 10–22–0 | 18–30–0 | 13.2 : 14.5 | 15–1 |
+| **v3 gen‑0** | 10–5–1 | 11–18–3 | **21–23–4** | 15.1 : 16.1 | – |
+| v3 gen‑1 | 6–8–2 | 6–24–2 | 12–32–4 | 10.3 : 14.1 | – |
+| v3 gen‑2 | 4–10–2 | 5–23–4 | 9–33–6 | 10.1 : 13.6 | 15–1 |
+
+* **Randomization helps the first step.** v3 gen‑0 is the first self-play
+  policy to reach rough parity with the champion natively. On fresh seeds it
+  goes 11–18 where unrandomized gen‑3 went 10–22. A 16-bout result alone is
+  not enough: on seeds 0–7 it looked like a 10–5 win.
+* **Continued self-play drifts.** Later generations stay strong against the
+  scripted brain (15–1) but lose more to the champion, and both sides land
+  fewer punches (about 22 per bout, against 32). In batched physics v3 gen‑2
+  still beats the champion 137–103 over 256 deterministic bouts, while falling
+  in 56 of them. Native physics punishes those risky positions, so the policy
+  learns batched-specific risk-taking.
+* **The champion is unchanged.** Promising next steps:
+  1. Select or gate every checkpoint by native evaluation (48 bouts, about
+     12 CPU minutes), instead of trusting the last generation.
+  2. Penalize falls harder and reward staying up, because risk-taking is
+     what fails to transfer.
+  3. Retrain the `spar` motor under the same randomization, so balance is
+     robust before tactics exploit it.
+
 ## Champion: `checkpoints/tactics` (v1 gen‑0)
 
 Gen‑0 (20M steps against the scripted brain, 14 minutes of training) beats
