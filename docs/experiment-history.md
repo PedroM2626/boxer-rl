@@ -5,10 +5,25 @@ conditional and why the next experiment was authorized. Detailed protocols,
 full physical results, limitations, checkpoints and accounting remain in the
 linked reports. This index does not replace those records or the live state.
 
+Latest consolidated review: **2026-10-30**. The [sparring motor](spar-motor.md)
+removes the paired-fall bottleneck. The certified motor had only balanced with
+its arms in guard; with punching arms it survived 6 % of solo trials. After
+39.3M fine-tuning steps under generated punches and shoves it survives 100 %,
+and unassisted two-robot bouts go the full 20 s in 8/8 seeds with 18.6 clean
+punches per bout. Tactics are still scripted.
+
 Last consolidated review: **2026-10-29**, including retained-policy comparisons,
 complete batched GPU mechanics and the conditional warm-start integration.
 Reliable general boxing is **not yet certified**. The foundation is certified;
 learned complete strikes exist, while stable reciprocal combat remains unresolved.
+
+## Sparring motor and unassisted two-robot bouts, 2026-10-30
+
+| Work | Reviewed outcome | Decision and limitation |
+| --- | --- | --- |
+| [Arm-motion diagnosis](spar-motor.md#diagnosis) | Certified `approach` motor with generated punching arms, solo, no opponent: mean survival 0.06, mean 2–5 s. | The frozen leg controller, not the arm objective, caused the v12–v17 paired falls. Arm residual PPO over it is retired. |
+| [`spar` stage fine-tune](spar-motor.md#change) | 39.3M steps from `approach`, ≈ 30 min on the RTX 3060. Gates: 10.8M 0.994 (tracking fail), 21.6M pass, 32.4M fail (one tracking error 0.216), 39.3M pass with 1.000 in all 28 trials. | `checkpoints/spar` is the new motor. One pass, not two consecutive; the gate is a solo test. |
+| [Two-robot bouts](spar-motor.md#results) | Native MuJoCo, free roots, scripted tactics: 8/8 go 20 s, 18.6 clean punches/bout, both corners win. Old motor: 0/4, 3 s. | First reliable unassisted reciprocal boxing in the project. Punch choice is scripted; clinching after ≈ 8 s. |
 
 ## Historical corrections and retained capabilities
 

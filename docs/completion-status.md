@@ -1,5 +1,20 @@
 # Functional completion estimate and remaining evidence
 
+**Update 2026-10-30: about 60 %.** The [sparring motor](spar-motor.md) closes
+the stability gap that held this estimate at 40 %. Two unassisted robots now
+exchange punches for 20 s in 8/8 bouts (18.6 clean punches per bout, zero
+falls). Still outstanding: learned tactics (punch selection is scripted),
+defense and blocking, punch types beyond straight punches, clinch breaking,
+and longer or multi-knockdown rounds. The 2026-10-29 text below is the
+historical record.
+
+| Capability (2026-10-30) | Evidence/status |
+| --- | --- |
+| Balance while punching and being shoved | `spar` motor: 100 % solo survival, full gate pass |
+| Two-sided unassisted exchanges | 8/8 bouts × 20 s, both corners score and win |
+| Learned tactics | Outstanding: scripted `RingBrain` |
+| Defense, hooks/uppercuts, clinch breaking | Outstanding |
+
 Reviewed 2026-10-29. **Approximately 40%** is a subjective estimate of demonstrated
 functional scope, not a measured learning-convergence percentage, fraction of
 remaining work hours, or promise that the rest is routine implementation.

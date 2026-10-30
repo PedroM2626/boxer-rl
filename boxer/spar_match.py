@@ -6,9 +6,9 @@ Each corner is a three-layer controller:
   trained to keep balance while its arms punch and it gets shoved);
 * arms: the same straight-punch primitives the ``spar`` stage trains under
   (``curriculum_env.PUNCH_*``), latched at launch and retracted to the guard;
-* tactics: a scripted ring brain choosing footwork commands and when, with
-  which hand and at what height to punch. It is deliberately a controller, not
-  a learned policy; it is the slot a self-play policy will take.
+* tactics: footwork commands and when, with which hand and at what height to
+  punch. Either the scripted ``RingBrain`` or a learned self-play policy from
+  ``boxer.tactics_train`` (``PolicyBrain``), chosen per corner.
 
 No pelvis springs, welds or root forces: the first knockdown ends the bout,
 otherwise the bout goes the distance and is decided on clean punches.
@@ -35,14 +35,20 @@ class PunchArm:
     def __init__(self, pose, action_scale, dt):
         self.pose, self.scale = np.asarray(pose), action_scale
         self.extend, self.retract = PUNCH_EXTEND / dt, PUNCH_RETRACT / dt
-        self.age, self.hand, self.target, self.speed = -1.0, 0, np.zeros(4), 1.0
+        self.age, self.hand, self.target, self.speed, self.aim = -1.0, 0, np.zeros(4), 1.0, 0.0
 
     @property
     def ready(self):
         return self.age < 0
 
+    def features(self):
+        """(age fraction, active, hand sign, aim), as in ``TacticsEnv._arm_features``."""
+        active = self.age >= 0
+        return np.array([max(self.age, 0) / (self.extend + self.retract), float(active),
+                         (2. * self.hand - 1) if active else 0., self.aim if active else 0.])
+
     def launch(self, hand, aim, rng):
-        self.hand, self.age = int(hand), 0.0
+        self.hand, self.age, self.aim = int(hand), 0.0, float(aim)
         self.target = (PUNCH_BODY + aim * (PUNCH_HEAD - PUNCH_BODY)
                        + rng.uniform(-.06, .06, 4))
         self.speed = rng.uniform(.9, 1.15)
@@ -100,11 +106,44 @@ class RingBrain:
         return np.asarray(command), punch
 
 
-def bout(pair, motor, seed, seconds=20.0, record=False):
+class PolicyBrain:
+    """A learned tactics policy (``boxer.tactics_train``) playing one corner."""
+
+    def __init__(self, params, deterministic=True):
+        from boxer.tactics_env import tactics_policy
+        self.policy = jax.jit(tactics_policy(params, deterministic=deterministic))
+        self.key = jax.random.PRNGKey(0)
+
+    def decide_pair(self, pair, i, arms, clock):
+        from boxer.tactics_env import decode, observe
+        bodies = [_body(pair, k) for k in range(2)]
+        obs = observe(np, bodies[i], bodies[1 - i], arms[i].features(), arms[1 - i].features(), clock)
+        self.key, key = jax.random.split(self.key)
+        tactics, _ = self.policy(jp.asarray(obs, jp.float32), key)
+        tactics = np.asarray(tactics, np.float64)
+        delta = bodies[1 - i]['pos'] - bodies[i]['pos']
+        command, want, hand, aim = decode(tactics, np.linalg.norm(delta), bodies[i]['rot'].T @ delta)
+        punch = (int(hand), float(aim)) if want and arms[i].ready else None
+        return command, punch
+
+
+def _body(pair, i):
+    m = pair.maps[i]
+    rot = pair.data.site(m['side'] + 'imu_in_pelvis').xmat.reshape(3, 3)[:2, :2].copy()
+    rot /= max(np.linalg.norm(rot[:, 0]), 1e-6)
+    return dict(pos=pair.data.qpos[m['root']:m['root'] + 2].copy(), rot=rot,
+                vel=pair.data.qvel[m['rootv']:m['rootv'] + 2].copy(),
+                up=float(pair.data.sensor(m['side'] + 'upvector_torso').data[2]),
+                height=float(pair.data.qpos[m['root'] + 2] - pair.foundation._init_q[2]))
+
+
+def bout(pair, motor, seed, seconds=20.0, record=False, brains=None):
+    """One bout; ``brains`` maps corner -> PolicyBrain, others are scripted."""
     rng = np.random.default_rng(seed)
     pair.reset(seed=seed)
     arms = [PunchArm(pair.pose, pair.action_scale, pair.dt) for _ in range(2)]
-    brains = [RingBrain(np.random.default_rng([seed, i])) for i in range(2)]
+    brains = [(brains or {}).get(i) or RingBrain(np.random.default_rng([seed, i]))
+              for i in range(2)]
     scored, thrown, frames, times, events = np.zeros(2), np.zeros(2, int), [], [], []
     fallen = np.zeros(2, bool)
     steps = int(round(seconds / pair.dt))
@@ -115,7 +154,10 @@ def bout(pair, motor, seed, seconds=20.0, record=False):
             delta = roots[1 - i] - roots[i]
             rotation = pair.data.site(m['side'] + 'imu_in_pelvis').xmat.reshape(3, 3)
             local = rotation[:2, :2].T @ delta
-            command, punch = brains[i].decide(float(np.linalg.norm(delta)), local, arms[i])
+            if isinstance(brains[i], PolicyBrain):
+                command, punch = brains[i].decide_pair(pair, i, arms, t / steps)
+            else:
+                command, punch = brains[i].decide(float(np.linalg.norm(delta)), local, arms[i])
             commands.append(command)
             if punch is not None:
                 arms[i].launch(punch[0], punch[1], rng)
@@ -188,21 +230,39 @@ def main(argv=None):
     parser.add_argument('--seconds', type=float, default=20.0)
     parser.add_argument('--output', type=Path, default=Path('runs/spar/match.json'))
     parser.add_argument('--video', type=Path, help='render the first seed')
+    parser.add_argument('--red-tactics', type=Path, help='learned tactics checkpoint for red')
+    parser.add_argument('--blue-tactics', type=Path, help='learned tactics checkpoint for blue')
+    parser.add_argument('--swap', action='store_true',
+                        help='also play every seed with the tactics exchanged between corners')
     args = parser.parse_args(argv)
     params, metadata = load_policy_params(args.checkpoint)
+    tactics = {i: PolicyBrain(load_policy_params(path)[0])
+               for i, path in enumerate((args.red_tactics, args.blue_tactics)) if path}
+    names = [str(path) if path else 'scripted' for path in (args.red_tactics, args.blue_tactics)]
     foundation = UnassistedG1('spar')
     motor = jax.jit(inference(foundation, params))
     pair = PairedFoundation(foundation)
     bouts = []
-    for index, seed in enumerate(args.seeds):
+    schedule = [(seed, False) for seed in args.seeds]
+    if args.swap:
+        schedule += [(seed, True) for seed in args.seeds]
+    for index, (seed, swapped) in enumerate(schedule):
         record = args.video is not None and index == 0
-        result, frames, times = bout(pair, motor, seed, args.seconds, record)
+        brains = {1 - i if swapped else i: brain for i, brain in tactics.items()}
+        result, frames, times = bout(pair, motor, seed, args.seconds, record, brains)
+        result.update(red=names[1] if swapped else names[0], blue=names[0] if swapped else names[1])
         bouts.append(result)
         print(json.dumps({k: v for k, v in result.items() if k != 'impact_events'}), flush=True)
         if record:
             render(pair, frames, times, args.video,
-                   f"G1 vs G1 | motor {metadata['stage']} @ {metadata['stage_steps']:,} | seed {seed}")
+                   f"Red {result['red']} vs Blue {result['blue']} | seed {seed}")
     survived = sum(not any(b['fallen']) for b in bouts)
+    # Win rate of the tactics named for red at launch, across both corner assignments.
+    first = names[0]
+    wins = sum(b['winner'] == ('red' if b['red'] == first else 'blue') for b in bouts if b['winner'])
+    losses = sum(1 for b in bouts if b['winner']) - wins
+    points = [b['clean_punches'][0 if b['red'] == first else 1] for b in bouts]
+    against = [b['clean_punches'][1 if b['red'] == first else 0] for b in bouts]
     summary = dict(checkpoint=str(args.checkpoint), stage=metadata['stage'],
                    stage_steps=metadata['stage_steps'], checkpoint_sha256=metadata['sha256'],
                    bouts=len(bouts), went_the_distance=survived,
@@ -210,6 +270,10 @@ def main(argv=None):
                    mean_seconds=float(np.mean([b['seconds'] for b in bouts])),
                    clean_punches_per_bout=float(np.mean([sum(b['clean_punches']) for b in bouts])),
                    punches_thrown_per_bout=float(np.mean([sum(b['punches_thrown']) for b in bouts])),
+                   tactics=dict(first=names[0], second=names[1], first_wins=wins, first_losses=losses,
+                                draws=len(bouts) - wins - losses,
+                                first_clean_per_bout=float(np.mean(points)),
+                                second_clean_per_bout=float(np.mean(against))),
                    assistance=False, results=bouts)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(summary, indent=1))

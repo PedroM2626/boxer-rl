@@ -13,7 +13,16 @@ from boxer import scene
 from boxer.impact_scorecard import ImpactScorecard
 
 
-def build_pair(foundation, separation=2.0, *, visual_fists=False, diagnostic_excluded_pairs=()):
+STRIKE_SENSOR_TARGETS = ('head_collision', 'torso_collision')
+
+
+def strike_sensor_name(side, hand, target):
+    """Contact sensor: ``side``'s ``hand`` fist touching the opponent's ``target``."""
+    return f'{side}{hand}_on_{target}'
+
+
+def build_pair(foundation, separation=2.0, *, visual_fists=False, diagnostic_excluded_pairs=(),
+               strike_sensors=False):
     if not np.isfinite(separation) or separation < 1.8:
         raise ValueError("transfer spawns must be separated by at least 1.8 m")
     source = foundation.mj_model
@@ -86,6 +95,22 @@ def build_pair(foundation, separation=2.0, *, visual_fists=False, diagnostic_exc
         raise ValueError('diagnostic exclusion must name existing cross-robot pairs')
     for first, second in sorted(wanted-excluded):
         spec.add_pair(geomname1=first, geomname2=second, condim=3, friction=[.6, .6, .005, .0001, .0001])
+    if strike_sensors:
+        # Read-only "found" flags for batched training: fist-on-target and the
+        # chest-to-chest clinch. They add no force and no contact pairs.
+        def found(name, first, second):
+            sensor = spec.add_sensor(name=name, type=mujoco.mjtSensor.mjSENS_CONTACT)
+            sensor.objtype = sensor.reftype = mujoco.mjtObj.mjOBJ_GEOM
+            sensor.objname, sensor.refname = first, second
+            sensor.intprm[0] = 1      # data: found
+            sensor.intprm[1] = 1      # reduce: mindist
+            sensor.intprm[2] = 1      # num
+        for side in scene.SIDES:
+            other = scene.OPPONENT[side]
+            for hand in scene.HAND_GEOMS:
+                for target in STRIKE_SENSOR_TARGETS:
+                    found(strike_sensor_name(side, hand, target), side + hand, other + target)
+        found('clinch', scene.RED + 'torso_collision', scene.BLUE + 'torso_collision')
     model = spec.compile()
     if model.neq or np.any(model.body_gravcomp):
         raise ValueError("paired transfer forbids constraints and gravity compensation")

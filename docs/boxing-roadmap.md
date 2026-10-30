@@ -3,6 +3,24 @@
 The [trajectory and experiment index](experiment-history.md) records reviewed
 successes, failed approaches and the documentation protocol for every continuation.
 
+## Current plan (2026-10-30)
+
+The [sparring motor](spar-motor.md) makes two free G1s box for 20 s without
+falling. The remaining work is the boxing brain and the move set:
+
+1. **Learned tactics.** Replace the scripted `RingBrain` with a self-play PPO
+   policy. It chooses footwork commands and when, with which hand and how high
+   to punch, while the sparring motor executes. This needs a batched GPU
+   two-robot environment (see [tactics](tactics.md)).
+2. **Range control and clinch breaking.** Penalize chest contact and reward
+   staying at punching range.
+3. **More moves.** Hooks, uppercuts and active guard/blocking primitives in the
+   `spar` generator, so the motor also stays balanced through them.
+4. **Robustness.** Longer rounds, knockdowns that do not end the bout, and
+   evaluation against a league of past tactical policies.
+
+The historical plan below is kept as a record of earlier work.
+
 Latest engineering milestone: packed collection and the explicitly scaled GPU
 PPO integration are verified, including exact replay of all optimizer updates.
 The [first bounded scaled-GPU continuation](gpu-bounded-learning.md) now exercises

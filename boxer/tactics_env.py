@@ -1,0 +1,357 @@
+"""Batched GPU boxing for learning tactics on top of the sparring motor.
+
+One MJX/Warp world holds both free G1s. Each control step (50 Hz):
+
+1. each corner's *tactics* (5 numbers) choose footwork and punches: the
+   learner's from PPO, the opponent's from a frozen snapshot of an earlier
+   learner or from the scripted ring brain;
+2. ``punch_arms`` (same primitives as the ``spar`` stage) turns a launch into
+   arm joint targets;
+3. the frozen ``spar`` motor turns footwork commands into leg/waist actions,
+   exactly as in native ``PairedFoundation`` play;
+4. physics runs five 4 ms substeps. Contact sensors flag fist-on-head/torso
+   and chest-to-chest touches.
+
+A *hit* is the first fist-on-target touch of a punch, during extension, with
+the fist closing on the target at ≥ 0.5 m/s. This proxy is only the training
+signal. Results are reported with the native impact scorecard
+(``boxer.spar_match``).
+
+The learner is always red. Spawns are randomized in distance, heading and
+global yaw, so red/blue carries no positional advantage.
+"""
+from __future__ import annotations
+
+import jax
+import jax.numpy as jp
+import mujoco
+import numpy as np
+from brax.training.acme import running_statistics
+from brax.training.agents.ppo import networks as ppo_networks
+from mujoco import mjx
+from ml_collections import config_dict
+from mujoco_playground._src import mjx_env
+
+from boxer import scene
+from boxer.curriculum_env import (LEFT_ARM, PUNCH_BODY, PUNCH_EXTEND, PUNCH_HEAD,
+                                  PUNCH_RETRACT, UnassistedG1)
+from boxer.curriculum_train import inference
+from boxer.paired_foundation import (STRIKE_SENSOR_TARGETS, build_pair,
+                                     strike_sensor_name)
+
+ACTION_SIZE = 5          # left punch, right punch, aim, advance, lateral
+OBS_SIZE = 26
+HEAD_VALUE, TORSO_VALUE = 1.0, .6
+REACH = .62              # root distance where straight punches land
+
+
+def tactics_network_factory():
+    import functools
+    return functools.partial(ppo_networks.make_ppo_networks,
+                             policy_hidden_layer_sizes=(128, 128),
+                             value_hidden_layer_sizes=(256, 256))
+
+
+def tactics_policy(params, deterministic=False):
+    """Inference function for a saved tactics policy (normalizer, policy, value)."""
+    net = tactics_network_factory()(OBS_SIZE, ACTION_SIZE,
+                                    preprocess_observations_fn=running_statistics.normalize)
+    return ppo_networks.make_inference_fn(net)(params, deterministic=deterministic)
+
+
+def decode(tactics, distance, local):
+    """Maps tactics in [-1, 1] to a footwork command and a punch request.
+
+    Turning toward the opponent is automatic; the policy chooses range and
+    angle. Works for NumPy and JAX inputs (``local``: opponent in pelvis frame).
+    """
+    xp = jp if isinstance(tactics, jax.Array) else np
+    tactics = xp.clip(tactics, -1, 1)
+    direction = local / xp.maximum(distance, 1e-6)
+    advance = xp.where(tactics[3] > 0, .4 * tactics[3], .3 * tactics[3])
+    tangent = xp.stack([-direction[1], direction[0]])
+    planar = advance * direction + .2 * tactics[4] * tangent
+    heading = xp.clip(xp.arctan2(local[1], local[0]), -.5, .5)
+    command = xp.clip(xp.concatenate([planar, heading[None]]),
+                      xp.array([-.35, -.25, -.5]), xp.array([.55, .25, .5]))
+    want = xp.maximum(tactics[0], tactics[1]) > 0
+    hand = xp.where(tactics[1] > tactics[0], 1, 0)
+    aim = (tactics[2] + 1) / 2
+    return command, want, hand, aim
+
+
+def observe(xp, own, opp, own_arm, opp_arm, clock):
+    """Tactics observation for one corner (26 floats), NumPy or JAX.
+
+    ``own``/``opp``: dict(pos (2,), rot (2, 2) pelvis->world, vel (2,),
+    up, height). ``*_arm``: (age fraction, active, hand sign, aim).
+    """
+    delta = opp["pos"] - own["pos"]
+    distance = xp.linalg.norm(delta)
+    local = own["rot"].T @ delta
+    opp_facing = opp["rot"].T @ (-delta) / xp.maximum(distance, 1e-6)
+    return xp.concatenate([
+        local, distance[None], (distance - REACH)[None], opp_facing,
+        own["rot"].T @ own["vel"], own["rot"].T @ opp["vel"],
+        xp.stack([own["up"], own["height"], opp["up"], opp["height"]]),
+        own_arm, opp_arm, xp.stack([clock, 1 - clock]),
+        xp.stack([xp.minimum(distance, 3.0) ** 2, xp.sin(xp.arctan2(local[1], local[0]))]),
+    ])
+
+
+class TacticsEnv(mjx_env.MjxEnv):
+    """Single-agent view (red) of two-robot boxing with a frozen opponent."""
+
+    def __init__(self, motor_params, opponent_params=None, *, scripted_fraction=1.0,
+                 episode_seconds=20.0, worlds_hint=512, impl="warp"):
+        super().__init__(config_dict.create(ctrl_dt=.02, sim_dt=.004))
+        self.foundation = UnassistedG1("spar")
+        self._mj_model = build_pair(self.foundation, strike_sensors=True)
+        self._mjx_model = mjx_env.put_model(self._mj_model, impl=impl)
+        self._impl = impl
+        self.naconmax, self.njmax = worlds_hint * 64, 600
+        self.motor = inference(self.foundation, motor_params)
+        self.opponent = (tactics_policy(opponent_params) if opponent_params is not None
+                         else None)
+        self.scripted_fraction = 1.0 if opponent_params is None else float(scripted_fraction)
+        self.episode_steps = int(round(episode_seconds / self.dt))
+        self.pose = jp.asarray(self.foundation._default_pose)
+        self.scale = float(self.foundation._config.action_scale)
+        self.stand_height = float(self.foundation._init_q[2])
+        m = self._mj_model
+        self.act, self.q, self.v, self.root, self.rootv = [], [], [], [], []
+        self.linvel, self.gyro, self.upvec, self.imu, self.fists, self.targets = [], [], [], [], [], []
+        hits = []
+        for i, side in enumerate(scene.SIDES):
+            names = [self.foundation.mj_model.actuator(k).name for k in range(29)]
+            act = np.array([m.actuator(side + n).id for n in names])
+            joints = m.actuator_trnid[act, 0]
+            root = next(j for j in range(m.njnt) if m.jnt_type[j] == mujoco.mjtJoint.mjJNT_FREE
+                        and m.joint(j).name.startswith(side))
+            self.act.append(act)
+            self.q.append(m.jnt_qposadr[joints])
+            self.v.append(m.jnt_dofadr[joints])
+            self.root.append(int(m.jnt_qposadr[root]))
+            self.rootv.append(int(m.jnt_dofadr[root]))
+            adr = lambda name: int(m.sensor_adr[m.sensor(side + name).id])
+            self.linvel.append(adr("local_linvel_pelvis"))
+            self.gyro.append(adr("gyro_pelvis"))
+            self.upvec.append(adr("upvector_torso"))
+            self.imu.append(m.site(side + "imu_in_pelvis").id)
+            self.fists.append([m.geom(side + h).id for h in scene.HAND_GEOMS])
+            other = scene.OPPONENT[side]
+            self.targets.append([m.geom(other + t).id for t in STRIKE_SENSOR_TARGETS])
+            hits.append([[int(m.sensor_adr[m.sensor(strike_sensor_name(side, h, t)).id])
+                          for t in STRIKE_SENSOR_TARGETS] for h in scene.HAND_GEOMS])
+        self.act, self.q, self.v = map(np.stack, (self.act, self.q, self.v))
+        self.fists, self.targets = np.array(self.fists), np.array(self.targets)
+        self.hit_adr = np.array(hits)                     # (corner, hand, target)
+        self.clinch_adr = int(m.sensor_adr[m.sensor("clinch").id])
+        self.extend, self.retract = PUNCH_EXTEND / self.dt, PUNCH_RETRACT / self.dt
+
+    # --- MjxEnv contract -------------------------------------------------
+    @property
+    def xml_path(self):
+        return self.foundation.xml_path
+
+    @property
+    def action_size(self):
+        return ACTION_SIZE
+
+    @property
+    def mj_model(self):
+        return self._mj_model
+
+    @property
+    def mjx_model(self):
+        return self._mjx_model
+
+    @property
+    def observation_size(self):
+        return OBS_SIZE
+
+    # --- helpers ---------------------------------------------------------
+    def _body(self, data, i):
+        r = self.root[i]
+        rot = data.site_xmat[self.imu[i]][:2, :2]
+        rot = rot / jp.maximum(jp.linalg.norm(rot[:, 0]), 1e-6)
+        return dict(pos=data.qpos[r:r + 2], rot=rot, vel=data.qvel[self.rootv[i]:self.rootv[i] + 2],
+                    up=data.sensordata[self.upvec[i] + 2], height=data.qpos[r + 2] - self.stand_height)
+
+    def _arm_features(self, arm, i):
+        active = arm["age"][i] >= 0
+        return jp.stack([jp.maximum(arm["age"][i], 0) / (self.extend + self.retract),
+                         active.astype(jp.float32),
+                         jp.where(active, 2. * arm["hand"][i] - 1, 0.), arm["aim"][i] * active])
+
+    def _observations(self, data, info):
+        bodies = [self._body(data, i) for i in range(2)]
+        clock = info["step"] / self.episode_steps
+        arm = info["arm"]
+        return [observe(jp, bodies[i], bodies[1 - i], self._arm_features(arm, i),
+                        self._arm_features(arm, 1 - i), clock) for i in range(2)]
+
+    def _motor_obs(self, data, info, commands):
+        rows = []
+        for i in range(2):
+            gravity = data.site_xmat[self.imu[i]].T @ jp.array([0., 0., -1.])
+            rows.append(jp.concatenate([
+                data.sensordata[self.linvel[i]:self.linvel[i] + 3],
+                data.sensordata[self.gyro[i]:self.gyro[i] + 3], gravity, commands[i],
+                data.qpos[self.q[i]] - self.pose, data.qvel[self.v[i]],
+                info["last_motor"][i], jp.cos(info["phase"][i]), jp.sin(info["phase"][i])]))
+        return jp.stack(rows)
+
+    def _scripted(self, obs, rng, wait):
+        """JAX twin of ``spar_match.RingBrain`` in tactics space."""
+        gap = obs[3]
+        advance = jp.where(gap > .08, jp.clip(gap * 2, .1, 1), jp.where(gap < -.12, -.5, 0.))
+        aim_rng, hand_rng, wait_rng, pause_rng = jax.random.split(rng, 4)
+        ready = (obs[15] == 0) & (wait <= 0) & (gap < .1) & (jp.abs(obs[25]) < .35)
+        hand = jax.random.bernoulli(hand_rng)
+        punch = jp.where(ready, 1., -1.)
+        tactics = jp.stack([jp.where(hand, -1., punch), jp.where(hand, punch, -1.),
+                            jp.where(jax.random.bernoulli(aim_rng), 1., -1.), advance, 0.])
+        pause = jp.where(jax.random.bernoulli(pause_rng, .6),
+                         jax.random.randint(wait_rng, (), 2, 12),
+                         jax.random.randint(wait_rng, (), 20, 50))
+        return tactics, jp.where(ready, pause, wait - 1)
+
+    def _arms(self, arm, i, want, hand, aim, rng):
+        """Launches/advances corner ``i``'s punch and returns its 14 arm actions."""
+        jitter_rng, speed_rng = jax.random.split(rng)
+        launch = want & (arm["age"][i] < 0)
+        target = (PUNCH_BODY + aim * (PUNCH_HEAD - PUNCH_BODY)
+                  + jax.random.uniform(jitter_rng, (4,), minval=-.06, maxval=.06))
+        hand = jp.where(launch, hand, arm["hand"][i])
+        target = jp.where(launch, target, arm["target"][i])
+        speed = jp.where(launch, jax.random.uniform(speed_rng, minval=.9, maxval=1.15),
+                         arm["speed"][i])
+        age = jp.where(launch, 0., arm["age"][i])
+        fraction = jp.where(age < self.extend, (age + 1) / self.extend,
+                            1 - (age - self.extend) / self.retract)
+        fraction = jp.clip(fraction, 0, 1) * (age >= 0)
+        sign = jp.where(hand == 0, 1., -1.)
+        start = jp.where(hand == 0, LEFT_ARM, LEFT_ARM + 7)
+        guard = jax.lax.dynamic_slice(self.pose, (start,), (4,))
+        offset = fraction * (target * jp.array([1, sign, sign, 1]) - guard) / self.scale
+        actions = jax.lax.dynamic_update_slice(jp.zeros(14), offset, (start - LEFT_ARM,))
+        extending = (age >= 0) & (age < self.extend + 2)
+        new_age = jp.where(age >= 0, age + speed, age)
+        new_age = jp.where(new_age >= self.extend + self.retract, -1., new_age)
+        state = dict(age=new_age, hand=hand, target=target, speed=speed,
+                     aim=jp.where(launch, aim, arm["aim"][i]))
+        return actions, state, launch, extending
+
+    # --- reset / step ----------------------------------------------------
+    def reset(self, rng):
+        rng, place_rng, yaw_rng, center_rng, opp_rng, freq_rng, wait_rng = jax.random.split(rng, 7)
+        distance = jax.random.uniform(place_rng, minval=.9, maxval=1.7)
+        theta = jax.random.uniform(yaw_rng, minval=-jp.pi, maxval=jp.pi)
+        center = jax.random.uniform(center_rng, (2,), minval=-.5, maxval=.5)
+        noise = jax.random.uniform(yaw_rng, (2,), minval=-.25, maxval=.25)
+        axis = jp.array([jp.cos(theta), jp.sin(theta)])
+        qpos = jp.asarray(self._mj_model.qpos0)
+        for i in range(2):
+            r = self.root[i]
+            pos = center + (-.5 if i == 0 else .5) * distance * axis
+            yaw = theta + (0. if i == 0 else jp.pi) + noise[i]
+            qpos = qpos.at[r:r + 3].set(jp.concatenate([pos, jp.array([self.stand_height])]))
+            qpos = qpos.at[r + 3:r + 7].set(jp.array([jp.cos(yaw / 2), 0., 0., jp.sin(yaw / 2)]))
+            qpos = qpos.at[self.q[i]].set(self.pose)
+        ctrl = jp.zeros(self._mj_model.nu)
+        for i in range(2):
+            ctrl = ctrl.at[self.act[i]].set(self.pose)
+        data = mjx_env.make_data(self._mj_model, qpos=qpos, qvel=jp.zeros(self._mj_model.nv),
+                                 ctrl=ctrl, impl=self._impl, naconmax=self.naconmax,
+                                 njmax=self.njmax)
+        data = mjx.forward(self._mjx_model, data)
+        arm = dict(age=-jp.ones(2), hand=jp.zeros(2, jp.int32), target=jp.zeros((2, 4)),
+                   speed=jp.ones(2), aim=jp.zeros(2))
+        info = dict(rng=rng, step=jp.array(0), arm=arm, last_motor=jp.zeros((2, 29)),
+                    phase=jp.array([[0., jp.pi], [0., jp.pi]]),
+                    frequency=jax.random.uniform(freq_rng, (2, 1), minval=1.25, maxval=1.5),
+                    landed=jp.zeros(2, bool), scripted_wait=jax.random.randint(wait_rng, (), 5, 30),
+                    scripted=jax.random.bernoulli(opp_rng, self.scripted_fraction),
+                    previous_fists=data.geom_xpos[self.fists], previous_targets=data.geom_xpos[self.targets])
+        obs = self._observations(data, info)
+        metrics = {k: jp.zeros(()) for k in (
+            "hits", "hits_taken", "head_hits", "punches", "fell", "opponent_fell", "clinch", "distance")}
+        return mjx_env.State(data, obs[0], jp.zeros(()), jp.zeros(()), metrics, info)
+
+    def step(self, state, action):
+        info, data = dict(state.info), state.data
+        info["rng"], opp_rng, script_rng, arm_rng0, arm_rng1 = jax.random.split(info["rng"], 5)
+        obs = self._observations(data, info)
+        if self.opponent is not None:
+            learned, _ = self.opponent(obs[1], opp_rng)
+        else:
+            learned = jp.zeros(ACTION_SIZE)
+        scripted, wait = self._scripted(obs[1], script_rng, info["scripted_wait"])
+        info["scripted_wait"] = wait
+        opponent = jp.where(info["scripted"], scripted, learned)
+        bodies = [self._body(data, i) for i in range(2)]
+        commands, arm_actions, arm_states, launches, extending = [], [], [], [], []
+        for i, (tactics, rng) in enumerate(((action, arm_rng0), (opponent, arm_rng1))):
+            delta = bodies[1 - i]["pos"] - bodies[i]["pos"]
+            distance = jp.linalg.norm(delta)
+            command, want, hand, aim = decode(tactics, distance, bodies[i]["rot"].T @ delta)
+            actions, arm_state, launch, ext = self._arms(info["arm"], i, want, hand, aim, rng)
+            commands.append(command)
+            arm_actions.append(actions)
+            arm_states.append(arm_state)
+            launches.append(launch)
+            extending.append(ext)
+        info["arm"] = jax.tree.map(lambda a, b: jp.stack([a, b]), *arm_states)
+        motor, _ = self.motor({"state": self._motor_obs(data, info, commands),
+                               "privileged_state": jp.zeros((2, 216))}, jax.random.PRNGKey(0))
+        motor = motor.at[:, LEFT_ARM:].set(jp.stack(arm_actions))
+        ctrl = data.ctrl
+        for i in range(2):
+            ctrl = ctrl.at[self.act[i]].set(self.pose + self.scale * motor[i])
+
+        def substep(carry, _):
+            data, found, clinch = carry
+            data = mjx.step(self._mjx_model, data.replace(ctrl=ctrl))
+            found = jp.maximum(found, data.sensordata[self.hit_adr])
+            return (data, found, jp.maximum(clinch, data.sensordata[self.clinch_adr])), None
+
+        zeros = jp.zeros(self.hit_adr.shape)
+        (data, found, clinch), _ = jax.lax.scan(substep, (data, zeros, jp.zeros(())), (), 5)
+
+        # Clean hits: first touch of a punch, while extending, closing >= 0.5 m/s.
+        fists, targets = data.geom_xpos[self.fists], data.geom_xpos[self.targets]
+        fist_motion = (fists - info["previous_fists"]) / self.dt              # (2, hand, 3)
+        target_motion = (targets - info["previous_targets"]) / self.dt        # (2, target, 3)
+        towards = targets[:, None] - info["previous_fists"][:, :, None]       # (2, hand, target, 3)
+        towards = towards / jp.maximum(jp.linalg.norm(towards, axis=-1, keepdims=True), 1e-6)
+        closing = jp.sum((fist_motion[:, :, None] - target_motion[:, None]) * towards, axis=-1)
+        punching_hand = jp.stack([jp.arange(2) == info["arm"]["hand"][i] for i in range(2)])
+        clean = (found > 0) & (closing >= .5) & punching_hand[:, :, None]
+        clean = clean & jp.stack(extending)[:, None, None]
+        value = jp.array([HEAD_VALUE, TORSO_VALUE])
+        best = jp.max(clean * value, axis=(1, 2))                             # (2,)
+        landed = info["landed"] & (info["arm"]["age"] >= 0)                   # reset per punch
+        scored = jp.where(landed, 0., best)
+        info["landed"] = landed | (best > 0)
+        info["previous_fists"], info["previous_targets"] = fists, targets
+
+        info["last_motor"] = motor
+        info["phase"] = jp.fmod(info["phase"] + 2 * jp.pi * self.dt * info["frequency"] + jp.pi,
+                                2 * jp.pi) - jp.pi
+        info["step"] = info["step"] + 1
+        bodies = [self._body(data, i) for i in range(2)]
+        fell = jp.stack([(data.qpos[self.root[i] + 2] < .55) | (bodies[i]["up"] < .6)
+                         | ~jp.isfinite(data.qpos).all() for i in range(2)])
+        distance = jp.linalg.norm(bodies[1]["pos"] - bodies[0]["pos"])
+        in_range = jp.exp(-((distance - REACH) / .15) ** 2)
+        reward = (2. * scored[0] - 1.5 * scored[1] - 10. * fell[0] + 5. * fell[1] * ~fell[0]
+                  + self.dt * (.3 * in_range - 1. * clinch) - .02 * launches[0])
+        done = fell.any() | (info["step"] >= self.episode_steps)
+        metrics = dict(hits=scored[0], hits_taken=scored[1], head_hits=(scored[0] >= HEAD_VALUE) * 1.,
+                       punches=launches[0] * 1., fell=fell[0] * 1., opponent_fell=fell[1] * 1.,
+                       clinch=clinch, distance=distance)
+        obs = self._observations(data, info)
+        reward = jp.where(jp.isfinite(reward), reward, -10.)
+        return state.replace(data=data, obs=obs[0], reward=reward, done=done.astype(jp.float32),
+                             metrics=metrics, info=info)
