@@ -24,6 +24,7 @@ from mujoco_playground import wrapper
 from boxer.checkpoint_io import atomic_json
 from boxer.curriculum_train import jax_compat, load_policy_params, save_policy, utc
 from boxer.tactics_env import TacticsEnv, tactics_network_factory
+from boxer.tactics_gate import gate_generation
 
 
 def generation_dir(output, generation):
@@ -33,7 +34,7 @@ def generation_dir(output, generation):
 def train_generation(args, generation, motor, learner, pool):
     env = TacticsEnv(motor, pool or None, scripted_fraction=args.scripted_fraction if pool else 1.0,
                      worlds_hint=args.worlds, native_reset_fraction=args.native_reset_fraction,
-                     scoring=args.scoring)
+                     scoring=args.scoring, fall_penalty=args.fall_penalty)
     root = generation_dir(args.output, generation)
     root.mkdir(parents=True, exist_ok=True)
     started = time.monotonic()
@@ -55,7 +56,7 @@ def train_generation(args, generation, motor, learner, pool):
         save_policy(root / "checkpoint", params, dict(stage="tactics", generation=generation,
                     stage_steps=int(step), opponents=["scripted"] + [f"pool-{g}" for g in range(len(pool))],
                     native_reset_fraction=args.native_reset_fraction, scoring=args.scoring,
-                    randomize=args.randomize,
+                    randomize=args.randomize, fall_penalty=args.fall_penalty,
                     pool_sources=[str(p) for p in args.pool], initialized_from=str(args.init_from),
                     scripted_fraction=env.scripted_fraction, updated_utc=utc()))
 
@@ -93,6 +94,13 @@ def main(argv=None):
                         help="training hit rule; 'native' mirrors the native ImpactScorecard")
     parser.add_argument("--randomize", type=float, default=0.0,
                         help="domain randomization strength (TacticsEnv.randomizer); 0 = nominal physics")
+    parser.add_argument("--fall-penalty", type=float, default=10.0,
+                        help="reward lost when the learner falls")
+    parser.add_argument("--native-gate", type=int, default=0,
+                        help="natively evaluate this many final checkpoints per generation and "
+                             "continue from the best (boxer.tactics_gate); 0 trusts the last one")
+    parser.add_argument("--champion", type=Path, default=Path("checkpoints/tactics"),
+                        help="opponent for the native gate")
     parser.add_argument("--init-from", type=Path, help="tactics checkpoint to warm-start generation 0")
     parser.add_argument("--pool", type=Path, nargs="*", default=[],
                         help="earlier tactics checkpoints that join every generation's opponent pool")
@@ -107,7 +115,10 @@ def main(argv=None):
             print(f"generation {generation} already complete; resuming after it", flush=True)
         else:
             train_generation(args, generation, motor, learner, pool)
-        learner, _ = load_policy_params(root / "checkpoint")
+        selected = root / "checkpoint"
+        if args.native_gate:
+            selected = gate_generation(root, args.champion, args.native_gate)
+        learner, _ = load_policy_params(selected)
         pool.append(learner)
     return 0
 

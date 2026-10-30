@@ -104,7 +104,8 @@ class TacticsEnv(mjx_env.MjxEnv):
 
     def __init__(self, motor_params, opponent_params=None, *, scripted_fraction=1.0,
                  episode_seconds=20.0, worlds_hint=512, impl="warp",
-                 opponent_deterministic=False, native_reset_fraction=0.0, scoring="punch"):
+                 opponent_deterministic=False, native_reset_fraction=0.0, scoring="punch",
+                 fall_penalty=10.0):
         """``opponent_params``: one tactics checkpoint's params or a list (a pool).
 
         Each bout draws its opponent at reset: the scripted brain with
@@ -118,6 +119,7 @@ class TacticsEnv(mjx_env.MjxEnv):
         if scoring not in ("punch", "native"):
             raise ValueError(f"unknown scoring {scoring!r}")
         self.scoring = scoring
+        self.fall_penalty = float(fall_penalty)
         super().__init__(config_dict.create(ctrl_dt=.02, sim_dt=.004))
         self.foundation = UnassistedG1("spar")
         self._mj_model = build_pair(self.foundation, strike_sensors=True)
@@ -458,7 +460,7 @@ class TacticsEnv(mjx_env.MjxEnv):
         fell = self._fallen(data)
         distance = jp.linalg.norm(bodies[1]["pos"] - bodies[0]["pos"])
         in_range = jp.exp(-((distance - REACH) / .15) ** 2)
-        reward = (2. * scored[0] - 1.5 * scored[1] - 10. * fell[0] + 5. * fell[1] * ~fell[0]
+        reward = (2. * scored[0] - 1.5 * scored[1] - self.fall_penalty * fell[0] + 5. * fell[1] * ~fell[0]
                   + self.dt * (.3 * in_range - 1. * clinch) - .02 * launches[0])
         done = fell.any() | (info["step"] >= self.episode_steps)
         metrics = dict(hits=scored[0], hits_taken=scored[1], head_hits=(scored[0] >= HEAD_VALUE) * 1.,
