@@ -22,7 +22,9 @@ self-play generations improve in batched physics but not natively. That
 transfer gap is the next problem; see the report. With physics randomization, the
 first randomized generation reaches rough parity with the champion natively
 (21–23–4 over 48 bouts). Further generations drift toward risky play that only
-pays off in batched physics.
+pays off in batched physics. A native-physics gate shows this degradation
+directly (3–13 after 20M steps, from rough parity at the start), even with
+falls made costlier. The next step is fine-tuning on native rollouts.
 
 ```bash
 bash tools/run_spar.sh boxer.spar_match --red-tactics checkpoints/tactics   --blue-tactics checkpoints/tactics --seeds 0 1 2 3 --swap --video runs/fight.mp4

@@ -145,6 +145,41 @@ fresh seeds 8–23, corners swapped.
   3. Retrain the `spar` motor under the same randomization, so balance is
      robust before tactics exploit it.
 
+## Native gate and fall penalty (v4)
+
+`boxer/tactics_gate.py` stops trusting a generation's last checkpoint. After
+each generation, its last 4 checkpoints play the champion natively (seeds 0–7,
+corners swapped). The best continues training and joins the pool, and it is
+confirmed on fresh seeds 8–23 for a 48-bout record (`--native-gate 4`). v4
+started from v3 gen‑0, with randomization, a fall penalty of 30 instead of 10,
+and a pool of the champion, v3 gen‑0 and v1 gen‑3.
+
+| v4 gen‑0 checkpoint | vs champion, seeds 0–7 | Clean punches / bout |
+| --- | --- | --- |
+| 5M | 6–8–2 | 13.8 : 16.4 |
+| 10M | 4–11–1 | 11.1 : 16.7 |
+| 15M | 5–10–1 | 12.5 : 16.1 |
+| 20M | 3–13–0 | 14.5 : 19.0 |
+| **gate pick 5M, 48 bouts** | **16–30–2** | 15.4 : 18.4, 2 falls |
+
+* **The fall penalty works.** Only 2 knockdowns in 48 bouts.
+* **The gate shows the drift directly.** Native strength against the champion
+  falls the longer the policy trains in batched self-play: starting point
+  21–23–4, then 6–8 at 5M and 3–13 at 20M. Randomization, pools, native-style
+  starts, native scoring and fall penalties do not change that direction.
+  v4 was stopped after generation 0 because more generations would only
+  repeat it.
+
+**Conclusion.** The batched MJX/Warp environment is good for learning
+tactics against a fixed scripted opponent (champion: 16–0). Refining against
+learned opponents optimizes contact details that native MuJoCo does not
+share. The next step that addresses this directly is **native-physics
+fine-tuning**: PPO on rollouts from parallel CPU `PairedFoundation`
+processes. Native play runs at about 100 control steps/s per process, so 16
+cores give roughly 1.5k steps/s, about 5M steps in an hour. An alternative is
+to run tactics training on `mujoco_warp` directly, the backend Codex
+validated against native for this model.
+
 ## Champion: `checkpoints/tactics` (v1 gen‑0)
 
 Gen‑0 (20M steps against the scripted brain, 14 minutes of training) beats

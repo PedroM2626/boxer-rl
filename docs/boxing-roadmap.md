@@ -10,8 +10,10 @@ falling. The remaining work is the boxing brain and the move set:
 
 1. **Learned tactics: first version done** ([tactics](tactics.md)). The
    champion beats the scripted brain 16–0 natively. Next: make self-play
-   progress transfer to native physics (domain randomization, native or
-   `mujoco_warp` fine-tuning, native checkpoint selection).
+   progress transfer to native physics. Randomization, opponent pools,
+   native-style starts, native scoring, fall penalties and native-gated
+   selection were all tried ([tactics](tactics.md)); none stops the drift.
+   Next: PPO fine-tuning on parallel native CPU rollouts.
 2. **Range control and clinch breaking.** Penalize chest contact and reward
    staying at punching range.
 3. **More moves.** Hooks, uppercuts and active guard/blocking primitives in the
