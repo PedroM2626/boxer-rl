@@ -1,0 +1,46 @@
+{
+  "scope": "qualified_training_cycle_pending_independent_policy_evaluation",
+  "event": {
+    "corner": 1,
+    "hand": 1,
+    "onset_time": 8.293764114379883,
+    "event_time": 8.299763679504395,
+    "onset_relative_speed": 1.0495877937792881,
+    "onset_forward_cosine": 0.8523038630463621,
+    "onset_contact_closing": 0.9290819607215022,
+    "onset_contact_advancing": 0.9004770488093108,
+    "pre_window_seconds": 0.24998188018798828,
+    "pre_peak_relative_speed": 2.629749108313771,
+    "pre_max_displacement_m": 0.2117474145877976,
+    "pre_path_length_m": 0.400955988595411,
+    "pre_elbow_excursion_rad": 0.502685934305191,
+    "event_window_impulse_ns": 0.5385937805175781,
+    "native_contact_window_impulse_ns": 0.5385937805175781,
+    "post_window_seconds": 0.49996376037597656,
+    "post_contact_seconds": 0.016,
+    "return_toward_pre_window_position_m": 0.06715227408985279,
+    "post_window_complete": true
+  },
+  "controlled_by": "learner",
+  "learner_corner": 1,
+  "consumed_at_recognition": 10233984,
+  "world": 30,
+  "reset_seed": 104079,
+  "swap": false,
+  "active_opponent": true,
+  "foundation_sha256": "b39b1990945e8a374802c3a190e5ac5e026ae39e7fd5ef61c5c2b01ad291c6fc",
+  "policy_checkpoints_in_window": [
+    {
+      "optimized_steps": 10224640,
+      "file": "/home/pedro/boxing-runs/gpu-learning-v1/checkpoint/step-10224640.pkl",
+      "sha256": "ebc9a2655a5370e58c9fe5da25b7789a63882ec1f6059b75a4fc5224abc8b710"
+    }
+  ],
+  "native_file": "/home/pedro/boxing-runs/gpu-learning-v1/event-evidence/step-10233984-world-30-corner-1-hand-1-time-8299763680.npz",
+  "native_sha256": "3859cf9c7175324e8edd9822ffe3211ee9db226316ed2cec711745ff3f75e173",
+  "new_physical_controls_for_capture": 0,
+  "new_optimizer_updates_for_capture": 0,
+  "new_geometry_queries": 0,
+  "main_adoption": false,
+  "limitation": "A stochastic training event is not a deterministic held-out gate pass; the window may span PPO updates."
+}
