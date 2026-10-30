@@ -32,7 +32,8 @@ def generation_dir(output, generation):
 
 def train_generation(args, generation, motor, learner, pool):
     env = TacticsEnv(motor, pool or None, scripted_fraction=args.scripted_fraction if pool else 1.0,
-                     worlds_hint=args.worlds, native_reset_fraction=args.native_reset_fraction)
+                     worlds_hint=args.worlds, native_reset_fraction=args.native_reset_fraction,
+                     scoring=args.scoring)
     root = generation_dir(args.output, generation)
     root.mkdir(parents=True, exist_ok=True)
     started = time.monotonic()
@@ -52,8 +53,9 @@ def train_generation(args, generation, motor, learner, pool):
         if not all(np.isfinite(x).all() for x in leaves):
             raise FloatingPointError("non-finite tactics policy")
         save_policy(root / "checkpoint", params, dict(stage="tactics", generation=generation,
-                    stage_steps=int(step), opponents=["scripted"] + [f"gen-{g}" for g in range(len(pool))],
-                    native_reset_fraction=args.native_reset_fraction,
+                    stage_steps=int(step), opponents=["scripted"] + [f"pool-{g}" for g in range(len(pool))],
+                    native_reset_fraction=args.native_reset_fraction, scoring=args.scoring,
+                    pool_sources=[str(p) for p in args.pool], initialized_from=str(args.init_from),
                     scripted_fraction=env.scripted_fraction, updated_utc=utc()))
 
     _, params, _ = ppo.train(
@@ -85,10 +87,16 @@ def main(argv=None):
     parser.add_argument("--learning-rate", type=float, default=3e-4)
     parser.add_argument("--entropy-cost", type=float, default=1e-2)
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--scoring", choices=("punch", "native"), default="punch",
+                        help="training hit rule; 'native' mirrors the native ImpactScorecard")
+    parser.add_argument("--init-from", type=Path, help="tactics checkpoint to warm-start generation 0")
+    parser.add_argument("--pool", type=Path, nargs="*", default=[],
+                        help="earlier tactics checkpoints that join every generation's opponent pool")
     args = parser.parse_args(argv)
     jax_compat()
     motor, _ = load_policy_params(args.motor)
-    learner, pool = None, []
+    learner = load_policy_params(args.init_from)[0] if args.init_from else None
+    pool = [load_policy_params(path)[0] for path in args.pool]
     for generation in range(args.generations):
         root = generation_dir(args.output, generation)
         if (root / "done.json").exists():

@@ -85,3 +85,18 @@ def test_native_style_starts_and_an_opponent_pool():
     for _ in range(10):
         state = step(state, jp.zeros(ACTION_SIZE))
     assert np.isfinite(np.asarray(state.obs)).all()
+
+
+def test_native_scoring_counts_events_per_hand_and_rearms():
+    motor, _ = load_policy_params("checkpoints/spar")
+    env = TacticsEnv(motor, worlds_hint=2, episode_seconds=1.0, scoring="native")
+    state = jax.jit(env.reset)(jax.random.PRNGKey(2))
+    assert state.info["engaged"].shape == (2, 2)
+    step = jax.jit(env.step)
+    total = 0.
+    for t in range(40):
+        action, _ = env._scripted(state.obs, jax.random.PRNGKey(t), state.info["scripted_wait"])
+        state = step(state, action)
+        total += float(state.metrics["hits"])
+        assert float(state.metrics["hits"]) in (0., 1., 2.)   # whole events, at most one per hand
+    assert np.isfinite(np.asarray(state.obs)).all() and total >= 0

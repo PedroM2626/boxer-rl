@@ -104,15 +104,20 @@ class TacticsEnv(mjx_env.MjxEnv):
 
     def __init__(self, motor_params, opponent_params=None, *, scripted_fraction=1.0,
                  episode_seconds=20.0, worlds_hint=512, impl="warp",
-                 opponent_deterministic=False, native_reset_fraction=0.0):
+                 opponent_deterministic=False, native_reset_fraction=0.0, scoring="punch"):
         """``opponent_params``: one tactics checkpoint's params or a list (a pool).
 
         Each bout draws its opponent at reset: the scripted brain with
         ``scripted_fraction``, otherwise a uniformly chosen pool member.
         ``native_reset_fraction`` of bouts start like ``PairedFoundation.reset``
         (2 m apart, joints scaled by U(0.5, 1.5), random root velocity), the
-        states native evaluation starts from.
+        states native evaluation starts from. ``scoring``: "punch" (first touch
+        of an extending punch, head 1.0 / torso 0.6; generations 0-3) or
+        "native" (the ImpactScorecard rules, see ``step``).
         """
+        if scoring not in ("punch", "native"):
+            raise ValueError(f"unknown scoring {scoring!r}")
+        self.scoring = scoring
         super().__init__(config_dict.create(ctrl_dt=.02, sim_dt=.004))
         self.foundation = UnassistedG1("spar")
         self._mj_model = build_pair(self.foundation, strike_sensors=True)
@@ -188,6 +193,10 @@ class TacticsEnv(mjx_env.MjxEnv):
         rot = rot / jp.maximum(jp.linalg.norm(rot[:, 0]), 1e-6)
         return dict(pos=data.qpos[r:r + 2], rot=rot, vel=data.qvel[self.rootv[i]:self.rootv[i] + 2],
                     up=data.sensordata[self.upvec[i] + 2], height=data.qpos[r + 2] - self.stand_height)
+
+    def _fallen(self, data):
+        return jp.stack([(data.qpos[self.root[i] + 2] < .55) | (data.sensordata[self.upvec[i] + 2] < .6)
+                         | ~jp.isfinite(data.qpos).all() for i in range(2)])
 
     def _arm_features(self, arm, i):
         active = arm["age"][i] >= 0
@@ -290,7 +299,8 @@ class TacticsEnv(mjx_env.MjxEnv):
         info = dict(rng=rng, step=jp.array(0), arm=arm, last_motor=jp.zeros((2, 29)),
                     phase=jp.array([[0., jp.pi], [0., jp.pi]]),
                     frequency=jax.random.uniform(freq_rng, (2, 1), minval=1.25, maxval=1.5),
-                    landed=jp.zeros(2, bool), scripted_wait=jax.random.randint(wait_rng, (), 5, 30),
+                    landed=jp.zeros(2, bool), engaged=jp.zeros((2, 2), bool),
+                    absent=jp.full((2, 2), .1), since_score=jp.full((2, 2), 1.), scripted_wait=jax.random.randint(wait_rng, (), 5, 30),
                     scripted=jax.random.bernoulli(opp_rng, self.scripted_fraction),
                     opponent=jax.random.randint(pool_rng, (), 0, max(len(self.opponents), 1)),
                     previous_fists=data.geom_xpos[self.fists], previous_targets=data.geom_xpos[self.targets])
@@ -347,14 +357,34 @@ class TacticsEnv(mjx_env.MjxEnv):
         towards = targets[:, None] - info["previous_fists"][:, :, None]       # (2, hand, target, 3)
         towards = towards / jp.maximum(jp.linalg.norm(towards, axis=-1, keepdims=True), 1e-6)
         closing = jp.sum((fist_motion[:, :, None] - target_motion[:, None]) * towards, axis=-1)
-        punching_hand = jp.stack([jp.arange(2) == info["arm"]["hand"][i] for i in range(2)])
-        clean = (found > 0) & (closing >= .5) & punching_hand[:, :, None]
-        clean = clean & jp.stack(extending)[:, None, None]
-        value = jp.array([HEAD_VALUE, TORSO_VALUE])
-        best = jp.max(clean * value, axis=(1, 2))                             # (2,)
-        landed = info["landed"] & (info["arm"]["age"] >= 0)                   # reset per punch
-        scored = jp.where(landed, 0., best)
-        info["landed"] = landed | (best > 0)
+        if self.scoring == "native":
+            # Mirrors ImpactScorecard: one event per hand contact onset, closing
+            # >= 0.3 m/s on the target and >= 0.2 m/s relative to the own torso,
+            # rearmed after 0.1 s apart, 0.2 s cooldown. Every event is worth 1.
+            # (The 0.5 N s impulse test has no batched equivalent.)
+            touching = (found > 0).any(axis=2)                                # (2, hand)
+            torso = jp.stack([data.qvel[self.rootv[i]:self.rootv[i] + 3] for i in range(2)])
+            own = jp.sum((fist_motion[:, :, None] - torso[:, None, None]) * towards, axis=-1)
+            touched = found > 0
+            closing_ok = jp.max(jp.where(touched, closing, -jp.inf), axis=2) >= .3
+            advancing_ok = jp.max(jp.where(touched, own, -jp.inf), axis=2) >= .2
+            absent = jp.where(touching, 0., info["absent"] + self.dt)
+            engaged = info["engaged"] & ~(~touching & (absent >= .1))
+            onset = touching & ~engaged
+            events = onset & closing_ok & advancing_ok & (info["since_score"] >= .2) & ~self._fallen(data).any()
+            info["engaged"] = engaged | touching
+            info["absent"] = absent
+            info["since_score"] = jp.where(events, 0., info["since_score"] + self.dt)
+            scored = events.sum(axis=1).astype(jp.float32)
+        else:
+            punching_hand = jp.stack([jp.arange(2) == info["arm"]["hand"][i] for i in range(2)])
+            clean = (found > 0) & (closing >= .5) & punching_hand[:, :, None]
+            clean = clean & jp.stack(extending)[:, None, None]
+            value = jp.array([HEAD_VALUE, TORSO_VALUE])
+            best = jp.max(clean * value, axis=(1, 2))                         # (2,)
+            landed = info["landed"] & (info["arm"]["age"] >= 0)               # reset per punch
+            scored = jp.where(landed, 0., best)
+            info["landed"] = landed | (best > 0)
         info["previous_fists"], info["previous_targets"] = fists, targets
 
         info["last_motor"] = motor
@@ -362,8 +392,7 @@ class TacticsEnv(mjx_env.MjxEnv):
                                 2 * jp.pi) - jp.pi
         info["step"] = info["step"] + 1
         bodies = [self._body(data, i) for i in range(2)]
-        fell = jp.stack([(data.qpos[self.root[i] + 2] < .55) | (bodies[i]["up"] < .6)
-                         | ~jp.isfinite(data.qpos).all() for i in range(2)])
+        fell = self._fallen(data)
         distance = jp.linalg.norm(bodies[1]["pos"] - bodies[0]["pos"])
         in_range = jp.exp(-((distance - REACH) / .15) ** 2)
         reward = (2. * scored[0] - 1.5 * scored[1] - 10. * fell[0] + 5. * fell[1] * ~fell[0]
