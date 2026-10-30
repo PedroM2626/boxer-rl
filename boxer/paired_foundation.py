@@ -127,9 +127,11 @@ class PairedFoundation:
 
     dt = .02
 
-    def __init__(self, foundation, separation=2.0, *, diagnostic_excluded_pairs=()):
+    def __init__(self, foundation, separation=2.0, *, diagnostic_excluded_pairs=(), model=None):
+        """``model``: an already built ``build_pair`` model (e.g. loaded in a worker)."""
         self.foundation = foundation
-        self.model = build_pair(foundation, separation, diagnostic_excluded_pairs=diagnostic_excluded_pairs)
+        self.model = model if model is not None else build_pair(
+            foundation, separation, diagnostic_excluded_pairs=diagnostic_excluded_pairs)
         self.data = mujoco.MjData(self.model)
         self.pose = np.asarray(foundation._default_pose)
         self.action_scale = float(foundation._config.action_scale)
