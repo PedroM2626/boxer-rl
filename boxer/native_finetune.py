@@ -6,8 +6,10 @@ comes from the physics used for evaluation. Worker processes each run a
 ``PairedFoundation`` bout with the frozen sparring motor, the native impact
 scorecard and the shared ``observe``/``decode``/``PunchArm`` code. Each bout
 picks the learner's corner at random, and its opponent from the scripted
-brain and a pool of frozen tactics policies. A central learner runs PPO on
-the gathered transitions.
+brain and a pool of frozen tactics policies. A share of the scripted
+opponents can hold the high guard throughout, which no straight gets through
+(docs/moves.md, scoring audit): only hooks score on them. A central learner
+runs PPO on the gathered transitions.
 
 The observation normalizer stays frozen at the starting checkpoint's
 statistics, so behaviour log-probabilities stay exact across the update.
@@ -23,6 +25,8 @@ from pathlib import Path
 
 import numpy as np
 
+from boxer import moves
+
 REWARD = dict(hit=2.0, taken=1.5, opponent_fell=5.0, in_range=.3, punch=.02)
 
 
@@ -37,10 +41,12 @@ def _configure_worker_env():
 class NativeBout:
     """One native two-robot bout, stepped one learner decision at a time."""
 
-    def __init__(self, pair, motor, rng, opponents, scripted_fraction, episode_steps, fall_penalty):
+    def __init__(self, pair, motor, rng, opponents, scripted_fraction, episode_steps, fall_penalty,
+                 high_guard_fraction=0.):
         from boxer.spar_match import PunchArm
         self.pair, self.motor, self.rng = pair, motor, rng
         self.opponents, self.scripted_fraction = opponents, scripted_fraction
+        self.high_guard_fraction = high_guard_fraction
         self.episode_steps, self.fall_penalty = episode_steps, fall_penalty
         self.PunchArm = PunchArm
         self.reset()
@@ -52,7 +58,8 @@ class NativeBout:
         self.arms = [self.PunchArm(self.pair.pose, self.pair.action_scale, self.pair.dt) for _ in range(2)]
         self.learner = int(self.rng.integers(2))
         if not self.opponents or self.rng.random() < self.scripted_fraction:
-            self.opponent = RingBrain(np.random.default_rng(seed))
+            self.opponent = RingBrain(np.random.default_rng(seed),
+                                      high=bool(self.rng.random() < self.high_guard_fraction))
         else:
             self.opponent = self.opponents[int(self.rng.integers(len(self.opponents)))]
         self.t = 0
@@ -73,7 +80,7 @@ class NativeBout:
         from boxer.tactics_env import REACH, decode
         pair, i = self.pair, self.learner
         bodies = [_body(pair, k) for k in range(2)]
-        commands, launched, high = [None, None], False, [False, False]
+        commands, launched, hooked, high = [None, None], False, False, [False, False]
         for k in range(2):
             delta = bodies[1 - k]["pos"] - bodies[k]["pos"]
             distance = float(np.linalg.norm(delta))
@@ -83,11 +90,13 @@ class NativeBout:
                     np.asarray(tactics, np.float64), distance, local)
                 punch = (int(hand), float(aim), int(move)) if want and self.arms[k].ready else None
                 launched = punch is not None
+                hooked = launched and punch[2] == moves.HOOK
             elif isinstance(self.opponent, PolicyBrain):
                 command, punch, high[k] = self.opponent.decide_pair(
                     pair, k, self.arms, self.t / self.episode_steps)
             else:
                 command, punch = self.opponent.decide(distance, local, self.arms[k])
+                high[k] = self.opponent.high
             if punch is not None:
                 self.arms[k].launch(*punch[:2], self.rng, *punch[2:])
             commands[k] = command
@@ -109,7 +118,8 @@ class NativeBout:
         terminal = bool(outcome["done"])
         truncated = not terminal and self.t >= self.episode_steps
         return float(reward), terminal, truncated, dict(hits=float(scored[i]), taken=float(scored[1 - i]),
-                                                        fell=float(fallen[i]))
+                                                        fell=float(fallen[i]), punches=float(launched),
+                                                        hooks=float(hooked))
 
 
 def worker(conn, *args):
@@ -168,7 +178,7 @@ def export_native_model(path):
 
 
 def _worker(conn, seed, motor_path, opponent_paths, scripted_fraction, episode_steps, fall_penalty,
-            min_std, model_path, constants):
+            min_std, model_path, constants, high_guard_fraction=0.):
     _configure_worker_env()
     import jax
     import jax.numpy as jp
@@ -186,7 +196,8 @@ def _worker(conn, seed, motor_path, opponent_paths, scripted_fraction, episode_s
         brain = PolicyBrain(load_policy_params(path)[0], deterministic=bool(k % 2 == 0))
         brain.key = jax.random.PRNGKey(seed * 101 + k)
         opponents.append(brain)
-    bout = NativeBout(pair, motor, rng, opponents, scripted_fraction, episode_steps, fall_penalty)
+    bout = NativeBout(pair, motor, rng, opponents, scripted_fraction, episode_steps, fall_penalty,
+                      high_guard_fraction)
     sample = jax.jit(make_sampler(min_std))
     key = jax.random.PRNGKey(seed)
     obs = bout.observe()
@@ -197,7 +208,7 @@ def _worker(conn, seed, motor_path, opponent_paths, scripted_fraction, episode_s
             break
         params, steps = message
         record = {k: [] for k in ("obs", "raw", "logp", "reward", "terminal", "truncated", "next_obs")}
-        stats = dict(hits=0., taken=0., fell=0., bouts=0)
+        stats = dict(hits=0., taken=0., fell=0., punches=0., hooks=0., bouts=0)
         for _ in range(steps):
             key, sub = jax.random.split(key)
             action, raw, logp = sample(params, jp.asarray(obs), sub)
@@ -207,7 +218,7 @@ def _worker(conn, seed, motor_path, opponent_paths, scripted_fraction, episode_s
                                 ("reward", reward), ("terminal", terminal), ("truncated", truncated),
                                 ("next_obs", next_obs)):
                 record[name].append(value)
-            for name in ("hits", "taken", "fell"):
+            for name in ("hits", "taken", "fell", "punches", "hooks"):
                 stats[name] += info[name]
             if terminal or truncated:
                 stats["bouts"] += 1
@@ -272,6 +283,8 @@ def main(argv=None):
     parser.add_argument("--steps", type=int, default=3_000_000)
     parser.add_argument("--checkpoint-every", type=int, default=500_000)
     parser.add_argument("--scripted-fraction", type=float, default=.3)
+    parser.add_argument("--high-guard-fraction", type=float, default=0.,
+                        help="share of scripted opponents that hold the high guard")
     parser.add_argument("--fall-penalty", type=float, default=30.)
     parser.add_argument("--min-std", type=float, default=.15)
     parser.add_argument("--learning-rate", type=float, default=1e-4)
@@ -344,7 +357,8 @@ def main(argv=None):
         parent, child = context.Pipe()
         process = context.Process(target=worker, args=(
             child, args.seed * 1000 + w, args.motor, [str(p) for p in args.pool],
-            args.scripted_fraction, 1000, args.fall_penalty, args.min_std, model_path, constants),
+            args.scripted_fraction, 1000, args.fall_penalty, args.min_std, model_path, constants,
+            args.high_guard_fraction),
             daemon=True)
         process.start()
         pipes.append(parent)
@@ -397,6 +411,7 @@ def main(argv=None):
                           hits_per_1000=1000 * sum(s["hits"] for s in stats) / size,
                           taken_per_1000=1000 * sum(s["taken"] for s in stats) / size,
                           falls=sum(s["fell"] for s in stats), bouts_finished=bouts,
+                          hook_share=sum(s["hooks"] for s in stats) / max(sum(s["punches"] for s in stats), 1.),
                           **{k: float(v) for k, v in info.items()})
             log.write(json.dumps(record) + "\n")
             log.flush()

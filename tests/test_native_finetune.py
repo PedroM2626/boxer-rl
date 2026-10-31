@@ -33,3 +33,19 @@ def test_std_floor_raises_only_small_scales_and_keeps_the_mean():
     assert floor_std(logits, 0) is logits
     raw = dist.sample_no_postprocessing(floored, jax.random.PRNGKey(0))
     assert np.isfinite(float(dist.log_prob(floored, raw)[0]))
+
+
+def test_scripted_high_guard_opponents_hold_the_guard():
+    from boxer.native_finetune import NativeBout
+
+    class Pair:
+        pose, action_scale, dt = np.zeros(29), 1., .02
+
+        def reset(self, seed):
+            pass
+
+    holds = []
+    for fraction in (0., 1.):
+        bout = NativeBout(Pair(), None, np.random.default_rng(0), [], 1., 10, 30., fraction)
+        holds.append(bout.opponent.high)
+    assert holds == [False, True]
