@@ -2,6 +2,7 @@
 import jax
 import jax.numpy as jp
 import numpy as np
+import pytest
 
 from boxer import moves
 from boxer.curriculum_control import STAGES, TRAINABLE_STAGES, commands_for
@@ -76,3 +77,50 @@ def test_ring_brain_closes_distance_then_punches_only_in_range():
     assert command[0] > .2 and punch is None
     punches = [brain.decide(.6, np.array([.6, 0.]), arm)[1] for _ in range(60)]
     assert any(p is not None for p in punches)
+
+
+class _FallingPair:
+    """Minimal stand-in for PairedFoundation whose boxers fall on schedule."""
+
+    dt, action_scale, pose = .02, 1., np.zeros(29)
+
+    def __init__(self, falls):
+        self.falls, self.t, self.resets = falls, 0, 0
+        self.maps = [dict(root=0, side='red/'), dict(root=7, side='blue/')]
+
+        class Data:
+            qpos = np.zeros(14)
+
+            @staticmethod
+            def site(name):
+                return type('Site', (), {'xmat': np.eye(3).ravel()})
+        self.data = Data()
+        self.data.qpos[7] = .6
+
+    def reset(self, seed=0):
+        self.resets += 1
+
+    def observation(self, commands):
+        return np.zeros((2, 4), np.float32)
+
+    def step(self, action):
+        fallen = np.array(self.falls.get(self.t, (False, False)))
+        self.t += 1
+        return dict(done=fallen.any(), fallen=fallen, scored=np.zeros(2))
+
+
+def test_knockdowns_restart_the_bout_until_the_stopping_count():
+    from boxer.spar_match import KNOCKDOWN_POINTS, bout
+    motor = lambda obs, key: (np.zeros((2, 29)), None)
+    falls = {10: (False, True), 20: (False, True), 30: (True, False)}
+    original, _, _ = bout(_FallingPair(falls), motor, 0, 1.0)
+    assert original['method'] == 'knockdown' and original['winner'] == 'red'
+    assert original['seconds'] == pytest.approx(.22)
+    pair = _FallingPair(falls)
+    result, _, _ = bout(pair, motor, 0, 1.0, knockdowns=3)
+    assert result['method'] == 'points' and result['seconds'] == pytest.approx(1.0)
+    assert result['knockdowns_suffered'] == [1, 2] and len(result['restarts']) == 3
+    assert result['cards'] == [2 * KNOCKDOWN_POINTS, KNOCKDOWN_POINTS] and result['winner'] == 'red'
+    assert pair.resets == 4
+    stopped, _, _ = bout(_FallingPair(falls), motor, 0, 1.0, knockdowns=2)
+    assert stopped['method'] == 'tko' and stopped['winner'] == 'red' and stopped['fallen'] == [False, True]

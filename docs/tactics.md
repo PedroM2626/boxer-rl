@@ -269,7 +269,43 @@ tripled, starting as early as 19 s. Fading out sideways circling only when
 the opponent is well off-axis keeps normal play unchanged and prevents the
 drift. That variant is now `decode`, shared by batched training and native
 bouts. The champion keeps a 13–3 edge over the level-hook champion either
-way.
+way. The fix reduces the drift but does not remove it: in the 180 s bouts
+below, one boxer of 16 bouts still spent 23 s turned away.
+
+## Knockdown rules (2026-10-31)
+
+Until now the first fall ended a bout. `boxer.spar_match --knockdowns N`
+(the `knockdowns` argument of `bout`) adds a referee:
+
+* A knockdown is counted against the boxer who fell (both, if both fall).
+* The G1s cannot get up by themselves, so the referee restarts the bout:
+  both robots are reset standing at fresh, randomized starting positions
+  2 m apart. Punches in flight are cancelled. Scores and the bout clock
+  carry on; the reset takes no bout time.
+* The N-th knockdown of one boxer stops the bout (TKO).
+* Otherwise the bout is decided on the cards: clean punches, plus
+  `KNOCKDOWN_POINTS` (10) for every knockdown scored against the opponent.
+
+`--knockdowns 1` (the default) is the original rule, so gates and earlier
+results are unchanged. Results report `knockdowns_suffered`, the `restarts`
+(time and who fell), the `cards`, and the totals `stoppages` and
+`total_knockdowns`.
+
+Test: current champion vs level-hook champion, 16 native bouts of 180 s
+(3 minutes, a professional round), corners swapped, TKO at 3 knockdowns:
+
+| | Result |
+| --- | --- |
+| Bouts | 16 of 180 s; all went the distance, no TKO |
+| Knockdowns | 10 in total, 5 per side; 7 bouts had at least one restart |
+| Champion vs level-hook champion | **15–1** on the cards, 178.6 : 160.8 clean punches per bout |
+| Clean punches per bout (both boxers) | 339 |
+| Turned away (> 45 deg off) | 15 of 16 bouts under 2.1 s per boxer; one boxer 23 s |
+| Longest stretch without a score | 4–10 s in 15 bouts, 37 s in one |
+
+After a restart both boxers re-engage and keep scoring. Knockdowns come
+about once every 4–5 minutes of boxing (10 in 48 min), evenly split, so
+falling is now a cost rather than the end of the bout.
 
 ## Champion history
 

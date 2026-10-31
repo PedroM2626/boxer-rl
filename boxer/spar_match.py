@@ -11,8 +11,13 @@ Each corner is a three-layer controller:
   punch. Either the scripted ``RingBrain`` or a learned self-play policy from
   ``boxer.tactics_train`` (``PolicyBrain``), chosen per corner.
 
-No pelvis springs, welds or root forces: the first knockdown ends the bout,
-otherwise the bout goes the distance and is decided on clean punches.
+No pelvis springs, welds or root forces. By default the first knockdown
+ends the bout; otherwise it goes the distance and is decided on clean
+punches. With ``knockdowns=N`` (``--knockdowns N``) a knockdown is counted
+and the referee restarts the bout instead: the G1s cannot get up, so both
+are reset standing at fresh starting positions, scores and the clock carry
+on, and the N-th knockdown of one boxer stops the bout (TKO). Each knockdown
+scored is worth ``KNOCKDOWN_POINTS`` clean punches on the cards.
 """
 from __future__ import annotations
 
@@ -28,6 +33,8 @@ from boxer import moves
 from boxer.curriculum_env import LEFT_ARM, UnassistedG1
 from boxer.curriculum_train import inference, load_policy_params
 from boxer.paired_foundation import PairedFoundation
+
+KNOCKDOWN_POINTS = 10
 
 
 class PunchArm:
@@ -150,8 +157,12 @@ def _body(pair, i):
                 height=float(pair.data.qpos[m['root'] + 2] - pair.foundation._init_q[2]))
 
 
-def bout(pair, motor, seed, seconds=20.0, record=False, brains=None):
-    """One bout; ``brains`` maps corner -> PolicyBrain, others are scripted."""
+def bout(pair, motor, seed, seconds=20.0, record=False, brains=None, knockdowns=1):
+    """One bout; ``brains`` maps corner -> PolicyBrain, others are scripted.
+
+    ``knockdowns``: knockdowns of one boxer that stop the bout (1: the first
+    fall ends it, the original rule).
+    """
     rng = np.random.default_rng(seed)
     pair.reset(seed=seed)
     arms = [PunchArm(pair.pose, pair.action_scale, pair.dt) for _ in range(2)]
@@ -160,6 +171,7 @@ def bout(pair, motor, seed, seconds=20.0, record=False, brains=None):
     scored, thrown, frames, times, events = np.zeros(2), np.zeros(2, int), [], [], []
     hooks, guarded, high = np.zeros(2, int), np.zeros(2, int), [False, False]
     fallen = np.zeros(2, bool)
+    downs, restarts = np.zeros(2, int), []
     turned_away = np.zeros(2, int)      # steps facing more than 45 deg off the opponent
     steps = int(round(seconds / pair.dt))
     for t in range(steps):
@@ -189,25 +201,39 @@ def bout(pair, motor, seed, seconds=20.0, record=False, brains=None):
             action[i, LEFT_ARM:] = arms[i].actions(high[i])
             guarded[i] += high[i]
         outcome = pair.step(action)
+        elapsed = (t + 1) * pair.dt
         if outcome['scored'].any():
-            events.append(dict(time=round(pair.elapsed, 3),
+            events.append(dict(time=round(elapsed, 3),
                                scored=outcome['scored'].tolist()))
         scored += outcome['scored']
         if record and t % 2 == 0:
             frames.append(pair.data.qpos.copy())
-            times.append((pair.elapsed, scored.copy()))
+            times.append((elapsed, scored.copy()))
         if outcome['done']:
             fallen = np.asarray(outcome['fallen'], bool)
-            break
+            downs += fallen
+            if downs.max() >= knockdowns or t == steps - 1:
+                break
+            # The referee's restart: both boxers stand again at fresh spots.
+            restarts.append(dict(time=round(elapsed, 3), fallen=fallen.tolist()))
+            pair.reset(seed=int(rng.integers(1 << 30)))
+            arms = [PunchArm(pair.pose, pair.action_scale, pair.dt) for _ in range(2)]
+            fallen = np.zeros(2, bool)
+    stopped = downs >= knockdowns
+    cards = scored + KNOCKDOWN_POINTS * downs[::-1]
+    if knockdowns > 1:
+        fallen = stopped
     if fallen.any() and not fallen.all():
-        winner, method = int(np.flatnonzero(~fallen)[0]), 'knockdown'
+        winner = int(np.flatnonzero(~fallen)[0])
+        method = 'knockdown' if knockdowns == 1 else 'tko'
     elif fallen.all():
         winner, method = None, 'double knockdown'
-    elif scored[0] != scored[1]:
-        winner, method = int(np.argmax(scored)), 'points'
+    elif cards[0] != cards[1]:
+        winner, method = int(np.argmax(cards)), 'points'
     else:
         winner, method = None, 'draw'
-    result = dict(seed=seed, seconds=round(pair.elapsed, 2), clean_punches=scored.tolist(),
+    result = dict(seed=seed, seconds=round(min(steps, t + 1) * pair.dt, 2), clean_punches=scored.tolist(),
+                  knockdowns_suffered=downs.tolist(), restarts=restarts, cards=cards.tolist(),
                   punches_thrown=thrown.tolist(), hooks_thrown=hooks.tolist(),
                   high_guard_seconds=(guarded * pair.dt).round(2).tolist(),
                   turned_away_seconds=(turned_away * pair.dt).round(2).tolist(), fallen=fallen.tolist(),
@@ -253,6 +279,8 @@ def main(argv=None):
     parser.add_argument('--video', type=Path, help='render the first seed')
     parser.add_argument('--red-tactics', type=Path, help='learned tactics checkpoint for red')
     parser.add_argument('--blue-tactics', type=Path, help='learned tactics checkpoint for blue')
+    parser.add_argument('--knockdowns', type=int, default=1,
+                        help='knockdowns of one boxer that stop the bout; earlier ones restart it')
     parser.add_argument('--swap', action='store_true',
                         help='also play every seed with the tactics exchanged between corners')
     args = parser.parse_args(argv)
@@ -270,7 +298,7 @@ def main(argv=None):
     for index, (seed, swapped) in enumerate(schedule):
         record = args.video is not None and index == 0
         brains = {1 - i if swapped else i: brain for i, brain in tactics.items()}
-        result, frames, times = bout(pair, motor, seed, args.seconds, record, brains)
+        result, frames, times = bout(pair, motor, seed, args.seconds, record, brains, args.knockdowns)
         result.update(red=names[1] if swapped else names[0], blue=names[0] if swapped else names[1])
         bouts.append(result)
         print(json.dumps({k: v for k, v in result.items() if k != 'impact_events'}), flush=True)
@@ -288,6 +316,8 @@ def main(argv=None):
                    stage_steps=metadata['stage_steps'], checkpoint_sha256=metadata['sha256'],
                    bouts=len(bouts), went_the_distance=survived,
                    knockdowns=sum(b['method'] == 'knockdown' for b in bouts),
+                   stoppages=sum(b['method'] in ('knockdown', 'tko', 'double knockdown') for b in bouts),
+                   total_knockdowns=int(sum(sum(b['knockdowns_suffered']) for b in bouts)),
                    mean_seconds=float(np.mean([b['seconds'] for b in bouts])),
                    clean_punches_per_bout=float(np.mean([sum(b['clean_punches']) for b in bouts])),
                    punches_thrown_per_bout=float(np.mean([sum(b['punches_thrown']) for b in bouts])),

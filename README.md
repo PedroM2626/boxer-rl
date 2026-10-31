@@ -33,6 +33,12 @@ high guard (the previous champion: 43 to 9). It breaks the guard with
 straights and has stopped throwing hooks
 ([video](fights/tactics_guard_vs_native_v1.mp4) shows an earlier champion).
 
+**Long rounds and knockdowns.** Bouts of 120–180 s hold up after a footwork fix
+that keeps the boxers facing each other. `--knockdowns 3` adds a referee:
+a fall is counted and both robots restart standing (they cannot get up
+unaided), and a third knockdown is a TKO
+([details](docs/tactics.md#knockdown-rules-2026-10-31)).
+
 ```bash
 bash tools/run_spar.sh boxer.spar_match --red-tactics checkpoints/tactics \
   --blue-tactics checkpoints/tactics-levelhook-v1 --seeds 0 1 2 3 --swap --video runs/fight.mp4
