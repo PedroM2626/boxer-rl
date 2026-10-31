@@ -2,6 +2,7 @@
 import jax
 import jax.numpy as jp
 import numpy as np
+import pytest
 
 from boxer import moves
 from boxer.curriculum_train import load_policy_params
@@ -171,3 +172,11 @@ def test_domain_randomization_batches_physics_and_zero_strength_is_nominal():
     nominal, _ = env.randomizer(0.0)(env.mjx_model, keys)
     np.testing.assert_allclose(np.asarray(nominal.actuator_gainprm)[0], env.mj_model.actuator_gainprm, rtol=1e-6)
     np.testing.assert_allclose(np.asarray(nominal.body_mass)[1], env.mj_model.body_mass, rtol=1e-6)
+
+
+def test_decode_stops_circling_and_turns_when_facing_away():
+    circle = np.array([-1, -1, 0, 0, 1., -1, -1])
+    facing, *_ = decode(circle, .6, np.array([.6, 0.]))
+    behind, *_ = decode(circle, .6, .6 * np.array([np.cos(2.), np.sin(2.)]))
+    assert abs(facing[1]) == pytest.approx(.2) and facing[2] == 0
+    assert np.allclose(behind[:2], 0) and behind[2] == pytest.approx(.5)

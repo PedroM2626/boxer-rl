@@ -21,7 +21,9 @@ falling. The remaining work is the boxing brain and the move set:
 3. **More moves: partly done** ([moves](moves.md)). The high guard is learned
    and wins; hooks exist but go unused. Next: footwork that closes to hook
    range, uppercuts, slips.
-4. **Robustness.** Longer rounds, knockdowns that do not end the bout, and
+4. **Robustness: long rounds done** ([tactics](tactics.md#long-rounds-120-s-2026-10-31)).
+   120 s bouts go the distance 15/16 times once circling fades out when a
+   boxer is off-axis. Still open: knockdowns that do not end the bout, and
    evaluation against a league of past tactical policies.
 
 The historical plan below is kept as a record of earlier work.

@@ -134,8 +134,13 @@ def decode(tactics, distance, local):
     direction = local / xp.maximum(distance, 1e-6)
     advance = xp.where(tactics[3] > 0, .4 * tactics[3], .3 * tactics[3])
     tangent = xp.stack([-direction[1], direction[0]])
-    planar = advance * direction + .2 * tactics[4] * tangent
-    heading = xp.clip(xp.arctan2(local[1], local[0]), -.5, .5)
+    # Circling can turn the bearing faster than the motor yaws; fade it out
+    # between 35 and 55 deg off, or the pair can drift until they face away
+    # for good (docs/tactics.md, long rounds).
+    bearing = xp.arctan2(local[1], local[0])
+    circling = xp.clip((.96 - xp.abs(bearing)) / .35, 0., 1.)
+    planar = advance * direction + .2 * tactics[4] * circling * tangent
+    heading = xp.clip(bearing, -.5, .5)
     command = xp.clip(xp.concatenate([planar, heading[None]]),
                       xp.array([-.35, -.25, -.5]), xp.array([.55, .25, .5]))
     want = xp.maximum(tactics[0], tactics[1]) > 0

@@ -160,6 +160,7 @@ def bout(pair, motor, seed, seconds=20.0, record=False, brains=None):
     scored, thrown, frames, times, events = np.zeros(2), np.zeros(2, int), [], [], []
     hooks, guarded, high = np.zeros(2, int), np.zeros(2, int), [False, False]
     fallen = np.zeros(2, bool)
+    turned_away = np.zeros(2, int)      # steps facing more than 45 deg off the opponent
     steps = int(round(seconds / pair.dt))
     for t in range(steps):
         roots = [pair.data.qpos[m['root']:m['root'] + 2] for m in pair.maps]
@@ -168,6 +169,7 @@ def bout(pair, motor, seed, seconds=20.0, record=False, brains=None):
             delta = roots[1 - i] - roots[i]
             rotation = pair.data.site(m['side'] + 'imu_in_pelvis').xmat.reshape(3, 3)
             local = rotation[:2, :2].T @ delta
+            turned_away[i] += abs(np.arctan2(local[1], local[0])) > np.pi / 4
             if isinstance(brains[i], PolicyBrain):
                 command, punch, high[i] = brains[i].decide_pair(pair, i, arms, t / steps)
             else:
@@ -207,7 +209,8 @@ def bout(pair, motor, seed, seconds=20.0, record=False, brains=None):
         winner, method = None, 'draw'
     result = dict(seed=seed, seconds=round(pair.elapsed, 2), clean_punches=scored.tolist(),
                   punches_thrown=thrown.tolist(), hooks_thrown=hooks.tolist(),
-                  high_guard_seconds=(guarded * pair.dt).round(2).tolist(), fallen=fallen.tolist(),
+                  high_guard_seconds=(guarded * pair.dt).round(2).tolist(),
+                  turned_away_seconds=(turned_away * pair.dt).round(2).tolist(), fallen=fallen.tolist(),
                   winner=None if winner is None else ('red', 'blue')[winner],
                   method=method, impact_events=events)
     return result, frames, times
@@ -288,6 +291,7 @@ def main(argv=None):
                    mean_seconds=float(np.mean([b['seconds'] for b in bouts])),
                    clean_punches_per_bout=float(np.mean([sum(b['clean_punches']) for b in bouts])),
                    punches_thrown_per_bout=float(np.mean([sum(b['punches_thrown']) for b in bouts])),
+                   turned_away_seconds_per_boxer=float(np.mean([b['turned_away_seconds'] for b in bouts])),
                    tactics=dict(first=names[0], second=names[1], first_wins=wins, first_losses=losses,
                                 draws=len(bouts) - wins - losses,
                                 first_clean_per_bout=float(np.mean(points)),

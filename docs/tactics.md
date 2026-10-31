@@ -239,6 +239,38 @@ tactics look close to saturated. Further gains should come from a richer
 move set (hooks, uppercuts, guard and blocks in the `spar` generator and
 `PunchArm`) and from making falls costlier in native training.
 
+## Long rounds (120 s, 2026-10-31)
+
+Bouts so far lasted 20 s. To test robustness the current champion and the
+level-hook champion fought 16 native bouts of 120 s (8 seeds, corners
+swapped; `boxer.spar_match --seconds 120`). `spar_match` now also reports
+how long each boxer faces more than 45 deg away from its opponent
+(`turned_away_seconds`).
+
+The motor and tactics mostly hold up: 13 of 16 bouts went the distance and
+scoring continued to the final second. One bout broke down. After about
+55 s both boxers drifted until they faced 90–170 deg away from each other.
+They stopped scoring for 33 s, collided and one fell. The cause is in
+`decode`, not the policy. Turning is automatic (yaw rate = bearing error,
+clipped to 0.5 rad/s), but the policy's sideways circling turns the bearing
+faster than the motor yaws. Even in normal play both boxers sit 15–25 deg
+off-axis.
+
+Two fixes were tried, applied to both corners:
+
+| Variant | Went the distance | Knockdowns | Turned away (s per boxer) | Clean punches per bout | Longest scoreless gap |
+| --- | --- | --- | --- | --- | --- |
+| baseline | 13/16 | 3 | 1.74 | 216.7 | 33 s |
+| yaw gain ×2, circling fades out at 25–45 deg | 6/16 | **10** | 0.06 | 123.2 | 17 s |
+| **circling fades out at 35–55 deg, yaw gain unchanged** | **15/16** | **1** | 0.37 | **223.8** | 21 s |
+
+Turning harder fixes the facing but destabilizes the motor: knockdowns
+tripled, starting as early as 19 s. Fading out sideways circling only when
+the opponent is well off-axis keeps normal play unchanged and prevents the
+drift. That variant is now `decode`, shared by batched training and native
+bouts. The champion keeps a 13–3 edge over the level-hook champion either
+way.
+
 ## Champion history
 
 * `checkpoints/tactics-batched`: batched v1 gen‑0 (2026-10-30).
