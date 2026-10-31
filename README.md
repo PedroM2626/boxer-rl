@@ -24,14 +24,18 @@ fitted by forward kinematics and shared by every backend. The motor was
 retrained to balance through them. Native fine-tuning taught the champion to
 keep a high guard a third to half of the time. After diagnostics showed the
 first hook could not land, the hook became a level IK arc with straight-like
-reach. The current champion (`checkpoints/tactics`) beats the previous one
-**37–9–2 over 48 native bouts** and falls less, but still throws hooks for
-only about 2 % of its punches ([video](fights/tactics_guard_vs_native_v1.mp4)
-shows the guard champion).
+reach. A [scoring audit](docs/moves.md#scoring-audit-toolsscore_auditpy)
+showed the scorecard is fair to hooks; they rarely reach the target. Fine-tuning
+against scripted opponents that hold the high guard produced the current
+champion (`checkpoints/tactics`): **27–17–4 over 48 native bouts** against
+the level-hook champion, and 113 clean punches to 16 in 8 bouts against a held
+high guard (the previous champion: 43 to 9). It breaks the guard with
+straights and has stopped throwing hooks
+([video](fights/tactics_guard_vs_native_v1.mp4) shows an earlier champion).
 
 ```bash
 bash tools/run_spar.sh boxer.spar_match --red-tactics checkpoints/tactics \
-  --blue-tactics checkpoints/tactics-guard-v1 --seeds 0 1 2 3 --swap --video runs/fight.mp4
+  --blue-tactics checkpoints/tactics-levelhook-v1 --seeds 0 1 2 3 --swap --video runs/fight.mp4
 ```
 
 ## Current experiment: unassisted paired boxing diagnostics

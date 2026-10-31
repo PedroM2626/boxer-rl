@@ -169,8 +169,8 @@ champion:
 | **0.75M, 48 bouts with fresh seeds** | **37–9–2** | **11.7 : 8.8**; falls 1 vs 4 (confirmation) |
 | 0.75M vs scripted (16 bouts) | 14–2–0 | 11.4 : 2.8 |
 
-It becomes `checkpoints/tactics`; the guard champion is kept as
-`checkpoints/tactics-guard-v1`. Both use the high guard heavily (35–41 % and
+It became `checkpoints/tactics` (now `checkpoints/tactics-levelhook-v1`); the
+guard champion is kept as `checkpoints/tactics-guard-v1`. Both use the high guard heavily (35–41 % and
 50–56 % of bout time). **Hooks are still rare: about 2 % of the new champion's
 punches**, up from 0 %. Its edge comes mainly from falling less and landing a
 few more straights, not from hooks.
@@ -220,6 +220,45 @@ What the audit shows:
   guard toggles often, so the straight still finds openings and the policy
   has little reason to hook.
 
-Next candidates: put scripted high-guard opponents into the fine-tune pool so
-hooking a held guard pays off; footwork that holds a closer range so hooks
-connect more often.
+### Fine-tune against a held high guard
+
+The audit suggested an opening: the scripted attacker's straights never touch
+a held high guard, but its hooks do. `boxer.native_finetune
+--high-guard-fraction` makes that share of the scripted opponents hold the
+high guard all bout. Run: `runs/tactics-highguard`, from the level-hook
+champion, 3M native steps, pool = level-hook and guard champions, half the
+bouts scripted, 60 % of those with a held high guard (30 % of all bouts).
+
+The learner's hook share fell instead of rising: about 6 % of punches in the
+first 0.5M steps, 1–2 % by 1.5M, 0–1 % at the end.
+
+Native gate against the level-hook champion:
+
+| Candidate | W–L–D (16 bouts) | Clean punches per bout |
+| --- | --- | --- |
+| 0.75M | 6–8–2 | 10.8 : 11.7 |
+| 1.5M | 7–4–5 | 12.4 : 12.0 |
+| 2.25M | 9–5–2 | 13.1 : 13.2 |
+| **3.0M** | **10–4–2** | **17.1 : 13.2** |
+| **3.0M, 48 bouts with fresh seeds** | **27–17–4** | **16.0 : 14.0**; falls 2 vs 2 (confirmation) |
+
+Against scripted opponents (8 bouts of 20 s each, learner in red):
+
+| Policy | vs held high guard: W–L, clean, hooks | vs normal guard: W–L, clean, hooks |
+| --- | --- | --- |
+| level-hook champion | 8–0, 43 : 9, 5 hooks | 8–0, 93 : 25, 3 hooks |
+| high-guard 0.75M | 8–0, 73 : 17, 0 hooks | 8–0, 100 : 26, 0 hooks |
+| **high-guard 3.0M** | **8–0, 113 : 16, 0 hooks** | **8–0, 117 : 25, 0 hooks** |
+
+The 3.0M checkpoint becomes `checkpoints/tactics`; the level-hook champion
+moves to `checkpoints/tactics-levelhook-v1`.
+
+**The learner beats the held high guard with straights, not hooks.** The
+scripted attacker's straights never reach that guard, but the learned
+policy's straights land 113 times in 160 s. A straight reaches its target in
+0.18 s, a hook in 0.26 s, so once footwork finds an opening the straight is likely
+the better punch. These runs did not measure how its footwork and aim open
+the guard. Under this scorecard and these moves, hooks are not worth
+learning. Making them matter would mean changing the game: e.g. a guard that
+actually covers the torso front so only angled punches get through, or a
+richer target (head shots within reach at closer range).
