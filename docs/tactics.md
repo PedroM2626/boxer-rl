@@ -218,6 +218,27 @@ taken stayed near 14, and falls rose a little. **Unlike every batched
 continuation, native strength improves monotonically.** This confirms that the
 earlier drift came from the physics mismatch, not from self-play itself.
 
+### Second native round: plateau
+
+A further 3M native steps started from the new champion, with the champion,
+the batched champion and v3 gen‑0 as opponents (`runs/tactics-native2`), all
+gated against the new champion:
+
+| Checkpoint | vs champion, seeds 0–7 | Clean punches / bout |
+| --- | --- | --- |
+| 0.75M | 5–8–3 | 21.1 : 22.6 |
+| 1.5M | 8–7–1 | 21.8 : 22.5 |
+| 2.25M | 7–9–0 | 24.1 : 25.4 |
+| 3.0M | 7–6–3 | 21.1 : 22.1 |
+| gate pick 1.5M, 48 bouts | 18–28–2 | 22.2 : 23.2; candidate fell 9×, champion 5× |
+
+Training against a pool that contains the champion itself reaches parity
+rather than dominance, and play becomes riskier, with more knockdowns. The
+champion is unchanged. With only straight punches and footwork, the
+tactics look close to saturated. Further gains should come from a richer
+move set (hooks, uppercuts, guard and blocks in the `spar` generator and
+`PunchArm`) and from making falls costlier in native training.
+
 ## Champion: `checkpoints/tactics` (native fine-tune, 2026-10-31)
 
 `checkpoints/tactics` is the 2.0M native fine-tune

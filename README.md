@@ -21,7 +21,9 @@ getting worse in native physics. Native fine-tuning instead improves steadily,
 and the new champion (`checkpoints/tactics`) beats the batched champion
 **42–2–4 over 48 native bouts** (21.9 to 15.0 clean punches per bout). It also
 beats the scripted tactics 15–1 (21.6 to 5.3)
-([video vs batched champion](fights/tactics_native_vs_batched.mp4)).
+([video vs batched champion](fights/tactics_native_vs_batched.mp4)). A second native
+round against itself plateaued at parity, so the next gains need more moves
+(hooks, uppercuts, blocking).
 
 ```bash
 bash tools/run_spar.sh boxer.spar_match --red-tactics checkpoints/tactics \

@@ -14,8 +14,8 @@ falling. The remaining work is the boxing brain and the move set:
    native-style starts, native scoring, fall penalties and native-gated
    selection were all tried ([tactics](tactics.md)); none stops the drift.
    **Native CPU fine-tuning solved it** (42–2–4 against the batched champion).
-   Next: longer native fine-tuning with the champion in its own pool,
-   i.e. native self-play.
+   A second native round with the champion in its own pool plateaued at
+   parity (18–28–2), so tactics are near saturation for the current moves.
 2. **Range control and clinch breaking.** Penalize chest contact and reward
    staying at punching range.
 3. **More moves.** Hooks, uppercuts and active guard/blocking primitives in the
