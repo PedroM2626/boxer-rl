@@ -22,10 +22,21 @@ import numpy as np
 STRAIGHT, HOOK = 0, 1
 STRAIGHT_BODY = np.array([-1.18, .04, .10, 1.20])
 STRAIGHT_HEAD = np.array([-1.94, .065, .20, 1.51])
+# Active hook (v1, fist 0.32-0.36 m to the face centre). The current motor and
+# champion were trained with it. It lands only 0-6 % natively
+# (tools/move_effectiveness.py), so the policy never uses it.
 HOOK_BODY = np.array([-1.191, .565, -1.17, .388])
 HOOK_HEAD = np.array([-2.09, .817, -1.541, .357])
 WINDUP_BODY = np.array([.026, .702, .296, -.12])
 WINDUP_HEAD = np.array([-1.19, .354, .738, .077])
+# Candidate long hook (v2, not active): straight-like reach (fist 0.37-0.41 m)
+# from a wide, far-forward wind-up. Interpolating joints from wind-up to strike
+# lifts the head hook's fist to z 0.535 (an overhand arc), so it needs
+# Cartesian waypoints before the motor is retrained for it. See docs/moves.md.
+LONG_HOOK_BODY = np.array([-1.202, .419, -1.022, .79])
+LONG_HOOK_HEAD = np.array([-2.19, .686, -1.86, .7])
+LONG_WINDUP_BODY = np.array([-.807, .615, .259, .94])
+LONG_WINDUP_HEAD = np.array([-1.498, .559, .822, .865])
 HIGH_GUARD = np.array([-1.162, .087, .008, -.074])
 TIMING = {STRAIGHT: (.18, .26), HOOK: (.26, .28)}      # extension, retraction seconds
 WINDUP_FRACTION = .4                                   # share of a hook's extension

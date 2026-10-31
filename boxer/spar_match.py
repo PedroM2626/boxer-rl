@@ -82,8 +82,11 @@ class PunchArm:
 class RingBrain:
     """Scripted tactics: close to range, punch in combos, step back, circle."""
 
-    def __init__(self, rng, aggression=1.0, reach=.62):
+    def __init__(self, rng, aggression=1.0, reach=.62, move=None, high=False):
+        """``move``: always throw this ``boxer.moves`` punch (default straights);
+        ``high``: hold the high guard. Both exist for move diagnostics."""
         self.rng, self.aggression, self.reach = rng, aggression, reach
+        self.move, self.high = move, high
         self.wait = int(rng.integers(5, 30))
         self.circle, self.circle_steps = 0.0, 0
 
@@ -107,6 +110,8 @@ class RingBrain:
         punch = None
         if arm.ready and self.wait <= 0 and distance < self.reach + .1 and abs(heading) < .35:
             punch = (int(self.rng.integers(0, 2)), float(self.rng.random() > .5))
+            if self.move is not None:
+                punch += (int(self.move),)
             # Combos: a short pause after most punches, a long reset now and then.
             self.wait = int(self.rng.integers(2, 12) if self.rng.random() < .6 * self.aggression
                             else self.rng.integers(20, 50))
@@ -167,6 +172,7 @@ def bout(pair, motor, seed, seconds=20.0, record=False, brains=None):
                 command, punch, high[i] = brains[i].decide_pair(pair, i, arms, t / steps)
             else:
                 command, punch = brains[i].decide(float(np.linalg.norm(delta)), local, arms[i])
+                high[i] = getattr(brains[i], 'high', False)
             commands.append(command)
             if punch is not None:
                 arms[i].launch(*punch[:2], rng, *punch[2:])

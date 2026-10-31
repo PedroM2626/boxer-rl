@@ -88,6 +88,20 @@ def main():
     for name, (q, (fist, elbow), err) in results.items():
         print(f"{name:12s} pose {q} fist {fist} elbow {elbow} residual {err:.4f}")
 
+    # Long hook (v2). The short hook above lands 0-6 % natively: it ends 0.32 m
+    # out, at the centre of the face where a high guard sits. This one keeps the
+    # straight's reach and sweeps in horizontally from wide and far forward,
+    # past the opponent's guard plane (their fists ~0.27 m before their torso).
+    long_hook = {}
+    for name, fist_ref in (("long hook head", head_fist), ("long hook body", body_fist)):
+        target = np.array([fist_ref[0] - .02, .03, fist_ref[2]])
+        long_hook[name] = fit(arm, target, starts, np.array([target[0] - .2, .22, target[2]]), weight=1.)
+    for name, fist_ref in (("long windup head", head_fist), ("long windup body", body_fist)):
+        target = np.array([fist_ref[0] - .06, .34, fist_ref[2]])
+        long_hook[name] = fit(arm, target, starts)
+    for name, (q, (fist, elbow), err) in long_hook.items():
+        print(f"{name:16s} pose {q} fist {fist} elbow {elbow} residual {err:.4f}")
+
 
 if __name__ == "__main__":
     main()

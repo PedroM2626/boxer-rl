@@ -96,3 +96,39 @@ Published as `checkpoints/tactics`
 ([gate record](../checkpoints/tactics/native-gate.json)). The video
 [`fights/tactics_guard_vs_native_v1.mp4`](../fights/tactics_guard_vs_native_v1.mp4)
 (seed 3) shows it winning 11–4 with 5.7 s of high guard.
+
+## Why hooks go unused (diagnostics, 2026-10-31)
+
+`tools/move_effectiveness.py` pits a scripted attacker that throws only one
+punch type against the scripted brain in the normal or high guard, in native
+physics, with 6 bouts per row. It reports clean punches per punch thrown:
+
+| Attacker / defender range | Punch | vs normal guard | vs high guard |
+| --- | --- | --- | --- |
+| 0.62 / 0.62 m | straight | 16.8 % | 8.8 % |
+| 0.62 / 0.62 m | short hook (active) | 3.1 % | 1.5 % |
+| 0.52 / 0.62 m | short hook | 6.1 % | 0 % |
+| 0.62 / 0.62 m | long hook (candidate) | 4.5 % | 3.8 % |
+| 0.57 / 0.62 m | long hook | 9.6 % | 1.5 % |
+| 0.52 / 0.52 m | straight | 25.7 % | 7.4 % |
+| 0.52 / 0.52 m | long hook | 3.7 % | 8.2 % |
+
+* The active short hook ends 0.32–0.36 m out at the centre of the face,
+  exactly where a high guard sits. The policy was right to ignore it.
+* The opponent's guard fists are about 0.27 m in front of their torso, so a
+  hook gets around them only at close range. At 0.52 m the long hook matches
+  the straight against a high guard, on small counts.
+* Tracing the fist with forward kinematics shows that straight-line
+  interpolation of joint angles from the long wind-up to the strike lifts the
+  head hook to z 0.535 m (an overhand arc over the opponent's arms) instead
+  of sweeping level at 0.42 m. Video frames confirm this. The body hook stays
+  level (z 0.18–0.20 m).
+
+Next steps, not yet done:
+
+1. Drive the hook through Cartesian waypoints (IK per waypoint along a level
+   arc) instead of one joint-space interpolation.
+2. Make the long hook active, retrain the motor (spar gate), then fine-tune
+   tactics natively.
+3. Re-measure. The tactics also need to keep infighting range for hooks to
+   pay off.
