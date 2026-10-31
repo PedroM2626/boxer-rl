@@ -197,6 +197,7 @@ def _bout(pair, motor, seed, seconds, record, brains, knockdowns):
     fallen = np.zeros(2, bool)
     downs, restarts = np.zeros(2, int), []
     turned_away = np.zeros(2, int)      # steps facing more than 45 deg off the opponent
+    roped = np.zeros(2, int)            # steps touching the ropes
     steps = int(round(seconds / pair.dt))
     for t in range(steps):
         roots = [pair.data.qpos[m['root']:m['root'] + 2] for m in pair.maps]
@@ -223,6 +224,7 @@ def _bout(pair, motor, seed, seconds, record, brains, knockdowns):
             action[i, LEFT_ARM:] = arms[i].actions(high[i])
             guarded[i] += high[i]
         outcome = pair.step(action)
+        roped += pair.on_ropes()
         elapsed = (t + 1) * pair.dt
         if outcome['scored'].any():
             events.append(dict(time=round(elapsed, 3),
@@ -258,7 +260,8 @@ def _bout(pair, motor, seed, seconds, record, brains, knockdowns):
                   knockdowns_suffered=downs.tolist(), restarts=restarts, cards=cards.tolist(),
                   punches_thrown=thrown.tolist(), hooks_thrown=hooks.tolist(),
                   high_guard_seconds=(guarded * pair.dt).round(2).tolist(),
-                  turned_away_seconds=(turned_away * pair.dt).round(2).tolist(), fallen=fallen.tolist(),
+                  turned_away_seconds=(turned_away * pair.dt).round(2).tolist(),
+                  rope_seconds=(roped * pair.dt).round(2).tolist(), fallen=fallen.tolist(),
                   winner=None if winner is None else ('red', 'blue')[winner],
                   method=method, impact_events=events)
     return result, frames, times
@@ -269,7 +272,7 @@ def render(pair, frames, times, path, caption):
     import mujoco
     from PIL import Image, ImageDraw
     from boxer.paired_foundation import build_pair
-    model = build_pair(pair.foundation, visual_fists=True)
+    model = build_pair(pair.foundation, visual_fists=True, ring=pair.ring)
     data = mujoco.MjData(model)
     camera = mujoco.MjvCamera()
     camera.distance, camera.azimuth, camera.elevation = 3.6, 100, -15
@@ -310,6 +313,7 @@ def main(argv=None):
     parser.add_argument('--blue-tactics', type=Path, help='learned tactics checkpoint for blue')
     parser.add_argument('--knockdowns', type=int, default=1,
                         help='knockdowns of one boxer that stop the bout; earlier ones restart it')
+    parser.add_argument('--ring', action='store_true', help='fight inside the roped ring')
     parser.add_argument('--swap', action='store_true',
                         help='also play every seed with the tactics exchanged between corners')
     args = parser.parse_args(argv)
@@ -319,7 +323,7 @@ def main(argv=None):
     names = [str(path) if path else 'scripted' for path in (args.red_tactics, args.blue_tactics)]
     foundation = UnassistedG1('spar')
     motor = jax.jit(inference(foundation, params))
-    pair = PairedFoundation(foundation)
+    pair = PairedFoundation(foundation, ring=args.ring)
     bouts = []
     schedule = [(seed, False) for seed in args.seeds]
     if args.swap:
@@ -351,6 +355,7 @@ def main(argv=None):
                    clean_punches_per_bout=float(np.mean([sum(b['clean_punches']) for b in bouts])),
                    punches_thrown_per_bout=float(np.mean([sum(b['punches_thrown']) for b in bouts])),
                    turned_away_seconds_per_boxer=float(np.mean([b['turned_away_seconds'] for b in bouts])),
+                   ring=args.ring, rope_seconds_per_boxer=float(np.mean([b['rope_seconds'] for b in bouts])),
                    tactics=dict(first=names[0], second=names[1], first_wins=wins, first_losses=losses,
                                 draws=len(bouts) - wins - losses,
                                 first_clean_per_bout=float(np.mean(points)),

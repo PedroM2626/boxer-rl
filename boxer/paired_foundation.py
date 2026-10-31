@@ -14,6 +14,43 @@ from boxer.impact_scorecard import ImpactScorecard
 
 
 STRIKE_SENSOR_TARGETS = ('head_collision', 'torso_collision')
+# Roped ring, scaled to the 1.32 m G1 (0.73 x a human ring): 4 m between the
+# ropes, three ropes at 0.35 / 0.60 / 0.85 m (human: 0.46 / 0.81 / 1.17 m).
+RING_HALF = 2.0
+ROPE_HEIGHTS = (.35, .60, .85)
+ROPE_RADIUS = .02
+# Ropes give like stiff springs (50 ms time constant) rather than walls.
+ROPE_SOLREF = (.05, 1.)
+# Robot geoms that collide with the ropes.
+ROPE_CONTACTS = (scene.HAND_GEOMS + scene.FOREARM_GEOMS + scene.UPPER_TARGET_GEOMS
+                 + scene.BODY_TARGET_GEOMS + ('left_shin', 'right_shin', 'left_foot', 'right_foot'))
+
+
+def add_ring(spec, robot_geoms):
+    """Four corner posts and three ropes per side, colliding with each robot."""
+    h = RING_HALF + ROPE_RADIUS
+    corners = [(h, h), (-h, h), (-h, -h), (h, -h)]
+    ropes = []
+    for k, (a, b) in enumerate(zip(corners, corners[1:] + corners[:1])):
+        for level, z in enumerate(ROPE_HEIGHTS):
+            rope = spec.worldbody.add_geom(
+                name=f'rope_{k}_{level}', type=mujoco.mjtGeom.mjGEOM_CAPSULE,
+                fromto=[a[0], a[1], z, b[0], b[1], z], size=[ROPE_RADIUS, 0, 0],
+                contype=0, conaffinity=0)
+            rope.rgba = [.85, .85, .85, 1]
+            ropes.append(rope.name)
+    for k, (x, y) in enumerate(corners):
+        post = spec.worldbody.add_geom(
+            name=f'post_{k}', type=mujoco.mjtGeom.mjGEOM_CYLINDER,
+            pos=[x * 1.02, y * 1.02, .5], size=[.04, .5, 0], contype=0, conaffinity=0)
+        post.rgba = [.6, .1, .1, 1] if k in (0, 3) else [.1, .2, .6, 1]
+    for rope in ropes:
+        for side in scene.SIDES:
+            for name in ROPE_CONTACTS:
+                if name in robot_geoms:
+                    pair = spec.add_pair(geomname1=rope, geomname2=side + name, condim=3,
+                                         friction=[.3, .3, .005, .0001, .0001])
+                    pair.solref = list(ROPE_SOLREF)
 
 
 def strike_sensor_name(side, hand, target):
@@ -22,7 +59,8 @@ def strike_sensor_name(side, hand, target):
 
 
 def build_pair(foundation, separation=2.0, *, visual_fists=False, diagnostic_excluded_pairs=(),
-               strike_sensors=False):
+               strike_sensors=False, ring=False):
+    """Both robots on a shared floor; ``ring`` adds the roped ring (``add_ring``)."""
     if not np.isfinite(separation) or separation < 1.8:
         raise ValueError("transfer spawns must be separated by at least 1.8 m")
     source = foundation.mj_model
@@ -73,6 +111,7 @@ def build_pair(foundation, separation=2.0, *, visual_fists=False, diagnostic_exc
             geom.rgba = [.7, .2, .2, .25] if index == 0 else [.2, .3, .8, .25]
         frame = spec.worldbody.add_frame(pos=[(-.5 if index == 0 else .5) * separation, 0, 0],
                                          quat=[1, 0, 0, 0] if index == 0 else [0, 0, 0, 1])
+        robot_geoms = {g.name for g in robot.geoms}
         spec.attach(robot, prefix=side, frame=frame)
         for first, second, dim, friction, solref, solimp in floor_pairs:
             pair = spec.add_pair(geomname1="floor" if first == "floor" else side + first,
@@ -95,6 +134,8 @@ def build_pair(foundation, separation=2.0, *, visual_fists=False, diagnostic_exc
         raise ValueError('diagnostic exclusion must name existing cross-robot pairs')
     for first, second in sorted(wanted-excluded):
         spec.add_pair(geomname1=first, geomname2=second, condim=3, friction=[.6, .6, .005, .0001, .0001])
+    if ring:
+        add_ring(spec, robot_geoms)
     if strike_sensors:
         # Read-only "found" flags for batched training: fist-on-target and the
         # chest-to-chest clinch. They add no force and no contact pairs.
@@ -127,11 +168,14 @@ class PairedFoundation:
 
     dt = .02
 
-    def __init__(self, foundation, separation=2.0, *, diagnostic_excluded_pairs=(), model=None):
+    def __init__(self, foundation, separation=2.0, *, diagnostic_excluded_pairs=(), model=None,
+                 ring=False):
         """``model``: an already built ``build_pair`` model (e.g. loaded in a worker)."""
         self.foundation = foundation
         self.model = model if model is not None else build_pair(
-            foundation, separation, diagnostic_excluded_pairs=diagnostic_excluded_pairs)
+            foundation, separation, diagnostic_excluded_pairs=diagnostic_excluded_pairs, ring=ring)
+        # A loaded model (native fine-tuning workers) carries its own ring.
+        self.ring = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_GEOM, 'rope_0_0') >= 0
         self.data = mujoco.MjData(self.model)
         self.pose = np.asarray(foundation._default_pose)
         self.init_height32 = np.float32(foundation._init_q[2])
@@ -174,6 +218,9 @@ class PairedFoundation:
         trips = ({'left_foot', 'right_foot'}, {'left_foot', 'right_shin'}, {'right_foot', 'left_shin'})
         self._trip = {}
         names = [model.geom(g).name for g in range(model.ngeom)]
+        self._ropes = {g for g, n in enumerate(names) if n.startswith('rope_')}
+        self._corner_of = {g: i for i, side in enumerate(scene.SIDES)
+                           for g, n in enumerate(names) if n.startswith(side)}
         for i, side in enumerate(scene.SIDES):
             own = {n[len(side):]: g for g, n in enumerate(names) if n.startswith(side)}
             for pair in trips:
@@ -231,6 +278,16 @@ class PairedFoundation:
             commands.append([*(speed * local / max(distance, 1e-6)),
                              np.clip(np.arctan2(local[1], local[0]), -.5, .5)])
         return np.asarray(commands)
+
+    def on_ropes(self):
+        """Per corner: is any part of the robot touching a rope now?"""
+        touching = np.zeros(2, bool)
+        if self._ropes:
+            for g1, g2 in self.data.contact.geom:
+                g1, g2 = int(g1), int(g2)
+                if g1 in self._ropes or g2 in self._ropes:
+                    touching[self._corner_of.get(g2 if g1 in self._ropes else g1, 0)] = True
+        return touching
 
     def fallen(self):
         finite = np.isfinite(self.data.qpos).all() and np.isfinite(self.data.qvel).all()

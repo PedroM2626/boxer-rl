@@ -29,7 +29,7 @@ def test_observation_and_decoding_match_between_numpy_and_jax():
         batched = observe(jp, *(jax.tree.map(jp.asarray, (own, opp))), jp.asarray(arm),
                           jp.asarray(other), jp.asarray(clock))
         assert native.shape == (OBS_SIZE,)
-        np.testing.assert_allclose(native[26:], [arm[4], arm[5], other[4], other[5]])
+        np.testing.assert_allclose(native[26:30], [arm[4], arm[5], other[4], other[5]])
         np.testing.assert_allclose(native, np.asarray(batched), rtol=1e-5, atol=1e-5)
         tactics = rng.uniform(-1.5, 1.5, ACTION_SIZE)
         distance, local = np.linalg.norm(opp["pos"] - own["pos"]), own["rot"].T @ (opp["pos"] - own["pos"])
@@ -180,3 +180,22 @@ def test_decode_stops_circling_and_turns_when_facing_away():
     behind, *_ = decode(circle, .6, .6 * np.array([np.cos(2.), np.sin(2.)]))
     assert abs(facing[1]) == pytest.approx(.2) and facing[2] == 0
     assert np.allclose(behind[:2], 0) and behind[2] == pytest.approx(.5)
+
+
+def test_widened_pre_ring_policy_acts_like_the_original():
+    from boxer.tactics_env import policy_sizes, tactics_policy, widen_legacy
+    before_ring = load_policy_params("checkpoints/tactics-levelhook-v1")[0]
+    assert policy_sizes(before_ring) == (30, ACTION_SIZE)
+    wide = widen_legacy(before_ring)
+    assert policy_sizes(wide) == (OBS_SIZE, ACTION_SIZE)
+    obs = jax.random.normal(jax.random.PRNGKey(0), (16, OBS_SIZE))
+    a, _ = tactics_policy(before_ring, True)(obs, jax.random.PRNGKey(1))
+    b, _ = tactics_policy(wide, True)(obs, jax.random.PRNGKey(1))
+    np.testing.assert_allclose(np.asarray(a), np.asarray(b), atol=1e-5)
+
+
+def test_ring_observation_points_to_the_centre():
+    own = dict(pos=np.array([1., 0.]), rot=np.eye(2), vel=np.zeros(2), up=1., height=0.)
+    opp = dict(own, pos=np.array([0., 0.]))
+    obs = observe(np, own, opp, np.zeros(6), np.zeros(6), .5)
+    np.testing.assert_allclose(obs[-2:], [-.5, 0.])

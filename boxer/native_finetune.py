@@ -162,14 +162,14 @@ class FoundationStub:
                     action_size=int(foundation.action_size))
 
 
-def export_native_model(path):
+def export_native_model(path, ring=False):
     """Writes the native pair model and ``FoundationStub`` constants next to it."""
     _configure_worker_env()
     import mujoco
     from boxer.curriculum_env import UnassistedG1
     from boxer.paired_foundation import build_pair
     foundation = UnassistedG1("spar")
-    mujoco.mj_saveModel(build_pair(foundation), str(path), None)
+    mujoco.mj_saveModel(build_pair(foundation, ring=ring), str(path), None)
     Path(path).with_suffix(".json").write_text(json.dumps(FoundationStub.constants(foundation)))
 
 
@@ -282,6 +282,7 @@ def main(argv=None):
     parser.add_argument("--steps", type=int, default=3_000_000)
     parser.add_argument("--checkpoint-every", type=int, default=500_000)
     parser.add_argument("--scripted-fraction", type=float, default=.3)
+    parser.add_argument("--ring", action="store_true", help="train and gate inside the roped ring")
     parser.add_argument("--high-guard-fraction", type=float, default=0.,
                         help="share of scripted opponents that hold the high guard")
     parser.add_argument("--fall-penalty", type=float, default=30.)
@@ -344,7 +345,7 @@ def main(argv=None):
     context = mp.get_context("spawn")
     # Build the Playground environment in a throwaway process: it keeps over
     # 2 GB resident, which would otherwise crowd out rollout workers.
-    exporter = context.Process(target=export_native_model, args=(model_path,))
+    exporter = context.Process(target=export_native_model, args=(model_path, args.ring))
     exporter.start()
     exporter.join()
     if exporter.exitcode:
@@ -427,7 +428,7 @@ def main(argv=None):
         for process in processes:
             process.join(timeout=10)
     if args.native_gate:
-        gate_generation(root, args.init_from, args.native_gate)
+        gate_generation(root, args.init_from, args.native_gate, args.ring)
     return 0
 
 

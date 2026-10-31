@@ -37,12 +37,12 @@ from boxer import scene
 from boxer import moves
 from boxer.curriculum_env import LEFT_ARM, UnassistedG1
 from boxer.curriculum_train import inference
-from boxer.paired_foundation import (STRIKE_SENSOR_TARGETS, build_pair,
+from boxer.paired_foundation import (RING_HALF, STRIKE_SENSOR_TARGETS, build_pair,
                                      strike_sensor_name)
 
 # left punch, right punch, aim, advance, lateral, hook (vs straight), high guard
 ACTION_SIZE = 7
-OBS_SIZE = 30
+OBS_SIZE = 32
 # Checkpoints before hooks and guards (2026-10-30/31) see the first 26 inputs
 # and output the first 5 actions; ``tactics_policy`` adapts them.
 LEGACY_ACTION_SIZE, LEGACY_OBS_SIZE = 5, 26
@@ -67,9 +67,9 @@ def policy_sizes(params):
 def tactics_policy(params, deterministic=False):
     """Inference function for a saved tactics policy (normalizer, policy, value).
 
-    Accepts current (30 → 7) and legacy (26 → 5) policies: a legacy policy sees
-    the first 26 observations, and its actions are padded with "straight, normal
-    guard".
+    Accepts current (32 → 7) and older policies: 30 → 7 (before the ring) and
+    26 → 5 (straights only). An older policy sees the first observations, which
+    keep its layout, and missing actions are padded with "straight, normal guard".
     """
     obs_size, action_size = policy_sizes(params)
     net = tactics_network_factory()(obs_size, action_size,
@@ -80,13 +80,15 @@ def tactics_policy(params, deterministic=False):
 
     def legacy(obs, key):
         action, extras = infer(obs[..., :obs_size], key)
-        pad = -jp.ones(action.shape[:-1] + (ACTION_SIZE - action_size,))
-        return jp.concatenate([action, pad], axis=-1), extras
+        if action_size < ACTION_SIZE:
+            pad = -jp.ones(action.shape[:-1] + (ACTION_SIZE - action_size,))
+            action = jp.concatenate([action, pad], axis=-1)
+        return action, extras
     return legacy
 
 
 def widen_legacy(params, new_scale=-1.):
-    """A 30 → 7 policy that acts exactly like a legacy 26 → 5 one.
+    """A 32 → 7 policy that acts exactly like an older, narrower one.
 
     New inputs get zero weights (normalized by mean 0, std 1), new action means
     start at 0 ("straight, normal guard", since only positive values switch), and
@@ -151,12 +153,14 @@ def decode(tactics, distance, local):
 
 
 def observe(xp, own, opp, own_arm, opp_arm, clock):
-    """Tactics observation for one corner (30 floats), NumPy or JAX.
+    """Tactics observation for one corner (32 floats), NumPy or JAX.
 
     ``own``/``opp``: dict(pos (2,), rot (2, 2) pelvis->world, vel (2,),
-    up, height). ``*_arm``: (age fraction, active, hand sign, aim, hook,
-    high guard). The hook/guard flags come last, so the first 26 entries keep
-    the legacy layout.
+    up, height); ``pos`` is in world coordinates, the ring centred at the
+    origin. ``*_arm``: (age fraction, active, hand sign, aim, hook, high guard).
+    New entries are appended, so older policies read their own layout from the
+    front: 26 legacy entries, then hook/guard flags (to 30), then the ring
+    centre in this boxer's frame, in units of the half-width ``RING_HALF``.
     """
     delta = opp["pos"] - own["pos"]
     distance = xp.linalg.norm(delta)
@@ -169,6 +173,7 @@ def observe(xp, own, opp, own_arm, opp_arm, clock):
         own_arm[:4], opp_arm[:4], xp.stack([clock, 1 - clock]),
         xp.stack([xp.minimum(distance, 3.0) ** 2, xp.sin(xp.arctan2(local[1], local[0]))]),
         own_arm[4:6], opp_arm[4:6],
+        own["rot"].T @ (-own["pos"]) / RING_HALF,
     ])
 
 

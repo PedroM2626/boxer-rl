@@ -103,6 +103,9 @@ class _FallingPair:
     def observation(self, commands):
         return np.zeros((2, 4), np.float32)
 
+    def on_ropes(self):
+        return np.zeros(2, bool)
+
     def step(self, action):
         fallen = np.array(self.falls.get(self.t, (False, False)))
         self.t += 1
