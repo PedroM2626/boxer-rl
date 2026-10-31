@@ -134,6 +134,7 @@ class PairedFoundation:
             foundation, separation, diagnostic_excluded_pairs=diagnostic_excluded_pairs)
         self.data = mujoco.MjData(self.model)
         self.pose = np.asarray(foundation._default_pose)
+        self.init_height32 = np.float32(foundation._init_q[2])
         self.action_scale = float(foundation._config.action_scale)
         self.substeps = round(self.dt / self.model.opt.timestep)
         if not np.isclose(self.substeps * self.model.opt.timestep, self.dt):
@@ -155,7 +156,30 @@ class PairedFoundation:
                          for target in ('head_collision', 'torso_collision')}
                         for side in scene.SIDES]
         self.scorecard = ImpactScorecard()
+        self._index_geoms()
         self.reset()
+
+    def _index_geoms(self):
+        """Integer lookups that replace per-substep name and set work in ``step``."""
+        model = self.model
+        self._tracked = sorted(set(self.fists.ravel()) | self.targets[0] | self.targets[1])
+        self._torso_sites = [model.site(m['side'] + 'imu_in_torso').id for m in self.maps]
+        self._warnings = [w for w in (getattr(mujoco.mjtWarning, name, None) for name in (
+            'mjWARN_BADQPOS', 'mjWARN_BADQVEL', 'mjWARN_BADQACC',
+            'mjWARN_CNSTRFULL', 'mjWARN_CONTACTFULL')) if w is not None]
+        # owner[g] = (corner, hand) for fists; target_of[g] = corner whose target g is.
+        self._fist_owner = {int(g): (i, hand) for i in range(2) for hand, g in enumerate(self.fists[i])}
+        self._target_of = {int(g): i for i in range(2) for g in self.targets[i]}
+        # Self-contacts that count as a fall (foot on foot or foot on the other shin).
+        trips = ({'left_foot', 'right_foot'}, {'left_foot', 'right_shin'}, {'right_foot', 'left_shin'})
+        self._trip = {}
+        names = [model.geom(g).name for g in range(model.ngeom)]
+        for i, side in enumerate(scene.SIDES):
+            own = {n[len(side):]: g for g, n in enumerate(names) if n.startswith(side)}
+            for pair in trips:
+                a, b = sorted(pair)
+                if a in own and b in own:
+                    self._trip[frozenset((own[a], own[b]))] = i
 
     def reset(self, seed=0, swap=False, randomized=True):
         mujoco.mj_resetData(self.model, self.data)
@@ -215,14 +239,10 @@ class PairedFoundation:
             flags.append(not finite or self.data.qpos[m['root'] + 2] < .55
                          or self.data.sensor(m['side'] + 'upvector_torso').data[2] < .6)
         # Keep the foundation's self-foot/leg contact termination rule.
-        for contact in self.data.contact:
-            names = [self.model.geom(int(g)).name for g in contact.geom]
-            for i, side in enumerate(scene.SIDES):
-                if all(n.startswith(side) for n in names):
-                    names_local = {n[len(side):] for n in names}
-                    if names_local in ({'left_foot', 'right_foot'},
-                                       {'left_foot', 'right_shin'}, {'right_foot', 'left_shin'}):
-                        flags[i] = True
+        for g1, g2 in self.data.contact.geom:
+            corner = self._trip.get(frozenset((int(g1), int(g2))))
+            if corner is not None:
+                flags[corner] = True
         return np.array(flags)
 
     def step(self, actions):
@@ -241,15 +261,14 @@ class PairedFoundation:
             # Cache velocities before the constraint solver changes them on
             # impact. A motionless fist cannot score when an opponent falls in.
             velocities = {}
-            for geom in set(self.fists.ravel()) | self.targets[0] | self.targets[1]:
+            for geom in self._tracked:
                 velocity = np.zeros(6)
                 mujoco.mj_objectVelocity(self.model, self.data, mujoco.mjtObj.mjOBJ_GEOM,
                                          int(geom), velocity, 0)
                 velocities[geom] = velocity[3:].copy()
             positions = self.data.geom_xpos.copy()
             torso_motion = []
-            for m in self.maps:
-                site = self.model.site(m['side'] + 'imu_in_torso').id
+            for site in self._torso_sites:
                 velocity = np.zeros(6)
                 mujoco.mj_objectVelocity(self.model, self.data, mujoco.mjtObj.mjOBJ_SITE,
                                          site, velocity, 0)
@@ -258,47 +277,45 @@ class PairedFoundation:
             if punch_trace is not None:
                 punch_trace.before_substep(self, positions, velocities, torso_motion)
             self._physics_step()
-            for name in ('mjWARN_BADQPOS', 'mjWARN_BADQVEL', 'mjWARN_BADQACC',
-                         'mjWARN_CNSTRFULL', 'mjWARN_CONTACTFULL'):
-                warning = getattr(mujoco.mjtWarning, name, None)
-                if warning is not None and self.data.warning[warning].number:
+            for warning in self._warnings:
+                if self.data.warning[warning].number:
                     # Native MuJoCo can reset an invalid state internally.
                     # Such a reset must never become apparent trial survival.
-                    raise FloatingPointError(f'Invalid paired physics: {name}')
+                    raise FloatingPointError(f'Invalid paired physics: {warning.name}')
             present = np.zeros((2, 2), bool)
             per_hand = np.zeros((2, 2))
             closing = np.zeros((2, 2))
             advancing = np.zeros((2, 2))
-            for k, contact in enumerate(self.data.contact):
-                geoms = set(map(int, contact.geom))
+            contact_times = getattr(self, 'diagnostic_contact_times', None)
+            for k, (g1, g2) in enumerate(self.data.contact.geom):
+                g1, g2 = int(g1), int(g2)
                 # Optional passive diagnostic: first positive normal force at
                 # native substep resolution; no physics/scoring modification.
-                contact_times = getattr(self, 'diagnostic_contact_times', None)
                 if contact_times is not None:
-                    pair_key = tuple(sorted(geoms))
+                    pair_key = tuple(sorted({g1, g2}))
                     if pair_key not in contact_times:
                         diagnostic_force = np.zeros(6)
                         mujoco.mj_contactForce(self.model, self.data, k, diagnostic_force)
                         if diagnostic_force[0] > 0:
                             contact_times[pair_key] = float(self.data.time)
-                for i in range(2):
-                    for hand, fist in enumerate(self.fists[i]):
-                        target_set = geoms & self.targets[1-i]
-                        if fist not in geoms or not target_set:
-                            continue
-                        target = next(iter(target_set))
-                        force = np.zeros(6)
-                        mujoco.mj_contactForce(self.model, self.data, k, force)
-                        per_hand[i, hand] += max(0., force[0]) * self.model.opt.timestep
-                        present[i, hand] = True
-                        direction = positions[target] - positions[fist]
-                        direction /= max(np.linalg.norm(direction), 1e-8)
-                        closing[i, hand] = max(closing[i, hand],
-                            float((velocities[fist] - velocities[target]) @ direction))
-                        origin, velocity = torso_motion[i]
-                        torso_at_fist = velocity[3:] + np.cross(velocity[:3], positions[fist] - origin)
-                        advancing[i, hand] = max(advancing[i, hand],
-                            float((velocities[fist] - torso_at_fist) @ direction))
+                # A legal hit: one geom a fist, the other a target of the
+                # fist owner's opponent (corner 0 before corner 1, as before).
+                hits = sorted(self._fist_owner[f] + (t,) for f, t in ((g1, g2), (g2, g1))
+                              if f in self._fist_owner and self._target_of.get(t) == 1 - self._fist_owner[f][0])
+                for i, hand, target in hits:
+                    fist = self.fists[i][hand]
+                    force = np.zeros(6)
+                    mujoco.mj_contactForce(self.model, self.data, k, force)
+                    per_hand[i, hand] += max(0., force[0]) * self.model.opt.timestep
+                    present[i, hand] = True
+                    direction = positions[target] - positions[fist]
+                    direction /= max(np.linalg.norm(direction), 1e-8)
+                    closing[i, hand] = max(closing[i, hand],
+                        float((velocities[fist] - velocities[target]) @ direction))
+                    origin, velocity = torso_motion[i]
+                    torso_at_fist = velocity[3:] + np.cross(velocity[:3], positions[fist] - origin)
+                    advancing[i, hand] = max(advancing[i, hand],
+                        float((velocities[fist] - torso_at_fist) @ direction))
             impulses += per_hand.sum(axis=1)
             fallen = self.fallen()
             scored += self.scorecard.update(present, per_hand, closing, advancing,

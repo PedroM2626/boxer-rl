@@ -333,6 +333,40 @@ events). The native gate, native fine-tuning workers and the learner already
 ran on the CPU, so their results are unchanged. Batched GPU training is
 unaffected; it never replays native bouts.
 
+## Faster native stepping (2026-10-31)
+
+Native fine-tuning ran at about 640 steps/s with 8 workers, so 3M steps took
+about 80 minutes. A profile of one worker showed MuJoCo's `mj_step` was only
+about 20 % of a step. The rest was Python overhead:
+
+* the paired harness looked up geom names and built sets for every contact
+  on every 2 ms substep (hit detection and the self-trip fall rule);
+* each control step dispatched several small JAX operations: a fresh
+  `PRNGKey(0)` and zero array for the motor, splitting keys outside `jit`,
+  and subtracting a JAX scalar for the observed height;
+* the impact scorecard did its full array update on every substep, even
+  when no fist touched a target.
+
+These now use integer lookups precomputed at start-up, constant NumPy motor
+inputs, key splits inside the jitted calls, a cached float32 start height
+(the same arithmetic as before), and a no-contact fast path in the
+scorecard with the same result.
+
+`tools/native_fingerprint.py` checks the result. It plays a learned bout, a
+scripted bout under knockdown rules and 1500 fine-tuning steps, and
+compares events, rewards and observations with a reference recorded before
+the change. **All are bit-for-bit identical.**
+
+| | Before | After |
+| --- | --- | --- |
+| One worker, fine-tuning steps/s | 141 | 388 (2.75×) |
+| 20 s learned bout (`spar_match`) | 7.9 s | 3.3 s (2.4×) |
+| 8 workers + learner, steps/s | ~640 | **1,353** (2.1×) |
+
+3M native steps now take about 37 minutes instead of 80. In the fine-tuning
+workers, which build the model from a stub, the observed height used to be
+computed in float64 and is now float32, the same as in native evaluation.
+
 ## Champion history
 
 * `checkpoints/tactics-batched`: batched v1 gen‑0 (2026-10-30).

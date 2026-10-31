@@ -73,10 +73,8 @@ class NativeBout:
                        self.arms[1 - i].features(), self.t / self.episode_steps).astype(np.float32)
 
     def step(self, tactics):
-        import jax
-        import jax.numpy as jp
         from boxer.curriculum_env import LEFT_ARM
-        from boxer.spar_match import PolicyBrain, _body
+        from boxer.spar_match import PolicyBrain, _body, motor_actions
         from boxer.tactics_env import REACH, decode
         pair, i = self.pair, self.learner
         bodies = [_body(pair, k) for k in range(2)]
@@ -101,9 +99,7 @@ class NativeBout:
                 self.arms[k].launch(*punch[:2], self.rng, *punch[2:])
             commands[k] = command
         commands = np.clip(commands, [-.35, -.25, -.5], [.55, .25, .5])
-        action, _ = self.motor({"state": jp.asarray(pair.observation(commands)),
-                                "privileged_state": jp.zeros((2, 216))}, jax.random.PRNGKey(0))
-        action = np.asarray(action).copy()
+        action = motor_actions(self.motor, pair.observation(commands))
         for k in range(2):
             action[k, LEFT_ARM:] = self.arms[k].actions(bool(high[k]))
         outcome = pair.step(action)
@@ -181,7 +177,6 @@ def _worker(conn, seed, motor_path, opponent_paths, scripted_fraction, episode_s
             min_std, model_path, constants, high_guard_fraction=0.):
     _configure_worker_env()
     import jax
-    import jax.numpy as jp
     import mujoco
     from boxer.curriculum_train import inference, load_policy_params
     from boxer.paired_foundation import PairedFoundation
@@ -198,7 +193,12 @@ def _worker(conn, seed, motor_path, opponent_paths, scripted_fraction, episode_s
         opponents.append(brain)
     bout = NativeBout(pair, motor, rng, opponents, scripted_fraction, episode_steps, fall_penalty,
                       high_guard_fraction)
-    sample = jax.jit(make_sampler(min_std))
+    sample_with = make_sampler(min_std)
+
+    def sample_next(params, obs, key):
+        key, sub = jax.random.split(key)
+        return (*sample_with(params, obs, sub), key)
+    sample = jax.jit(sample_next)
     key = jax.random.PRNGKey(seed)
     obs = bout.observe()
     conn.send("ready")
@@ -210,8 +210,7 @@ def _worker(conn, seed, motor_path, opponent_paths, scripted_fraction, episode_s
         record = {k: [] for k in ("obs", "raw", "logp", "reward", "terminal", "truncated", "next_obs")}
         stats = dict(hits=0., taken=0., fell=0., punches=0., hooks=0., bouts=0)
         for _ in range(steps):
-            key, sub = jax.random.split(key)
-            action, raw, logp = sample(params, jp.asarray(obs), sub)
+            action, raw, logp, key = sample(params, obs, key)
             reward, terminal, truncated, info = bout.step(np.asarray(action))
             next_obs = bout.observe()
             for name, value in (("obs", obs), ("raw", np.asarray(raw)), ("logp", float(logp)),

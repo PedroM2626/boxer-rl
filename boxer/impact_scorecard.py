@@ -40,6 +40,11 @@ class ImpactScorecard:
             raise FloatingPointError('non-finite impact input')
         if not np.isfinite(time) or not np.isfinite(dt) or dt <= 0 or np.any(impulses < 0):
             raise ValueError('invalid impact timing or impulse')
+        if not present.any():
+            # Most substeps: no hand touches a target. Same result as below.
+            self.absent += dt
+            self.engaged &= self.absent < self.release_seconds
+            return np.zeros(2, np.float32)
         self.absent = np.where(present, 0., self.absent + dt)
         rearm = ~present & (self.absent >= self.release_seconds)
         self.engaged[rearm] = False

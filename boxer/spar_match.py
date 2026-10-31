@@ -26,7 +26,6 @@ import json
 from pathlib import Path
 
 import jax
-import jax.numpy as jp
 import numpy as np
 
 from boxer import moves
@@ -35,6 +34,15 @@ from boxer.curriculum_train import inference, load_policy_params
 from boxer.paired_foundation import PairedFoundation
 
 KNOCKDOWN_POINTS = 10
+# Constant motor inputs, passed as NumPy so a step costs no extra JAX dispatch.
+MOTOR_PRIVILEGED = np.zeros((2, 216), np.float32)
+MOTOR_KEY = np.zeros(2, np.uint32)          # == jax.random.PRNGKey(0)
+
+
+def motor_actions(motor, obs):
+    """Both boxers' 29 joint targets from the motor (copy, safe to edit)."""
+    action, _ = motor({'state': obs, 'privileged_state': MOTOR_PRIVILEGED}, MOTOR_KEY)
+    return np.array(action)
 
 
 class PunchArm:
@@ -130,15 +138,20 @@ class PolicyBrain:
 
     def __init__(self, params, deterministic=True):
         from boxer.tactics_env import tactics_policy
-        self.policy = jax.jit(tactics_policy(params, deterministic=deterministic))
+        policy = tactics_policy(params, deterministic=deterministic)
+
+        def act(obs, key):
+            key, sub = jax.random.split(key)
+            return policy(obs, sub)[0], key
+        # Splitting the key inside the jitted call saves per-step dispatch.
+        self.act = jax.jit(act)
         self.key = jax.random.PRNGKey(0)
 
     def decide_pair(self, pair, i, arms, clock):
         from boxer.tactics_env import decode, observe
         bodies = [_body(pair, k) for k in range(2)]
         obs = observe(np, bodies[i], bodies[1 - i], arms[i].features(), arms[1 - i].features(), clock)
-        self.key, key = jax.random.split(self.key)
-        tactics, _ = self.policy(jp.asarray(obs, jp.float32), key)
+        tactics, self.key = self.act(np.asarray(obs, np.float32), self.key)
         tactics = np.asarray(tactics, np.float64)
         delta = bodies[1 - i]['pos'] - bodies[i]['pos']
         command, want, hand, aim, move, high = decode(tactics, np.linalg.norm(delta),
@@ -154,7 +167,8 @@ def _body(pair, i):
     return dict(pos=pair.data.qpos[m['root']:m['root'] + 2].copy(), rot=rot,
                 vel=pair.data.qvel[m['rootv']:m['rootv'] + 2].copy(),
                 up=float(pair.data.sensor(m['side'] + 'upvector_torso').data[2]),
-                height=float(pair.data.qpos[m['root'] + 2] - pair.foundation._init_q[2]))
+                # float32, as when this subtracted the JAX array directly.
+                height=float(np.float32(pair.data.qpos[m['root'] + 2]) - pair.init_height32))
 
 
 def bout(pair, motor, seed, seconds=20.0, record=False, brains=None, knockdowns=1):
@@ -204,9 +218,7 @@ def _bout(pair, motor, seed, seconds, record, brains, knockdowns):
                 hooks[i] += len(punch) > 2 and punch[2] == moves.HOOK
         commands = np.clip(commands, [-.35, -.25, -.5], [.55, .25, .5])
         obs = pair.observation(commands)
-        action, _ = motor({'state': jp.asarray(obs), 'privileged_state': jp.zeros((2, 216))},
-                          jax.random.PRNGKey(0))
-        action = np.asarray(action).copy()
+        action = motor_actions(motor, obs)
         for i in range(2):
             action[i, LEFT_ARM:] = arms[i].actions(high[i])
             guarded[i] += high[i]
