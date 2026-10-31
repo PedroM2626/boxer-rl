@@ -151,6 +151,38 @@ normal / high guard at 0.62 m, and 2.6 % / 4.5 % at 0.52 m. A contact census
 
 The motor (`runs/spar-levelhook`) passed the full spar gate with the new hook
 already at step 0 and again at 10.8M steps. It becomes `checkpoints/spar`; the
-short-hook motor is kept as `checkpoints/spar-shorthook`. Next: native tactics
-fine-tuning from the champion, to see whether it learns body hooks against
-high guards.
+short-hook motor is kept as `checkpoints/spar-shorthook`.
+
+### Native fine-tune with the level hook
+
+3M native steps from the guard champion with the new motor
+(`runs/tactics-hooks`). The champion's hook output averages −0.02 with scale
+0.23, so training sampled hooks about half the time. Gated against the guard
+champion:
+
+| Checkpoint | vs guard champion, seeds 0–7 | Clean punches / bout |
+| --- | --- | --- |
+| **0.75M** | **14–2–0** | 12.1 : 8.6 |
+| 1.5M | 12–3–1 | 9.3 : 5.3 |
+| 2.25M | 11–3–2 | 7.4 : 3.6 |
+| 3.0M | 10–4–2 | 12.6 : 8.6 |
+| **0.75M, 48 bouts with fresh seeds** | **37–9–2** | **11.7 : 8.8**; falls 1 vs 4 (confirmation) |
+| 0.75M vs scripted (16 bouts) | 14–2–0 | 11.4 : 2.8 |
+
+It becomes `checkpoints/tactics`; the guard champion is kept as
+`checkpoints/tactics-guard-v1`. Both use the high guard heavily (35–41 % and
+50–56 % of bout time). **Hooks are still rare: about 2 % of the new champion's
+punches**, up from 0 %. Its edge comes mainly from falling less and landing a
+few more straights, not from hooks.
+
+Where this leaves hooks:
+
+* The level arc fixed the motion, and the motor balances through it. The
+  census shows body hooks get around a high guard more often than straights.
+* The scorecard rarely credits those contacts, and the head stays out of reach,
+  so a hook is rarely worth more than a straight. The policy uses it about 2 %
+  of the time.
+* Next candidates: a per-move landing census inside learned bouts; footwork
+  that holds infighting range so hooks reach the side of the head; and
+  checking whether the scorecard's closing-speed test (measured toward the
+  target's centre) under-credits lateral impacts.

@@ -243,8 +243,10 @@ move set (hooks, uppercuts, guard and blocks in the `spar` generator and
 
 * `checkpoints/tactics-batched`: batched v1 gen‑0 (2026-10-30).
 * `checkpoints/tactics-native-v1`: native fine-tune, straights only (2026-10-31).
-* `checkpoints/tactics`: native fine-tune with hooks and the high guard;
+* `checkpoints/tactics-guard-v1`: native fine-tune with hooks and the high guard;
   33–12–3 against native-v1 ([moves](moves.md)).
+* `checkpoints/tactics`: native fine-tune with the level long hook and its
+  motor; 37–9–2 against guard-v1, hooks still only ~2 % of punches.
 
 ## Native-v1 champion (native fine-tune, 2026-10-31)
 
