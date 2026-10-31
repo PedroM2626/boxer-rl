@@ -179,10 +179,47 @@ Where this leaves hooks:
 
 * The level arc fixed the motion, and the motor balances through it. The
   census shows body hooks get around a high guard more often than straights.
-* The scorecard rarely credits those contacts, and the head stays out of reach,
-  so a hook is rarely worth more than a straight. The policy uses it about 2 %
-  of the time.
-* Next candidates: a per-move landing census inside learned bouts; footwork
-  that holds infighting range so hooks reach the side of the head; and
-  checking whether the scorecard's closing-speed test (measured toward the
-  target's centre) under-credits lateral impacts.
+* The policy uses hooks about 2 % of the time. The scoring audit below
+  shows the scorecard is not the reason.
+
+### Scoring audit (`tools/score_audit.py`)
+
+Does the scorecard under-credit hooks? Its closing and fist-speed gates
+measure speed along the fist -> target-centre line, which might reject a
+fist that arrives from the side. The audit logs every contact onset of a fist
+on a legal target (head or torso) in native bouts, with the move in flight,
+the gate values, the same speeds along the contact normal, and the first
+gate that rejected it. Run with 8 seeds, 20 s per bout:
+
+| Bouts | Move | Target contacts | Scored | Rejected by |
+| --- | --- | --- | --- | --- |
+| scripted straight vs normal guard | straight | 64 | 60 (94 %) | closing 4 |
+| scripted straight vs high guard | straight | **0** | — | — |
+| scripted hook vs normal guard | hook | 8 | 7 (88 %) | closing 1 |
+| scripted hook vs high guard | hook | 5 | 4 (80 %) | closing 1 |
+| learned vs learned (champion) | straight | 221 | 194 (88 %) | fist speed 14, closing 11, impulse 2 |
+| learned vs learned (champion) | hook | 0 | — | — |
+
+Medians: hook contacts close at 0.8–0.9 m/s and push 1.7–2.3 N s, against
+the 0.3 m/s and 0.5 N s thresholds. Across all rows, only 4 of the 31 gate
+rejections would pass if speeds were measured along the contact normal.
+
+What the audit shows:
+
+* **The scorecard is fair to hooks.** Once a hook touches the head or torso
+  it scores 80–88 % of the time, like a straight. Lateral impacts are not
+  penalized, so the scoring rule stays as it is.
+* **The bottleneck is reaching the target.** A scripted hook touches the
+  target about 8 times in 160 s, against 64 for a straight.
+* **A high guard stops straights completely** (no torso contact in 160 s),
+  while hooks still land around it. That is the only matchup where a hook
+  beats a straight.
+* In learned bouts the champion's straights still land, and it throws no
+  hooks that touch a target, even though it holds the high guard 35–56 % of
+  the time. A straight's arm leaves the high guard while it punches, and the
+  guard toggles often, so the straight still finds openings and the policy
+  has little reason to hook.
+
+Next candidates: put scripted high-guard opponents into the fine-tune pool so
+hooking a held guard pays off; footwork that holds a closer range so hooks
+connect more often.
