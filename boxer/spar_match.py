@@ -208,7 +208,7 @@ def bout(pair, motor, seed, seconds=20.0, record=False, brains=None, knockdowns=
         scored += outcome['scored']
         if record and t % 2 == 0:
             frames.append(pair.data.qpos.copy())
-            times.append((elapsed, scored.copy()))
+            times.append((elapsed, scored.copy(), downs.copy()))
         if outcome['done']:
             fallen = np.asarray(outcome['fallen'], bool)
             downs += fallen
@@ -255,7 +255,10 @@ def render(pair, frames, times, path, caption):
     path.parent.mkdir(parents=True, exist_ok=True)
     with mujoco.Renderer(model, height=540, width=960) as renderer, \
             imageio.get_writer(path, fps=25) as writer:
-        for qpos, (elapsed, score) in zip(frames, times):
+        last_down, downs_before = -np.inf, np.zeros(2)
+        for qpos, (elapsed, score, downs) in zip(frames, times):
+            if (downs != downs_before).any():
+                last_down, downs_before = elapsed, downs
             data.qpos[:] = qpos
             mujoco.mj_forward(model, data)
             roots = [qpos[m['root']:m['root'] + 3] for m in pair.maps]
@@ -265,8 +268,12 @@ def render(pair, frames, times, path, caption):
             draw = ImageDraw.Draw(image)
             draw.rectangle((0, 0, 960, 44), fill='black')
             draw.text((10, 6), caption, fill='white')
-            draw.text((10, 25), f'{elapsed:5.2f} s   Red {int(score[0])}  -  Blue {int(score[1])}'
+            knockdowns = f'   knockdowns {int(downs[0])}-{int(downs[1])}' if downs.any() else ''
+            draw.text((10, 25), f'{elapsed:6.2f} s   Red {int(score[0])}  -  Blue {int(score[1])}{knockdowns}'
                       '   | free legs, no pelvis support', fill='white')
+            if elapsed - last_down < 2.:
+                draw.rectangle((330, 470, 630, 510), fill='darkred')
+                draw.text((345, 482), 'KNOCKDOWN - referee restart', fill='white')
             writer.append_data(np.asarray(image))
 
 

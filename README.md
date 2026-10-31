@@ -37,7 +37,9 @@ straights and has stopped throwing hooks
 that keeps the boxers facing each other. `--knockdowns 3` adds a referee:
 a fall is counted and both robots restart standing (they cannot get up
 unaided), and a third knockdown is a TKO
-([details](docs/tactics.md#knockdown-rules-2026-10-31)).
+([details](docs/tactics.md#knockdown-rules-2026-10-31);
+[3-minute video](fights/tactics_knockdown_rules_180s.mp4) with two knockdowns,
+current champion in blue).
 
 ```bash
 bash tools/run_spar.sh boxer.spar_match --red-tactics checkpoints/tactics \
