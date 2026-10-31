@@ -102,6 +102,39 @@ def main():
     for name, (q, (fist, elbow), err) in long_hook.items():
         print(f"{name:16s} pose {q} fist {fist} elbow {elbow} residual {err:.4f}")
 
+    # Level arc. Interpolating joints from wind-up to strike lifts the head hook
+    # to z 0.535 m. Instead, solve IK at waypoints on a horizontal arc around
+    # the shoulder, each warm-started from (and kept near) the previous one.
+    for aim in ("head", "body"):
+        path = arc_path(arm, long_hook[f"long windup {aim}"][0], long_hook[f"long hook {aim}"][0])
+        print(f"LONG_HOOK_PATH_{aim.upper()} = np.array([")
+        for q in path:
+            print("    [" + ", ".join(f"{v:.4f}" for v in q) + "],")
+        print("])")
+        zs = [arm.place(q)[0][2] for q in path]
+        print(f"# fist z along the arc: {np.round(zs, 3).tolist()}")
+
+
+def arc_path(arm, start, end, waypoints=6, smooth=.02):
+    """Joint poses whose fists lie on a level arc around the shoulder."""
+    rot = arm.data.xmat[arm.torso].reshape(3, 3)
+    shoulder = rot.T @ (arm.data.xpos[arm.model.body("left_shoulder_pitch_link").id]
+                        - arm.data.xpos[arm.torso])
+    a, b = arm.place(start)[0], arm.place(end)[0]
+    angle = lambda p: np.arctan2(p[1] - shoulder[1], p[0] - shoulder[0])
+    radius = lambda p: np.hypot(p[1] - shoulder[1], p[0] - shoulder[0])
+    low, high = arm.range["left"][:, 0], arm.range["left"][:, 1]
+    path, previous = [np.asarray(start)], np.asarray(start)
+    for t in np.linspace(0, 1, waypoints)[1:]:
+        theta = angle(a) + t * (angle(b) - angle(a))
+        r = radius(a) + t * (radius(b) - radius(a))
+        target = np.array([shoulder[0] + r * np.cos(theta), shoulder[1] + r * np.sin(theta),
+                           a[2] + t * (b[2] - a[2])])
+        cost = lambda q: np.sum((arm.place(q)[0] - target) ** 2) + smooth * np.sum((q - previous) ** 2)
+        previous = minimize(cost, previous, bounds=list(zip(low, high)), method="L-BFGS-B").x
+        path.append(previous)
+    return np.array(path)
+
 
 if __name__ == "__main__":
     main()

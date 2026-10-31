@@ -124,11 +124,33 @@ physics, with 6 bouts per row. It reports clean punches per punch thrown:
   of sweeping level at 0.42 m. Video frames confirm this. The body hook stays
   level (z 0.18–0.20 m).
 
-Next steps, not yet done:
+### Level long hook (v2, active since 2026-10-31 evening)
 
-1. Drive the hook through Cartesian waypoints (IK per waypoint along a level
-   arc) instead of one joint-space interpolation.
-2. Make the long hook active, retrain the motor (spar gate), then fine-tune
-   tactics natively.
-3. Re-measure. The tactics also need to keep infighting range for hooks to
-   pay off.
+`tools/fit_moves.py` now solves IK at 6 waypoints on a horizontal arc around
+the shoulder (each warm-started from and kept near the previous solution),
+and `moves.punch_pose` swings through them. Traced with forward kinematics,
+the head hook stays at z 0.426–0.431 m and the body hook at 0.182–0.184 m. It
+sweeps from 0.31 m out to the side to the centre line and reaches 0.40–0.43 m
+forward, about the straight's reach. The short hook is kept as `SHORT_*`.
+
+A level arc alone did not raise the landing rate: 6.6 % / 1.4 % against the
+normal / high guard at 0.62 m, and 2.6 % / 4.5 % at 0.52 m. A contact census
+(`tools/fist_contacts.py`, 3 bouts per row, red throwing only one move at
+0.55 m) shows what punches actually touch:
+
+* **The head is essentially out of reach.** Hooks never touched it, and
+  straights touched it in 55 substeps against 191 on the torso. The front of
+  the head sits at the limit of the G1's reach at these distances.
+* **Gloves meet gloves.** About 1,300–1,500 substeps per hand of fist-on-fist
+  contact: both guards touch constantly and the arms stay tangled.
+* **Head hooks run into arms and shoulders** (150–500 shoulder-contact
+  substeps).
+* **Body hooks get around a high guard.** Against a high guard, hooks touched
+  the torso in 140 substeps against 63 for straights. The raised fists leave
+  the body open from the side.
+
+The motor (`runs/spar-levelhook`) passed the full spar gate with the new hook
+already at step 0 and again at 10.8M steps. It becomes `checkpoints/spar`; the
+short-hook motor is kept as `checkpoints/spar-shorthook`. Next: native tactics
+fine-tuning from the champion, to see whether it learns body hooks against
+high guards.
