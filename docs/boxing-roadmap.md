@@ -18,8 +18,9 @@ falling. The remaining work is the boxing brain and the move set:
    parity (18–28–2), so tactics are near saturation for the current moves.
 2. **Range control and clinch breaking.** Penalize chest contact and reward
    staying at punching range.
-3. **More moves.** Hooks, uppercuts and active guard/blocking primitives in the
-   `spar` generator, so the motor also stays balanced through them.
+3. **More moves: partly done** ([moves](moves.md)). The high guard is learned
+   and wins; hooks exist but go unused. Next: footwork that closes to hook
+   range, uppercuts, slips.
 4. **Robustness.** Longer rounds, knockdowns that do not end the bout, and
    evaluation against a league of past tactical policies.
 

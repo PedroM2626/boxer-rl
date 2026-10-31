@@ -239,10 +239,17 @@ tactics look close to saturated. Further gains should come from a richer
 move set (hooks, uppercuts, guard and blocks in the `spar` generator and
 `PunchArm`) and from making falls costlier in native training.
 
-## Champion: `checkpoints/tactics` (native fine-tune, 2026-10-31)
+## Champion history
 
-`checkpoints/tactics` is the 2.0M native fine-tune
-(`checkpoints/tactics/native-gate.json` holds its gate record). The previous
+* `checkpoints/tactics-batched`: batched v1 gen‑0 (2026-10-30).
+* `checkpoints/tactics-native-v1`: native fine-tune, straights only (2026-10-31).
+* `checkpoints/tactics`: native fine-tune with hooks and the high guard;
+  33–12–3 against native-v1 ([moves](moves.md)).
+
+## Native-v1 champion (native fine-tune, 2026-10-31)
+
+The 2.0M native fine-tune is now `checkpoints/tactics-native-v1`
+(its `native-gate.json` holds the gate record). The previous
 champion, batched v1 gen‑0, moved to `checkpoints/tactics-batched`. Videos:
 [`fights/tactics_native_vs_batched.mp4`](../fights/tactics_native_vs_batched.mp4)
 (new red vs old blue, seed 3: 26–15, both standing for 20 s) and

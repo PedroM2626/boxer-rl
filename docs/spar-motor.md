@@ -1,5 +1,9 @@
 # Sparring motor: balance that survives its own punches
 
+> Update 2026-10-31: `checkpoints/spar` is now the motor retrained for hooks
+> and the high guard ([moves](moves.md)). The straight-only motor described
+> here is `checkpoints/spar-straight`.
+
 Date: 2026-10-30.
 
 ## Diagnosis
@@ -52,7 +56,7 @@ Solo `spar` gate (2 seeds × 7 commands × push on/off, 32 worlds, 10 s):
 | `spar` @ 10.8M (≈ 8 min of training) | 0.994 | 0.969 | fail: standing drift 0.21 m/s vs 0.20, weak left step |
 | `spar` @ 21.6M | 0.999 | 0.969 | **pass** |
 | `spar` @ 32.4M | 1.000 | 1.000 | fail: one tracking error 0.216 |
-| `spar` @ 39.3M (final, `checkpoints/spar`) | **1.000** | 1.000 | **pass** |
+| `spar` @ 39.3M (final, now `checkpoints/spar-straight`) | **1.000** | 1.000 | **pass** |
 
 Two-robot bouts (`boxer/spar_match.py`): native MuJoCo, free roots, no pelvis
 support, scripted ring tactics, 20 s or first knockdown, seeds 0–7:
@@ -68,7 +72,7 @@ stay up. Weakness: from about 8 s they drift into a chest-to-chest clinch and
 rotate, so the scripted range control needs work.
 
 ```bash
-bash tools/run_spar.sh boxer.spar_match --checkpoint checkpoints/spar \
+bash tools/run_spar.sh boxer.spar_match --checkpoint checkpoints/spar-straight \
   --seeds 0 1 2 3 4 5 6 7 --seconds 20 --video runs/spar/match.mp4
 ```
 

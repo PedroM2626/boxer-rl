@@ -13,21 +13,24 @@ the full gate. In two-robot native MuJoCo bouts with scripted tactics,
 per bout between both corners ([video](fights/spar_g1_vs_g1.mp4)).
 
 **Learned tactics (2026-10-30/31).** [Self-play PPO](docs/tactics.md) chooses
-footwork and punches. It is pretrained in a batched GPU two-robot environment
-(about 25k steps/s; 14 minutes beats the scripted tactics 16–0), then
-**fine-tuned on native MuJoCo rollouts** from 8 parallel CPU workers (about 630
-steps/s, 2M steps, 53 minutes). Batched self-play beyond the first policy kept
-getting worse in native physics. Native fine-tuning instead improves steadily,
-and the new champion (`checkpoints/tactics`) beats the batched champion
-**42–2–4 over 48 native bouts** (21.9 to 15.0 clean punches per bout). It also
-beats the scripted tactics 15–1 (21.6 to 5.3)
-([video vs batched champion](fights/tactics_native_vs_batched.mp4)). A second native
-round against itself plateaued at parity, so the next gains need more moves
-(hooks, uppercuts, blocking).
+footwork, punches and guard height. It is pretrained in a batched GPU
+two-robot environment, then **fine-tuned on native MuJoCo rollouts** from 8
+parallel CPU workers. Batched self-play beyond the first policy kept getting
+worse in native physics; native fine-tuning improves steadily (first native
+champion: 42–2–4 against the batched one).
+
+**Hooks and a high guard (2026-10-31).** [New moves](docs/moves.md) are
+fitted by forward kinematics and shared by every backend. The motor was
+retrained to balance through them (two consecutive full gate passes), and
+the champion was widened and fine-tuned natively. The current champion
+(`checkpoints/tactics`) **beats the previous one 33–12–3 over 48 native bouts** and holds
+the scripted tactics to 1.75 clean punches per bout. It learned to keep a
+high guard about a third of the time; it never chooses hooks
+([video](fights/tactics_guard_vs_native_v1.mp4)).
 
 ```bash
 bash tools/run_spar.sh boxer.spar_match --red-tactics checkpoints/tactics \
-  --blue-tactics checkpoints/tactics-batched --seeds 0 1 2 3 --swap --video runs/fight.mp4
+  --blue-tactics checkpoints/tactics-native-v1 --seeds 0 1 2 3 --swap --video runs/fight.mp4
 ```
 
 ## Current experiment: unassisted paired boxing diagnostics

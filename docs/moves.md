@@ -1,0 +1,98 @@
+# Hooks and the high guard
+
+Date: 2026-10-31. Builds on the [sparring motor](spar-motor.md) and
+[learned tactics](tactics.md).
+
+## Why
+
+The second native self-play round plateaued at parity with the champion
+(18–28–2). With only straight punches and footwork, the tactics looked
+saturated. More moves give the tactics something new to learn.
+
+## Moves (`boxer/moves.py`)
+
+All poses are left-arm (shoulder pitch, roll, yaw, elbow); the right arm
+mirrors roll and yaw. Hook and guard poses were fitted by forward kinematics
+(`tools/fit_moves.py`, L-BFGS on fist and elbow positions in the torso frame).
+One module serves the spar generator (JAX), batched tactics (JAX) and native
+play (NumPy), so the three cannot drift apart. Tests check NumPy/JAX parity.
+
+| Move | Path | Timing | Fist in torso frame |
+| --- | --- | --- | --- |
+| Straight (unchanged) | guard → strike | 0.18 s out, 0.26 s back | x 0.41–0.44 m |
+| Hook | guard → wind-up (fist 0.30 m out to the side, 40 % of the extension) → strike across the centre line, elbow wide (y ≈ 0.20 m) and level | 0.26 s out, 0.28 s back | x 0.32–0.36 m, y ≈ 0 |
+| High guard | both fists in front of the face | held while chosen | z 0.43 m (normal guard 0.26 m) |
+
+Raised fists and forearms collide with incoming punches through the
+existing fist-vs-hand/wrist/elbow contact pairs, so the high guard blocks
+physically. Only head and torso contacts score.
+
+## Motor: balance through the new moves
+
+The spar generator now throws 40 % hooks and switches between the normal
+and high guard every 0.5–3 s (40 % of periods high). The straight-only motor
+(`checkpoints/spar-straight`) survives only 58 % of solo spar trials under the
+new generator (worst trial 0.375). Fine-tuned from it (`runs/spar-moves`), the
+motor passes the full spar gate at 10.8M and 21.6M steps with 100 % survival,
+two consecutive passes, and becomes `checkpoints/spar`. In a native mirror of
+the tactics champion with the new motor, all 16 bouts go the full 20 s with
+no falls (31.4 clean punches per bout).
+
+## Tactics interface
+
+Tactics grow from 5 to 7 actions: hook instead of straight when output 6 is
+positive, high guard when output 7 is positive. Observations grow from 26
+to 30: both corners' "hook in flight" and "high guard" flags, appended at
+the end so the first 26 entries keep their meaning. Older 26/5 checkpoints
+still run: `tactics_policy` feeds them the first 26 inputs and pads their
+actions with "straight, normal guard". `widen_legacy` turns such a checkpoint
+into an equivalent 30/7 network: zero weights on the new inputs, new action
+means at 0 and a moderate exploration scale. A test checks that it acts
+identically. Native fine-tuning then learns when the new moves pay off.
+
+## Training
+
+```bash
+bash tools/run_spar.sh boxer.native_finetune --init-from checkpoints/tactics \
+  --output runs/tactics-moves --steps 3000000 --checkpoint-every 750000 \
+  --workers 8 --pool checkpoints/tactics --native-gate 4 --seed 2
+```
+
+## Results (native MuJoCo, new motor for both corners)
+
+3M native steps from the widened champion (`runs/tactics-moves`, 2.2 h at
+about 380 steps/s; extra arm contacts make it slower than straight-only
+training's 630). Gated against the previous champion
+(`checkpoints/tactics-native-v1`, which keeps straights and the normal guard):
+
+| Checkpoint | vs previous champion, seeds 0–7 | Clean punches / bout |
+| --- | --- | --- |
+| 0.75M | 12–3–1 | 17.9 : 14.9 |
+| 1.5M | 6–8–2 | 16.1 : 15.3 |
+| 2.25M | 11–5–0 | 15.8 : 13.8 |
+| **3.0M** | **12–3–1** | 11.8 : 7.6 |
+| **3.0M, 48 bouts with fresh seeds 8–23** | **33–12–3** | **12.4 : 8.9** |
+| 3.0M vs scripted (16 bouts) | 15–1–0 | 12.3 : 1.75 |
+
+How it boxes: acting deterministically, the new champion holds the **high
+guard about a third of the time** (33–34 % of bout time), throws about as many
+punches as before (44 per bout), and **never chooses hooks**. The guard is
+the advantage. Opponents' clean punches fall from about 15 to 8.9 per bout
+(previous champion) and from 5.3 to 1.75 (scripted brain). Its own scoring
+also drops, since punches launched from the high guard start farther from
+the target. In the videos the boxers now stay at punching range instead of
+drifting into the chest-to-chest clinch.
+
+Limits:
+
+* **Hooks went unused.** They were explored during training (the new
+  action started at 50 % hooks) but dropped. A likely reason is reach: 0.32–0.36 m
+  against 0.41–0.44 m for straights, at the range these boxers keep. Hooks may
+  need closer footwork, or a reward for angle and variety, to become useful.
+* **It falls a little more:** 6 falls in 48 bouts against the previous
+  champion's 2, and 1 in 16 against the scripted brain.
+
+Published as `checkpoints/tactics`
+([gate record](../checkpoints/tactics/native-gate.json)). The video
+[`fights/tactics_guard_vs_native_v1.mp4`](../fights/tactics_guard_vs_native_v1.mp4)
+(seed 3) shows it winning 11–4 with 5.7 s of high guard.
