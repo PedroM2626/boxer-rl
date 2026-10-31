@@ -1,6 +1,6 @@
 # Functional completion estimate and remaining evidence
 
-**Update 2026-10-30: about 65 %** (60 % after the motor, plus learned tactics). The [sparring motor](spar-motor.md) closes
+**Update 2026-10-31: about 70 %** (60 % after the motor, plus learned tactics that improve under native fine-tuning). The [sparring motor](spar-motor.md) closes
 the stability gap that held this estimate at 40 %. Two unassisted robots now
 exchange punches for 20 s in 8/8 bouts (18.6 clean punches per bout, zero
 falls). Still outstanding: learned tactics (punch selection is scripted),
@@ -12,7 +12,7 @@ historical record.
 | --- | --- |
 | Balance while punching and being shoved | `spar` motor: 100 % solo survival, full gate pass |
 | Two-sided unassisted exchanges | 8/8 bouts × 20 s, both corners score and win |
-| Learned tactics | Champion self-play policy beats scripted 16–0 natively; later generations do not transfer (see [tactics](tactics.md)) |
+| Learned tactics | Native fine-tuned champion beats the batched champion 42–2–4 and scripted 15–1 natively ([tactics](tactics.md)) |
 | Defense, hooks/uppercuts, clinch breaking | Outstanding |
 
 Reviewed 2026-10-29. **Approximately 40%** is a subjective estimate of demonstrated

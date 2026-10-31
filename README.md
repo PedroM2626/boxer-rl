@@ -12,22 +12,20 @@ the full gate. In two-robot native MuJoCo bouts with scripted tactics,
 **8/8 bouts go the full 20 s with no falls**, averaging 18.6 clean punches
 per bout between both corners ([video](fights/spar_g1_vs_g1.mp4)).
 
-**Learned tactics (2026-10-30).** [Self-play PPO](docs/tactics.md) now chooses
-footwork and punches in a batched GPU two-robot environment, about 25k
-steps/s on the RTX 3060. The champion (`checkpoints/tactics`, 14 minutes of
-training) beats the scripted tactics **16–0** in native MuJoCo, landing 20.1
-to 5.7 clean punches per bout. Learned-vs-learned bouts average 37.6 clean
-punches per 20 s with no falls ([video](fights/tactics_selfplay.mp4)). Later
-self-play generations improve in batched physics but not natively. That
-transfer gap is the next problem; see the report. With physics randomization, the
-first randomized generation reaches rough parity with the champion natively
-(21–23–4 over 48 bouts). Further generations drift toward risky play that only
-pays off in batched physics. A native-physics gate shows this degradation
-directly (3–13 after 20M steps, from rough parity at the start), even with
-falls made costlier. The next step is fine-tuning on native rollouts.
+**Learned tactics (2026-10-30/31).** [Self-play PPO](docs/tactics.md) chooses
+footwork and punches. It is pretrained in a batched GPU two-robot environment
+(about 25k steps/s; 14 minutes beats the scripted tactics 16–0), then
+**fine-tuned on native MuJoCo rollouts** from 8 parallel CPU workers (about 630
+steps/s, 2M steps, 53 minutes). Batched self-play beyond the first policy kept
+getting worse in native physics. Native fine-tuning instead improves steadily,
+and the new champion (`checkpoints/tactics`) beats the batched champion
+**42–2–4 over 48 native bouts** (21.9 to 15.0 clean punches per bout). It also
+beats the scripted tactics 15–1 (21.6 to 5.3)
+([video vs batched champion](fights/tactics_native_vs_batched.mp4)).
 
 ```bash
-bash tools/run_spar.sh boxer.spar_match --red-tactics checkpoints/tactics   --blue-tactics checkpoints/tactics --seeds 0 1 2 3 --swap --video runs/fight.mp4
+bash tools/run_spar.sh boxer.spar_match --red-tactics checkpoints/tactics \
+  --blue-tactics checkpoints/tactics-batched --seeds 0 1 2 3 --swap --video runs/fight.mp4
 ```
 
 ## Current experiment: unassisted paired boxing diagnostics

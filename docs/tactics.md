@@ -180,17 +180,60 @@ cores give roughly 1.5k steps/s, about 5M steps in an hour. An alternative is
 to run tactics training on `mujoco_warp` directly, the backend Codex
 validated against native for this model.
 
-## Champion: `checkpoints/tactics` (v1 gen‑0)
+## Native-physics fine-tuning: the new champion
 
-Gen‑0 (20M steps against the scripted brain, 14 minutes of training) beats
-every later generation natively, including on fresh seeds (22–10 against
-gen‑3), never falls against the scripted brain, and wins 16–0 against it.
-It is published as `checkpoints/tactics`. Video:
-[`fights/tactics_selfplay.mp4`](../fights/tactics_selfplay.mp4) (gen‑0 vs
-gen‑0, seed 3: 17–24 clean punches, both standing for the full 20 s).
+`boxer/native_finetune.py` trains on the physics used for evaluation. Eight
+spawn workers each run `PairedFoundation` bouts with the frozen spar motor, the
+native impact scorecard and the same `observe`/`decode`/`PunchArm` code as
+evaluation. Each bout draws the learner's corner at random, and its opponent
+from the scripted brain (30 %) or the batched champion or v3 gen‑0 (sampled
+or deterministic). A central PPO learner (clip 0.2, 4 epochs, learning rate
+1e‑4, entropy 1e‑3) updates the policy and value nets. The normalizer stays
+frozen at the starting checkpoint, so behaviour log-probabilities are exact.
+An exploration floor (scale ≥ 0.15) re-opens the nearly deterministic
+starting policy. Reward matches `TacticsEnv` with native scorecard events and
+a fall penalty of 30.
+
+Engineering notes. Building the Playground environment costs over 1 GB per
+process, so the learner builds the pair model once in a throwaway process and
+saves it (`pair.mjb`). Workers load it through `FoundationStub` (0.6 GB each)
+and start one at a time: 8 starting together peak at 1.0–1.7 GB each and
+were OOM-killed in WSL's 7.8 GB. CUDA is hidden from workers. Throughput is
+about 630 native steps/s with 8 workers.
+
+From the batched champion, 2M native steps (53 minutes), then the native
+gate:
+
+| Checkpoint | vs batched champion, seeds 0–7 | Clean punches / bout |
+| --- | --- | --- |
+| 0.5M | 8–7–1 | 17.8 : 17.6 |
+| 1.0M | 13–3–0 | 22.4 : 15.9 |
+| 1.5M | 13–2–1 | 23.0 : 16.5 |
+| **2.0M** | **15–0–1** | 21.9 : 14.8 |
+| **2.0M, 48 bouts with fresh seeds 8–23** | **42–2–4** | **21.9 : 15.0**, 3 falls |
+| 2.0M vs scripted (16 bouts) | 15–1–0 | 21.6 : 5.3, 2 falls |
+
+During training, hits per 1000 steps rose from 18.9 to about 24 while hits
+taken stayed near 14, and falls rose a little. **Unlike every batched
+continuation, native strength improves monotonically.** This confirms that the
+earlier drift came from the physics mismatch, not from self-play itself.
+
+## Champion: `checkpoints/tactics` (native fine-tune, 2026-10-31)
+
+`checkpoints/tactics` is the 2.0M native fine-tune
+(`checkpoints/tactics/native-gate.json` holds its gate record). The previous
+champion, batched v1 gen‑0, moved to `checkpoints/tactics-batched`. Videos:
+[`fights/tactics_native_vs_batched.mp4`](../fights/tactics_native_vs_batched.mp4)
+(new red vs old blue, seed 3: 26–15, both standing for 20 s) and
+[`fights/tactics_selfplay.mp4`](../fights/tactics_selfplay.mp4) (old champion
+mirror).
 
 ```bash
-bash tools/run_spar.sh boxer.spar_match --red-tactics checkpoints/tactics   --blue-tactics checkpoints/tactics --seeds 3 --video runs/tactics/selfplay.mp4
+bash tools/run_spar.sh boxer.native_finetune --init-from checkpoints/tactics-batched \
+  --pool checkpoints/tactics-batched runs/tactics-v3/gen-0/checkpoint \
+  --steps 2000000 --workers 8 --output runs/tactics-native
+bash tools/run_spar.sh boxer.spar_match --red-tactics checkpoints/tactics \
+  --blue-tactics checkpoints/tactics-batched --seeds 3 --video runs/tactics/native.mp4
 ```
 
 Runs: `runs/tactics` holds v1 gen 0–3 (`gen-2-oom-killed` is an interrupted
