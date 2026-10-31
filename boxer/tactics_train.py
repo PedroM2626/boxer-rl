@@ -23,7 +23,8 @@ from mujoco_playground import wrapper
 
 from boxer.checkpoint_io import atomic_json
 from boxer.curriculum_train import jax_compat, load_policy_params, save_policy, utc
-from boxer.tactics_env import TacticsEnv, tactics_network_factory
+from boxer.tactics_env import (ACTION_SIZE, OBS_SIZE, TacticsEnv, policy_sizes,
+                               tactics_network_factory, widen_legacy)
 from boxer.tactics_gate import gate_generation
 
 
@@ -108,6 +109,8 @@ def main(argv=None):
     jax_compat()
     motor, _ = load_policy_params(args.motor)
     learner = load_policy_params(args.init_from)[0] if args.init_from else None
+    if learner is not None and policy_sizes(learner) != (OBS_SIZE, ACTION_SIZE):
+        learner = widen_legacy(learner)
     pool = [load_policy_params(path)[0] for path in args.pool]
     for generation in range(args.generations):
         root = generation_dir(args.output, generation)

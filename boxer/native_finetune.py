@@ -73,28 +73,30 @@ class NativeBout:
         from boxer.tactics_env import REACH, decode
         pair, i = self.pair, self.learner
         bodies = [_body(pair, k) for k in range(2)]
-        commands, launched = [None, None], False
+        commands, launched, high = [None, None], False, [False, False]
         for k in range(2):
             delta = bodies[1 - k]["pos"] - bodies[k]["pos"]
             distance = float(np.linalg.norm(delta))
             local = bodies[k]["rot"].T @ delta
             if k == i:
-                command, want, hand, aim = decode(np.asarray(tactics, np.float64), distance, local)
-                punch = (int(hand), float(aim)) if want and self.arms[k].ready else None
+                command, want, hand, aim, move, high[k] = decode(
+                    np.asarray(tactics, np.float64), distance, local)
+                punch = (int(hand), float(aim), int(move)) if want and self.arms[k].ready else None
                 launched = punch is not None
             elif isinstance(self.opponent, PolicyBrain):
-                command, punch = self.opponent.decide_pair(pair, k, self.arms, self.t / self.episode_steps)
+                command, punch, high[k] = self.opponent.decide_pair(
+                    pair, k, self.arms, self.t / self.episode_steps)
             else:
                 command, punch = self.opponent.decide(distance, local, self.arms[k])
             if punch is not None:
-                self.arms[k].launch(punch[0], punch[1], self.rng)
+                self.arms[k].launch(*punch[:2], self.rng, *punch[2:])
             commands[k] = command
         commands = np.clip(commands, [-.35, -.25, -.5], [.55, .25, .5])
         action, _ = self.motor({"state": jp.asarray(pair.observation(commands)),
                                 "privileged_state": jp.zeros((2, 216))}, jax.random.PRNGKey(0))
         action = np.asarray(action).copy()
         for k in range(2):
-            action[k, LEFT_ARM:] = self.arms[k].actions()
+            action[k, LEFT_ARM:] = self.arms[k].actions(bool(high[k]))
         outcome = pair.step(action)
         fallen = np.asarray(outcome["fallen"], bool)
         scored = outcome["scored"]
@@ -291,7 +293,12 @@ def main(argv=None):
     from boxer.curriculum_train import load_policy_params, save_policy, utc
     from boxer.tactics_gate import gate_generation
 
-    norm, policy, value = load_policy_params(args.init_from)[0]
+    from boxer.tactics_env import ACTION_SIZE, OBS_SIZE, policy_sizes, widen_legacy
+    initial = load_policy_params(args.init_from)[0]
+    if policy_sizes(initial) != (OBS_SIZE, ACTION_SIZE):
+        # A pre-hook policy: same behaviour, new inputs/outputs start silent.
+        initial = widen_legacy(initial)
+    norm, policy, value = initial
     net, dist = tactics_net()
     optimizer = optax.chain(optax.clip_by_global_norm(1.), optax.adam(args.learning_rate))
     trainable = dict(policy=policy, value=value)

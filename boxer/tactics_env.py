@@ -2,7 +2,8 @@
 
 One MJX/Warp world holds both free G1s. Each control step (50 Hz):
 
-1. each corner's *tactics* (5 numbers) choose footwork and punches: the
+1. each corner's *tactics* (7 numbers) choose footwork, punches (straight or
+   hook) and the guard height: the
    learner's from PPO, the opponent's from a frozen snapshot of an earlier
    learner or from the scripted ring brain;
 2. ``punch_arms`` (same primitives as the ``spar`` stage) turns a launch into
@@ -33,14 +34,18 @@ from ml_collections import config_dict
 from mujoco_playground._src import mjx_env
 
 from boxer import scene
-from boxer.curriculum_env import (LEFT_ARM, PUNCH_BODY, PUNCH_EXTEND, PUNCH_HEAD,
-                                  PUNCH_RETRACT, UnassistedG1)
+from boxer import moves
+from boxer.curriculum_env import LEFT_ARM, UnassistedG1
 from boxer.curriculum_train import inference
 from boxer.paired_foundation import (STRIKE_SENSOR_TARGETS, build_pair,
                                      strike_sensor_name)
 
-ACTION_SIZE = 5          # left punch, right punch, aim, advance, lateral
-OBS_SIZE = 26
+# left punch, right punch, aim, advance, lateral, hook (vs straight), high guard
+ACTION_SIZE = 7
+OBS_SIZE = 30
+# Checkpoints before hooks and guards (2026-10-30/31) see the first 26 inputs
+# and output the first 5 actions; ``tactics_policy`` adapts them.
+LEGACY_ACTION_SIZE, LEGACY_OBS_SIZE = 5, 26
 HEAD_VALUE, TORSO_VALUE = 1.0, .6
 REACH = .62              # root distance where straight punches land
 
@@ -52,21 +57,80 @@ def tactics_network_factory():
                              value_hidden_layer_sizes=(256, 256))
 
 
+def policy_sizes(params):
+    """(observation, action) sizes of a saved tactics policy."""
+    layers = params[1]["params"]
+    last = layers[sorted(layers, key=lambda name: int(name.split("_")[1]))[-1]]
+    return int(layers["hidden_0"]["kernel"].shape[0]), int(last["bias"].shape[0]) // 2
+
+
 def tactics_policy(params, deterministic=False):
-    """Inference function for a saved tactics policy (normalizer, policy, value)."""
-    net = tactics_network_factory()(OBS_SIZE, ACTION_SIZE,
+    """Inference function for a saved tactics policy (normalizer, policy, value).
+
+    Accepts current (30 → 7) and legacy (26 → 5) policies: a legacy policy sees
+    the first 26 observations, and its actions are padded with "straight, normal
+    guard".
+    """
+    obs_size, action_size = policy_sizes(params)
+    net = tactics_network_factory()(obs_size, action_size,
                                     preprocess_observations_fn=running_statistics.normalize)
-    return ppo_networks.make_inference_fn(net)(params, deterministic=deterministic)
+    infer = ppo_networks.make_inference_fn(net)(params, deterministic=deterministic)
+    if (obs_size, action_size) == (OBS_SIZE, ACTION_SIZE):
+        return infer
+
+    def legacy(obs, key):
+        action, extras = infer(obs[..., :obs_size], key)
+        pad = -jp.ones(action.shape[:-1] + (ACTION_SIZE - action_size,))
+        return jp.concatenate([action, pad], axis=-1), extras
+    return legacy
+
+
+def widen_legacy(params, new_scale=-1.):
+    """A 30 → 7 policy that acts exactly like a legacy 26 → 5 one.
+
+    New inputs get zero weights (normalized by mean 0, std 1), new action means
+    start at 0 ("straight, normal guard", since only positive values switch), and
+    new action scales start at softplus(``new_scale``) + 0.001 for exploration.
+    """
+    norm, policy, value = params
+    obs_size, action_size = policy_sizes(params)
+    extra_obs, extra_act = OBS_SIZE - obs_size, ACTION_SIZE - action_size
+
+    def widen_input(net):
+        net = jax.tree.map(lambda x: x, net)
+        kernel = net["params"]["hidden_0"]["kernel"]
+        net["params"]["hidden_0"]["kernel"] = jp.concatenate(
+            [kernel, jp.zeros((extra_obs, kernel.shape[1]), kernel.dtype)])
+        return net
+
+    policy, value = widen_input(policy), widen_input(value)
+    layers = policy["params"]
+    last = sorted(layers, key=lambda name: int(name.split("_")[1]))[-1]
+    kernel, bias = layers[last]["kernel"], layers[last]["bias"]
+    zeros = jp.zeros((kernel.shape[0], extra_act), kernel.dtype)
+    layers[last]["kernel"] = jp.concatenate(
+        [kernel[:, :action_size], zeros, kernel[:, action_size:], zeros], axis=1)
+    layers[last]["bias"] = jp.concatenate(
+        [bias[:action_size], jp.zeros(extra_act), bias[action_size:], jp.full(extra_act, new_scale)])
+    pad = lambda x, v: jp.concatenate([x, jp.full((extra_obs,), v, x.dtype)])
+    # The normalizer is frozen during fine-tuning; only mean and std are used.
+    norm = norm.replace(mean=pad(norm.mean, 0.), std=pad(norm.std, 1.),
+                        summed_variance=pad(norm.summed_variance, 0.))
+    return norm, policy, value
 
 
 def decode(tactics, distance, local):
-    """Maps tactics in [-1, 1] to a footwork command and a punch request.
+    """Maps tactics in [-1, 1] to footwork, a punch request, punch type and guard.
 
     Turning toward the opponent is automatic; the policy chooses range and
     angle. Works for NumPy and JAX inputs (``local``: opponent in pelvis frame).
+    Returns (command, want, hand, aim, move, high_guard); legacy 5-number
+    tactics mean straight punches and the normal guard.
     """
     xp = jp if isinstance(tactics, jax.Array) else np
     tactics = xp.clip(tactics, -1, 1)
+    if tactics.shape[-1] == LEGACY_ACTION_SIZE:
+        tactics = xp.concatenate([tactics, -xp.ones(ACTION_SIZE - LEGACY_ACTION_SIZE)])
     direction = local / xp.maximum(distance, 1e-6)
     advance = xp.where(tactics[3] > 0, .4 * tactics[3], .3 * tactics[3])
     tangent = xp.stack([-direction[1], direction[0]])
@@ -77,14 +141,17 @@ def decode(tactics, distance, local):
     want = xp.maximum(tactics[0], tactics[1]) > 0
     hand = xp.where(tactics[1] > tactics[0], 1, 0)
     aim = (tactics[2] + 1) / 2
-    return command, want, hand, aim
+    move = xp.where(tactics[5] > 0, moves.HOOK, moves.STRAIGHT)
+    return command, want, hand, aim, move, tactics[6] > 0
 
 
 def observe(xp, own, opp, own_arm, opp_arm, clock):
-    """Tactics observation for one corner (26 floats), NumPy or JAX.
+    """Tactics observation for one corner (30 floats), NumPy or JAX.
 
     ``own``/``opp``: dict(pos (2,), rot (2, 2) pelvis->world, vel (2,),
-    up, height). ``*_arm``: (age fraction, active, hand sign, aim).
+    up, height). ``*_arm``: (age fraction, active, hand sign, aim, hook,
+    high guard). The hook/guard flags come last, so the first 26 entries keep
+    the legacy layout.
     """
     delta = opp["pos"] - own["pos"]
     distance = xp.linalg.norm(delta)
@@ -94,8 +161,9 @@ def observe(xp, own, opp, own_arm, opp_arm, clock):
         local, distance[None], (distance - REACH)[None], opp_facing,
         own["rot"].T @ own["vel"], own["rot"].T @ opp["vel"],
         xp.stack([own["up"], own["height"], opp["up"], opp["height"]]),
-        own_arm, opp_arm, xp.stack([clock, 1 - clock]),
+        own_arm[:4], opp_arm[:4], xp.stack([clock, 1 - clock]),
         xp.stack([xp.minimum(distance, 3.0) ** 2, xp.sin(xp.arctan2(local[1], local[0]))]),
+        own_arm[4:6], opp_arm[4:6],
     ])
 
 
@@ -165,7 +233,6 @@ class TacticsEnv(mjx_env.MjxEnv):
         self.fists, self.targets = np.array(self.fists), np.array(self.targets)
         self.hit_adr = np.array(hits)                     # (corner, hand, target)
         self.clinch_adr = int(m.sensor_adr[m.sensor("clinch").id])
-        self.extend, self.retract = PUNCH_EXTEND / self.dt, PUNCH_RETRACT / self.dt
 
     # --- MjxEnv contract -------------------------------------------------
     @property
@@ -265,9 +332,12 @@ class TacticsEnv(mjx_env.MjxEnv):
 
     def _arm_features(self, arm, i):
         active = arm["age"][i] >= 0
-        return jp.stack([jp.maximum(arm["age"][i], 0) / (self.extend + self.retract),
+        extend, retract = moves.durations(jp, arm["move"][i], self.dt)
+        return jp.stack([jp.maximum(arm["age"][i], 0) / (extend + retract),
                          active.astype(jp.float32),
-                         jp.where(active, 2. * arm["hand"][i] - 1, 0.), arm["aim"][i] * active])
+                         jp.where(active, 2. * arm["hand"][i] - 1, 0.), arm["aim"][i] * active,
+                         (active & (arm["move"][i] == moves.HOOK)).astype(jp.float32),
+                         arm["high"][i].astype(jp.float32)])
 
     def _observations(self, data, info):
         bodies = [self._body(data, i) for i in range(2)]
@@ -296,37 +366,43 @@ class TacticsEnv(mjx_env.MjxEnv):
         hand = jax.random.bernoulli(hand_rng)
         punch = jp.where(ready, 1., -1.)
         tactics = jp.stack([jp.where(hand, -1., punch), jp.where(hand, punch, -1.),
-                            jp.where(jax.random.bernoulli(aim_rng), 1., -1.), advance, 0.])
+                            jp.where(jax.random.bernoulli(aim_rng), 1., -1.), advance, 0., -1., -1.])
         pause = jp.where(jax.random.bernoulli(pause_rng, .6),
                          jax.random.randint(wait_rng, (), 2, 12),
                          jax.random.randint(wait_rng, (), 20, 50))
         return tactics, jp.where(ready, pause, wait - 1)
 
-    def _arms(self, arm, i, want, hand, aim, rng):
-        """Launches/advances corner ``i``'s punch and returns its 14 arm actions."""
+    def _arms(self, arm, i, want, hand, aim, move, high, rng):
+        """Launches/advances corner ``i``'s punch and returns its 14 arm actions.
+
+        Both arms rest in the normal or high guard (``high``, chosen every
+        step); the punching arm follows ``moves.punch_pose`` from and back to it.
+        """
         jitter_rng, speed_rng = jax.random.split(rng)
         launch = want & (arm["age"][i] < 0)
-        target = (PUNCH_BODY + aim * (PUNCH_HEAD - PUNCH_BODY)
-                  + jax.random.uniform(jitter_rng, (4,), minval=-.06, maxval=.06))
+        move = jp.where(launch, move, arm["move"][i])
+        aim = jp.where(launch, aim, arm["aim"][i])
+        target = moves.strike_pose(jp, move, aim,
+                                   jax.random.uniform(jitter_rng, (4,), minval=-.06, maxval=.06))
         hand = jp.where(launch, hand, arm["hand"][i])
         target = jp.where(launch, target, arm["target"][i])
         speed = jp.where(launch, jax.random.uniform(speed_rng, minval=.9, maxval=1.15),
                          arm["speed"][i])
         age = jp.where(launch, 0., arm["age"][i])
-        fraction = jp.where(age < self.extend, (age + 1) / self.extend,
-                            1 - (age - self.extend) / self.retract)
-        fraction = jp.clip(fraction, 0, 1) * (age >= 0)
-        sign = jp.where(hand == 0, 1., -1.)
-        start = jp.where(hand == 0, LEFT_ARM, LEFT_ARM + 7)
-        guard = jax.lax.dynamic_slice(self.pose, (start,), (4,))
-        offset = fraction * (target * jp.array([1, sign, sign, 1]) - guard) / self.scale
-        actions = jax.lax.dynamic_update_slice(jp.zeros(14), offset, (start - LEFT_ARM,))
-        extending = (age >= 0) & (age < self.extend + 2)
+        actions = []
+        for side in range(2):
+            guard = self.pose[LEFT_ARM + 7 * side:LEFT_ARM + 7 * side + 4]
+            rest = moves.rest_pose(jp, moves.mirror(jp, guard, side), high)
+            swing = moves.punch_pose(jp, move, aim, target, age, rest, self.dt)
+            pose = moves.mirror(jp, jp.where((age >= 0) & (hand == side), swing, rest), side)
+            actions.append(jp.concatenate([(pose - guard) / self.scale, jp.zeros(3)]))
+        extend, _ = moves.durations(jp, move, self.dt)
+        extending = (age >= 0) & (age < extend + 2)
         new_age = jp.where(age >= 0, age + speed, age)
-        new_age = jp.where(new_age >= self.extend + self.retract, -1., new_age)
-        state = dict(age=new_age, hand=hand, target=target, speed=speed,
-                     aim=jp.where(launch, aim, arm["aim"][i]))
-        return actions, state, launch, extending
+        new_age = jp.where(moves.finished(jp, move, new_age, self.dt), -1., new_age)
+        state = dict(age=new_age, hand=hand, target=target, speed=speed, aim=aim, move=move,
+                     high=jp.asarray(high))
+        return jp.concatenate(actions), state, launch, extending
 
     # --- reset / step ----------------------------------------------------
     def reset(self, rng):
@@ -360,7 +436,8 @@ class TacticsEnv(mjx_env.MjxEnv):
                                  njmax=self.njmax)
         data = mjx.forward(self._mjx_model, data)
         arm = dict(age=-jp.ones(2), hand=jp.zeros(2, jp.int32), target=jp.zeros((2, 4)),
-                   speed=jp.ones(2), aim=jp.zeros(2))
+                   speed=jp.ones(2), aim=jp.zeros(2), move=jp.zeros(2, jp.int32),
+                   high=jp.zeros(2, bool))
         info = dict(rng=rng, step=jp.array(0), arm=arm, last_motor=jp.zeros((2, 29)),
                     phase=jp.array([[0., jp.pi], [0., jp.pi]]),
                     frequency=jax.random.uniform(freq_rng, (2, 1), minval=1.25, maxval=1.5),
@@ -391,8 +468,9 @@ class TacticsEnv(mjx_env.MjxEnv):
         for i, (tactics, rng) in enumerate(((action, arm_rng0), (opponent, arm_rng1))):
             delta = bodies[1 - i]["pos"] - bodies[i]["pos"]
             distance = jp.linalg.norm(delta)
-            command, want, hand, aim = decode(tactics, distance, bodies[i]["rot"].T @ delta)
-            actions, arm_state, launch, ext = self._arms(info["arm"], i, want, hand, aim, rng)
+            command, want, hand, aim, move, high = decode(tactics, distance, bodies[i]["rot"].T @ delta)
+            actions, arm_state, launch, ext = self._arms(info["arm"], i, want, hand, aim, move,
+                                                         high, rng)
             commands.append(command)
             arm_actions.append(actions)
             arm_states.append(arm_state)

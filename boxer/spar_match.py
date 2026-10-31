@@ -4,8 +4,9 @@ Each corner is a three-layer controller:
 
 * legs and waist: the learned full-body motor (normally the ``spar`` stage,
   trained to keep balance while its arms punch and it gets shoved);
-* arms: the same straight-punch primitives the ``spar`` stage trains under
-  (``curriculum_env.PUNCH_*``), latched at launch and retracted to the guard;
+* arms: the same arm moves the ``spar`` stage trains under
+  (``boxer.moves``: straights and hooks from a normal or high guard), latched at
+  launch and retracted to the guard;
 * tactics: footwork commands and when, with which hand and at what height to
   punch. Either the scripted ``RingBrain`` or a learned self-play policy from
   ``boxer.tactics_train`` (``PolicyBrain``), chosen per corner.
@@ -23,52 +24,58 @@ import jax
 import jax.numpy as jp
 import numpy as np
 
-from boxer.curriculum_env import (LEFT_ARM, PUNCH_BODY, PUNCH_EXTEND, PUNCH_HEAD,
-                                  PUNCH_RETRACT, RIGHT_ARM, UnassistedG1)
+from boxer import moves
+from boxer.curriculum_env import LEFT_ARM, UnassistedG1
 from boxer.curriculum_train import inference, load_policy_params
 from boxer.paired_foundation import PairedFoundation
 
 
 class PunchArm:
-    """NumPy twin of ``UnassistedG1.punch_arms`` driven by a launch request."""
+    """NumPy twin of the batched arm controller (``boxer.moves``) for one boxer.
+
+    Holds the normal or high guard and runs one straight or hook at a time,
+    latched at launch.
+    """
 
     def __init__(self, pose, action_scale, dt):
-        self.pose, self.scale = np.asarray(pose), action_scale
-        self.extend, self.retract = PUNCH_EXTEND / dt, PUNCH_RETRACT / dt
+        self.pose, self.scale, self.dt = np.asarray(pose), action_scale, dt
         self.age, self.hand, self.target, self.speed, self.aim = -1.0, 0, np.zeros(4), 1.0, 0.0
+        self.move, self.high = moves.STRAIGHT, False
 
     @property
     def ready(self):
         return self.age < 0
 
     def features(self):
-        """(age fraction, active, hand sign, aim), as in ``TacticsEnv._arm_features``."""
+        """(age fraction, active, hand sign, aim, hook, high guard), as ``TacticsEnv._arm_features``."""
         active = self.age >= 0
-        return np.array([max(self.age, 0) / (self.extend + self.retract), float(active),
-                         (2. * self.hand - 1) if active else 0., self.aim if active else 0.])
+        extend, retract = moves.durations(np, self.move, self.dt)
+        return np.array([max(self.age, 0) / (extend + retract), float(active),
+                         (2. * self.hand - 1) if active else 0., self.aim if active else 0.,
+                         float(active and self.move == moves.HOOK), float(self.high)])
 
-    def launch(self, hand, aim, rng):
-        self.hand, self.age, self.aim = int(hand), 0.0, float(aim)
-        self.target = (PUNCH_BODY + aim * (PUNCH_HEAD - PUNCH_BODY)
-                       + rng.uniform(-.06, .06, 4))
+    def launch(self, hand, aim, rng, move=moves.STRAIGHT):
+        self.hand, self.age, self.aim, self.move = int(hand), 0.0, float(aim), int(move)
+        self.target = moves.strike_pose(np, self.move, self.aim, rng.uniform(-.06, .06, 4))
         self.speed = rng.uniform(.9, 1.15)
 
-    def actions(self):
+    def actions(self, high=None):
+        """14 arm actions for this step; ``high`` sets the guard height."""
+        if high is not None:
+            self.high = bool(high)
         arms = np.zeros(14)
-        if self.age < 0:
-            return arms
-        age = self.age
-        fraction = (age + 1) / self.extend if age < self.extend else \
-            1 - (age - self.extend) / self.retract
-        fraction = float(np.clip(fraction, 0, 1))
-        sign = 1.0 if self.hand == 0 else -1.0
-        start = LEFT_ARM if self.hand == 0 else RIGHT_ARM
-        guard = self.pose[start:start + 4]
-        offset = fraction * (self.target * [1, sign, sign, 1] - guard)
-        arms[start - LEFT_ARM:start - LEFT_ARM + 4] = offset / self.scale
-        self.age += self.speed
-        if self.age >= self.extend + self.retract:
-            self.age = -1.0
+        for side in range(2):
+            start = LEFT_ARM + 7 * side
+            guard = self.pose[start:start + 4]
+            rest = moves.rest_pose(np, moves.mirror(np, guard, side), self.high)
+            pose = rest
+            if self.age >= 0 and self.hand == side:
+                pose = moves.punch_pose(np, self.move, self.aim, self.target, self.age, rest, self.dt)
+            arms[7 * side:7 * side + 4] = (moves.mirror(np, pose, side) - guard) / self.scale
+        if self.age >= 0:
+            self.age += self.speed
+            if moves.finished(np, self.move, self.age, self.dt):
+                self.age = -1.0
         return arms
 
 
@@ -122,9 +129,10 @@ class PolicyBrain:
         tactics, _ = self.policy(jp.asarray(obs, jp.float32), key)
         tactics = np.asarray(tactics, np.float64)
         delta = bodies[1 - i]['pos'] - bodies[i]['pos']
-        command, want, hand, aim = decode(tactics, np.linalg.norm(delta), bodies[i]['rot'].T @ delta)
-        punch = (int(hand), float(aim)) if want and arms[i].ready else None
-        return command, punch
+        command, want, hand, aim, move, high = decode(tactics, np.linalg.norm(delta),
+                                                      bodies[i]['rot'].T @ delta)
+        punch = (int(hand), float(aim), int(move)) if want and arms[i].ready else None
+        return command, punch, bool(high)
 
 
 def _body(pair, i):
@@ -145,6 +153,7 @@ def bout(pair, motor, seed, seconds=20.0, record=False, brains=None):
     brains = [(brains or {}).get(i) or RingBrain(np.random.default_rng([seed, i]))
               for i in range(2)]
     scored, thrown, frames, times, events = np.zeros(2), np.zeros(2, int), [], [], []
+    hooks, guarded, high = np.zeros(2, int), np.zeros(2, int), [False, False]
     fallen = np.zeros(2, bool)
     steps = int(round(seconds / pair.dt))
     for t in range(steps):
@@ -155,20 +164,22 @@ def bout(pair, motor, seed, seconds=20.0, record=False, brains=None):
             rotation = pair.data.site(m['side'] + 'imu_in_pelvis').xmat.reshape(3, 3)
             local = rotation[:2, :2].T @ delta
             if isinstance(brains[i], PolicyBrain):
-                command, punch = brains[i].decide_pair(pair, i, arms, t / steps)
+                command, punch, high[i] = brains[i].decide_pair(pair, i, arms, t / steps)
             else:
                 command, punch = brains[i].decide(float(np.linalg.norm(delta)), local, arms[i])
             commands.append(command)
             if punch is not None:
-                arms[i].launch(punch[0], punch[1], rng)
+                arms[i].launch(*punch[:2], rng, *punch[2:])
                 thrown[i] += 1
+                hooks[i] += len(punch) > 2 and punch[2] == moves.HOOK
         commands = np.clip(commands, [-.35, -.25, -.5], [.55, .25, .5])
         obs = pair.observation(commands)
         action, _ = motor({'state': jp.asarray(obs), 'privileged_state': jp.zeros((2, 216))},
                           jax.random.PRNGKey(0))
         action = np.asarray(action).copy()
         for i in range(2):
-            action[i, LEFT_ARM:] = arms[i].actions()
+            action[i, LEFT_ARM:] = arms[i].actions(high[i])
+            guarded[i] += high[i]
         outcome = pair.step(action)
         if outcome['scored'].any():
             events.append(dict(time=round(pair.elapsed, 3),
@@ -189,7 +200,8 @@ def bout(pair, motor, seed, seconds=20.0, record=False, brains=None):
     else:
         winner, method = None, 'draw'
     result = dict(seed=seed, seconds=round(pair.elapsed, 2), clean_punches=scored.tolist(),
-                  punches_thrown=thrown.tolist(), fallen=fallen.tolist(),
+                  punches_thrown=thrown.tolist(), hooks_thrown=hooks.tolist(),
+                  high_guard_seconds=(guarded * pair.dt).round(2).tolist(), fallen=fallen.tolist(),
                   winner=None if winner is None else ('red', 'blue')[winner],
                   method=method, impact_events=events)
     return result, frames, times

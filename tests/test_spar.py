@@ -3,6 +3,7 @@ import jax
 import jax.numpy as jp
 import numpy as np
 
+from boxer import moves
 from boxer.curriculum_control import STAGES, TRAINABLE_STAGES, commands_for
 from boxer.curriculum_env import (LEFT_ARM, PUNCH_EXTEND, PUNCH_RETRACT,
                                   UnassistedG1, stage_config)
@@ -29,12 +30,30 @@ def test_generated_punches_override_only_the_arms_and_return_to_guard():
         launched |= float(state.info["punch_age"]) >= 0
         moved |= np.abs(applied[LEFT_ARM:]).max() > 1.0
     assert launched and moved
-    # Between punches, the arm command is exactly the guard (zero offset).
+    # Between punches, the arms hold the normal guard (zero offset) or the high guard.
     while float(state.info["punch_age"]) >= 0:
         state = step(state, policy_arms)
     state = step(state, policy_arms)
     if float(state.info["punch_age"]) < 0:
-        np.testing.assert_allclose(np.asarray(state.info["last_act"])[LEFT_ARM:], 0, atol=1e-6)
+        arms = np.asarray(state.info["last_act"])[LEFT_ARM:]
+        if bool(state.info["high_guard"]):
+            guard = np.asarray(env._default_pose)[LEFT_ARM:LEFT_ARM + 4]
+            np.testing.assert_allclose(arms[:4], (moves.HIGH_GUARD - guard) / .5, atol=1e-5)
+        else:
+            np.testing.assert_allclose(arms, 0, atol=1e-6)
+
+
+def test_generator_throws_hooks_and_raises_the_guard():
+    env = UnassistedG1("spar")
+    state = jax.jit(env.reset)(jax.random.PRNGKey(5))
+    step = jax.jit(env.step)
+    seen_moves, seen_high = set(), set()
+    for _ in range(600):
+        state = step(state, jp.zeros(29))
+        if float(state.info["punch_age"]) >= 0:
+            seen_moves.add(int(state.info["punch_move"]))
+        seen_high.add(bool(state.info["high_guard"]))
+    assert seen_moves == {moves.STRAIGHT, moves.HOOK} and seen_high == {False, True}
 
 
 def test_match_punch_arm_extends_one_hand_and_retracts():
