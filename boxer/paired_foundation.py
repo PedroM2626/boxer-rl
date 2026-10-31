@@ -208,6 +208,8 @@ class PairedFoundation:
         model = self.model
         self._tracked = sorted(set(self.fists.ravel()) | self.targets[0] | self.targets[1])
         self._torso_sites = [model.site(m['side'] + 'imu_in_torso').id for m in self.maps]
+        self._aim_geoms = [(model.geom(side + 'head_collision').id, model.geom(side + 'torso_collision').id)
+                           for side in scene.SIDES]
         self._warnings = [w for w in (getattr(mujoco.mjtWarning, name, None) for name in (
             'mjWARN_BADQPOS', 'mjWARN_BADQVEL', 'mjWARN_BADQACC',
             'mjWARN_CNSTRFULL', 'mjWARN_CONTACTFULL')) if w is not None]

@@ -56,6 +56,9 @@ class PunchArm:
         self.pose, self.scale, self.dt = np.asarray(pose), action_scale, dt
         self.age, self.hand, self.target, self.speed, self.aim = -1.0, 0, np.zeros(4), 1.0, 0.0
         self.move, self.high = moves.STRAIGHT, False
+        # Learned correction to the punching arm's (shoulder, elbow) targets,
+        # left-arm convention; set each step by ``arm_skill.ArmSkill``.
+        self.residual = np.zeros(4)
 
     @property
     def ready(self):
@@ -73,6 +76,7 @@ class PunchArm:
         self.hand, self.age, self.aim, self.move = int(hand), 0.0, float(aim), int(move)
         self.target = moves.strike_pose(np, self.move, self.aim, rng.uniform(-.06, .06, 4))
         self.speed = rng.uniform(.9, 1.15)
+        self.residual = np.zeros(4)
 
     def actions(self, high=None):
         """14 arm actions for this step; ``high`` sets the guard height."""
@@ -86,11 +90,12 @@ class PunchArm:
             pose = rest
             if self.age >= 0 and self.hand == side:
                 pose = moves.punch_pose(np, self.move, self.aim, self.target, self.age, rest, self.dt)
+                pose = pose + self.residual
             arms[7 * side:7 * side + 4] = (moves.mirror(np, pose, side) - guard) / self.scale
         if self.age >= 0:
             self.age += self.speed
             if moves.finished(np, self.move, self.age, self.dt):
-                self.age = -1.0
+                self.age, self.residual = -1.0, np.zeros(4)
         return arms
 
 
@@ -171,11 +176,12 @@ def _body(pair, i):
                 height=float(np.float32(pair.data.qpos[m['root'] + 2]) - pair.init_height32))
 
 
-def bout(pair, motor, seed, seconds=20.0, record=False, brains=None, knockdowns=1):
+def bout(pair, motor, seed, seconds=20.0, record=False, brains=None, knockdowns=1, arm_skills=None):
     """One bout; ``brains`` maps corner -> PolicyBrain, others are scripted.
 
     ``knockdowns``: knockdowns of one boxer that stop the bout (1: the first
-    fall ends it, the original rule).
+    fall ends it, the original rule). ``arm_skills`` maps corner ->
+    ``arm_skill.ArmSkill`` that steers that corner's punches.
 
     Networks run on the CPU even when a GPU is visible. GPU float32 matmuls
     use TF32 by default (motor actions differ by up to 5e-4), and a bout is
@@ -183,10 +189,10 @@ def bout(pair, motor, seed, seconds=20.0, record=False, brains=None, knockdowns=
     a seed always replays the same bout.
     """
     with jax.default_device(jax.devices('cpu')[0]):
-        return _bout(pair, motor, seed, seconds, record, brains, knockdowns)
+        return _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills or {})
 
 
-def _bout(pair, motor, seed, seconds, record, brains, knockdowns):
+def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills):
     rng = np.random.default_rng(seed)
     pair.reset(seed=seed)
     arms = [PunchArm(pair.pose, pair.action_scale, pair.dt) for _ in range(2)]
@@ -221,6 +227,8 @@ def _bout(pair, motor, seed, seconds, record, brains, knockdowns):
         obs = pair.observation(commands)
         action = motor_actions(motor, obs)
         for i in range(2):
+            if i in arm_skills:
+                arm_skills[i].steer(pair, i, arms[i])
             action[i, LEFT_ARM:] = arms[i].actions(high[i])
             guarded[i] += high[i]
         outcome = pair.step(action)
@@ -314,6 +322,8 @@ def main(argv=None):
     parser.add_argument('--knockdowns', type=int, default=1,
                         help='knockdowns of one boxer that stop the bout; earlier ones restart it')
     parser.add_argument('--ring', action='store_true', help='fight inside the roped ring')
+    parser.add_argument('--red-arm', type=Path, help='arm-skill checkpoint steering red punches')
+    parser.add_argument('--blue-arm', type=Path, help='arm-skill checkpoint steering blue punches')
     parser.add_argument('--swap', action='store_true',
                         help='also play every seed with the tactics exchanged between corners')
     args = parser.parse_args(argv)
@@ -321,6 +331,11 @@ def main(argv=None):
     tactics = {i: PolicyBrain(load_policy_params(path)[0])
                for i, path in enumerate((args.red_tactics, args.blue_tactics)) if path}
     names = [str(path) if path else 'scripted' for path in (args.red_tactics, args.blue_tactics)]
+    from boxer.arm_skill import ArmSkill
+    skills = {i: ArmSkill(load_policy_params(path)[0])
+              for i, path in enumerate((args.red_arm, args.blue_arm)) if path}
+    # A corner's arm skill belongs to the policy named for it, like its tactics.
+    names = [n + (f' + arm {p}' if p else '') for n, p in zip(names, (args.red_arm, args.blue_arm))]
     foundation = UnassistedG1('spar')
     motor = jax.jit(inference(foundation, params))
     pair = PairedFoundation(foundation, ring=args.ring)
@@ -331,7 +346,9 @@ def main(argv=None):
     for index, (seed, swapped) in enumerate(schedule):
         record = args.video is not None and index == 0
         brains = {1 - i if swapped else i: brain for i, brain in tactics.items()}
-        result, frames, times = bout(pair, motor, seed, args.seconds, record, brains, args.knockdowns)
+        arm_skills = {1 - i if swapped else i: skill for i, skill in skills.items()}
+        result, frames, times = bout(pair, motor, seed, args.seconds, record, brains, args.knockdowns,
+                                     arm_skills)
         result.update(red=names[1] if swapped else names[0], blue=names[0] if swapped else names[1])
         bouts.append(result)
         print(json.dumps({k: v for k, v in result.items() if k != 'impact_events'}), flush=True)
