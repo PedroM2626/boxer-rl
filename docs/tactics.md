@@ -312,7 +312,26 @@ seed 6, level-hook champion (red) vs current champion (blue), rendered on
 CPU. Knockdowns at 39.6 s (blue) and 143.6 s (red), each followed by a
 restart; blue wins on the cards 169 : 150. The overlay shows the knockdown
 count and a banner for 2 s after each restart. A GPU (CUDA) run of the same
-seed differs numerically and had no knockdowns.
+seed played out differently, with no knockdowns. That led to the
+reproducibility fix below.
+
+## Reproducible native bouts (CPU vs GPU)
+
+The same seed gave different bouts depending on whether JAX ran the networks
+on the GPU or the CPU. MuJoCo physics runs on the CPU either way; the
+difference is in the networks. On this RTX 3060 (Ampere), XLA runs float32
+matrix multiplies in TF32 by default. The motor's actions then differ from
+the CPU by up to 5.2e-4 (1.8e-7 with `jax.default_matmul_precision("highest")`),
+and a bout is chaotic enough to amplify that: seed 3, champion vs itself,
+scored 17–18 on the CPU with the first point at 3.42 s, and 20–19 on the GPU
+with the first point at 5.22 s. Two CPU runs were identical.
+
+`spar_match.bout` now always runs the motor and tactics networks on the CPU
+(`jax.default_device(cpu)`), even when a GPU is visible. With the GPU
+visible, the seed-3 bout now replays the CPU result exactly (17–18, same
+events). The native gate, native fine-tuning workers and the learner already
+ran on the CPU, so their results are unchanged. Batched GPU training is
+unaffected; it never replays native bouts.
 
 ## Champion history
 

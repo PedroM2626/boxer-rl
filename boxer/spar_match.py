@@ -162,7 +162,17 @@ def bout(pair, motor, seed, seconds=20.0, record=False, brains=None, knockdowns=
 
     ``knockdowns``: knockdowns of one boxer that stop the bout (1: the first
     fall ends it, the original rule).
+
+    Networks run on the CPU even when a GPU is visible. GPU float32 matmuls
+    use TF32 by default (motor actions differ by up to 5e-4), and a bout is
+    chaotic enough that the same seed then plays out differently. On the CPU
+    a seed always replays the same bout.
     """
+    with jax.default_device(jax.devices('cpu')[0]):
+        return _bout(pair, motor, seed, seconds, record, brains, knockdowns)
+
+
+def _bout(pair, motor, seed, seconds, record, brains, knockdowns):
     rng = np.random.default_rng(seed)
     pair.reset(seed=seed)
     arms = [PunchArm(pair.pose, pair.action_scale, pair.dt) for _ in range(2)]
