@@ -18,7 +18,11 @@ falling. The remaining work is the boxing brain and the move set:
    parity (18–28–2), so tactics are near saturation for the current moves.
 2. **Range control and clinch breaking.** Penalize chest contact and reward
    staying at punching range.
-3. **More moves: partly done** ([moves](moves.md)). The high guard is learned
+3. **Learned punches: first version done** ([arm skill](arm-skill.md)). A
+   learned arm skill corrects each punch toward the real target: 39–4–5 with
+   identical tactics, landing rate 41 % → 50 %. Next: tactics and motor
+   trained with it attached.
+3b. **More moves: partly done** ([moves](moves.md)). The high guard is learned
    and wins; hooks exist but go unused. Next: footwork that closes to hook
    range, uppercuts, slips.
 4. **Robustness: long rounds done** ([tactics](tactics.md#long-rounds-120-s-2026-10-31)).

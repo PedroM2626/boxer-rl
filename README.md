@@ -40,6 +40,12 @@ previous champion 27–16–5 over 48 native bouts and 14–2 in 120 s ring bout
 ([details](docs/tactics.md#roped-ring-2026-10-31)). Native bouts now replay
 identically on GPU and CPU hosts, and native fine-tuning runs 2.1× faster.
 
+**Learned punches (2026-10-31).** An [arm skill](docs/arm-skill.md) adds
+learned, real-time corrections to each punch, aimed at where the target
+actually is (`--red-arm checkpoints/arm-skill`). With identical tactics on
+both sides it wins 39–4–5 over 48 native bouts and 16–0 in 120 s ring
+bouts; punches land about 50 % of the time instead of 41 %.
+
 **Long rounds and knockdowns.** Bouts of 120–180 s hold up after a footwork fix
 that keeps the boxers facing each other. `--knockdowns 3` adds a referee:
 a fall is counted and both robots restart standing (they cannot get up
