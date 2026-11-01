@@ -33,6 +33,13 @@ high guard (the previous champion: 43 to 9). It breaks the guard with
 straights and has stopped throwing hooks
 ([video](fights/tactics_guard_vs_native_v1.mp4) shows an earlier champion).
 
+**Roped ring (2026-10-31).** Bouts can take place inside a 4 m roped ring
+scaled to the G1 (`--ring`). The current champion (`checkpoints/tactics`)
+was fine-tuned inside it and sees where the ring centre is; it beats the
+previous champion 27–16–5 over 48 native bouts and 14–2 in 120 s ring bouts
+([details](docs/tactics.md#roped-ring-2026-10-31)). Native bouts now replay
+identically on GPU and CPU hosts, and native fine-tuning runs 2.1× faster.
+
 **Long rounds and knockdowns.** Bouts of 120–180 s hold up after a footwork fix
 that keeps the boxers facing each other. `--knockdowns 3` adds a referee:
 a fall is counted and both robots restart standing (they cannot get up
@@ -43,7 +50,7 @@ current champion in blue).
 
 ```bash
 bash tools/run_spar.sh boxer.spar_match --red-tactics checkpoints/tactics \
-  --blue-tactics checkpoints/tactics-levelhook-v1 --seeds 0 1 2 3 --swap --video runs/fight.mp4
+  --blue-tactics checkpoints/tactics-highguard-v1 --ring --seeds 0 1 2 3 --swap --video runs/fight.mp4
 ```
 
 ## Current experiment: unassisted paired boxing diagnostics

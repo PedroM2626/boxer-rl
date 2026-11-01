@@ -367,6 +367,54 @@ the change. **All are bit-for-bit identical.**
 workers, which build the model from a stub, the observed height used to be
 computed in float64 and is now float32, the same as in native evaluation.
 
+## Roped ring (2026-10-31)
+
+Bouts used to take place on an endless floor. `build_pair(ring=True)`
+(`--ring` in `spar_match`, `native_finetune` and the native gate) adds a
+roped ring scaled to the 1.32 m G1, about 0.73× a human ring:
+
+* 4 m between the ropes (`RING_HALF` = 2 m), boxers start 2 m apart in the
+  middle;
+* three ropes per side at 0.35, 0.60 and 0.85 m (human: 0.46 / 0.81 /
+  1.17 m), 2 cm capsules, plus four corner posts (two red, two blue);
+* the ropes collide with fists, forearms, arms, head, torso, pelvis, thighs,
+  shins and feet. They give like stiff springs (50 ms contact time constant)
+  rather than walls.
+
+Bouts report `rope_seconds`, the time each boxer touches a rope. The
+tactics observation grows from 30 to 32 inputs: the ring centre in the
+boxer's own frame, in units of `RING_HALF`. Older policies read their own
+prefix of the observation, and `widen_legacy` widens them exactly (a test
+checks the outputs match).
+
+**Previous champions in the ring.** 16 bouts of 120 s (TKO at 3
+knockdowns): all went the distance, 6 knockdowns, ropes touched 0.85 s per
+boxer, high-guard champion 11–5 over the level-hook champion.
+
+**Fine-tune inside the ring.** `runs/tactics-ring`: from the high-guard
+champion, 3M native steps in the ring, same pool and opponents as the
+high-guard run. Gate against the high-guard champion:
+
+| Candidate | W–L–D (16 bouts) | Clean punches per bout |
+| --- | --- | --- |
+| 0.75M | 9–6–1 | 19.8 : 18.4 |
+| **1.5M** | **13–2–1** | **21.7 : 17.7** |
+| 2.25M | 12–3–1 | 16.4 : 14.1 |
+| 3.0M | 13–3–0 | 19.5 : 15.3 |
+| **1.5M, 48 bouts with fresh seeds** | **27–16–5** | **20.5 : 18.3**; no falls in the 32 confirmation bouts |
+
+The gate's 20 s bouts start in the middle of the ring and never reach the
+ropes (0 s of rope contact), so they score exactly as they would without a
+ring. The long bouts test the ring itself:
+
+| 16 bouts of 120 s in the ring | Knockdowns | Rope contact (s per boxer) | Result |
+| --- | --- | --- | --- |
+| high-guard vs level-hook champion | 6 | 0.85 | 11–5, 118.7 : 105.3 |
+| **ring 1.5M vs high-guard champion** | **2** | **0.57** | **14–2, 146.8 : 129.9** |
+
+The 1.5M checkpoint becomes `checkpoints/tactics`. The high-guard champion
+moves to `checkpoints/tactics-highguard-v1`.
+
 ## Champion history
 
 * `checkpoints/tactics-batched`: batched v1 gen‑0 (2026-10-30).
@@ -375,9 +423,13 @@ computed in float64 and is now float32, the same as in native evaluation.
   33–12–3 against native-v1 ([moves](moves.md)).
 * `checkpoints/tactics-levelhook-v1`: native fine-tune with the level long hook
   and its motor; 37–9–2 against guard-v1, hooks still only ~2 % of punches.
-* `checkpoints/tactics`: native fine-tune with scripted high-guard opponents
-  in the pool; 27–17–4 against levelhook-v1. It beats a held high guard with
-  straights and throws no hooks ([moves](moves.md#fine-tune-against-a-held-high-guard)).
+* `checkpoints/tactics-highguard-v1`: native fine-tune with scripted
+  high-guard opponents in the pool; 27–17–4 against levelhook-v1. It beats a
+  held high guard with straights and throws no hooks
+  ([moves](moves.md#fine-tune-against-a-held-high-guard)).
+* `checkpoints/tactics`: native fine-tune inside the roped ring, 32 inputs
+  (sees the ring centre); 27–16–5 against highguard-v1, 14–2 in 120 s ring
+  bouts ([roped ring](#roped-ring-2026-10-31)).
 
 ## Native-v1 champion (native fine-tune, 2026-10-31)
 

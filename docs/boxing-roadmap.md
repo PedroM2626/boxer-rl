@@ -26,8 +26,10 @@ falling. The remaining work is the boxing brain and the move set:
    boxer is off-axis. **Knockdown rules done**: a referee restarts the bout
    after a fall and stops it at the third knockdown (the G1s cannot get up by
    themselves). 180 s bouts: 10 knockdowns in 16 bouts, all went the
-   distance. Still open: getting up unaided, and evaluation against a league
-   of past tactical policies.
+   distance. **Roped ring done** ([tactics](tactics.md#roped-ring-2026-10-31)):
+   a 4 m ring with springy ropes; the champion trained inside it. Still open:
+   getting up unaided, and evaluation against a league of past tactical
+   policies.
 
 The historical plan below is kept as a record of earlier work.
 

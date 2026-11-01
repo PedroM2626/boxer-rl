@@ -15,6 +15,7 @@ historical record.
 | Learned tactics | Native fine-tuned champion beats the batched champion 42–2–4 and scripted 15–1 natively ([tactics](tactics.md)) |
 | Defense | High guard learned and effective (opponent clean punches 15 → 8.9) |
 | Long rounds | 120 s bouts: 15/16 go the distance, 1 knockdown, scoring to the final second, after a footwork fix that stops boxers drifting until they face away ([tactics](tactics.md#long-rounds-120-s-2026-10-31)) |
+| Ring | 4 m roped ring scaled to the G1; ring-trained champion: 14–2 and 2 knockdowns in 16 bouts of 120 s, ropes touched 0.6 s per boxer ([tactics](tactics.md#roped-ring-2026-10-31)) |
 | Knockdowns | Referee rules: a knockdown is counted and the bout restarts; 3 knockdowns is a TKO. 180 s bouts: 10 knockdowns in 16, all went the distance. The robots cannot get up unaided ([tactics](tactics.md#knockdown-rules-2026-10-31)) |
 | Hooks, uppercuts, slips | Hooks implemented but unused by the policy; uppercuts and slips outstanding |
 
