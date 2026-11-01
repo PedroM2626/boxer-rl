@@ -427,9 +427,13 @@ moves to `checkpoints/tactics-highguard-v1`.
   high-guard opponents in the pool; 27–17–4 against levelhook-v1. It beats a
   held high guard with straights and throws no hooks
   ([moves](moves.md#fine-tune-against-a-held-high-guard)).
-* `checkpoints/tactics`: native fine-tune inside the roped ring, 32 inputs
-  (sees the ring centre); 27–16–5 against highguard-v1, 14–2 in 120 s ring
-  bouts ([roped ring](#roped-ring-2026-10-31)).
+* `checkpoints/tactics-ring-v1`: native fine-tune inside the roped ring, 32
+  inputs (sees the ring centre); 27–16–5 against highguard-v1, 14–2 in 120 s
+  ring bouts ([roped ring](#roped-ring-2026-10-31)).
+* `checkpoints/tactics`: native fine-tune in the ring with the arm skill
+  steering punches; with the arm skill on both sides 35–11–2 against
+  ring-v1. Play it with `--red-arm checkpoints/arm-skill`
+  ([arm skill](arm-skill.md#tactics-trained-with-the-arm-skill)).
 
 ## Native-v1 champion (native fine-tune, 2026-10-31)
 

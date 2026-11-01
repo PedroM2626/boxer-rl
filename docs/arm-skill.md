@@ -86,6 +86,42 @@ bash tools/run_spar.sh boxer.spar_match --ring \
 `--red-arm` / `--blue-arm` attach an arm skill to a corner; the bout
 results name it after the tactics ("tactics + arm …").
 
-Next steps: fine-tune tactics with the arm skill attached (tactics were
-trained with scripted punches), and retrain the motor with arm-skill
-punches so larger corrections stay balanced.
+## Tactics trained with the arm skill
+
+`native_finetune --arm checkpoints/arm-skill` steers every corner's punches
+with the arm skill during training, and the native gate then gives it to
+both corners so only the tactics differ. Run `runs/tactics-arm`: from the
+ring champion, 3M native steps inside the ring, same pool and opponents as
+before.
+
+Gate against the ring champion, both corners with the arm skill:
+
+| Candidate | W–L–D (16 bouts) | Clean punches per bout |
+| --- | --- | --- |
+| 0.75M | 9–5–2 | 21.6 : 19.0 |
+| 1.5M | 11–3–2 | 21.4 : 17.6 |
+| **2.25M** | **13–1–2** | **21.1 : 16.4** |
+| 3.0M | 4–8–4 | 15.7 : 15.9 |
+| **2.25M, 48 bouts with fresh seeds** | **35–11–2** | **20.9 : 17.1**; no falls in the 32 confirmation bouts |
+
+16 bouts of 120 s in the ring (TKO at 3 knockdowns), new tactics with the
+arm skill:
+
+| Opponent | Result | Clean punches per bout | Landing rate | Knockdowns suffered (new / opponent) | Ropes (s per boxer) |
+| --- | --- | --- | --- | --- | --- |
+| ring champion + arm skill | **13–3** | 132.2 : 114.2 | 50.4 % / 42.0 % | 6 / 7 | 2.2 |
+| ring champion, scripted punches | **14–2** | 131.0 : 100.4 | 49.3 % / 36.9 % | 7 / 3 | 1.4 |
+
+The 2.25M tactics become `checkpoints/tactics`; play them with
+`--red-arm checkpoints/arm-skill` (or `--blue-arm`). The ring champion moves
+to `checkpoints/tactics-ring-v1`.
+
+**The trade-off:** the new tactics win every comparison but box more
+aggressively. Over long bouts they spend more time on the ropes and fall
+more: 6–7 knockdowns in 16 bouts of 120 s, against 2 for the ring champion
+pair without the arm skill. No bout ended in a TKO, and the 20 s gate saw
+almost no falls.
+
+Next steps: retrain the leg motor with arm-skill punches and rope contact,
+so the more aggressive play stays balanced; a fall cost in tactics training
+that matches the knockdown rules.

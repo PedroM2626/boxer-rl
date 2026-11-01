@@ -26,15 +26,15 @@ keep a high guard a third to half of the time. After diagnostics showed the
 first hook could not land, the hook became a level IK arc with straight-like
 reach. A [scoring audit](docs/moves.md#scoring-audit-toolsscore_auditpy)
 showed the scorecard is fair to hooks; they rarely reach the target. Fine-tuning
-against scripted opponents that hold the high guard produced the current
-champion (`checkpoints/tactics`): **27–17–4 over 48 native bouts** against
+against scripted opponents that hold the high guard produced a new
+champion (now `checkpoints/tactics-highguard-v1`): **27–17–4 over 48 native bouts** against
 the level-hook champion, and 113 clean punches to 16 in 8 bouts against a held
 high guard (the previous champion: 43 to 9). It breaks the guard with
 straights and has stopped throwing hooks
 ([video](fights/tactics_guard_vs_native_v1.mp4) shows an earlier champion).
 
 **Roped ring (2026-10-31).** Bouts can take place inside a 4 m roped ring
-scaled to the G1 (`--ring`). The current champion (`checkpoints/tactics`)
+scaled to the G1 (`--ring`). The ring champion (`checkpoints/tactics-ring-v1`)
 was fine-tuned inside it and sees where the ring centre is; it beats the
 previous champion 27–16–5 over 48 native bouts and 14–2 in 120 s ring bouts
 ([details](docs/tactics.md#roped-ring-2026-10-31)). Native bouts now replay
@@ -44,7 +44,10 @@ identically on GPU and CPU hosts, and native fine-tuning runs 2.1× faster.
 learned, real-time corrections to each punch, aimed at where the target
 actually is (`--red-arm checkpoints/arm-skill`). With identical tactics on
 both sides it wins 39–4–5 over 48 native bouts and 16–0 in 120 s ring
-bouts; punches land about 50 % of the time instead of 41 %.
+bouts; punches land about 50 % of the time instead of 41 %. The current
+champion (`checkpoints/tactics`) is tactics fine-tuned with the arm skill
+attached: 35–11–2 against the ring champion, though more knockdown-prone
+over long bouts ([details](docs/arm-skill.md#tactics-trained-with-the-arm-skill)).
 
 **Long rounds and knockdowns.** Bouts of 120–180 s hold up after a footwork fix
 that keeps the boxers facing each other. `--knockdowns 3` adds a referee:
@@ -52,7 +55,7 @@ a fall is counted and both robots restart standing (they cannot get up
 unaided), and a third knockdown is a TKO
 ([details](docs/tactics.md#knockdown-rules-2026-10-31);
 [3-minute video](fights/tactics_knockdown_rules_180s.mp4) with two knockdowns,
-current champion in blue).
+the high-guard champion in blue).
 
 ```bash
 bash tools/run_spar.sh boxer.spar_match --red-tactics checkpoints/tactics \
