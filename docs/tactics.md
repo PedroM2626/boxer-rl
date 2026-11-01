@@ -308,7 +308,7 @@ about once every 4–5 minutes of boxing (10 in 48 min), evenly split, so
 falling is now a cost rather than the end of the bout.
 
 Video: [`fights/tactics_knockdown_rules_180s.mp4`](../fights/tactics_knockdown_rules_180s.mp4),
-seed 6, level-hook champion (red) vs current champion (blue), rendered on
+seed 6, level-hook champion (red) vs high-guard champion (blue), rendered on
 CPU. Knockdowns at 39.6 s (blue) and 143.6 s (red), each followed by a
 restart; blue wins on the cards 169 : 150. The overlay shows the knockdown
 count and a banner for 2 s after each restart. A GPU (CUDA) run of the same

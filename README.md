@@ -58,8 +58,8 @@ unaided), and a third knockdown is a TKO
 the high-guard champion in blue).
 
 ```bash
-bash tools/run_spar.sh boxer.spar_match --red-tactics checkpoints/tactics \
-  --blue-tactics checkpoints/tactics-highguard-v1 --ring --seeds 0 1 2 3 --swap --video runs/fight.mp4
+bash tools/run_spar.sh boxer.spar_match --red-tactics checkpoints/tactics --red-arm checkpoints/arm-skill \
+  --blue-tactics checkpoints/tactics-ring-v1 --ring --seeds 0 1 2 3 --swap --video runs/fight.mp4
 ```
 
 ## Current experiment: unassisted paired boxing diagnostics
