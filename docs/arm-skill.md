@@ -122,6 +122,8 @@ more: 6–7 knockdowns in 16 bouts of 120 s, against 2 for the ring champion
 pair without the arm skill. No bout ended in a TKO, and the 20 s gate saw
 almost no falls.
 
-Next steps: retrain the leg motor with arm-skill punches and rope contact,
-so the more aggressive play stays balanced; a fall cost in tactics training
-that matches the knockdown rules.
+Follow-up (2026-11-01): 7 of 13 of those knockdowns were the self-trip
+rule, not real falls. With knockdown rules now counting only real falls,
+the same bouts have 6 knockdowns. A motor retrained against phantom
+opponent shins did not reduce them
+([spar motor](spar-motor.md#phantom-shins-and-real-falls-2026-11-01)).

@@ -13,8 +13,10 @@ Each corner is a three-layer controller:
 
 No pelvis springs, welds or root forces. By default the first knockdown
 ends the bout; otherwise it goes the distance and is decided on clean
-punches. With ``knockdowns=N`` (``--knockdowns N``) a knockdown is counted
-and the referee restarts the bout instead: the G1s cannot get up, so both
+punches. With ``knockdowns=N`` (``--knockdowns N``, N > 1) a knockdown is
+counted and the referee restarts the bout instead. Only real falls count
+(pelvis below 0.55 m or torso tilted past the limit), not the foundation's
+self-trip rule (a foot touching the robot's own other foot or shin): the G1s cannot get up, so both
 are reset standing at fresh starting positions, scores and the clock carry
 on, and the N-th knockdown of one boxer stops the bout (TKO). Each knockdown
 scored is worth ``KNOCKDOWN_POINTS`` clean punches on the cards.
@@ -188,8 +190,14 @@ def bout(pair, motor, seed, seconds=20.0, record=False, brains=None, knockdowns=
     chaotic enough that the same seed then plays out differently. On the CPU
     a seed always replays the same bout.
     """
-    with jax.default_device(jax.devices('cpu')[0]):
-        return _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills or {})
+    # Under knockdown rules only real falls count: a robot whose feet touch
+    # (the foundation's self-trip rule) is still standing and boxes on.
+    trips, pair.self_trip_falls = pair.self_trip_falls, knockdowns == 1
+    try:
+        with jax.default_device(jax.devices('cpu')[0]):
+            return _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills or {})
+    finally:
+        pair.self_trip_falls = trips
 
 
 def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills):

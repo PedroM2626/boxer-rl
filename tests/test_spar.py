@@ -83,6 +83,7 @@ class _FallingPair:
     """Minimal stand-in for PairedFoundation whose boxers fall on schedule."""
 
     dt, action_scale, pose = .02, 1., np.zeros(29)
+    self_trip_falls = True
 
     def __init__(self, falls):
         self.falls, self.t, self.resets = falls, 0, 0

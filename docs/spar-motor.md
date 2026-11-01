@@ -89,3 +89,54 @@ bash tools/run_spar.sh boxer.spar_match --checkpoint checkpoints/spar-straight \
 * Blocking, slipping and punch types other than straight punches are not
   trained yet. Adding hooks and guard movements to `punch_arms` is the same
   kind of change as this one.
+
+## Phantom shins and real falls (2026-11-01)
+
+With the arm-trained tactics, 16 native ring bouts of 120 s had 13
+knockdowns. `tools/knockdown_causes.py` records what happened in the last
+second before each one, next to how often it happens at any moment:
+
+| Before a knockdown | Share of knockdowns | Base rate (any 1 s) |
+| --- | --- | --- |
+| rope contact | 8 % | 12 % |
+| clean punch taken | 38 % | 81 % |
+| body contact between the robots | 54 % | 25 % |
+
+Every knockdown after body contact involved the robots' **shins** touching;
+none followed upper-body contact. Body contacts are short bumps (median
+40 ms, at most 0.24 s, 30–190 N), about the size of the shoves the motor
+already trains on.
+
+**Phantom shins.** `curriculum_train --phantom-shins` adds a mocap pair of
+opponent shins to the spar scene (`curriculum_env.PHANTOM_*`). Every 2–6 s
+they appear 0.45 m from the pelvis, mostly in front, sweep in to 0.18–0.30 m
+and back out over 0.3–2 s, colliding only with the robot's shins and feet.
+In this test (256 worlds, 10 s) the current motor survives 98 % without
+them and 83 % with them.
+
+| Motor | 10 s survival without / with phantom shins | Standard spar gate |
+| --- | --- | --- |
+| `checkpoints/spar` | 98.0 % / 83.2 % | pass |
+| phantom 10.8M (`runs/spar-phantom`) | 99.6 % / 91.4 % | pass (at 0 and 10.8M) |
+| phantom +29.5M (`runs/spar-phantom2`) | 99.2 % / 94.1 % | **fail**: standing drift 0.20, sideways tracking 0.21–0.23 |
+
+**Most "knockdowns" were not falls.** `PairedFoundation.fallen` keeps the
+foundation's self-trip rule: a robot whose foot touches its own other foot
+or shin counts as fallen. Of the 13 knockdowns, 7 were that rule and only 6
+were real falls (pelvis below 0.55 m). Under knockdown rules
+(`spar_match --knockdowns N`, N > 1) a knockdown now counts only real falls;
+a robot whose feet touch is still standing and boxes on. With one fall
+ending the bout (the gates and every earlier result), nothing changes.
+
+Under the new rule, the same 16 bouts of 120 s:
+
+| Motor | Real knockdowns | After shin contact |
+| --- | --- | --- |
+| **`checkpoints/spar`** | **6** | 5 |
+| phantom 10.8M | 9 | 6 |
+
+The self-trips did not turn into real falls (13 → 6). The phantom-trained
+motor is sturdier in the synthetic test but not in real bouts, where the
+tactics and the arm skill were trained with the current motor. The motor
+stays `checkpoints/spar`; `--phantom-shins` remains available for later
+experiments (with tactics retrained on top).

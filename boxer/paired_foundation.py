@@ -200,6 +200,9 @@ class PairedFoundation:
                          for target in ('head_collision', 'torso_collision')}
                         for side in scene.SIDES]
         self.scorecard = ImpactScorecard()
+        # The foundation also ends a trial when a robot's foot touches its own
+        # other foot or shin. Knockdown rules may count only real falls.
+        self.self_trip_falls = True
         self._index_geoms()
         self.reset()
 
@@ -298,6 +301,8 @@ class PairedFoundation:
             flags.append(not finite or self.data.qpos[m['root'] + 2] < .55
                          or self.data.sensor(m['side'] + 'upvector_torso').data[2] < .6)
         # Keep the foundation's self-foot/leg contact termination rule.
+        if not self.self_trip_falls:
+            return np.array(flags)
         for g1, g2 in self.data.contact.geom:
             corner = self._trip.get(frozenset((int(g1), int(g2))))
             if corner is not None:

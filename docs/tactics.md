@@ -278,6 +278,10 @@ Until now the first fall ended a bout. `boxer.spar_match --knockdowns N`
 (the `knockdowns` argument of `bout`) adds a referee:
 
 * A knockdown is counted against the boxer who fell (both, if both fall).
+  Since 2026-11-01 only real falls count (pelvis below 0.55 m or torso
+  tilted), not the foundation's self-trip rule (a foot touching the robot's
+  own other foot or shin); see [spar motor](spar-motor.md#phantom-shins-and-real-falls-2026-11-01).
+  The results in this section predate that change.
 * The G1s cannot get up by themselves, so the referee restarts the bout:
   both robots are reset standing at fresh, randomized starting positions
   2 m apart. Punches in flight are cancelled. Scores and the bout clock

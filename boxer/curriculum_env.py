@@ -10,6 +10,7 @@ from pathlib import Path
 import subprocess
 
 import jax
+import mujoco
 import jax.numpy as jp
 import numpy as np
 from etils import epath
@@ -29,6 +30,15 @@ PUNCH_BODY, PUNCH_HEAD = moves.STRAIGHT_BODY, moves.STRAIGHT_HEAD
 PUNCH_EXTEND, PUNCH_RETRACT = moves.TIMING[moves.STRAIGHT]
 HOOK_FRACTION = .4         # share of generated punches that are hooks
 HIGH_GUARD_FRACTION = .4   # share of guard periods held high
+# Phantom opponent shins (``--phantom-shins``): in native bouts every knockdown
+# after body contact followed the boxers' shins tangling (tools/knockdown_causes.py).
+PHANTOM_GAP = (2.0, 6.0)        # seconds between appearances
+PHANTOM_SPAN = (0.3, 2.0)       # seconds each appearance lasts
+PHANTOM_START = 0.45            # m from the pelvis when an appearance starts
+# Closest approach, m from the pelvis. In native bouts shins touch at root
+# distances of 0.45-0.9 m with the opponent's shins ~0.1-0.2 m before its pelvis.
+PHANTOM_CLOSEST = (0.18, 0.30)
+PHANTOM_PARK = jp.array([0., 0., -10.])
 LEFT_ARM, RIGHT_ARM = 15, 22  # first shoulder actuator of each arm
 
 
@@ -98,6 +108,12 @@ class UnassistedG1(joystick.Joystick):
         configure_assets()
         self.stage = stage
         super().__init__(config=config or stage_config(stage, impl))
+        self._phantom = None
+        if self._config.get("phantom_shins", False):
+            if stage != "spar":
+                raise ValueError("phantom shins belong to the spar stage")
+            self._add_phantom_shins()
+            self._phantom = True
         # Carry a compact boxing guard while balancing/walking, so transferring
         # to the boxing posture will not suddenly shift the centre of mass.
         for hand, values in GUARD_ARMS_BOXING.items():
@@ -157,6 +173,14 @@ class UnassistedG1(joystick.Joystick):
 
     def reset(self, rng):
         state = super().reset(rng)
+        if self.stage == "spar" and self._phantom is not None:
+            state.info.update(phantom_timer=jax.random.uniform(jax.random.fold_in(rng, 79), (),
+                                                               minval=PHANTOM_GAP[0], maxval=PHANTOM_GAP[1]),
+                              phantom_span=jp.array(1.0), phantom_age=jp.array(-1.0),
+                              phantom_angle=jp.array(0.0), phantom_yaw=jp.array(0.0),
+                              phantom_closest=jp.array(PHANTOM_CLOSEST[1]),
+                              phantom_rng=jax.random.fold_in(rng, 80))
+            state = state.replace(data=state.data.replace(mocap_pos=PHANTOM_PARK[None]))
         if self.stage == "spar":
             punch_rng = jax.random.fold_in(rng, 77)
             state.info.update(
@@ -222,7 +246,65 @@ class UnassistedG1(joystick.Joystick):
                     punch_wait=wait.astype(jp.int32), high_guard=high, guard_timer=timer.astype(jp.int32))
         return jp.concatenate(arms)
 
+    def _add_phantom_shins(self):
+        """Adds a mocap pair of opponent shins that touch only this robot's shins and feet."""
+        old = self._mj_model
+        spec = mujoco.MjSpec.from_file(self._xml_path, assets=self._model_assets)
+        body = spec.worldbody.add_body(name="phantom", mocap=True, pos=[0, 0, -10])
+        for k, y in enumerate((-.1, .1)):
+            body.add_geom(name=f"phantom_shin_{k}", type=mujoco.mjtGeom.mjGEOM_CAPSULE,
+                          fromto=[0, y, .08, 0, y, .45], size=[.045, 0, 0], contype=0, conaffinity=0,
+                          rgba=[.6, .2, .2, .5])
+            for part in ("left_shin", "right_shin", "left_foot", "right_foot"):
+                spec.add_pair(geomname1=f"phantom_shin_{k}", geomname2=part, condim=3,
+                              friction=[.6, .6, .005, .0001, .0001])
+        model = spec.compile()
+        model.opt.timestep = old.opt.timestep
+        model.jnt_range[:] = old.jnt_range
+        model.actuator_ctrlrange[:] = old.actuator_ctrlrange
+        model.vis.global_.offwidth, model.vis.global_.offheight = old.vis.global_.offwidth, old.vis.global_.offheight
+        if model.nq != old.nq or model.nbody != old.nbody + 1 or model.nu != old.nu:
+            raise ValueError("phantom shins must not change the robot")
+        self._mj_model = model
+        self._mjx_model = mjx_env.put_model(model, impl=self._config.impl)
+
+    def phantom(self, state):
+        """Moves the phantom shins: idle, or sweeping in toward the pelvis and back out."""
+        info = state.info
+        keys = jax.random.split(info["phantom_rng"], 4)
+        timer = info["phantom_timer"] - self.dt
+        start = (info["phantom_age"] < 0) & (timer <= 0)
+        # Mostly in front, where the opponent stands, but from any side.
+        angle = jp.where(start, jax.random.normal(keys[0]) * .8, info["phantom_angle"])
+        yaw = jp.where(start, jax.random.uniform(keys[1], minval=-.6, maxval=.6), info["phantom_yaw"])
+        span = jp.where(start, jax.random.uniform(keys[2], minval=PHANTOM_SPAN[0], maxval=PHANTOM_SPAN[1]),
+                        info["phantom_span"])
+        closest = jp.where(start, jax.random.uniform(jax.random.fold_in(keys[2], 1), minval=PHANTOM_CLOSEST[0],
+                                                     maxval=PHANTOM_CLOSEST[1]), info["phantom_closest"])
+        age = jp.where(start, 0.0, info["phantom_age"])
+        active = age >= 0
+        u = jp.clip(age / span, 0., 1.)
+        reach = PHANTOM_START - (PHANTOM_START - closest) * jp.sin(jp.pi * u)
+        heading = jp.arctan2(state.data.site_xmat[self._pelvis_imu_site_id][1, 0],
+                             state.data.site_xmat[self._pelvis_imu_site_id][0, 0])
+        direction = heading + angle
+        center = state.data.qpos[:2] + reach * jp.array([jp.cos(direction), jp.sin(direction)])
+        position = jp.where(active, jp.concatenate([center, jp.zeros(1)]), PHANTOM_PARK)
+        # Facing the robot, turned by up to +-0.6 rad.
+        facing = direction + jp.pi + yaw
+        quat = jp.array([jp.cos(facing / 2), 0., 0., jp.sin(facing / 2)])
+        age = jp.where(active, age + self.dt, age)
+        done = active & (age >= span)
+        timer = jp.where(done, jax.random.uniform(keys[3], minval=PHANTOM_GAP[0], maxval=PHANTOM_GAP[1]),
+                         timer)
+        info.update(phantom_timer=timer, phantom_span=span, phantom_age=jp.where(done, -1.0, age),
+                    phantom_angle=angle, phantom_yaw=yaw, phantom_closest=closest,
+                    phantom_rng=jax.random.split(keys[3])[0])
+        return state.replace(data=state.data.replace(mocap_pos=position[None], mocap_quat=quat[None]))
+
     def step(self, state, action):
+        if self.stage == "spar" and self._phantom is not None:
+            state = self.phantom(state)
         if self.stage == "spar":
             action = action.at[LEFT_ARM:].set(self.punch_arms(state.info))
         state = super().step(state, action)
