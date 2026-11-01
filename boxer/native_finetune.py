@@ -437,7 +437,7 @@ def main(argv=None):
         for process in processes:
             process.join(timeout=10)
     if args.native_gate:
-        gate_generation(root, args.init_from, args.native_gate, args.ring, args.arm)
+        gate_generation(root, args.init_from, args.native_gate, args.ring, args.arm, args.motor)
     return 0
 
 

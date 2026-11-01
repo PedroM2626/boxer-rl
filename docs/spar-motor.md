@@ -139,4 +139,24 @@ The self-trips did not turn into real falls (13 → 6). The phantom-trained
 motor is sturdier in the synthetic test but not in real bouts, where the
 tactics and the arm skill were trained with the current motor. The motor
 stays `checkpoints/spar`; `--phantom-shins` remains available for later
-experiments (with tactics retrained on top).
+experiments.
+
+**Tactics retrained on the phantom motor.** To rule out that the phantom
+motor only lost because the tactics above it were trained on the old one,
+the champion tactics were fine-tuned again on the phantom motor (3M native
+steps, same settings as the champion, `native_finetune --motor
+runs/spar-phantom/checkpoint`; the gate now plays on the training motor).
+The gate barely passed: 24–22–2 against the champion tactics on the same
+motor, with 15 falls in 48 bouts of 20 s (the champion's own gate had none).
+The two complete stacks, each with its own legs (`spar_match
+--blue-checkpoint`), 16 ring bouts of 120 s, three knockdowns stop a bout:
+
+| Stack | Real knockdowns (vs ring-v1, phantom/old motor) | Head-to-head | Knockdowns suffered head-to-head |
+| --- | --- | --- | --- |
+| **`checkpoints/spar` + `checkpoints/tactics`** | **6** | **15–1** | **1** |
+| phantom motor + retrained tactics | 16 | 1–15 | 21 (2 TKO) |
+
+Every phantom-stack knockdown was a real fall (pelvis low), 11 of 16 after
+leg contact. Retraining the tactics did not help: the phantom motor is
+sturdier against the synthetic shins but falls more in real bouts, whatever
+drives it. The motor stays `checkpoints/spar`.

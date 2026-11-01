@@ -27,3 +27,21 @@ def test_score_prefers_record_then_punch_margin_and_combine_weights_bouts():
     total = combine(record(10, 5, 1, 16, 16, knockdowns=1), record(11, 18, 3, 13, 16, bouts=32, knockdowns=2))
     assert (total["first_wins"], total["first_losses"], total["draws"], total["bouts"]) == (21, 23, 4, 48)
     assert abs(total["first_clean_per_bout"] - 14.0) < 1e-9 and total["falls"] == 3
+
+
+def test_native_match_plays_on_the_given_motor_with_shared_arms(tmp_path, monkeypatch):
+    import json
+    import subprocess
+    from boxer import tactics_gate
+    commands = []
+
+    def run(command, **kwargs):
+        commands.append(command)
+        (tmp_path / "m.json").write_text(json.dumps(dict(bouts=2, results=[])))
+    monkeypatch.setattr(subprocess, "run", run)
+    tactics_gate.native_match("a", "b", [0], tmp_path / "m.json", True, "arm", "motor")
+    tactics_gate.native_match("a", "b", [0], tmp_path / "m.json")
+    with_motor, default = commands
+    assert with_motor[with_motor.index("--checkpoint") + 1] == "motor" and "--ring" in with_motor
+    assert with_motor[with_motor.index("--blue-arm") + 1] == "arm"
+    assert "--checkpoint" not in default and "--red-arm" not in default

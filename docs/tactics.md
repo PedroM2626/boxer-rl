@@ -64,6 +64,11 @@ bash tools/run_spar.sh boxer.spar_match --red-tactics checkpoints/tactics \
   --seeds 0 1 2 3 4 5 6 7 --swap --output runs/tactics/eval/final_vs_scripted.json
 ```
 
+Both corners balance with `--checkpoint` (the leg motor). `--blue-checkpoint`
+gives blue its own motor, which follows blue's tactics when corners swap, so
+two whole stacks can meet ([phantom stack](spar-motor.md#phantom-shins-and-real-falls-2026-11-01)).
+`native_finetune --motor` trains on, and gates with, another motor.
+
 ## Results (native MuJoCo, 16 bouts per row)
 
 "First" is the policy named first; wins, losses and draws count across both

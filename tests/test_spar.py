@@ -128,3 +128,12 @@ def test_knockdowns_restart_the_bout_until_the_stopping_count():
     assert pair.resets == 4
     stopped, _, _ = bout(_FallingPair(falls), motor, 0, 1.0, knockdowns=2)
     assert stopped['method'] == 'tko' and stopped['winner'] == 'red' and stopped['fallen'] == [False, True]
+
+
+def test_corner_motors_take_each_row_from_that_corners_motor():
+    from boxer.spar_match import corner_motors, motor_actions
+    red = lambda inputs, key: (inputs['state'][:, :3] + 1, None)
+    blue = lambda inputs, key: (inputs['state'][:, :3] - 1, None)
+    obs = np.arange(12, dtype=np.float32).reshape(2, 6)
+    np.testing.assert_array_equal(motor_actions(corner_motors(red, blue), obs), [[1, 2, 3], [5, 6, 7]])
+    np.testing.assert_array_equal(motor_actions(corner_motors(red, red), obs), motor_actions(red, obs))

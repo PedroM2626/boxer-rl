@@ -47,6 +47,13 @@ def motor_actions(motor, obs):
     return np.array(action)
 
 
+def corner_motors(red, blue):
+    """One motor whose row ``i`` (corner ``i``'s joint targets) comes from motor ``i``."""
+    def motor(inputs, key):
+        return np.stack([np.asarray(red(inputs, key)[0])[0], np.asarray(blue(inputs, key)[0])[1]]), None
+    return motor
+
+
 class PunchArm:
     """NumPy twin of the batched arm controller (``boxer.moves``) for one boxer.
 
@@ -321,6 +328,8 @@ def render(pair, frames, times, path, caption):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--checkpoint', type=Path, default=Path("checkpoints/spar"))
+    parser.add_argument('--blue-checkpoint', type=Path,
+                        help='a different leg motor for blue (default: --checkpoint for both)')
     parser.add_argument('--seeds', type=int, nargs='+', default=list(range(8)))
     parser.add_argument('--seconds', type=float, default=20.0)
     parser.add_argument('--output', type=Path, default=Path('runs/spar/match.json'))
@@ -346,6 +355,11 @@ def main(argv=None):
     names = [n + (f' + arm {p}' if p else '') for n, p in zip(names, (args.red_arm, args.blue_arm))]
     foundation = UnassistedG1('spar')
     motor = jax.jit(inference(foundation, params))
+    motors = [motor, motor]
+    if args.blue_checkpoint:
+        # So is its leg motor: the two stacks differ from the legs up.
+        motors[1] = jax.jit(inference(foundation, load_policy_params(args.blue_checkpoint)[0]))
+        names = [n + f' + motor {p}' for n, p in zip(names, (args.checkpoint, args.blue_checkpoint))]
     pair = PairedFoundation(foundation, ring=args.ring)
     bouts = []
     schedule = [(seed, False) for seed in args.seeds]
@@ -355,6 +369,8 @@ def main(argv=None):
         record = args.video is not None and index == 0
         brains = {1 - i if swapped else i: brain for i, brain in tactics.items()}
         arm_skills = {1 - i if swapped else i: skill for i, skill in skills.items()}
+        if args.blue_checkpoint:
+            motor = corner_motors(*(motors[::-1] if swapped else motors))
         result, frames, times = bout(pair, motor, seed, args.seconds, record, brains, args.knockdowns,
                                      arm_skills)
         result.update(red=names[1] if swapped else names[0], blue=names[0] if swapped else names[1])
