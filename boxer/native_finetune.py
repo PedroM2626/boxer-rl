@@ -42,9 +42,11 @@ class NativeBout:
     """One native two-robot bout, stepped one learner decision at a time."""
 
     def __init__(self, pair, motor, rng, opponents, scripted_fraction, episode_steps, fall_penalty,
-                 high_guard_fraction=0.):
+                 high_guard_fraction=0., arm_skill=None):
+        """``arm_skill``: an ``arm_skill.ArmSkill`` steering both corners' punches."""
         from boxer.spar_match import PunchArm
         self.pair, self.motor, self.rng = pair, motor, rng
+        self.arm_skill = arm_skill
         self.opponents, self.scripted_fraction = opponents, scripted_fraction
         self.high_guard_fraction = high_guard_fraction
         self.episode_steps, self.fall_penalty = episode_steps, fall_penalty
@@ -101,6 +103,8 @@ class NativeBout:
         commands = np.clip(commands, [-.35, -.25, -.5], [.55, .25, .5])
         action = motor_actions(self.motor, pair.observation(commands))
         for k in range(2):
+            if self.arm_skill is not None:
+                self.arm_skill.steer(pair, k, self.arms[k])
             action[k, LEFT_ARM:] = self.arms[k].actions(bool(high[k]))
         outcome = pair.step(action)
         fallen = np.asarray(outcome["fallen"], bool)
@@ -174,7 +178,7 @@ def export_native_model(path, ring=False):
 
 
 def _worker(conn, seed, motor_path, opponent_paths, scripted_fraction, episode_steps, fall_penalty,
-            min_std, model_path, constants, high_guard_fraction=0.):
+            min_std, model_path, constants, high_guard_fraction=0., arm_path=None):
     _configure_worker_env()
     import jax
     import mujoco
@@ -191,8 +195,12 @@ def _worker(conn, seed, motor_path, opponent_paths, scripted_fraction, episode_s
         brain = PolicyBrain(load_policy_params(path)[0], deterministic=bool(k % 2 == 0))
         brain.key = jax.random.PRNGKey(seed * 101 + k)
         opponents.append(brain)
+    arm_skill = None
+    if arm_path:
+        from boxer.arm_skill import ArmSkill
+        arm_skill = ArmSkill(load_policy_params(arm_path)[0])
     bout = NativeBout(pair, motor, rng, opponents, scripted_fraction, episode_steps, fall_penalty,
-                      high_guard_fraction)
+                      high_guard_fraction, arm_skill)
     sample_with = make_sampler(min_std)
 
     def sample_next(params, obs, key):
@@ -283,6 +291,7 @@ def main(argv=None):
     parser.add_argument("--checkpoint-every", type=int, default=500_000)
     parser.add_argument("--scripted-fraction", type=float, default=.3)
     parser.add_argument("--ring", action="store_true", help="train and gate inside the roped ring")
+    parser.add_argument("--arm", type=Path, help="arm-skill checkpoint steering every corner's punches")
     parser.add_argument("--high-guard-fraction", type=float, default=0.,
                         help="share of scripted opponents that hold the high guard")
     parser.add_argument("--fall-penalty", type=float, default=30.)
@@ -358,7 +367,7 @@ def main(argv=None):
         process = context.Process(target=worker, args=(
             child, args.seed * 1000 + w, args.motor, [str(p) for p in args.pool],
             args.scripted_fraction, 1000, args.fall_penalty, args.min_std, model_path, constants,
-            args.high_guard_fraction),
+            args.high_guard_fraction, str(args.arm) if args.arm else None),
             daemon=True)
         process.start()
         pipes.append(parent)
@@ -428,7 +437,7 @@ def main(argv=None):
         for process in processes:
             process.join(timeout=10)
     if args.native_gate:
-        gate_generation(root, args.init_from, args.native_gate, args.ring)
+        gate_generation(root, args.init_from, args.native_gate, args.ring, args.arm)
     return 0
 
 

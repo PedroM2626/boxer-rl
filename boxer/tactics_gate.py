@@ -40,12 +40,15 @@ def stage(manifest, destination):
     return destination
 
 
-def native_match(first, second, seeds, output, ring=False):
+def native_match(first, second, seeds, output, ring=False, arm=None):
     """Runs ``spar_match`` on CPU and returns its summary with the record of ``first``."""
     env = dict(os.environ, JAX_PLATFORMS="cpu", PYTHONPATH=str(Path.cwd()))
     command = [sys.executable, "-u", "-m", "boxer.spar_match", "--red-tactics", str(first),
                "--blue-tactics", str(second), "--swap", "--output", str(output),
                "--seeds", *map(str, seeds)] + (["--ring"] if ring else [])
+    if arm:
+        # Both corners punch with the same arm skill: only the tactics differ.
+        command += ["--red-arm", str(arm), "--blue-arm", str(arm)]
     subprocess.run(command, env=env, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     summary = json.loads(Path(output).read_text())
     return {k: v for k, v in summary.items() if k != "results"}
@@ -68,10 +71,11 @@ def combine(*records):
     return total
 
 
-def gate_generation(root, champion, last=4, ring=False):
+def gate_generation(root, champion, last=4, ring=False, arm=None):
     """Selects and confirms a generation's best checkpoint; returns its directory.
 
-    ``ring``: all gate bouts are fought inside the roped ring.
+    ``ring``: all gate bouts are fought inside the roped ring. ``arm``: an
+    arm-skill checkpoint steering both corners' punches.
     """
     root = Path(root)
     gate = root / "gate"
@@ -82,13 +86,13 @@ def gate_generation(root, champion, last=4, ring=False):
     for manifest in candidates(root / "checkpoint", last):
         step = json.loads(manifest.read_text())["stage_steps"]
         directory = stage(manifest, gate / f"step-{step}")
-        record = native_match(directory, champion, SELECTION_SEEDS, gate / f"step-{step}.json", ring)
+        record = native_match(directory, champion, SELECTION_SEEDS, gate / f"step-{step}.json", ring, arm)
         trials.append(dict(step=step, directory=str(directory), record=record))
         print(json.dumps(dict(event="native_gate", step=step, **record["tactics"])), flush=True)
     best = max(trials, key=lambda trial: score(trial["record"]))
-    fresh = native_match(best["directory"], champion, CONFIRMATION_SEEDS, gate / "confirmation.json", ring)
+    fresh = native_match(best["directory"], champion, CONFIRMATION_SEEDS, gate / "confirmation.json", ring, arm)
     total = combine(best["record"], fresh)
-    result = dict(champion=str(champion), ring=ring, selected=best["directory"], selected_step=best["step"],
+    result = dict(champion=str(champion), ring=ring, arm=str(arm) if arm else None, selected=best["directory"], selected_step=best["step"],
                   candidates=[dict(step=t["step"], **t["record"]["tactics"]) for t in trials],
                   confirmation=fresh["tactics"], total=total,
                   beats_champion=total["first_wins"] > total["first_losses"])
