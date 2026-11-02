@@ -30,6 +30,12 @@ PUNCH_BODY, PUNCH_HEAD = moves.STRAIGHT_BODY, moves.STRAIGHT_HEAD
 PUNCH_EXTEND, PUNCH_RETRACT = moves.TIMING[moves.STRAIGHT]
 HOOK_FRACTION = .4         # share of generated punches that are hooks
 HIGH_GUARD_FRACTION = .4   # share of guard periods held high
+PUNCH_WAIT = (5, 60)       # control steps between generated punches
+# Rapid punches (``--rapid-punches``): native tactics throw ~2.2 punches/s per
+# boxer, nearly back to back, and the arm skill adds up to 0.35 rad to the
+# punching arm (boxer.arm_skill.RESIDUAL_SCALE); the default generator throws ~1/s.
+RAPID_PUNCH_WAIT = (0, 6)
+RAPID_PUNCH_RESIDUAL = .35
 # Phantom opponent shins (``--phantom-shins``): in native bouts every knockdown
 # after body contact followed the boxers' shins tangling (tools/knockdown_causes.py).
 PHANTOM_GAP = (2.0, 6.0)        # seconds between appearances
@@ -187,7 +193,7 @@ class UnassistedG1(joystick.Joystick):
                 punch_rng=punch_rng, punch_age=jp.array(-1.0),
                 punch_hand=jp.array(0, jp.int32), punch_target=jp.zeros(4),
                 punch_speed=jp.array(1.0), punch_move=jp.array(0, jp.int32),
-                punch_aim=jp.array(0.), high_guard=jp.array(False),
+                punch_aim=jp.array(0.), high_guard=jp.array(False), punch_residual=jp.zeros(4),
                 guard_timer=jax.random.randint(jax.random.fold_in(rng, 78), (), 25, 150),
                 punch_wait=jax.random.randint(punch_rng, (), 10, 60))
         if self.stage == "approach":
@@ -213,6 +219,9 @@ class UnassistedG1(joystick.Joystick):
         """
         rng, hand_rng, aim_rng, jitter_rng, speed_rng, wait_rng, move_rng, guard_rng, timer_rng = (
             jax.random.split(info["punch_rng"], 9))
+        residual_rng = jax.random.fold_in(info["punch_rng"], 1)
+        rapid = self._config.get("rapid_punches", False)
+        wait_range = RAPID_PUNCH_WAIT if rapid else PUNCH_WAIT
         timer = info["guard_timer"] - 1
         high = jp.where(timer <= 0, jax.random.bernoulli(guard_rng, HIGH_GUARD_FRACTION),
                         info["high_guard"])
@@ -228,20 +237,25 @@ class UnassistedG1(joystick.Joystick):
         speed = jp.where(launch, jax.random.uniform(speed_rng, minval=.8, maxval=1.25),
                          info["punch_speed"])
         age = jp.where(launch, 0.0, info["punch_age"])
-        guards = [self._default_pose[LEFT_ARM:LEFT_ARM + 4], self._default_pose[RIGHT_ARM:RIGHT_ARM + 4]]
+        # Like an arm-skill correction, in the left arm's frame (mirrored with the swing).
+        residual = jp.where(launch, jax.random.uniform(residual_rng, (4,), minval=-RAPID_PUNCH_RESIDUAL,
+                                                       maxval=RAPID_PUNCH_RESIDUAL) * rapid,
+                            info["punch_residual"])
+        guards =[self._default_pose[LEFT_ARM:LEFT_ARM + 4], self._default_pose[RIGHT_ARM:RIGHT_ARM + 4]]
         arms = []
         for side, guard in enumerate(guards):
             rest = moves.mirror(jp, moves.rest_pose(jp, moves.mirror(jp, guard, side), high), side)
             punching = (age >= 0) & (hand == side)
             swing = moves.mirror(jp, moves.punch_pose(
-                jp, move, aim, target, age, moves.mirror(jp, rest, side), self.dt), side)
+                jp, move, aim, target, age, moves.mirror(jp, rest, side), self.dt) + residual, side)
             pose = jp.where(punching, swing, rest)
             arms.append(jp.concatenate([(pose - guard) / self._config.action_scale, jp.zeros(3)]))
         age = jp.where(age >= 0, age + speed, age)
         finished = moves.finished(jp, move, age, self.dt)
         wait = jp.where(age >= 0, info["punch_wait"], info["punch_wait"] - 1)
-        wait = jp.where(finished, jax.random.randint(wait_rng, (), 5, 60), wait)
+        wait = jp.where(finished, jax.random.randint(wait_rng, (), *wait_range), wait)
         info.update(punch_rng=rng, punch_hand=hand, punch_target=target, punch_move=move,
+                    punch_residual=residual,
                     punch_aim=aim, punch_speed=speed, punch_age=jp.where(finished, -1.0, age),
                     punch_wait=wait.astype(jp.int32), high_guard=high, guard_timer=timer.astype(jp.int32))
         return jp.concatenate(arms)

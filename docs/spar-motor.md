@@ -182,3 +182,47 @@ ropes and to moments without contact. Shin contact was a trigger, not the
 cause: the motor is close to its balance limit while it punches about twice a
 second, and any disturbance tips it over. Not promoted; the penalty
 defaults to 0.
+
+## Legs for rapid punching (2026-11-02)
+
+Every one of the knockdowns above came while the falling robot's own punch
+was in flight. Learned tactics throw about 2.2 punches per second per boxer,
+nearly back to back, and the arm skill bends each one by up to 0.35 rad. The
+spar generator the motor trained with waits 5–60 steps between punches
+(about one per second, an arm in motion 40 % of the time) and never bends a
+punch. `curriculum_train --rapid-punches` (`curriculum_env.RAPID_PUNCH_*`)
+waits 0–6 steps instead and adds a random correction of up to ±0.35 rad to
+the punching arm's shoulder and elbow targets for each punch (an arm in
+motion 81 % of the time). Default training is unchanged.
+
+10 s survival, 256 worlds, as for the phantom shins:
+
+| Motor | Normal punching | Rapid punching | Standard spar gate |
+| --- | --- | --- | --- |
+| `checkpoints/spar-v1` (previous) | 98.4 % | 93.8 % | pass |
+| **rapid 10.8M (`checkpoints/spar`)** | **99.2 %** | **97.7 %** | pass (at 0 and 10.8M) |
+
+With the old tactics on top, the new motor is worse: the champion tactics
+fell 19 times in 16 ring bouts of 120 s against ring-v1 (4 on the old motor).
+The tactics had learned commands that suit the old legs. Fine-tuned again on
+the new motor (3M native steps, the champion's settings, `native_finetune
+--motor`), the 3.0M tactics beat the previous champion tactics 30–13–5 in the
+native gate on the new motor. Whole stacks, each robot on its own legs
+(`spar_match --blue-checkpoint`), ring bouts of 120 s, three knockdowns stop
+a bout:
+
+| Bouts | New stack's record | Knockdowns, previous / new stack |
+| --- | --- | --- |
+| head-to-head, seeds 0–7 swapped | 9–7 | 5 / 1 |
+| head-to-head, seeds 8–15 swapped | 13–2–1 | 8 / 1 |
+| **head-to-head, 32 bouts** | **22–9–1** | **13 / 2** |
+| against ring-v1 on the previous motor | 16–0 (previous stack: 14–2) | 4 / 4 (each stack's own) |
+
+Promoted: the motor is `checkpoints/spar` (previous: `checkpoints/spar-v1`),
+the tactics `checkpoints/tactics` (previous: `checkpoints/tactics-arm-v1`;
+their `native-gate.json` calls it `checkpoints/tactics`, its name then).
+Against a common opponent the new stack falls as often as the old one; it
+falls far less in the head-to-head. Tactics trained on the previous motor
+should be played on it (`--checkpoint checkpoints/spar-v1`); with both
+corners on the new motor, ring-v1 fell 8 times in 16 bouts instead of 2.
+The arm skill was trained on the previous motor and is used unchanged.

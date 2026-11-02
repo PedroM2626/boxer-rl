@@ -137,3 +137,26 @@ def test_corner_motors_take_each_row_from_that_corners_motor():
     obs = np.arange(12, dtype=np.float32).reshape(2, 6)
     np.testing.assert_array_equal(motor_actions(corner_motors(red, blue), obs), [[1, 2, 3], [5, 6, 7]])
     np.testing.assert_array_equal(motor_actions(corner_motors(red, red), obs), motor_actions(red, obs))
+
+
+def test_rapid_punches_throw_back_to_back_with_bounded_corrections():
+    from boxer.curriculum_env import RAPID_PUNCH_RESIDUAL
+
+    def punching_share(config):
+        env = UnassistedG1("spar", config=config)
+        info = dict(jax.jit(env.reset)(jax.random.PRNGKey(0)).info)
+        generate = jax.jit(lambda info: (env.punch_arms(info), info)[1])
+        busy, residuals = 0, []
+        for _ in range(400):
+            info = generate(info)
+            busy += float(info["punch_age"]) >= 0
+            residuals.append(np.asarray(info["punch_residual"]))
+        return busy / 400, np.abs(residuals)
+
+    normal, normal_residual = punching_share(stage_config("spar"))
+    config = stage_config("spar")
+    config.rapid_punches = True
+    rapid, rapid_residual = punching_share(config)
+    assert rapid > normal + .25 and rapid > .7
+    assert normal_residual.max() == 0
+    assert 0 < rapid_residual.max() <= RAPID_PUNCH_RESIDUAL

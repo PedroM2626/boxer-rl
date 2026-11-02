@@ -441,10 +441,16 @@ moves to `checkpoints/tactics-highguard-v1`.
 * `checkpoints/tactics-ring-v1`: native fine-tune inside the roped ring, 32
   inputs (sees the ring centre); 27–16–5 against highguard-v1, 14–2 in 120 s
   ring bouts ([roped ring](#roped-ring-2026-10-31)).
-* `checkpoints/tactics`: native fine-tune in the ring with the arm skill
+* `checkpoints/tactics-arm-v1`: native fine-tune in the ring with the arm skill
   steering punches; with the arm skill on both sides 35–11–2 against
   ring-v1. Play it with `--red-arm checkpoints/arm-skill`
   ([arm skill](arm-skill.md#tactics-trained-with-the-arm-skill)).
+* `checkpoints/tactics`: the same fine-tune on the rapid-punching leg motor
+  (`checkpoints/spar` since 2026-11-02); 30–13–5 against arm-v1 on that
+  motor, and as a whole stack 22–9–1 against arm-v1 on its own motor
+  ([legs for rapid punching](spar-motor.md#legs-for-rapid-punching-2026-11-02)).
+  Every earlier tactics checkpoint was trained on `checkpoints/spar-v1`:
+  play it with `--checkpoint checkpoints/spar-v1` (or `--blue-checkpoint`).
 
 ## Native-v1 champion (native fine-tune, 2026-10-31)
 

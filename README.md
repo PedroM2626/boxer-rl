@@ -44,10 +44,20 @@ identically on GPU and CPU hosts, and native fine-tuning runs 2.1× faster.
 learned, real-time corrections to each punch, aimed at where the target
 actually is (`--red-arm checkpoints/arm-skill`). With identical tactics on
 both sides it wins 39–4–5 over 48 native bouts and 16–0 in 120 s ring
-bouts; punches land about 50 % of the time instead of 41 %. The current
-champion (`checkpoints/tactics`) is tactics fine-tuned with the arm skill
-attached: 35–11–2 against the ring champion, though more knockdown-prone
-over long bouts ([details](docs/arm-skill.md#tactics-trained-with-the-arm-skill)).
+bouts; punches land about 50 % of the time instead of 41 %. Tactics
+fine-tuned with the arm skill attached (now `checkpoints/tactics-arm-v1`)
+beat the ring champion 35–11–2, though more knockdown-prone over long bouts
+([details](docs/arm-skill.md#tactics-trained-with-the-arm-skill)).
+
+**Legs for rapid punching (2026-11-02).** Learned tactics punch about twice a
+second, twice as often as the leg motor was trained for. The leg motor
+(`checkpoints/spar`) is now trained with near back-to-back punches and
+arm-skill-sized corrections (`curriculum_train --rapid-punches`), and the
+champion tactics (`checkpoints/tactics`) are fine-tuned on top of it. Over 32
+bouts of 120 s against the previous stack, each robot on its own legs, the
+new stack wins **22–9–1 and suffers 2 knockdowns to 13**
+([details](docs/spar-motor.md#legs-for-rapid-punching-2026-11-02)). Earlier
+tactics play on their own motor: `--checkpoint checkpoints/spar-v1`.
 
 **Long rounds and knockdowns.** Bouts of 120–180 s hold up after a footwork fix
 that keeps the boxers facing each other. `--knockdowns 3` adds a referee:
@@ -59,7 +69,8 @@ the high-guard champion in blue).
 
 ```bash
 bash tools/run_spar.sh boxer.spar_match --red-tactics checkpoints/tactics --red-arm checkpoints/arm-skill \
-  --blue-tactics checkpoints/tactics-ring-v1 --ring --seeds 0 1 2 3 --swap --video runs/fight.mp4
+  --blue-tactics checkpoints/tactics-arm-v1 --blue-arm checkpoints/arm-skill --blue-checkpoint checkpoints/spar-v1 \
+  --ring --seconds 120 --knockdowns 3 --seeds 0 1 2 3 --swap --video runs/fight.mp4
 ```
 
 ## Current experiment: unassisted paired boxing diagnostics

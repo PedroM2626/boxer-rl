@@ -114,6 +114,9 @@ def main(argv=None):
                         help="fraction of moving easy-walking commands replaced by pure lateral requests")
     parser.add_argument("--phantom-shins", action="store_true",
                         help="spar: opponent shins sweep into the robot's legs (curriculum_env.PHANTOM_*)")
+    parser.add_argument("--rapid-punches", action="store_true",
+                        help="spar: near back-to-back punches with arm-skill-sized corrections "
+                             "(curriculum_env.RAPID_PUNCH_*)")
     parser.add_argument("--publish-run", type=Path)
     parser.add_argument("--preview-snapshots", action="store_true")
     parser.add_argument("--adaptive-gates", action="store_true")
@@ -144,6 +147,8 @@ def main(argv=None):
         config.lateral_practice_probability = args.lateral_practice_probability
     if args.phantom_shins:
         config.phantom_shins = True
+    if args.rapid_punches:
+        config.rapid_punches = True
     config.naconmax = max(8192, args.worlds * 16)
     env = UnassistedG1(args.stage, config=config)
     env_contract = contract(env)
