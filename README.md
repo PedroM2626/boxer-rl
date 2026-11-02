@@ -56,7 +56,9 @@ arm-skill-sized corrections (`curriculum_train --rapid-punches`), and the
 champion tactics (`checkpoints/tactics`) are fine-tuned on top of it. Over 32
 bouts of 120 s against the previous stack, each robot on its own legs, the
 new stack wins **22–9–1 and suffers 2 knockdowns to 13**
-([details](docs/spar-motor.md#legs-for-rapid-punching-2026-11-02)). Earlier
+([details](docs/spar-motor.md#legs-for-rapid-punching-2026-11-02);
+[2-minute video](fights/rapid_champion_120s.mp4): the new champion in blue
+wins 126–106 on points, red is knocked down once). Earlier
 tactics play on their own motor: `--checkpoint checkpoints/spar-v1`.
 
 **Long rounds and knockdowns.** Bouts of 120–180 s hold up after a footwork fix
