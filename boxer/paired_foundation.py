@@ -226,6 +226,8 @@ class PairedFoundation:
         self._ropes = {g for g, n in enumerate(names) if n.startswith('rope_')}
         self._corner_of = {g: i for i, side in enumerate(scene.SIDES)
                            for g, n in enumerate(names) if n.startswith(side)}
+        legs = ('foot', 'shin', 'thigh', 'thigh_collision', 'hip_collision')
+        self._legs = {g for g in self._corner_of if names[g].endswith(legs)}
         for i, side in enumerate(scene.SIDES):
             own = {n[len(side):]: g for g, n in enumerate(names) if n.startswith(side)}
             for pair in trips:
@@ -293,6 +295,14 @@ class PairedFoundation:
                 if g1 in self._ropes or g2 in self._ropes:
                     touching[self._corner_of.get(g2 if g1 in self._ropes else g1, 0)] = True
         return touching
+
+    def legs_touching(self):
+        """Are the two robots' legs (hips to feet) in contact with each other now?"""
+        for g1, g2 in self.data.contact.geom:
+            g1, g2 = int(g1), int(g2)
+            if g1 in self._legs and g2 in self._legs and self._corner_of[g1] != self._corner_of[g2]:
+                return True
+        return False
 
     def fallen(self):
         finite = np.isfinite(self.data.qpos).all() and np.isfinite(self.data.qvel).all()

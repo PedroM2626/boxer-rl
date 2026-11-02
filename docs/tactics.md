@@ -68,6 +68,8 @@ Both corners balance with `--checkpoint` (the leg motor). `--blue-checkpoint`
 gives blue its own motor, which follows blue's tactics when corners swap, so
 two whole stacks can meet ([phantom stack](spar-motor.md#phantom-shins-and-real-falls-2026-11-01)).
 `native_finetune --motor` trains on, and gates with, another motor.
+`native_finetune --leg-contact-penalty P` charges `P` per second of leg
+contact between the robots (default 0; [result](spar-motor.md#phantom-shins-and-real-falls-2026-11-01)).
 
 ## Results (native MuJoCo, 16 bouts per row)
 

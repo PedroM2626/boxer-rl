@@ -160,3 +160,25 @@ Every phantom-stack knockdown was a real fall (pelvis low), 11 of 16 after
 leg contact. Retraining the tactics did not help: the phantom motor is
 sturdier against the synthetic shins but falls more in real bouts, whatever
 drives it. The motor stays `checkpoints/spar`.
+
+**Tactics that keep their legs apart.** `native_finetune
+--leg-contact-penalty P` takes `P` reward per second the robots' legs (hips
+to feet, `PairedFoundation.legs_touching`) touch. Fine-tuned from the
+champion with P = 20 (3M steps, otherwise the champion's settings), leg
+contact in training fell from 2.4 % to 1.7 % of steps. The gate selected the
+1.5M checkpoint, which only drew with the champion (15–16–17, with about 10
+clean punches per bout instead of 18–21): it avoids contact by boxing less.
+Same 16 ring bouts of 120 s as above:
+
+| Tactics | Real knockdowns | Falls after leg contact | Falls on the ropes | Steps with leg contact |
+| --- | --- | --- | --- | --- |
+| **champion** | **6** | 5 | 1 | 1892 |
+| leg penalty 1.5M (gate pick) | 8 | 1 | 3 | 899 |
+| leg penalty 3.0M | 9 | 3 | 5 | 1526 |
+
+Leg contact halves and almost disappears before falls, yet the robots fall
+as often (6 → 8–9 is within the noise of 16 bouts); the falls move to the
+ropes and to moments without contact. Shin contact was a trigger, not the
+cause: the motor is close to its balance limit while it punches about twice a
+second, and any disturbance tips it over. Not promoted; the penalty
+defaults to 0.

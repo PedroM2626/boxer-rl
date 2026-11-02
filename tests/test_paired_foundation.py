@@ -169,3 +169,16 @@ def test_active_fist_impact_scores_but_passive_contact_does_not(pair):
     assert not outcome['done']
     np.testing.assert_array_equal(outcome['scored'],[1.,0.])
     assert outcome['legal_contact_impulse'][0]>.5
+
+
+def test_legs_touching_sees_only_leg_on_leg_contact_between_the_robots(pair):
+    pair.reset(seed=0, randomized=False)
+    assert not pair.legs_touching()                 # spawned 2 m apart
+    red, blue = (m['root'] for m in pair.maps)
+    # Blue stands with its pelvis 0.25 m in front of red's: the legs overlap.
+    pair.data.qpos[blue:blue + 2] = pair.data.qpos[red:red + 2] + [.25, 0.]
+    mujoco.mj_forward(pair.model, pair.data)
+    assert pair.legs_touching()
+    names = {pair.model.geom(g).name.split('/', 1)[1] for g in pair._legs}
+    assert names == {f'{s}_{p}' for s in ('left', 'right')
+                     for p in ('foot', 'shin', 'thigh', 'thigh_collision', 'hip_collision')}

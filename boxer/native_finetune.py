@@ -8,8 +8,10 @@ scorecard and the shared ``observe``/``decode``/``PunchArm`` code. Each bout
 picks the learner's corner at random, and its opponent from the scripted
 brain and a pool of frozen tactics policies. A share of the scripted
 opponents can hold the high guard throughout, which no straight gets through
-(docs/moves.md, scoring audit): only hooks score on them. A central learner
-runs PPO on the gathered transitions.
+(docs/moves.md, scoring audit): only hooks score on them. An optional penalty
+per second of leg contact between the robots targets the main cause of real
+knockdowns, tangled shins (docs/spar-motor.md). A central learner runs PPO on
+the gathered transitions.
 
 The observation normalizer stays frozen at the starting checkpoint's
 statistics, so behaviour log-probabilities stay exact across the update.
@@ -42,11 +44,12 @@ class NativeBout:
     """One native two-robot bout, stepped one learner decision at a time."""
 
     def __init__(self, pair, motor, rng, opponents, scripted_fraction, episode_steps, fall_penalty,
-                 high_guard_fraction=0., arm_skill=None):
-        """``arm_skill``: an ``arm_skill.ArmSkill`` steering both corners' punches."""
+                 high_guard_fraction=0., arm_skill=None, leg_contact_penalty=0.):
+        """``arm_skill``: an ``arm_skill.ArmSkill`` steering both corners' punches.
+        ``leg_contact_penalty``: reward lost per second the robots' legs touch."""
         from boxer.spar_match import PunchArm
         self.pair, self.motor, self.rng = pair, motor, rng
-        self.arm_skill = arm_skill
+        self.arm_skill, self.leg_contact_penalty = arm_skill, leg_contact_penalty
         self.opponents, self.scripted_fraction = opponents, scripted_fraction
         self.high_guard_fraction = high_guard_fraction
         self.episode_steps, self.fall_penalty = episode_steps, fall_penalty
@@ -110,16 +113,17 @@ class NativeBout:
         fallen = np.asarray(outcome["fallen"], bool)
         scored = outcome["scored"]
         distance = float(np.linalg.norm(_body(pair, 1)["pos"] - _body(pair, 0)["pos"]))
+        legs = pair.legs_touching()
         reward = (REWARD["hit"] * scored[i] - REWARD["taken"] * scored[1 - i]
                   - self.fall_penalty * fallen[i] + REWARD["opponent_fell"] * (fallen[1 - i] and not fallen[i])
                   + pair.dt * REWARD["in_range"] * np.exp(-((distance - REACH) / .15) ** 2)
-                  - REWARD["punch"] * launched)
+                  - REWARD["punch"] * launched - pair.dt * self.leg_contact_penalty * legs)
         self.t += 1
         terminal = bool(outcome["done"])
         truncated = not terminal and self.t >= self.episode_steps
         return float(reward), terminal, truncated, dict(hits=float(scored[i]), taken=float(scored[1 - i]),
                                                         fell=float(fallen[i]), punches=float(launched),
-                                                        hooks=float(hooked))
+                                                        hooks=float(hooked), legs=float(legs))
 
 
 def worker(conn, *args):
@@ -178,7 +182,8 @@ def export_native_model(path, ring=False):
 
 
 def _worker(conn, seed, motor_path, opponent_paths, scripted_fraction, episode_steps, fall_penalty,
-            min_std, model_path, constants, high_guard_fraction=0., arm_path=None):
+            min_std, model_path, constants, high_guard_fraction=0., arm_path=None,
+            leg_contact_penalty=0.):
     _configure_worker_env()
     import jax
     import mujoco
@@ -200,7 +205,7 @@ def _worker(conn, seed, motor_path, opponent_paths, scripted_fraction, episode_s
         from boxer.arm_skill import ArmSkill
         arm_skill = ArmSkill(load_policy_params(arm_path)[0])
     bout = NativeBout(pair, motor, rng, opponents, scripted_fraction, episode_steps, fall_penalty,
-                      high_guard_fraction, arm_skill)
+                      high_guard_fraction, arm_skill, leg_contact_penalty)
     sample_with = make_sampler(min_std)
 
     def sample_next(params, obs, key):
@@ -216,7 +221,7 @@ def _worker(conn, seed, motor_path, opponent_paths, scripted_fraction, episode_s
             break
         params, steps = message
         record = {k: [] for k in ("obs", "raw", "logp", "reward", "terminal", "truncated", "next_obs")}
-        stats = dict(hits=0., taken=0., fell=0., punches=0., hooks=0., bouts=0)
+        stats = dict(hits=0., taken=0., fell=0., punches=0., hooks=0., legs=0., bouts=0)
         for _ in range(steps):
             action, raw, logp, key = sample(params, obs, key)
             reward, terminal, truncated, info = bout.step(np.asarray(action))
@@ -225,7 +230,7 @@ def _worker(conn, seed, motor_path, opponent_paths, scripted_fraction, episode_s
                                 ("reward", reward), ("terminal", terminal), ("truncated", truncated),
                                 ("next_obs", next_obs)):
                 record[name].append(value)
-            for name in ("hits", "taken", "fell", "punches", "hooks"):
+            for name in ("hits", "taken", "fell", "punches", "hooks", "legs"):
                 stats[name] += info[name]
             if terminal or truncated:
                 stats["bouts"] += 1
@@ -295,6 +300,8 @@ def main(argv=None):
     parser.add_argument("--high-guard-fraction", type=float, default=0.,
                         help="share of scripted opponents that hold the high guard")
     parser.add_argument("--fall-penalty", type=float, default=30.)
+    parser.add_argument("--leg-contact-penalty", type=float, default=0.,
+                        help="reward lost per second the robots' legs touch")
     parser.add_argument("--min-std", type=float, default=.15)
     parser.add_argument("--learning-rate", type=float, default=1e-4)
     parser.add_argument("--entropy-cost", type=float, default=1e-3)
@@ -367,7 +374,7 @@ def main(argv=None):
         process = context.Process(target=worker, args=(
             child, args.seed * 1000 + w, args.motor, [str(p) for p in args.pool],
             args.scripted_fraction, 1000, args.fall_penalty, args.min_std, model_path, constants,
-            args.high_guard_fraction, str(args.arm) if args.arm else None),
+            args.high_guard_fraction, str(args.arm) if args.arm else None, args.leg_contact_penalty),
             daemon=True)
         process.start()
         pipes.append(parent)
@@ -420,6 +427,7 @@ def main(argv=None):
                           hits_per_1000=1000 * sum(s["hits"] for s in stats) / size,
                           taken_per_1000=1000 * sum(s["taken"] for s in stats) / size,
                           falls=sum(s["fell"] for s in stats), bouts_finished=bouts,
+                          leg_contact_share=sum(s["legs"] for s in stats) / size,
                           hook_share=sum(s["hooks"] for s in stats) / max(sum(s["punches"] for s in stats), 1.),
                           **{k: float(v) for k, v in info.items()})
             log.write(json.dumps(record) + "\n")
