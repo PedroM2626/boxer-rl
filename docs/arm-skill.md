@@ -127,3 +127,22 @@ rule, not real falls. With knockdown rules now counting only real falls,
 the same bouts have 6 knockdowns. A motor retrained against phantom
 opponent shins did not reduce them
 ([spar motor](spar-motor.md#phantom-shins-and-real-falls-2026-11-01)).
+
+## Retrained on the rapid-punching motor (2026-11-02)
+
+The arm skill was trained on the previous leg motor (`checkpoints/spar-v1`).
+On the rapid-punching motor (`checkpoints/spar` since 2026-11-02) it still
+works: in the arm gate (champion tactics with the arm skill against the same
+tactics with scripted punches, 16 bouts) it goes 10–4–2, landing 48.4 % /
+44.0 %. Fine-tuned from it on the new motor (`arm_finetune --init-from
+checkpoints/arm-skill --tactics checkpoints/tactics`, 1.5M punch steps), then
+matched directly against it, identical tactics on both sides:
+
+| Checkpoint | Arm gate (16 bouts) | vs current arm skill, 32 bouts of 20 s | vs current, 16 bouts of 120 s | Knockdowns in those, new / current |
+| --- | --- | --- | --- | --- |
+| 0.75M | 13–3, landing 54.6 % / 47.2 % | 18–11–3 | 11–4–1, landing 54.0 % / 50.9 % | 8 / 3 |
+| 1.5M | 10–6, landing 47.6 % / 42.1 % | 16–12–4 | 8–8, landing 51.4 % / 50.8 % | 7 / 4 |
+
+Both retrained arms land a little more but fall more over long bouts, the
+same trade-off that ruled out the original 1.5M checkpoint. Not promoted:
+`checkpoints/arm-skill` stays.
