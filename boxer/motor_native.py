@@ -71,9 +71,13 @@ def value_features(pair, obs, kinds):
 class MotorBout:
     """One native ring bout whose two robots both run the learner motor."""
 
-    def __init__(self, pair, rng, pool, arm_skill, episode_steps):
-        """``pool``: brain kind (index into ``BRAINS``) -> loaded brain, or None for scripted."""
+    def __init__(self, pair, rng, pool, arm_skill, episode_steps, weights=None):
+        """``pool``: brain kind (index into ``BRAINS``) -> loaded brain, or None for scripted;
+        ``weights``: kind -> relative chance that a corner draws it (default: equal)."""
         self.pair, self.rng, self.pool = pair, rng, pool
+        kinds = sorted(pool)
+        chances = np.array([(weights or {}).get(k, 1.) for k in kinds], float)
+        self.kinds_drawn, self.chances = kinds, chances / chances.sum()
         self.arm_skill, self.episode_steps = arm_skill, episode_steps
         pair.self_trip_falls = False        # knockdown rules: only real falls
         self.reset()
@@ -82,8 +86,7 @@ class MotorBout:
         from boxer.spar_match import RingBrain, _new_arm
         seed = int(self.rng.integers(1 << 30))
         self.pair.reset(seed=seed)
-        kinds = list(self.pool)
-        self.kinds = [int(kinds[self.rng.integers(len(kinds))]) for _ in range(2)]
+        self.kinds = [int(k) for k in self.rng.choice(self.kinds_drawn, 2, p=self.chances)]
         self.brains = [self.pool[k] or RingBrain(np.random.default_rng([seed, i]))
                        for i, k in enumerate(self.kinds)]
         self.arms = [_new_arm(self.pair, brain) for brain in self.brains]
@@ -173,7 +176,7 @@ def worker(conn, *args):
         raise
 
 
-def _worker(conn, seed, model_path, constants, pool_paths, arm_path, episode_steps):
+def _worker(conn, seed, model_path, constants, pool_paths, arm_path, episode_steps, weights=None):
     _configure_worker_env()
     import jax
     import jax.numpy as jp
@@ -190,7 +193,7 @@ def _worker(conn, seed, model_path, constants, pool_paths, arm_path, episode_ste
     for k, brain in pool.items():
         if brain is not None:
             brain.key = jax.random.PRNGKey(seed * 101 + k)
-    bout = MotorBout(pair, rng, pool, ArmSkill(load_policy_params(arm_path)[0]), episode_steps)
+    bout = MotorBout(pair, rng, pool, ArmSkill(load_policy_params(arm_path)[0]), episode_steps, weights)
     policy = motor_policy(foundation.observation_size, foundation.action_size)
     privileged = jp.zeros((2,) + tuple(foundation.observation_size["privileged_state"]))
 
@@ -259,6 +262,8 @@ def main(argv=None):
                         help="a striker trained with an arm-motion cost")
     parser.add_argument("--tactics", type=Path, default=Path("checkpoints/tactics"))
     parser.add_argument("--arm", type=Path, default=Path("checkpoints/arm-skill"))
+    parser.add_argument("--weights", type=float, nargs=4, default=[1., 1., 1., 1.],
+                        help="relative chances of each brain per corner, in BRAINS order")
     parser.add_argument("--workers", type=int, default=8)
     parser.add_argument("--unroll", type=int, default=256, help="control steps per worker per update")
     parser.add_argument("--episode-steps", type=int, default=3000, help="bout length cap (60 s)")
@@ -308,7 +313,8 @@ def main(argv=None):
     for w in range(args.workers):
         parent, child = context.Pipe()
         process = context.Process(target=worker, args=(
-            child, args.seed * 1000 + w, model_path, constants, paths, str(args.arm), args.episode_steps),
+            child, args.seed * 1000 + w, model_path, constants, paths, str(args.arm), args.episode_steps,
+            dict(enumerate(args.weights))),
             daemon=True)
         process.start()
         pipes.append(parent)

@@ -55,3 +55,10 @@ def test_bout_replaces_arms_and_ends_on_a_fall(pair):
             break
     assert terminal.any() and (terminal | truncated).all()
     assert rewards[terminal].max() < -REWARD["fall"] / 2 and next_values.shape == (2, VALUE_SIZE)
+
+
+def test_brain_weights_set_how_often_each_corner_draws_a_brain(pair):
+    bout = MotorBout(pair, np.random.default_rng(0), {0: None, 3: None}, None, 50, weights={0: 0., 3: 1.})
+    for _ in range(5):
+        bout.reset()
+        assert bout.kinds == [3, 3]

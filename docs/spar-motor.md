@@ -316,3 +316,16 @@ current legs: its tactics learned commands that suit those legs (as in
 Kept as `checkpoints/spar-native`, the legs for strikers; the champion keeps
 `checkpoints/spar`. Play each on its own legs with `spar_match --checkpoint`
 and `--blue-checkpoint`.
+
+**More striker brawls.** Continued from `checkpoints/spar-native` for 3M
+more transitions with the pool weighted toward strikers (`--weights 1 2 1
+.5`, BRAINS order; about 44 % of bouts striker against striker). Training
+falls stayed at 0.02–0.03 per 1000 transitions. 32 bouts of 120 s:
+
+| Bouts | `spar-native` | continued |
+| --- | --- | --- |
+| striker vs striker-v1, both on the legs tested | 32–0, knockdowns 15 : 5 | 32–0, knockdowns 9 : 12 |
+| striker on the legs tested vs champion on `checkpoints/spar` | 32–0, knockdowns 1 : 4 | 31–1, knockdowns 0 : 7 |
+
+The brawls fall as often as before (21 knockdowns against 20); the falls
+only change sides. Not promoted.
