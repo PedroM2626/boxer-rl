@@ -88,19 +88,25 @@ low and high. These are trajectories the policy produced itself.
 
 ## Limits
 
-* **Falls.** 14 knockdowns in 16 bouts of 120 s against 1 for the champion
-  (the motor was not trained for these arm motions or for leaning into the
-  opponent). It still wins every bout on the cards, knockdowns included.
+* **Falls (fixed in the legs).** On the motor it was trained with
+  (`checkpoints/spar-v2`), 14 knockdowns in 16 bouts of 120 s against 1 for
+  the champion: that motor never trained under these arm motions. The leg
+  motor now trains replaying the striker's own arm actions; on it the
+  striker wins 32–0 over 32 bouts of 120 s, 309 clean punches to 141, with
+  1 knockdown to 0 ([legs for the striker's arms](spar-motor.md#legs-for-the-strikers-arms-2026-11-03)).
 * **Close to a clinch.** Fighting chest to chest is legal under these rules
   (no referee breaks clinches) but is not what boxing looks like at its best.
 * **Legs are still separate.** The striker merges tactics, moves and arm
-  skill; the leg motor is still its own policy. Training the motor under the
-  striker's arm motions (as `--rapid-punches` did for the tactics) is the next
-  step for the falls.
+  skill; the leg motor is still its own policy, now trained under the
+  striker's recorded arm actions.
+* **Punching costs almost nothing.** The only cost is 0.02 per launch, and a
+  striker launch is an arm leaving the guard; it keeps its arms out and
+  launches about 3 times per 120 s bout. Missing is free, which favours
+  constant short punches at close range.
 
-The striker is kept as `checkpoints/striker`. It does not replace the
-champion stack (`checkpoints/tactics` + `checkpoints/arm-skill`), which
-falls far less.
+The striker is kept as `checkpoints/striker`. The champion stack
+(`checkpoints/tactics` + `checkpoints/arm-skill`) stays the reference built
+from scripted moves.
 
 ```bash
 bash tools/run_spar.sh boxer.spar_match --ring --red-tactics checkpoints/striker \

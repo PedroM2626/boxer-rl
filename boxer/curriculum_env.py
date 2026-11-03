@@ -45,6 +45,9 @@ PHANTOM_START = 0.45            # m from the pelvis when an appearance starts
 # distances of 0.45-0.9 m with the opponent's shins ~0.1-0.2 m before its pelvis.
 PHANTOM_CLOSEST = (0.18, 0.30)
 PHANTOM_PARK = jp.array([0., 0., -10.])
+# Striker arms (``--striker-arms``): a share of episodes replays arm actions a
+# striker (boxer.striker) sent in native bouts instead of the generated moves.
+STRIKER_ARM_FRACTION = .5
 LEFT_ARM, RIGHT_ARM = 15, 22  # first shoulder actuator of each arm
 
 
@@ -120,6 +123,14 @@ class UnassistedG1(joystick.Joystick):
                 raise ValueError("phantom shins belong to the spar stage")
             self._add_phantom_shins()
             self._phantom = True
+        self._arm_traces = None
+        if self._config.get("striker_arms", None):
+            if stage != "spar":
+                raise ValueError("striker arms belong to the spar stage")
+            traces = np.load(self._config.striker_arms)["arms"]
+            if traces.ndim != 2 or traces.shape[1] != 14 or len(traces) <= 2 * self._config.episode_length:
+                raise ValueError("striker arm traces must be (steps, 14), longer than two episodes")
+            self._arm_traces = jp.asarray(traces, jp.float32)
         # Carry a compact boxing guard while balancing/walking, so transferring
         # to the boxing posture will not suddenly shift the centre of mass.
         for hand, values in GUARD_ARMS_BOXING.items():
@@ -196,6 +207,13 @@ class UnassistedG1(joystick.Joystick):
                 punch_aim=jp.array(0.), high_guard=jp.array(False), punch_residual=jp.zeros(4),
                 guard_timer=jax.random.randint(jax.random.fold_in(rng, 78), (), 25, 150),
                 punch_wait=jax.random.randint(punch_rng, (), 10, 60))
+            if self._arm_traces is not None:
+                start_rng, on_rng = jax.random.split(jax.random.fold_in(rng, 81))
+                fraction = self._config.get("striker_arm_fraction", STRIKER_ARM_FRACTION)
+                state.info.update(
+                    trace_on=jax.random.bernoulli(on_rng, fraction),
+                    trace_t=jax.random.randint(start_rng, (), 0,
+                                               len(self._arm_traces) - self._config.episode_length - 1))
         if self.stage == "approach":
             # The target is a navigation marker, never a physical support.
             forward = state.data.site_xmat[self._pelvis_imu_site_id][:2, 0]
@@ -258,7 +276,13 @@ class UnassistedG1(joystick.Joystick):
                     punch_residual=residual,
                     punch_aim=aim, punch_speed=speed, punch_age=jp.where(finished, -1.0, age),
                     punch_wait=wait.astype(jp.int32), high_guard=high, guard_timer=timer.astype(jp.int32))
-        return jp.concatenate(arms)
+        arms = jp.concatenate(arms)
+        if self._arm_traces is not None:
+            # Replayed actions already hold both arms (wrists at zero) in action units.
+            t = jp.minimum(info["trace_t"], len(self._arm_traces) - 1)
+            arms = jp.where(info["trace_on"], self._arm_traces[t], arms)
+            info.update(trace_t=t + 1)
+        return arms
 
     def _add_phantom_shins(self):
         """Adds a mocap pair of opponent shins that touch only this robot's shins and feet."""

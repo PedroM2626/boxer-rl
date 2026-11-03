@@ -202,12 +202,14 @@ def _body(pair, i):
                 height=float(np.float32(pair.data.qpos[m['root'] + 2]) - pair.init_height32))
 
 
-def bout(pair, motor, seed, seconds=20.0, record=False, brains=None, knockdowns=1, arm_skills=None):
+def bout(pair, motor, seed, seconds=20.0, record=False, brains=None, knockdowns=1, arm_skills=None,
+         frame_every=2):
     """One bout; ``brains`` maps corner -> PolicyBrain, others are scripted.
 
     ``knockdowns``: knockdowns of one boxer that stop the bout (1: the first
     fall ends it, the original rule). ``arm_skills`` maps corner ->
-    ``arm_skill.ArmSkill`` that steers that corner's punches.
+    ``arm_skill.ArmSkill`` that steers that corner's punches. When
+    ``record``, a frame is kept every ``frame_every`` control steps.
 
     Networks run on the CPU even when a GPU is visible. GPU float32 matmuls
     use TF32 by default (motor actions differ by up to 5e-4), and a bout is
@@ -219,12 +221,13 @@ def bout(pair, motor, seed, seconds=20.0, record=False, brains=None, knockdowns=
     trips, pair.self_trip_falls = pair.self_trip_falls, knockdowns == 1
     try:
         with jax.default_device(jax.devices('cpu')[0]):
-            return _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills or {})
+            return _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills or {},
+                         frame_every)
     finally:
         pair.self_trip_falls = trips
 
 
-def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills):
+def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills, frame_every=2):
     rng = np.random.default_rng(seed)
     pair.reset(seed=seed)
     brains = [(brains or {}).get(i) or RingBrain(np.random.default_rng([seed, i]))
@@ -272,7 +275,7 @@ def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills):
             events.append(dict(time=round(elapsed, 3),
                                scored=outcome['scored'].tolist()))
         scored += outcome['scored']
-        if record and t % 2 == 0:
+        if record and t % frame_every == 0:
             frames.append(pair.data.qpos.copy())
             times.append((elapsed, scored.copy(), downs.copy()))
         if outcome['done']:
@@ -309,19 +312,54 @@ def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills):
     return result, frames, times
 
 
-def render(pair, frames, times, path, caption):
+def resample(model, frames, times, fps):
+    """Frames at ``fps`` from recorded ones, interpolated between neighbouring states.
+
+    Joint angles and positions are blended linearly and free/ball joint
+    quaternions normalized after the blend (recorded states are 20 ms apart).
+    Never blends across a referee restart: frames there hold the last state.
+    """
+    import mujoco
+    free, ball = int(mujoco.mjtJoint.mjJNT_FREE), int(mujoco.mjtJoint.mjJNT_BALL)
+    quats = [int(model.jnt_qposadr[j]) + (3 if model.jnt_type[j] == free else 0)
+             for j in range(model.njnt) if model.jnt_type[j] in (free, ball)]
+    stamps = np.array([t[0] for t in times])
+    out_frames, out_times = [], []
+    j = 0
+    for now in np.arange(stamps[0], stamps[-1] + 1e-9, 1. / fps):
+        while j + 1 < len(stamps) and stamps[j + 1] <= now + 1e-9:
+            j += 1
+        qpos = frames[j]
+        if j + 1 < len(stamps) and (times[j + 1][2] == times[j][2]).all():
+            w = (now - stamps[j]) / (stamps[j + 1] - stamps[j])
+            following = frames[j + 1].copy()
+            for a in quats:
+                if following[a:a + 4] @ qpos[a:a + 4] < 0:
+                    following[a:a + 4] *= -1
+            qpos = (1 - w) * qpos + w * following
+            for a in quats:
+                qpos[a:a + 4] /= np.linalg.norm(qpos[a:a + 4])
+        out_frames.append(qpos)
+        out_times.append((now, *times[j][1:]))
+    return out_frames, out_times
+
+
+def render(pair, frames, times, path, caption, fps=25):
+    """Writes the bout at ``fps``; frames are resampled when recorded at another rate."""
     import imageio.v2 as imageio
     import mujoco
     from PIL import Image, ImageDraw
     from boxer.paired_foundation import build_pair
     model = build_pair(pair.foundation, visual_fists=True, ring=pair.ring)
     data = mujoco.MjData(model)
+    if len(frames) > 1 and abs((times[1][0] - times[0][0]) * fps - 1) > 1e-6:
+        frames, times = resample(model, frames, times, fps)
     camera = mujoco.MjvCamera()
     camera.distance, camera.azimuth, camera.elevation = 3.6, 100, -15
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     with mujoco.Renderer(model, height=540, width=960) as renderer, \
-            imageio.get_writer(path, fps=25) as writer:
+            imageio.get_writer(path, fps=fps) as writer:
         last_down, downs_before = -np.inf, np.zeros(2)
         for qpos, (elapsed, score, downs) in zip(frames, times):
             if (downs != downs_before).any():
@@ -353,6 +391,7 @@ def main(argv=None):
     parser.add_argument('--seconds', type=float, default=20.0)
     parser.add_argument('--output', type=Path, default=Path('runs/spar/match.json'))
     parser.add_argument('--video', type=Path, help='render the first seed')
+    parser.add_argument('--fps', type=int, default=60, help='video frame rate')
     parser.add_argument('--red-tactics', type=Path,
                         help='learned tactics (or striker, boxer.striker) checkpoint for red')
     parser.add_argument('--blue-tactics', type=Path, help='learned tactics checkpoint for blue')
@@ -391,14 +430,15 @@ def main(argv=None):
         arm_skills = {1 - i if swapped else i: skill for i, skill in skills.items()}
         if args.blue_checkpoint:
             motor = corner_motors(*(motors[::-1] if swapped else motors))
+        # Every control step (50 Hz) when the video rate is not 25 fps, for resampling.
         result, frames, times = bout(pair, motor, seed, args.seconds, record, brains, args.knockdowns,
-                                     arm_skills)
+                                     arm_skills, 2 if args.fps == 25 else 1)
         result.update(red=names[1] if swapped else names[0], blue=names[0] if swapped else names[1])
         bouts.append(result)
         print(json.dumps({k: v for k, v in result.items() if k != 'impact_events'}), flush=True)
         if record:
             render(pair, frames, times, args.video,
-                   f"Red {result['red']} vs Blue {result['blue']} | seed {seed}")
+                   f"Red {result['red']} vs Blue {result['blue']} | seed {seed}", args.fps)
     survived = sum(not any(b['fallen']) for b in bouts)
     # Win rate of the tactics named for red at launch, across both corner assignments.
     first = names[0]

@@ -117,6 +117,9 @@ def main(argv=None):
     parser.add_argument("--rapid-punches", action="store_true",
                         help="spar: near back-to-back punches with arm-skill-sized corrections "
                              "(curriculum_env.RAPID_PUNCH_*)")
+    parser.add_argument("--striker-arms", type=Path,
+                        help="spar: npz of striker arm actions (striker_train arms) replayed in a share "
+                             "of episodes (curriculum_env.STRIKER_ARM_FRACTION)")
     parser.add_argument("--publish-run", type=Path)
     parser.add_argument("--preview-snapshots", action="store_true")
     parser.add_argument("--adaptive-gates", action="store_true")
@@ -149,6 +152,8 @@ def main(argv=None):
         config.phantom_shins = True
     if args.rapid_punches:
         config.rapid_punches = True
+    if args.striker_arms:
+        config.striker_arms = str(args.striker_arms)
     config.naconmax = max(8192, args.worlds * 16)
     env = UnassistedG1(args.stage, config=config)
     env_contract = contract(env)

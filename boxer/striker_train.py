@@ -11,6 +11,10 @@ records the native reward, for a first value function.
 ``clone`` fits a striker to those records (the policy mean by least
 squares, the value by discounted returns) and saves a checkpoint that
 ``spar_match`` and ``native_finetune --striker`` load.
+
+``arms`` records the other way round: a trained striker boxes the same
+native bouts and every control step the 14 arm actions it sent are saved,
+for the leg motor to train under (``curriculum_train --striker-arms``).
 """
 from __future__ import annotations
 
@@ -83,6 +87,98 @@ def _collect(seed, steps, motor_path, tactics_path, arm_path, pool, scripted_fra
             own = shadow()
     np.savez_compressed(output, **{k: np.asarray(v) for k, v in record.items()})
     conn.send("done")
+
+
+def arms_worker(conn, seed, steps, motor_path, striker_path, arm_path, pool, scripted_fraction,
+                high_guard_fraction, model_path, constants, output):
+    try:
+        _record_arms(seed, steps, motor_path, striker_path, arm_path, pool, scripted_fraction,
+                     high_guard_fraction, model_path, constants, output, conn)
+    except BaseException:
+        import traceback
+        conn.send(("error", traceback.format_exc()))
+        raise
+
+
+def _record_arms(seed, steps, motor_path, striker_path, arm_path, pool, scripted_fraction,
+                 high_guard_fraction, model_path, constants, output, conn):
+    _configure_worker_env()
+    import jax
+    import mujoco
+    from boxer.arm_skill import ArmSkill
+    from boxer.curriculum_train import inference, load_policy_params
+    from boxer.paired_foundation import PairedFoundation
+    from boxer.spar_match import PolicyBrain
+    from boxer.striker import StrikerBrain
+
+    foundation = FoundationStub(constants)
+    motor = jax.jit(inference(foundation, load_policy_params(motor_path)[0]))
+    pair = PairedFoundation(foundation, model=mujoco.MjModel.from_binary_path(str(model_path)))
+    rng = np.random.default_rng(seed)
+    opponents = []
+    for k, path in enumerate(pool):
+        brain = PolicyBrain(load_policy_params(path)[0], deterministic=bool(k % 2 == 0))
+        brain.key = jax.random.PRNGKey(seed * 101 + k)
+        opponents.append(brain)
+    striker = StrikerBrain(load_policy_params(striker_path)[0])
+    striker.key = jax.random.PRNGKey(seed)
+    bout = NativeBout(pair, motor, rng, opponents, scripted_fraction, 1000, 0., high_guard_fraction,
+                      ArmSkill(load_policy_params(arm_path)[0]), striker=True)
+    conn.send("ready")
+    arms, starts = [], [0]
+    for t in range(steps):
+        action, striker.key = striker.act(bout.observe(), striker.key)
+        _, terminal, truncated, _ = bout.step(np.asarray(action))
+        arms.append(bout.executed_arms[bout.learner].astype(np.float32))
+        if terminal or truncated:
+            bout.reset()
+            starts.append(t + 1)
+    np.savez_compressed(output, arms=np.asarray(arms), starts=np.asarray(starts[:-1] if starts[-1] == steps
+                                                                         else starts))
+    conn.send("done")
+
+
+def _export(root):
+    """The native pair model and its constants, written by a fresh process."""
+    model_path = root / "pair.mjb"
+    context = mp.get_context("spawn")
+    exporter = context.Process(target=export_native_model, args=(model_path, True))
+    exporter.start()
+    exporter.join()
+    if exporter.exitcode:
+        raise RuntimeError("could not export the native pair model")
+    return model_path, json.loads(model_path.with_suffix(".json").read_text())
+
+
+def record_arms(args):
+    _configure_worker_env()
+    root = args.output.parent / (args.output.stem + "-workers")
+    root.mkdir(parents=True, exist_ok=True)
+    model_path, constants = _export(root)
+    context = mp.get_context("spawn")
+    pipes, processes = [], []
+    for w in range(args.workers):
+        parent, child = context.Pipe()
+        process = context.Process(target=arms_worker, args=(
+            child, args.seed * 1000 + w, args.steps // args.workers, str(args.motor), str(args.striker),
+            str(args.arm), [str(p) for p in args.pool], args.scripted_fraction, args.high_guard_fraction,
+            model_path, constants, root / f"worker-{w}.npz"), daemon=True)
+        process.start()
+        pipes.append(parent)
+        processes.append(process)
+        assert _receive(parent) == "ready"
+    print(f"{args.workers} recorders running", flush=True)
+    for pipe in pipes:
+        assert _receive(pipe) == "done"
+    for process in processes:
+        process.join()
+    parts = [np.load(root / f"worker-{w}.npz") for w in range(args.workers)]
+    offsets = np.cumsum([0] + [len(p["arms"]) for p in parts[:-1]])
+    np.savez_compressed(args.output, arms=np.concatenate([p["arms"] for p in parts]),
+                        starts=np.concatenate([p["starts"] + o for p, o in zip(parts, offsets)]),
+                        striker=str(args.striker), motor=str(args.motor))
+    print(json.dumps(dict(event="recorded", steps=int(sum(len(p["arms"]) for p in parts)),
+                          output=str(args.output))), flush=True)
 
 
 def collect(args):
@@ -217,8 +313,21 @@ def main(argv=None):
     k.add_argument("--scale", type=float, default=.15, help="policy scale the clone starts PPO with")
     k.add_argument("--gamma", type=float, default=.97)
     k.add_argument("--seed", type=int, default=0)
+    a = sub.add_parser("arms")
+    a.add_argument("--striker", type=Path, default=Path("checkpoints/striker"))
+    a.add_argument("--output", type=Path, default=Path("runs/striker-arms.npz"))
+    a.add_argument("--motor", type=Path, default=Path("checkpoints/spar"))
+    a.add_argument("--arm", type=Path, default=Path("checkpoints/arm-skill"),
+                   help="the opponents' arm skill")
+    a.add_argument("--pool", type=Path, nargs="*",
+                   default=[Path("checkpoints/tactics"), Path("checkpoints/tactics-highguard-v1")])
+    a.add_argument("--scripted-fraction", type=float, default=.5)
+    a.add_argument("--high-guard-fraction", type=float, default=.6)
+    a.add_argument("--workers", type=int, default=8)
+    a.add_argument("--steps", type=int, default=200_000)
+    a.add_argument("--seed", type=int, default=0)
     args = parser.parse_args(argv)
-    (collect if args.command == "collect" else clone)(args)
+    dict(collect=collect, clone=clone, arms=record_arms)[args.command](args)
 
 
 if __name__ == "__main__":

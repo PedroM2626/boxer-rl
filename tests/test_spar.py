@@ -160,3 +160,51 @@ def test_rapid_punches_throw_back_to_back_with_bounded_corrections():
     assert rapid > normal + .25 and rapid > .7
     assert normal_residual.max() == 0
     assert 0 < rapid_residual.max() <= RAPID_PUNCH_RESIDUAL
+
+
+def test_striker_arm_traces_replay_in_a_share_of_episodes(tmp_path):
+    traces = np.random.default_rng(0).uniform(-1, 1, (1200, 14)).astype(np.float32)
+    traces[:, [4, 5, 6, 11, 12, 13]] = 0
+    np.savez(tmp_path / "arms.npz", arms=traces)
+    config = stage_config("spar")
+    config.striker_arms = str(tmp_path / "arms.npz")
+    env = UnassistedG1("spar", config=config)
+    generate = jax.jit(lambda info: (env.punch_arms(info), info))
+    replayed = 0
+    for seed in range(8):
+        info = dict(jax.jit(env.reset)(jax.random.PRNGKey(seed)).info)
+        start = int(info["trace_t"])
+        assert 0 <= start < len(traces) - config.episode_length
+        arms, after = generate(info)
+        arms = np.asarray(arms)
+        if bool(info["trace_on"]):
+            replayed += 1
+            np.testing.assert_allclose(arms, traces[start])
+            assert int(after["trace_t"]) == start + 1
+    assert 0 < replayed < 8
+    config.striker_arms = str(tmp_path / "missing.npz")
+    with pytest.raises(FileNotFoundError):
+        UnassistedG1("spar", config=config)
+
+
+def test_videos_resample_recorded_states_without_blending_restarts():
+    import mujoco
+    from boxer.spar_match import resample
+    model = mujoco.MjModel.from_xml_string(
+        "<mujoco><worldbody><body><freejoint/><geom size='.1'/></body>"
+        "<body><joint type='hinge'/><geom size='.1'/></body></worldbody></mujoco>")
+    frames, times = [], []
+    for k in range(6):                                   # 50 Hz, restart after the 4th state
+        angle = .1 * k
+        qpos = np.array([k, 0, 0, np.cos(angle), 0, 0, np.sin(angle), k * .5])
+        frames.append(qpos)
+        times.append(((k + 1) * .02, np.zeros(2), np.array([0., float(k >= 4)])))
+    out, out_times = resample(model, frames, times, 60)
+    assert len(out) == 7                                 # 0.02 .. 0.12 s at 1/60 s
+    np.testing.assert_allclose([t[0] for t in out_times], .02 + np.arange(7) / 60)
+    np.testing.assert_allclose(out[0], frames[0])
+    np.testing.assert_allclose(out[1][0], 50 / 60, atol=1e-9)   # 0.0367 s, between states 0 and 1
+    for qpos in out:
+        assert np.linalg.norm(qpos[3:7]) == pytest.approx(1)
+    held = [q for q, t in zip(out, out_times) if .08 <= t[0] < .1]   # between states 3 and 4: a restart
+    assert held and all(np.array_equal(q, frames[3]) for q in held)

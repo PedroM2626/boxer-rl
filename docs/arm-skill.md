@@ -131,7 +131,8 @@ opponent shins did not reduce them
 ## Retrained on the rapid-punching motor (2026-11-02)
 
 The arm skill was trained on the previous leg motor (`checkpoints/spar-v1`).
-On the rapid-punching motor (`checkpoints/spar` since 2026-11-02) it still
+On the rapid-punching motor (`checkpoints/spar` from 2026-11-02, now
+`checkpoints/spar-v2`) it still
 works: in the arm gate (champion tactics with the arm skill against the same
 tactics with scripted punches, 16 bouts) it goes 10–4–2, landing 48.4 % /
 44.0 %. Fine-tuned from it on the new motor (`arm_finetune --init-from

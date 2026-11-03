@@ -218,7 +218,8 @@ a bout:
 | **head-to-head, 32 bouts** | **22–9–1** | **13 / 2** |
 | against ring-v1 on the previous motor | 16–0 (previous stack: 14–2) | 4 / 4 (each stack's own) |
 
-Promoted: the motor is `checkpoints/spar` (previous: `checkpoints/spar-v1`),
+Promoted: the motor is `checkpoints/spar` (previous: `checkpoints/spar-v1`;
+since 2026-11-03 this motor is `checkpoints/spar-v2`),
 the tactics `checkpoints/tactics` (previous: `checkpoints/tactics-arm-v1`;
 their `native-gate.json` calls it `checkpoints/tactics`, its name then).
 Against a common opponent the new stack falls as often as the old one; it
@@ -226,3 +227,48 @@ falls far less in the head-to-head. Tactics trained on the previous motor
 should be played on it (`--checkpoint checkpoints/spar-v1`); with both
 corners on the new motor, ring-v1 fell 8 times in 16 bouts instead of 2.
 The arm skill was trained on the previous motor and is used unchanged.
+
+## Legs for the striker's arms (2026-11-03)
+
+The [striker](striker.md) sets both arms' joint targets itself and fell 14
+times in 16 bouts of 120 s against the champion's 1. Its arms move in ways
+the generator never produced: both arms at once, held out near the opponent,
+short repeated motions instead of punches that return to the guard.
+
+`striker_train arms` records the 14 arm actions the striker sent in native
+ring bouts (200,000 control steps, 8 workers, against the champion pool and
+scripted opponents, the same mix it trained in). `curriculum_train
+--striker-arms <npz>` replays them in half the spar episodes
+(`curriculum_env.STRIKER_ARM_FRACTION`), each from a random point in the
+recording, in place of the generated moves; the other half keeps the
+generator. The motor was fine-tuned from `checkpoints/spar` with
+`--rapid-punches --striker-arms` (seed 44) and passed the spar gate at 0 and
+10.8M steps. The recording is kept as `checkpoints/spar/striker-arms.npz`.
+
+10 s survival, 256 worlds; "striker arms" replays the recording in every
+episode:
+
+| Motor | Normal punching | Rapid punching | Striker arms | Standard spar gate |
+| --- | --- | --- | --- | --- |
+| rapid (`checkpoints/spar-v2`) | 99.6 % | 98.0 % | 85.2 % | pass |
+| **striker arms 10.8M (`checkpoints/spar`)** | **100 %** | **100 %** | **95.3 %** | pass (at 0 and 10.8M) |
+
+Native ring bouts of 120 s, three knockdowns stop a bout, corners swapped:
+
+| Bouts | Record | Clean punches per bout | Knockdowns |
+| --- | --- | --- | --- |
+| striker vs champion, both on the previous legs (before, 16 bouts) | 16–0 | 269 : 72 | 14 : 1 |
+| striker on the new legs vs champion on the previous legs (32) | 32–0 | 317 : 123 | 2 : 2 |
+| **striker vs champion, both on the new legs (32)** | **32–0** | **309 : 141** | **1 : 0** |
+| champion on the new legs vs champion on the previous legs (32) | 23–9 | | 6 : 29 |
+
+The striker was not retrained: the new legs alone take its knockdowns from
+14 in 16 long bouts to 1 in 32. The champion stack falls less on them too.
+A striker fine-tuned on the new legs (3M native steps, the striker's
+settings; the gate picks 2.25M, 48–0 against the striker on the same legs)
+lands more, 429 clean punches per bout to 110 against the champion, but
+suffers 8 knockdowns in 32 bouts to 0. Not promoted.
+
+Promoted: the motor is `checkpoints/spar` (previous: `checkpoints/spar-v2`).
+The champion tactics, the arm skill and the striker are unchanged and play
+on it.

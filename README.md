@@ -59,7 +59,8 @@ new stack wins **22–9–1 and suffers 2 knockdowns to 13**
 ([details](docs/spar-motor.md#legs-for-rapid-punching-2026-11-02);
 [2-minute video](fights/rapid_champion_120s.mp4): the new champion in blue
 wins 126–106 on points, red is knocked down once). Earlier
-tactics play on their own motor: `--checkpoint checkpoints/spar-v1`.
+tactics play on their own motor: `--checkpoint checkpoints/spar-v1` (the
+rapid-punching motor is `checkpoints/spar-v2` since 2026-11-03).
 
 **One policy for footwork and both arms (2026-11-03).** The
 [striker](docs/striker.md) (`checkpoints/striker`) replaces tactics, scripted
@@ -71,6 +72,16 @@ close range with short punches, mostly hook-like and a fifth on paths no
 scripted move takes, but it falls far more (14 knockdowns in 16 long bouts
 to 1), so the champion stack stays
 ([30 s video](fights/striker_vs_champion_30s.mp4)).
+
+**Legs for the striker's arms (2026-11-03).** The leg motor
+(`checkpoints/spar`, previous `checkpoints/spar-v2`) now also trains
+replaying arm actions recorded from the striker's own bouts
+(`striker_train arms`, `curriculum_train --striker-arms`). On it the
+unchanged striker beats the champion **32–0** over 32 bouts of 120 s, 309
+clean punches to 141, with **1 knockdown to 0** instead of 14 to 1; the
+champion stack falls less on it too
+([details](docs/spar-motor.md#legs-for-the-strikers-arms-2026-11-03);
+[60 s video at 60 fps](fights/striker_vs_champion_new_legs_60s.mp4); `spar_match` videos are 60 fps by default now, `--fps`).
 
 **Long rounds and knockdowns.** Bouts of 120–180 s hold up after a footwork fix
 that keeps the boxers facing each other. `--knockdowns 3` adds a referee:

@@ -446,7 +446,9 @@ moves to `checkpoints/tactics-highguard-v1`.
   ring-v1. Play it with `--red-arm checkpoints/arm-skill`
   ([arm skill](arm-skill.md#tactics-trained-with-the-arm-skill)).
 * `checkpoints/tactics`: the same fine-tune on the rapid-punching leg motor
-  (`checkpoints/spar` since 2026-11-02); 30–13–5 against arm-v1 on that
+  (`checkpoints/spar` from 2026-11-02, `checkpoints/spar-v2` since 2026-11-03;
+  it also plays on the current motor, see
+  [legs for the striker's arms](spar-motor.md#legs-for-the-strikers-arms-2026-11-03)); 30–13–5 against arm-v1 on that
   motor, and as a whole stack 22–9–1 against arm-v1 on its own motor
   ([legs for rapid punching](spar-motor.md#legs-for-rapid-punching-2026-11-02)).
   Every earlier tactics checkpoint was trained on `checkpoints/spar-v1`:
