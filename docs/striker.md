@@ -101,8 +101,38 @@ low and high. These are trajectories the policy produced itself.
   striker's recorded arm actions.
 * **Punching costs almost nothing.** The only cost is 0.02 per launch, and a
   striker launch is an arm leaving the guard; it keeps its arms out and
-  launches about 3 times per 120 s bout. Missing is free, which favours
-  constant short punches at close range.
+  launches about 3 times per 120 s bout. Missing is free. An arm-motion cost
+  did not help (below).
+
+## Arm-motion cost (2026-11-03)
+
+`spar_match` now reports `arm_motion_rad`, the radians each corner's
+shoulder and elbow targets move over a bout (both arms, 8 joints), whatever
+drives the arms. `native_finetune --arm-motion-cost c` takes `c` reward per
+radian from a striker learner.
+
+The striker's arm targets move about 1 rad per control step, so its arms
+look busy all the time. Yet per clean punch it spends what the champion
+does: in 32 bouts of 120 s on the current legs it moves 55 rad/s and lands
+309 clean punches per bout; the champion's scripted arms move 26 rad/s and
+land 141; that is 21.4 and 21.7 rad per clean punch.
+
+Fine-tuned from `checkpoints/striker` with `--arm-motion-cost .05` (about
+half its hit reward at its own motion; otherwise the striker's settings,
+3M native steps on `checkpoints/spar`), training motion fell from 1.39 to
+about 1.1 rad per step (exploration included). The gate picks 1.5M (48–0
+against the striker). Against the champion, 32 bouts of 120 s:
+
+| Striker | Record | Clean punches per bout | Arm motion | Rad per clean punch | Knockdowns (striker : champion) |
+| --- | --- | --- | --- | --- | --- |
+| `checkpoints/striker` | 32–0 | 309 : 141 | 55 rad/s | 21.4 | 1 : 0 |
+| arm-motion cost 0.05, 1.5M | 29–3 | 300 : 65 | 49 rad/s | 19.2 | **29 : 0** |
+
+It moves 11 % less and keeps the champion to half the clean punches, but
+it falls 29 times: its arms no longer move like the recording the leg
+motor trained under ([legs for the striker's arms](spar-motor.md#legs-for-the-strikers-arms-2026-11-03)).
+Not promoted. A striker whose arm style changes needs its legs retrained on
+its own recording.
 
 The striker is kept as `checkpoints/striker`. The champion stack
 (`checkpoints/tactics` + `checkpoints/arm-skill`) stays the reference built

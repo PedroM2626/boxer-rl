@@ -57,6 +57,7 @@ def test_a_striker_corner_boxes_a_short_native_bout(pair):
     motor = lambda inputs, key: (np.zeros((2, 29)), None)
     result, _, _ = bout(pair, motor, 0, .4, brains={0: brain})
     assert result['seconds'] > 0 and len(result['punches_thrown']) == 2
+    assert len(result['arm_motion_rad']) == 2 and min(result['arm_motion_rad']) >= 0
     assert STRIKER_ACTION_SIZE == 2 + 8
 
 
@@ -77,3 +78,22 @@ def test_punch_shapes_split_scripted_paths_from_new_ones():
     path = np.array([[0, 0, 0], [.2, 0, .05], [.4, 0, .1], [.2, 0, .05], [0, 0, 0]], float)
     found = shapes.punches(path, np.zeros((2, 3)), points)
     assert len(found) == 1 and found[0]["kind"] == "straight" and found[0]["reach"] == pytest.approx(.4)
+
+
+def test_native_striker_pays_for_moving_its_arm_targets(pair):
+    from boxer.native_finetune import NativeBout
+    motor = lambda inputs, key: (np.zeros((2, 29)), None)
+    rewards, motions = [], []
+    for cost in (0., 1.):
+        bout = NativeBout(pair, motor, np.random.default_rng(0), [], 1., 50, 30., striker=True,
+                          arm_motion_cost=cost)
+        start = bout.arms[bout.learner].arm_pose.copy()
+        action = np.concatenate([[0., 0.], to_unit(start).ravel() + .2])
+        reward, _, _, info = bout.step(action)
+        moved = np.abs(bout.arms[bout.learner].arm_pose - start).sum()
+        assert info["motion"] == pytest.approx(moved) and moved > 0
+        held = bout.step(np.concatenate([[0., 0.], to_unit(bout.arms[bout.learner].arm_pose).ravel()]))
+        assert held[3]["motion"] == pytest.approx(0, abs=1e-9)
+        rewards.append(reward)
+        motions.append(moved)
+    assert rewards[0] - rewards[1] == pytest.approx(motions[1])

@@ -239,6 +239,9 @@ def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills, fr
     downs, restarts = np.zeros(2, int), []
     turned_away = np.zeros(2, int)      # steps facing more than 45 deg off the opponent
     roped = np.zeros(2, int)            # steps touching the ropes
+    # Radians the shoulder and elbow targets of both arms move, summed over steps.
+    arm_joints = np.r_[LEFT_ARM:LEFT_ARM + 4, LEFT_ARM + 7:LEFT_ARM + 11]
+    motion, last_arms = np.zeros(2), None
     steps = int(round(seconds / pair.dt))
     for t in range(steps):
         roots = [pair.data.qpos[m['root']:m['root'] + 2] for m in pair.maps]
@@ -268,6 +271,9 @@ def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills, fr
                 arm_skills[i].steer(pair, i, arms[i])
             action[i, LEFT_ARM:] = arms[i].actions(high[i])
             guarded[i] += high[i]
+        if last_arms is not None:
+            motion += np.abs(action[:, arm_joints] - last_arms).sum(1) * pair.action_scale
+        last_arms = action[:, arm_joints].copy()
         outcome = pair.step(action)
         roped += pair.on_ropes()
         elapsed = (t + 1) * pair.dt
@@ -288,6 +294,7 @@ def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills, fr
             pair.reset(seed=int(rng.integers(1 << 30)))
             arms = [_new_arm(pair, brain) for brain in brains]
             fallen = np.zeros(2, bool)
+            last_arms = None
     stopped = downs >= knockdowns
     cards = scored + KNOCKDOWN_POINTS * downs[::-1]
     if knockdowns > 1:
@@ -307,6 +314,7 @@ def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills, fr
                   high_guard_seconds=(guarded * pair.dt).round(2).tolist(),
                   turned_away_seconds=(turned_away * pair.dt).round(2).tolist(),
                   rope_seconds=(roped * pair.dt).round(2).tolist(), fallen=fallen.tolist(),
+                  arm_motion_rad=motion.round(1).tolist(),
                   winner=None if winner is None else ('red', 'blue')[winner],
                   method=method, impact_events=events)
     return result, frames, times
