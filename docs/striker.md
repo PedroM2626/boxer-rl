@@ -131,8 +131,33 @@ against the striker). Against the champion, 32 bouts of 120 s:
 It moves 11 % less and keeps the champion to half the clean punches, but
 it falls 29 times: its arms no longer move like the recording the leg
 motor trained under ([legs for the striker's arms](spar-motor.md#legs-for-the-strikers-arms-2026-11-03)).
-Not promoted. A striker whose arm style changes needs its legs retrained on
-its own recording.
+Not promoted.
+
+**Legs retrained on its recording.** `striker_train arms` recorded the
+low-motion striker too (200,000 steps, 0.89 rad of arm-target motion per
+step against the striker's 0.97). The motor was fine-tuned from
+`checkpoints/spar` with both recordings (`--rapid-punches --striker-arms`,
+400,000 steps, seed 45) and passed the spar gate at 0 and 10.8M. 10 s solo
+survival, 256 worlds, replaying each recording in every episode:
+
+| Motor | Normal | Rapid | Striker arms | Low-motion striker arms |
+| --- | --- | --- | --- | --- |
+| `checkpoints/spar` | 100 % | 98.4 % | 96.1 % | 91.8 % |
+| both recordings, 10.8M | 99.6 % | 97.3 % | 94.1 % | 97.7 % |
+
+Against the champion, everyone on the retrained legs, 32 bouts of 120 s:
+
+| Striker | Record | Clean punches per bout | Arm motion | Knockdowns (striker : champion) |
+| --- | --- | --- | --- | --- |
+| `checkpoints/striker` | 32–0 | 346 : 126 | 55 rad/s | 2 : 0 |
+| arm-motion cost 0.05, 1.5M | 30–2 | 303 : 51 | 49 rad/s | 18 : 0 |
+
+The legs take the low-motion striker's knockdowns from 29 to 18, still far
+more than the striker's 2. Solo survival under its arms is already higher
+than under the striker's, so its falls come from what solo training does
+not reproduce, most likely the body contact of its fighting at closer
+range. Neither motor nor striker is promoted; `checkpoints/spar` and
+`checkpoints/striker` are unchanged.
 
 The striker is kept as `checkpoints/striker`. The champion stack
 (`checkpoints/tactics` + `checkpoints/arm-skill`) stays the reference built
