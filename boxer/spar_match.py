@@ -11,6 +11,9 @@ Each corner is a three-layer controller:
   punch. Either the scripted ``RingBrain`` or a learned self-play policy from
   ``boxer.tactics_train`` (``PolicyBrain``), chosen per corner.
 
+A corner can instead be a striker (``boxer.striker``): one policy for
+footwork and both arms' joint targets, in place of tactics and scripted arms.
+
 No pelvis springs, welds or root forces. By default the first knockdown
 ends the bout; otherwise it goes the distance and is decided on clean
 punches. With ``knockdowns=N`` (``--knockdowns N``, N > 1) a knockdown is
@@ -174,6 +177,20 @@ class PolicyBrain:
         return command, punch, bool(high)
 
 
+def load_brain(path, deterministic=True):
+    """A learned corner: tactics (``PolicyBrain``) or a striker (``boxer.striker``)."""
+    from boxer.striker import StrikerBrain, is_striker
+    params = load_policy_params(path)[0]
+    return (StrikerBrain if is_striker(params) else PolicyBrain)(params, deterministic=deterministic)
+
+
+def _new_arm(pair, brain):
+    """The brain's own arm (a striker drives its arms itself) or the scripted one."""
+    if hasattr(brain, 'new_arm'):
+        return brain.new_arm(pair)
+    return PunchArm(pair.pose, pair.action_scale, pair.dt)
+
+
 def _body(pair, i):
     m = pair.maps[i]
     rot = pair.data.site(m['side'] + 'imu_in_pelvis').xmat.reshape(3, 3)[:2, :2].copy()
@@ -210,9 +227,9 @@ def bout(pair, motor, seed, seconds=20.0, record=False, brains=None, knockdowns=
 def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills):
     rng = np.random.default_rng(seed)
     pair.reset(seed=seed)
-    arms = [PunchArm(pair.pose, pair.action_scale, pair.dt) for _ in range(2)]
     brains = [(brains or {}).get(i) or RingBrain(np.random.default_rng([seed, i]))
               for i in range(2)]
+    arms = [_new_arm(pair, brain) for brain in brains]
     scored, thrown, frames, times, events = np.zeros(2), np.zeros(2, int), [], [], []
     hooks, guarded, high = np.zeros(2, int), np.zeros(2, int), [False, False]
     fallen = np.zeros(2, bool)
@@ -228,7 +245,7 @@ def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills):
             rotation = pair.data.site(m['side'] + 'imu_in_pelvis').xmat.reshape(3, 3)
             local = rotation[:2, :2].T @ delta
             turned_away[i] += abs(np.arctan2(local[1], local[0])) > np.pi / 4
-            if isinstance(brains[i], PolicyBrain):
+            if hasattr(brains[i], 'decide_pair'):
                 command, punch, high[i] = brains[i].decide_pair(pair, i, arms, t / steps)
             else:
                 command, punch = brains[i].decide(float(np.linalg.norm(delta)), local, arms[i])
@@ -238,6 +255,8 @@ def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills):
                 arms[i].launch(*punch[:2], rng, *punch[2:])
                 thrown[i] += 1
                 hooks[i] += len(punch) > 2 and punch[2] == moves.HOOK
+            elif getattr(arms[i], 'launched', False):
+                thrown[i] += 1          # a striker's arm left the guard
         commands = np.clip(commands, [-.35, -.25, -.5], [.55, .25, .5])
         obs = pair.observation(commands)
         action = motor_actions(motor, obs)
@@ -264,7 +283,7 @@ def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills):
             # The referee's restart: both boxers stand again at fresh spots.
             restarts.append(dict(time=round(elapsed, 3), fallen=fallen.tolist()))
             pair.reset(seed=int(rng.integers(1 << 30)))
-            arms = [PunchArm(pair.pose, pair.action_scale, pair.dt) for _ in range(2)]
+            arms = [_new_arm(pair, brain) for brain in brains]
             fallen = np.zeros(2, bool)
     stopped = downs >= knockdowns
     cards = scored + KNOCKDOWN_POINTS * downs[::-1]
@@ -334,7 +353,8 @@ def main(argv=None):
     parser.add_argument('--seconds', type=float, default=20.0)
     parser.add_argument('--output', type=Path, default=Path('runs/spar/match.json'))
     parser.add_argument('--video', type=Path, help='render the first seed')
-    parser.add_argument('--red-tactics', type=Path, help='learned tactics checkpoint for red')
+    parser.add_argument('--red-tactics', type=Path,
+                        help='learned tactics (or striker, boxer.striker) checkpoint for red')
     parser.add_argument('--blue-tactics', type=Path, help='learned tactics checkpoint for blue')
     parser.add_argument('--knockdowns', type=int, default=1,
                         help='knockdowns of one boxer that stop the bout; earlier ones restart it')
@@ -345,7 +365,7 @@ def main(argv=None):
                         help='also play every seed with the tactics exchanged between corners')
     args = parser.parse_args(argv)
     params, metadata = load_policy_params(args.checkpoint)
-    tactics = {i: PolicyBrain(load_policy_params(path)[0])
+    tactics = {i: load_brain(path)
                for i, path in enumerate((args.red_tactics, args.blue_tactics)) if path}
     names = [str(path) if path else 'scripted' for path in (args.red_tactics, args.blue_tactics)]
     from boxer.arm_skill import ArmSkill

@@ -61,6 +61,17 @@ new stack wins **22–9–1 and suffers 2 knockdowns to 13**
 wins 126–106 on points, red is knocked down once). Earlier
 tactics play on their own motor: `--checkpoint checkpoints/spar-v1`.
 
+**One policy for footwork and both arms (2026-11-03).** The
+[striker](docs/striker.md) (`checkpoints/striker`) replaces tactics, scripted
+moves and arm skill with a single policy that sets both arms' joint targets
+every step: no move list, no fixed paths. Imitating the champion stack first
+and then trained with native PPO, it beats that stack **28–4** in 20 s bouts
+and **16–0** in 120 s bouts (269 clean punches to 72). It learned to fight at
+close range with short punches, mostly hook-like and a fifth on paths no
+scripted move takes, but it falls far more (14 knockdowns in 16 long bouts
+to 1), so the champion stack stays
+([30 s video](fights/striker_vs_champion_30s.mp4)).
+
 **Long rounds and knockdowns.** Bouts of 120–180 s hold up after a footwork fix
 that keeps the boxers facing each other. `--knockdowns 3` adds a referee:
 a fall is counted and both robots restart standing (they cannot get up
