@@ -125,7 +125,7 @@ against the striker). Against the champion, 32 bouts of 120 s:
 
 | Striker | Record | Clean punches per bout | Arm motion | Rad per clean punch | Knockdowns (striker : champion) |
 | --- | --- | --- | --- | --- | --- |
-| `checkpoints/striker` | 32–0 | 309 : 141 | 55 rad/s | 21.4 | 1 : 0 |
+| `checkpoints/striker` (now `striker-v1`) | 32–0 | 309 : 141 | 55 rad/s | 21.4 | 1 : 0 |
 | arm-motion cost 0.05, 1.5M | 29–3 | 300 : 65 | 49 rad/s | 19.2 | **29 : 0** |
 
 It moves 11 % less and keeps the champion to half the clean punches, but
@@ -149,23 +149,44 @@ Against the champion, everyone on the retrained legs, 32 bouts of 120 s:
 
 | Striker | Record | Clean punches per bout | Arm motion | Knockdowns (striker : champion) |
 | --- | --- | --- | --- | --- |
-| `checkpoints/striker` | 32–0 | 346 : 126 | 55 rad/s | 2 : 0 |
+| `checkpoints/striker` (now `striker-v1`) | 32–0 | 346 : 126 | 55 rad/s | 2 : 0 |
 | arm-motion cost 0.05, 1.5M | 30–2 | 303 : 51 | 49 rad/s | 18 : 0 |
 
 The legs take the low-motion striker's knockdowns from 29 to 18, still far
 more than the striker's 2. Solo survival under its arms is already higher
 than under the striker's, so its falls come from what solo training does
 not reproduce, most likely the body contact of its fighting at closer
-range. Neither motor nor striker is promoted; `checkpoints/spar` and
-`checkpoints/striker` are unchanged.
+range. Neither this motor nor the striker was promoted then.
 
-The striker is kept as `checkpoints/striker`. The champion stack
-(`checkpoints/tactics` + `checkpoints/arm-skill`) stays the reference built
-from scripted moves.
+## Legs trained in two-robot bouts (2026-11-03)
+
+The motor then trained where those falls happen: native two-robot ring
+bouts (`boxer.motor_native`, [spar motor](spar-motor.md#legs-trained-in-two-robot-bouts-2026-11-03)),
+with both strikers, the champion and the scripted brain in its opponent
+pool. On those legs (`checkpoints/spar-native`), 32 bouts of 120 s:
+
+| Bouts | Record | Clean punches per bout | Knockdowns |
+| --- | --- | --- | --- |
+| low-motion striker vs champion, both on the new legs | 32–0 | 276 : 60 | 2 : 1 |
+| striker-v1 vs champion, both on the new legs | 32–0 | 325 : 213 | 0 : 0 |
+| low-motion striker vs striker-v1, both on the new legs | 32–0 | 367 : 229 | 15 : 5 |
+| **low-motion striker on the new legs vs champion on its own** | **32–0** | **256 : 87** | **1 : 4** |
+| striker-v1 on the new legs vs champion on its own | 32–0 | 267 : 211 | 0 : 0 |
+
+The low-motion striker's knockdowns against the champion fall from 29
+(and 18 on legs retrained solo on its recording) to 2. Its brawls with
+striker-v1, two in-fighters chest to chest, still bring falls.
+
+Promoted: the low-motion striker is `checkpoints/striker` (previous:
+`checkpoints/striker-v1`), and strikers play on `checkpoints/spar-native`.
+The champion stack (`checkpoints/tactics` + `checkpoints/arm-skill`) keeps
+`checkpoints/spar` and stays the reference built from scripted moves. Each
+on its own legs:
 
 ```bash
-bash tools/run_spar.sh boxer.spar_match --ring --red-tactics checkpoints/striker \
-  --blue-tactics checkpoints/tactics --blue-arm checkpoints/arm-skill --swap --seeds 0 1 2 3
+bash tools/run_spar.sh boxer.spar_match --ring --checkpoint checkpoints/spar-native --red-tactics checkpoints/striker \
+  --blue-checkpoint checkpoints/spar --blue-tactics checkpoints/tactics --blue-arm checkpoints/arm-skill \
+  --seconds 120 --knockdowns 3 --swap --seeds 0 1 2 3
 ```
 
 `spar_match` recognizes a striker checkpoint by its sizes (74 → 10) wherever

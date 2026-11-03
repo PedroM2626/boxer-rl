@@ -1,0 +1,37 @@
+{
+  "init_from": "checkpoints/spar",
+  "output": "runs/motor-native",
+  "striker": "checkpoints/striker",
+  "low_motion_striker": "runs/striker-motion05/gate/step-1501184",
+  "tactics": "checkpoints/tactics",
+  "arm": "checkpoints/arm-skill",
+  "workers": 8,
+  "unroll": 256,
+  "episode_steps": 3000,
+  "steps": 3000000,
+  "warmup": 8,
+  "checkpoint_every": 500000,
+  "learning_rate": 2e-05,
+  "critic_learning_rate": 0.0003,
+  "epochs": 4,
+  "minibatches": 8,
+  "target_kl": 0.01,
+  "gamma": 0.99,
+  "lam": 0.95,
+  "seed": 1,
+  "reward": {
+    "linear": 1.0,
+    "yaw": 0.75,
+    "orientation": -2.0,
+    "tilt_rate": -0.15,
+    "action_rate": -0.01,
+    "fall": 10.0
+  },
+  "brains": {
+    "striker": "checkpoints/striker",
+    "champion": "checkpoints/tactics",
+    "scripted": null,
+    "low-motion striker": "runs/striker-motion05/gate/step-1501184"
+  },
+  "started_utc": "2026-11-03T19:29:14.383420+00:00"
+}

@@ -1,0 +1,38 @@
+{
+  "init_from": "checkpoints/striker",
+  "motor": "checkpoints/spar",
+  "pool": [
+    "checkpoints/tactics",
+    "checkpoints/tactics-highguard-v1"
+  ],
+  "output": "runs/striker-motion05",
+  "workers": 8,
+  "unroll": 256,
+  "steps": 3000000,
+  "checkpoint_every": 750000,
+  "scripted_fraction": 0.5,
+  "ring": true,
+  "arm": "checkpoints/arm-skill",
+  "high_guard_fraction": 0.6,
+  "fall_penalty": 30.0,
+  "leg_contact_penalty": 0.0,
+  "striker": true,
+  "arm_motion_cost": 0.05,
+  "min_std": 0.1,
+  "learning_rate": 0.0001,
+  "entropy_cost": 0.001,
+  "epochs": 4,
+  "minibatches": 4,
+  "gamma": 0.97,
+  "lam": 0.95,
+  "native_gate": 4,
+  "seed": 7,
+  "reward": {
+    "hit": 2.0,
+    "taken": 1.5,
+    "opponent_fell": 5.0,
+    "in_range": 0.3,
+    "punch": 0.02
+  },
+  "started_utc": "2026-11-03T17:21:07.400359+00:00"
+}

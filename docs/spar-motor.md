@@ -272,3 +272,47 @@ suffers 8 knockdowns in 32 bouts to 0. Not promoted.
 Promoted: the motor is `checkpoints/spar` (previous: `checkpoints/spar-v2`).
 The champion tactics, the arm skill and the striker are unchanged and play
 on it.
+
+## Legs trained in two-robot bouts (2026-11-03)
+
+Solo training stands in for an opponent with replayed arm motions and random
+shoves. A striker fine-tuned with an arm-motion cost
+([striker](striker.md#arm-motion-cost-2026-11-03)) kept falling (29
+knockdowns in 32 bouts of 120 s against the champion, 18 on legs retrained
+solo on its own recording, whose solo survival under its arms was 97.7 %):
+what remains is two bodies leaning and pushing at close range.
+
+`boxer.motor_native` fine-tunes the motor with PPO in native two-robot ring
+bouts, the physics of evaluation. Both robots run the learner motor and both
+robots' transitions train it. Each corner's commands and arms come from a
+brain drawn per bout: the striker, the low-motion striker, the champion
+tactics with the arm skill, or the scripted ring brain. Only the 15 leg and
+waist outputs carry log-probabilities (the arms are always replaced). The
+reward keeps the solo task's main terms per step (velocity tracking 1.0 and
+0.75, upright torso −2, tilt rate −0.15, action rate −0.01, times the
+control interval) and charges 10 for a fall; a fall ends the bout, terminal
+for the robot that fell. The motor's critic sees privileged simulator state
+that native bouts lack, so a new critic (two layers of 256) sees the policy
+observation, where the opponent is and which brains fight; the policy waits
+8 updates for it. Policy learning rate 2e-5, updates stop early beyond a KL
+of 0.01.
+
+From `checkpoints/spar`, 3M robot transitions (8 workers, 27 minutes): falls
+in training fell from 0.073 to about 0.012 per 1000 transitions. The
+standard spar gate passes (100 % survival, like `checkpoints/spar`).
+
+| Bouts of 120 s (32 each) | Record | Clean punches per bout | Knockdowns |
+| --- | --- | --- | --- |
+| low-motion striker vs champion, both on `checkpoints/spar` | 29–3 | 300 : 65 | 29 : 0 |
+| the same on the solo retrain with its recording | 30–2 | 303 : 51 | 18 : 0 |
+| **the same on the two-robot legs** | **32–0** | **276 : 60** | **2 : 1** |
+| striker-v1 vs champion on the two-robot legs | 32–0 | 325 : 213 | 0 : 0 |
+| champion on the two-robot legs vs champion on `checkpoints/spar` | 4–28 | | 1 : 12 |
+
+The champion falls far less on them but loses 4–28 to itself on the
+current legs: its tactics learned commands that suit those legs (as in
+[legs for rapid punching](#legs-for-rapid-punching-2026-11-02)).
+
+Kept as `checkpoints/spar-native`, the legs for strikers; the champion keeps
+`checkpoints/spar`. Play each on its own legs with `spar_match --checkpoint`
+and `--blue-checkpoint`.

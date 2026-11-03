@@ -83,6 +83,16 @@ champion stack falls less on it too
 ([details](docs/spar-motor.md#legs-for-the-strikers-arms-2026-11-03);
 [60 s video at 60 fps](fights/striker_vs_champion_new_legs_60s.mp4); `spar_match` videos are 60 fps by default now, `--fps`).
 
+**Legs trained in two-robot bouts (2026-11-03).** The motor also learns in
+native two-robot ring bouts now (`boxer.motor_native`), where pushing and
+leaning at close range happen. On those legs (`checkpoints/spar-native`) a
+striker that pays for arm motion (`checkpoints/striker`; previous
+`checkpoints/striker-v1`) beats the champion stack on its own legs **32–0**
+over 32 bouts of 120 s, 256 clean punches to 87, with **1 knockdown to 4**;
+on the previous legs it fell 29 times. The champion keeps `checkpoints/spar`
+([details](docs/striker.md#legs-trained-in-two-robot-bouts-2026-11-03);
+[60 s video](fights/striker_native_legs_vs_champion_60s.mp4)).
+
 **Long rounds and knockdowns.** Bouts of 120–180 s hold up after a footwork fix
 that keeps the boxers facing each other. `--knockdowns 3` adds a referee:
 a fall is counted and both robots restart standing (they cannot get up
