@@ -1,8 +1,13 @@
 # Sparring motor: balance that survives its own punches
 
-> Update 2026-10-31: `checkpoints/spar` is now the motor retrained for hooks
-> and the high guard ([moves](moves.md)). The straight-only motor described
-> here is `checkpoints/spar-straight`.
+> **Which motor is `checkpoints/spar`?** It has been promoted several times,
+> and each section below names the motor as it was then. Lineage:
+> `spar-straight` (2026-10-30, straights only, described first here) →
+> `spar-shorthook` (10-31, first hooks and the high guard, [moves](moves.md))
+> → `spar-v1` (10-31, level hook) → `spar-v2` (11-02, rapid punching) →
+> **`spar`** (11-03, rapid punching plus replayed striker arms; the
+> champion's legs). **`spar-native`** (11-03) is `spar` fine-tuned in native
+> two-robot bouts; the striker's legs.
 
 Date: 2026-10-30.
 

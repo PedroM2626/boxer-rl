@@ -24,7 +24,8 @@ native impact scorecard as any other (fist contact on head or torso with
 enough impulse, closing speed and fist speed relative to the own torso).
 Arm targets stay in a box around every scripted pose widened by 0.35 rad
 and move at most 0.3 rad per step (scripted swings: up to about 0.22). The
-leg motor (`checkpoints/spar`) still keeps balance: the legs remain a
+leg motor keeps balance (`checkpoints/spar-v2` when the striker was first
+trained, `checkpoints/spar-native` since 2026-11-03): the legs remain a
 separate layer.
 
 Observation (74): the tactics observation (32), and per arm the joint angles
@@ -117,7 +118,7 @@ does: in 32 bouts of 120 s on the current legs it moves 55 rad/s and lands
 309 clean punches per bout; the champion's scripted arms move 26 rad/s and
 land 141; that is 21.4 and 21.7 rad per clean punch.
 
-Fine-tuned from `checkpoints/striker` with `--arm-motion-cost .05` (about
+Fine-tuned from `checkpoints/striker` (now `striker-v1`) with `--arm-motion-cost .05` (about
 half its hit reward at its own motion; otherwise the striker's settings,
 3M native steps on `checkpoints/spar`), training motion fell from 1.39 to
 about 1.1 rad per step (exploration included). The gate picks 1.5M (48–0

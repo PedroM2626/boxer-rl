@@ -5,24 +5,32 @@ conditional and why the next experiment was authorized. Detailed protocols,
 full physical results, limitations, checkpoints and accounting remain in the
 linked reports. This index does not replace those records or the live state.
 
-Latest consolidated review: **2026-10-30**. The [sparring motor](spar-motor.md)
-removes the paired-fall bottleneck. The certified motor had only balanced with
-its arms in guard; with punching arms it survived 6 % of solo trials. After
-39.3M fine-tuning steps under generated punches and shoves it survives 100 %,
-and unassisted two-robot bouts go the full 20 s in 8/8 seeds with 18.6 clean
-punches per bout. Tactics are still scripted.
+Latest consolidated review: **2026-11-03**. Two unassisted G1 stacks box in
+native MuJoCo 120 s ring bouts under knockdown rules. The strongest is the
+striker (`checkpoints/striker`, one policy for footwork and both arms) on legs
+fine-tuned in two-robot bouts (`checkpoints/spar-native`): each on its own
+legs it beats the champion stack (`checkpoints/tactics` + scripted moves +
+`checkpoints/arm-skill` on `checkpoints/spar`) 32–0, 256 clean punches per
+bout to 87, 1 knockdown to 4. Open: falls when two strikers brawl chest to
+chest, no getting up, parts trained separately. The README has a
+[timeline of every phase](../README.md#progress-timeline).
 
-Last consolidated review: **2026-10-29**, including retained-policy comparisons,
-complete batched GPU mechanics and the conditional warm-start integration.
-Reliable general boxing is **not yet certified**. The foundation is certified;
-learned complete strikes exist, while stable reciprocal combat remains unresolved.
+Earlier reviews: **2026-10-30**, the sparring motor removed the paired-fall
+bottleneck (8/8 unassisted two-robot bouts of 20 s with scripted tactics);
+**2026-10-29**, the paired striking pilot ended without reliable reciprocal
+boxing.
 
-## Sparring motor and unassisted two-robot bouts, 2026-10-30
+## Sparring motor and unassisted two-robot bouts, 2026-10-30 onward
+
+One row per experiment in date order, rejected ones included. Checkpoint
+names in the decision column are those given at the time; several were
+renamed later (the current names are in the README's checkpoint list).
 
 | Work | Reviewed outcome | Decision and limitation |
 | --- | --- | --- |
 | [Arm-motion diagnosis](spar-motor.md#diagnosis) | Certified `approach` motor with generated punching arms, solo, no opponent: mean survival 0.06, mean 2–5 s. | The frozen leg controller, not the arm objective, caused the v12–v17 paired falls. Arm residual PPO over it is retired. |
 | [`spar` stage fine-tune](spar-motor.md#change) | 39.3M steps from `approach`, ≈ 30 min on the RTX 3060. Gates: 10.8M 0.994 (tracking fail), 21.6M pass, 32.4M fail (one tracking error 0.216), 39.3M pass with 1.000 in all 28 trials. | `checkpoints/spar` is the new motor. One pass, not two consecutive; the gate is a solo test. |
+| [Two-robot bouts](spar-motor.md#results) | Native MuJoCo, free roots, scripted tactics: 8/8 go 20 s, 18.6 clean punches/bout, both corners win. Old motor: 0/4, 3 s. | First reliable unassisted reciprocal boxing in the project. Punch choice is scripted; clinching after ≈ 8 s. |
 | [Learned tactics](tactics.md) | Batched MJX/Warp two-robot env, ≈ 25k PPO steps/s. Gen‑0 (vs scripted, 20M steps) beats scripted 16–0 natively (20.1 : 5.7 clean punches); learned mirror 37.6 clean punches / 20 s, no falls. | Champion until 2026-10-31, now `checkpoints/tactics-batched`. |
 | [Self-play league](tactics.md#results-native-mujoco-16-bouts-per-row) | Gen‑1 beats gen‑0 82–41 batched but loses 3–13 natively; pool + native-style starts: gen‑2 4–10–2, gen‑3 8–8 (10–22 on fresh seeds). Native-scorecard training (v2): 4–12, 3–12–1. | Batched→native transfer of policy-vs-policy skill is the open problem. Select by native evaluation only. |
 | [Domain randomization v3](tactics.md#domain-randomization-v3) | Per-world friction, contact softness, masses, joint friction and actuator stiffness. v3 gen‑0 vs champion 21–23–4 over 48 native bouts (best self-play result); gen‑1 12–32–4, gen‑2 9–33–6, still 15–1 vs scripted. Batched gen‑2 beats the champion 137–103 but falls in 56/256. | Randomization narrows the gap for one step; continued self-play learns batched-specific risk-taking. Champion unchanged. Next: native-gated selection, stronger fall penalty, randomized motor. |
@@ -44,14 +52,13 @@ learned complete strikes exist, while stable reciprocal combat remains unresolve
 | [Phantom stack](spar-motor.md#phantom-shins-and-real-falls-2026-11-01) | Tactics retrained on the phantom motor (gate 24–22–2, 15 falls in 48 bouts). Whole stacks head-to-head, each on its own motor (`spar_match --blue-checkpoint`): current stack 15–1, 1 vs 21 knockdowns; phantom stack 16 real knockdowns vs 6. | Phantom motor rejected. |
 | [Leg-contact penalty](spar-motor.md#phantom-shins-and-real-falls-2026-11-01) | Tactics fine-tuned with a penalty per second of leg contact (`--leg-contact-penalty 20`): leg contact halves, falls after it 5 → 1, but real knockdowns 6 → 8–9, moved to the ropes; gate pick draws 15–16–17 by punching less. | Not promoted. Leg contact triggers falls, it does not cause them. |
 | [Legs for rapid punching](spar-motor.md#legs-for-rapid-punching-2026-11-02) | Motor trained with near back-to-back punches and arm-skill-sized corrections (`--rapid-punches`): rapid-punching survival 93.8 → 97.7 %, passes the gate. Old tactics fall 19 times on it; tactics retrained on it win the gate 30–13–5. New stack vs previous, each on its own legs: 22–9–1 over 32 bouts of 120 s, 2 knockdowns to 13. | **Promoted** motor (`checkpoints/spar`) and tactics (`checkpoints/tactics`); previous ones are `spar-v1`, `tactics-arm-v1`. |
+| [Arm skill on the new motor](arm-skill.md#retrained-on-the-rapid-punching-motor-2026-11-02) | Arm skill fine-tuned on the rapid-punching motor: 0.75M beats the current arm 11–4–1 in 120 s bouts and lands 54 % vs 51 %, but suffers 8 knockdowns to 3; 1.5M 8–8, 7 to 4. | Not promoted: more falls. |
 | [Striker](striker.md) | One policy for footwork and both arms' joint targets (no scripted moves), cloned from the champion stack, then 3M native PPO steps: beats the champion stack 28–4 (20 s) and 16–0 (120 s, 269 clean punches to 72) by in-fighting; 64 % hook-like and 21 % new punch shapes; 14 knockdowns in 16 long bouts to 1. | Kept as `checkpoints/striker`; champion stack unchanged (falls). |
 | [Legs for the striker's arms](spar-motor.md#legs-for-the-strikers-arms-2026-11-03) | Motor trained replaying the striker's recorded arm actions in half the episodes (`--striker-arms`, plus `--rapid-punches`): survival under striker arms 85.2 → 95.3 %, passes the gate. Unchanged striker vs champion, both on it: 32–0 over 32 bouts of 120 s, 309 clean punches to 141, 1 knockdown to 0 (before: 14 to 1 in 16). Champion on it vs on the previous legs 23–9, 6 knockdowns to 29. Striker fine-tuned on it lands more but falls 8 times. | **Promoted** motor (`checkpoints/spar`); previous is `spar-v2`. Striker unchanged. |
 | [Arm-motion cost](striker.md#arm-motion-cost-2026-11-03) | Striker fine-tuned with 0.05 reward lost per radian of arm-target motion. Per clean punch the striker already moves its arms as much as the champion (21.4 vs 21.7 rad). With the cost: motion −11 %, 29–3 vs the champion with 300 clean punches to 65, but 29 knockdowns in 32 bouts (the legs trained under the old arm style). | Not promoted. |
 | [Legs for the low-motion striker](striker.md#arm-motion-cost-2026-11-03) | Motor retrained on the striker's and the low-motion striker's recordings: solo survival under the low-motion arms 91.8 → 97.7 %; in 120 s bouts against the champion its knockdowns fall 29 → 18 in 32 (the striker: 2). | Not promoted. |
 | [Legs trained in two-robot bouts](spar-motor.md#legs-trained-in-two-robot-bouts-2026-11-03) | Motor fine-tuned with native PPO in two-robot ring bouts (`boxer.motor_native`), both robots learning, opponents from strikers, champion and scripted brain. Low-motion striker vs champion: knockdowns 29 → 2 in 32 bouts of 120 s. Each on its own legs, the low-motion striker beats the champion 32–0, 256 clean punches to 87, 1 knockdown to 4. The champion loses 4–28 on these legs. | **Promoted** as `checkpoints/spar-native` (strikers' legs) and the low-motion striker as `checkpoints/striker` (previous: `striker-v1`); champion keeps `checkpoints/spar`. |
 | [More striker brawls](spar-motor.md#legs-trained-in-two-robot-bouts-2026-11-03) | Native motor training continued 3M transitions with ~44 % striker-vs-striker bouts (`motor_native --weights`). Striker brawls: 21 knockdowns in 32 bouts (before 20); vs champion 31–1, 0 : 7. | Not promoted. |
-| [Arm skill on the new motor](arm-skill.md#retrained-on-the-rapid-punching-motor-2026-11-02) | Arm skill fine-tuned on the rapid-punching motor: 0.75M beats the current arm 11–4–1 in 120 s bouts and lands 54 % vs 51 %, but suffers 8 knockdowns to 3; 1.5M 8–8, 7 to 4. | Not promoted: more falls. |
-| [Two-robot bouts](spar-motor.md#results) | Native MuJoCo, free roots, scripted tactics: 8/8 go 20 s, 18.6 clean punches/bout, both corners win. Old motor: 0/4, 3 s. | First reliable unassisted reciprocal boxing in the project. Punch choice is scripted; clinching after ≈ 8 s. |
 
 ## Historical corrections and retained capabilities
 
