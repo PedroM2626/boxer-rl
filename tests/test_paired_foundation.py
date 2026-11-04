@@ -8,6 +8,7 @@ import pytest
 
 from boxer.curriculum_env import UnassistedG1, stage_config
 from boxer.paired_foundation import PairedFoundation, build_pair
+from boxer.scene import FIST_COLORS
 
 
 def test_closed_fist_replay_preserves_physics_and_coordinate_contract(foundation, pair):
@@ -35,6 +36,8 @@ def test_closed_fist_replay_preserves_physics_and_coordinate_contract(foundation
                 assert 'rubber_hand' not in name
                 if '_hand_' in name:
                     assert visual.geom_contype[g] == visual.geom_conaffinity[g] == 0
+                    np.testing.assert_allclose(visual.geom_rgba[g], FIST_COLORS[side])
+                    assert visual.geom_matid[g] == -1
                     meshes[name.split('_hand_')[-1]] = data.geom_xpos[g]
             assert len(meshes) == 8
             for tip in ('index_1_link', 'middle_1_link', 'thumb_2_link'):

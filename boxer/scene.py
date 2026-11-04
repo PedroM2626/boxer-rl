@@ -22,6 +22,7 @@ RED = "red/"
 BLUE = "blue/"
 SIDES = (RED, BLUE)
 OPPONENT = {RED: BLUE, BLUE: RED}
+FIST_COLORS = {RED: (0.9, 0.08, 0.06, 1.0), BLUE: (0.06, 0.25, 0.95, 1.0)}
 
 FLOOR = "floor"
 RING_RADIUS = 2.0
@@ -238,7 +239,7 @@ def _fist_geoms(hand: str) -> list[tuple[str, np.ndarray, np.ndarray]]:
     return out
 
 
-def _graft_fists(robot: mujoco.MjSpec) -> None:
+def _graft_fists(robot: mujoco.MjSpec, rgba=None) -> None:
     """Swaps each rubber hand for the articulated hand's meshes, welded into a fist.
 
     The robot that trains has one rigid rubber-hand mesh where a hand should be,
@@ -287,6 +288,10 @@ def _graft_fists(robot: mujoco.MjSpec) -> None:
             geom.group = template.group
             geom.density = 0.0
             geom.material = template.material
+            if rgba is not None:
+                # Clear the upstream material so its grey does not override RGBA.
+                geom.material = ""
+                geom.rgba = rgba
             geom.contype = 0
             geom.conaffinity = 0
 
@@ -375,7 +380,7 @@ def _add_robot(spec: mujoco.MjSpec, prefix: str, x: float, face_away: bool) -> N
 
     for sensor in list(robot.sensors):
         robot.delete(sensor)
-    _graft_fists(robot)
+    _graft_fists(robot, FIST_COLORS[prefix])
     for body_name, sites in EXTRA_SITES.items():
         body = robot.body(body_name)
         for site_name, pos in sites:

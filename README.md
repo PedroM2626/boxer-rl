@@ -1,5 +1,12 @@
 # boxer — two humanoids learning to fight each other in JAX
 
+![Striker (red fists) boxing Champion (blue fists) in native MuJoCo](fights/striker_vs_champion_preview.gif)
+
+**Striker (red) vs Champion (blue).** A 12-second native MuJoCo bout with
+learned controllers, free legs and no pelvis support. Both fists match each
+boxer's corner color. [Watch the preview video](fights/striker_vs_champion_preview.mp4)
+or the [full 60-second bout](fights/striker_native_legs_vs_champion_60s.mp4).
+
 ## Where things stand (2026-11-03)
 
 Two simulated Unitree G1 humanoids box each other in native MuJoCo with no

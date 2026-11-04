@@ -43,7 +43,7 @@ def add_ring(spec, robot_geoms):
         post = spec.worldbody.add_geom(
             name=f'post_{k}', type=mujoco.mjtGeom.mjGEOM_CYLINDER,
             pos=[x * 1.02, y * 1.02, .5], size=[.04, .5, 0], contype=0, conaffinity=0)
-        post.rgba = [.6, .1, .1, 1] if k in (0, 3) else [.1, .2, .6, 1]
+        post.rgba = [.55, .55, .55, 1]
     for rope in ropes:
         for side in scene.SIDES:
             for name in ROPE_CONTACTS:
@@ -83,7 +83,7 @@ def build_pair(foundation, separation=2.0, *, visual_fists=False, diagnostic_exc
         if visual_fists:
             # Reuse the original closed-hand visual graft only in replay models.
             # The live learner keeps its exact compiled model and geom ordering.
-            scene._graft_fists(robot)
+            scene._graft_fists(robot, scene.FIST_COLORS[side])
         for sensor in list(robot.sensors):
             if sensor.type == mujoco.mjtSensor.mjSENS_CONTACT:
                 robot.delete(sensor)
