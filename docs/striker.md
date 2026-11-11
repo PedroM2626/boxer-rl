@@ -192,3 +192,59 @@ bash tools/run_spar.sh boxer.spar_match --ring --checkpoint checkpoints/spar-nat
 
 `spar_match` recognizes a striker checkpoint by its sizes (74 → 10) wherever
 it takes tactics.
+
+## Long-bout gate and alternating rounds (2026-11-11)
+
+**Gate on long bouts.** The native gate (`boxer/tactics_gate.py`) chose
+checkpoints from 20 s bouts, but falls show up in 120 s bouts. The striker
+with the arm-motion cost had 0 knockdowns in the gate and 29 in long bouts.
+`native_finetune --long-gate N` now runs a long check on the top N
+candidates before confirming one: 8 bouts of 120 s with knockdown rules
+(seeds 24–31, corners swapped) against the gate's champion and against every
+`--long-gate-opponents`. A candidate is stable when it suffers at most
+`opponent knockdowns + max(2, opponent knockdowns)` against every opponent.
+If none is stable, the gate keeps the champion (`native_gate_rejected`).
+
+Checked against known cases:
+- **Positive control:** tactics vs tactics-arm-v1 on `spar-v2` is stable
+  (9 : 5).
+- **Negative control:** the low-motion striker on the old `spar` legs vs the
+  champion tactics is unstable (17 : 1).
+- The opponent matters. Against striker-v1 that same striker looked stable
+  (2 : 1), so the champion tactics is a standing long-gate opponent.
+
+**Alternating rounds** (`python -m boxer.co_train`). Each round has two
+phases:
+1. Legs: `motor_native`, 1M transitions, with the current striker in its
+   pool.
+2. Striker: `native_finetune --striker`, 750k transitions on those new legs,
+   gated with the long check against the current striker and the champion
+   tactics.
+
+New legs always carry over; the striker carries over only when the gate
+selects it. Three rounds, each about an hour:
+
+| Round | Striker long check (knockdowns, candidate : opponent) | Gate |
+| --- | --- | --- |
+| 0 | 375k: 13 : 10 vs striker, 10 : 0 vs champion; 750k: 18 : 13, 21 : 0 | rejected |
+| 1 | 375k: 6 : 3 vs striker, 1 : 0 vs champion | selected (44–4 in confirmation) |
+| 2 | 750k: 20 : 26 vs round-1 striker, 4 : 0 vs champion; 375k: 14 : 4 | rejected |
+
+The final pair is the round-1 striker on the round-2 legs. Its result in
+32 bouts of 120 s (seeds 0–15, corners swapped):
+
+| Bouts | Record | Clean punches per bout | Knockdowns |
+| --- | --- | --- | --- |
+| co-trained pair vs champion on its own legs | 32–0 | 273 : 103 | 2 : 2 |
+| co-trained pair vs itself | — | 232 : 207 | 28 in all |
+| co-trained pair vs current striker on `spar-native` | 32–0 | 280 : 188 | 12 : 4 |
+| current striker vs itself on `spar-native` (baseline) | — | 234 : 252 | 20 in all |
+
+The rounds did not reduce brawl falls. Two co-trained strikers fall 28
+times in 32 bouts, against 20 for the current striker. Against the current
+striker, the co-trained pair goes down three times as often. Against the
+champion it is level with the current striker (2 : 2 against 1 : 4). Not
+promoted. Each phase adapts to the other, but the striker phase still
+learns to hit harder in 30 s episodes, and its legs pay for it in long
+bouts. The [whole-body policy](whole-body.md) removes the two phases
+altogether.

@@ -7,7 +7,7 @@ learned controllers, free legs and no pelvis support. Both fists match each
 boxer's corner color. [Watch the preview video](fights/striker_vs_champion_preview.mp4)
 or the [full 60-second bout](fights/striker_native_legs_vs_champion_60s.mp4).
 
-## Where things stand (2026-11-03)
+## Where things stand (2026-11-11)
 
 Two simulated Unitree G1 humanoids box each other in native MuJoCo with no
 physical assistance: free legs and roots, no pelvis springs, welds or
@@ -42,23 +42,32 @@ bash tools/run_spar.sh boxer.spar_match --ring --seconds 120 --knockdowns 3 --se
 **Limits, measured:**
 
 * **Falls in striker brawls.** Two strikers fighting chest to chest fall
-  about 20 times in 32 bouts of 120 s; more leg training did not reduce it
-  ([spar motor](docs/spar-motor.md#legs-trained-in-two-robot-bouts-2026-11-03)).
+  about 20 times in 32 bouts of 120 s. Neither more leg training nor
+  alternating leg and striker rounds reduced it
+  ([spar motor](docs/spar-motor.md#legs-trained-in-two-robot-bouts-2026-11-03),
+  [rounds](docs/striker.md#long-bout-gate-and-alternating-rounds-2026-11-11)).
 * **Close to a clinch.** The striker wins by fighting at very close range;
   nothing in the rules separates clinched boxers.
 * **No getting up.** After a knockdown the referee resets both robots standing.
 * **Parts are trained separately.** Legs, tactics, arm skill and striker are
   separate policies trained in turn; changing one (e.g. a striker's arm style)
-  can break another (its legs), as several experiments below show.
+  can break another (its legs), as several experiments below show. A single
+  [whole-body policy](docs/whole-body.md) for legs, waist and arms boxes full
+  bouts when cloned from the striker (`checkpoints/whole-body-clone`), but
+  falls more than the striker, and native PPO so far adds falls with its hits.
+* **Training sees short episodes.** PPO runs on 30 s episodes, and falls
+  show up over 120 s. The native gate now checks 120 s bouts before it
+  promotes anything (`--long-gate`), and it rejected 4 of 5 recent runs.
 * **Turning is automatic.** Brains choose advance and circling; facing the
   opponent is a fixed rule (`tactics_env.decode`).
 * **Simulation only**, against a fixed pool of policies; no sim-to-real work.
-* **Tests:** all 83 test files (409 tests) pass when run one file per
-  process (`tools/test_all.sh`, 2026-11-03); the whole suite in one process
+* **Tests:** all 85 test files (422 tests) pass when run one file per
+  process (`tools/test_all.sh`, 2026-11-11); the whole suite in one process
   exhausts the WSL VM's memory.
 
 **Checkpoints.** Current: `spar`, `spar-native`, `tactics`, `arm-skill`,
-`striker`. Earlier, kept for comparison: `striker-v1` (first striker),
+`striker`. Experimental: `whole-body-clone` (one policy for the whole
+body, imitating the striker). Earlier, kept for comparison: `striker-v1` (first striker),
 `spar-v2` (rapid-punching legs), `spar-v1`, `spar-shorthook`,
 `spar-straight` (earlier spar motors), `tactics-arm-v1`, `tactics-ring-v1`,
 `tactics-highguard-v1`, `tactics-levelhook-v1`, `tactics-guard-v1`,
@@ -92,6 +101,9 @@ since 2026-10-30, including the rejected ones.
 | 11-03 | Legs for the striker's arms | Motor replays recorded striker arm actions in half its episodes. | Striker knockdowns 14 → 1; promoted as `spar` ([details](docs/spar-motor.md#legs-for-the-strikers-arms-2026-11-03)). |
 | 11-03 | Arm-motion cost | Striker pays per radian of arm motion; legs retrained solo on its recording. | Per clean punch it already moved as much as the champion; with the cost it fell 29, then 18 times; rejected ([striker](docs/striker.md#arm-motion-cost-2026-11-03)). |
 | 11-03 | Legs trained in two-robot bouts | Native PPO for the motor in two-robot ring bouts (`boxer.motor_native`), opponents from strikers, champion and scripted brain. | Low-motion striker knockdowns 29 → 2; promoted (`spar-native`, `striker`). Champion loses 4–28 on these legs, keeps its own. Striker-heavy continuation: no gain ([details](docs/spar-motor.md#legs-trained-in-two-robot-bouts-2026-11-03)). |
+| 11-11 | Long-bout gate | Native gate adds 8 bouts of 120 s with knockdown rules against its champion and named opponents before promoting. | Catches unstable candidates (17 : 1 control); adopted ([details](docs/striker.md#long-bout-gate-and-alternating-rounds-2026-11-11)). |
+| 11-11 | Alternating legs and striker | Three rounds of native leg training then striker training on the new legs (`boxer.co_train`). | Gate kept 1 of 3 strikers; brawl falls 20 → 28; not promoted ([details](docs/striker.md#long-bout-gate-and-alternating-rounds-2026-11-11)). |
+| 11-11 | Whole-body policy | One network for legs, waist and arms (174 → 23), no motor: cloned from the striker, then native PPO. | Clone beats the champion 32–0 (kd 6 : 2); both PPO runs hit more but fell more and were rejected ([whole body](docs/whole-body.md)). |
 
 ## Milestones since unassisted two-robot bouts (2026-10-30 onward)
 
@@ -212,6 +224,19 @@ did not reduce their falls
 ([details](docs/striker.md#legs-trained-in-two-robot-bouts-2026-11-03);
 [60 s video](fights/striker_native_legs_vs_champion_60s.mp4)).
 
+**A gate on long bouts, alternating rounds, one whole-body policy
+(2026-11-11).** The native gate now runs 8 bouts of 120 s under knockdown
+rules before promoting a checkpoint. It counts as stable only a candidate
+that falls at most a little more than its opponents. Three rounds alternating
+native leg training and striker training on the new legs (`boxer.co_train`)
+did not cut falls in striker brawls: 28 in 32 bouts against 20
+([details](docs/striker.md#long-bout-gate-and-alternating-rounds-2026-11-11)).
+A [whole-body policy](docs/whole-body.md) replaces the hierarchy with one
+network that sets all 23 leg, waist and arm targets. Cloned from the
+striker, it beats the champion **32–0** (259 clean punches to 88) but
+suffers 6 knockdowns to 2. Two native PPO runs made it hit harder and fall
+more, and the long gate rejected both.
+
 ## Archive
 
 Earlier phases, moved out of this README on 2026-11-03 and kept as written:
@@ -302,12 +327,14 @@ boxer/paired_foundation.py two robots in one native MuJoCo model, ring, impact s
 boxer/moves.py             scripted straights, hooks and guards, fitted by forward kinematics
 boxer/tactics_env.py       tactics observation and decode (footwork, punch, aim, guard)
 boxer/tactics_train.py     batched GPU self-play for tactics
-boxer/native_finetune.py   PPO on native two-robot bouts in CPU workers (tactics or striker)
-boxer/tactics_gate.py      native selection and confirmation gates
+boxer/native_finetune.py   PPO on native two-robot bouts in CPU workers (tactics, striker or whole body)
+boxer/tactics_gate.py      native selection, 120 s stability check and confirmation gates
 boxer/arm_skill.py, boxer/arm_finetune.py   learned corrections of scripted punches
 boxer/striker.py           one policy for footwork and both arms' joint targets
 boxer/striker_train.py     striker imitation data, cloning, and arm recordings for the legs
 boxer/motor_native.py      PPO for the leg motor in native two-robot bouts
+boxer/co_train.py          alternating rounds: legs, then striker on the new legs
+boxer/whole_body.py, boxer/whole_body_train.py   one policy for legs, waist and arms; its cloning
 boxer/spar_match.py        native bouts between any two stacks, knockdown rules, video
 tools/punch_shapes.py      which punch shapes a corner throws
 tools/knockdown_causes.py  what happens in the second before each knockdown
@@ -318,8 +345,10 @@ tools/run_spar.sh          runs any of these with the curriculum runtime on WSL
 Each stack runs at 50 Hz: a brain (tactics or striker) sets the footwork
 command and the arms; the leg motor turns the command into leg and waist
 targets while keeping balance; the arm targets replace the motor's own arm
-outputs. Details: [spar motor](docs/spar-motor.md), [tactics](docs/tactics.md),
-[moves](docs/moves.md), [arm skill](docs/arm-skill.md), [striker](docs/striker.md).
+outputs. A whole-body policy skips the motor and sets every target itself.
+Details: [spar motor](docs/spar-motor.md), [tactics](docs/tactics.md),
+[moves](docs/moves.md), [arm skill](docs/arm-skill.md), [striker](docs/striker.md),
+[whole body](docs/whole-body.md).
 The original MJX and warp stacks are described in the
 [archive](docs/archive/mjx-warp-experiments.md#architecture-of-the-mjx-and-warp-stacks).
 
