@@ -49,3 +49,15 @@ def test_scripted_high_guard_opponents_hold_the_guard():
         bout = NativeBout(Pair(), None, np.random.default_rng(0), [], 1., 10, 30., fraction)
         holds.append(bout.opponent.high)
     assert holds == [False, True]
+
+
+def test_run_config_writes_paths_and_path_lists_as_text():
+    import argparse
+    import json
+    from pathlib import Path
+    from boxer.native_finetune import run_config
+    args = argparse.Namespace(output=Path("runs/x"), pool=[Path("a"), Path("b")], long_gate_opponents=[],
+                              steps=3, ring=True)
+    config = run_config(args)
+    assert json.loads(json.dumps(config)) == dict(output="runs/x", pool=["a", "b"], long_gate_opponents=[],
+                                                  steps=3, ring=True)

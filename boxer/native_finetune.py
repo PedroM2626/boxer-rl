@@ -326,6 +326,17 @@ def learner_net(striker, whole_body=False):
     return tactics_net()
 
 
+def run_config(args):
+    """The parsed arguments as JSON values (paths, and lists of paths, as strings)."""
+    def plain(value):
+        if isinstance(value, Path):
+            return str(value)
+        if isinstance(value, list):
+            return [plain(v) for v in value]
+        return value
+    return {k: plain(v) for k, v in vars(args).items()}
+
+
 def gae(rewards, values, next_values, terminal, truncated, gamma, lam):
     """Generalized advantage estimates for one worker's time-ordered steps."""
     advantages = np.zeros_like(rewards)
@@ -450,7 +461,7 @@ def main(argv=None):
         assert _receive(parent) == "ready"
     print(f"{args.workers} native workers ready", flush=True)
 
-    atomic_json(root / "config.json", {k: str(v) if isinstance(v, Path) else v for k, v in vars(args).items()}
+    atomic_json(root / "config.json", run_config(args)
                 | dict(pool=[str(p) for p in args.pool], reward=REWARD, started_utc=utc()))
     log = (root / "progress.jsonl").open("a")
     key = jax.random.PRNGKey(args.seed)
