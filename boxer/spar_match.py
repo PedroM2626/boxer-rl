@@ -178,10 +178,13 @@ class PolicyBrain:
 
 
 def load_brain(path, deterministic=True):
-    """A learned corner: tactics (``PolicyBrain``) or a striker (``boxer.striker``)."""
+    """A learned corner: tactics (``PolicyBrain``), a striker (``boxer.striker``) or a
+    whole-body policy (``boxer.whole_body``), told apart by their network sizes."""
     from boxer.striker import StrikerBrain, is_striker
+    from boxer.whole_body import WholeBodyBrain, is_whole_body
     params = load_policy_params(path)[0]
-    return (StrikerBrain if is_striker(params) else PolicyBrain)(params, deterministic=deterministic)
+    kind = WholeBodyBrain if is_whole_body(params) else StrikerBrain if is_striker(params) else PolicyBrain
+    return kind(params, deterministic=deterministic)
 
 
 def _new_arm(pair, brain):
@@ -267,6 +270,8 @@ def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills, fr
         obs = pair.observation(commands)
         action = motor_actions(motor, obs)
         for i in range(2):
+            if hasattr(brains[i], 'legs'):     # a whole-body policy sets its own legs and waist
+                action[i, :LEFT_ARM] = brains[i].legs
             if i in arm_skills:
                 arm_skills[i].steer(pair, i, arms[i])
             action[i, LEFT_ARM:] = arms[i].actions(high[i])
@@ -454,6 +459,7 @@ def main(argv=None):
     losses = sum(1 for b in bouts if b['winner']) - wins
     points = [b['clean_punches'][0 if b['red'] == first else 1] for b in bouts]
     against = [b['clean_punches'][1 if b['red'] == first else 0] for b in bouts]
+    downs = [sum(b['knockdowns_suffered'][k if b['red'] == first else 1 - k] for b in bouts) for k in (0, 1)]
     summary = dict(checkpoint=str(args.checkpoint), stage=metadata['stage'],
                    stage_steps=metadata['stage_steps'], checkpoint_sha256=metadata['sha256'],
                    bouts=len(bouts), went_the_distance=survived,
@@ -468,7 +474,8 @@ def main(argv=None):
                    tactics=dict(first=names[0], second=names[1], first_wins=wins, first_losses=losses,
                                 draws=len(bouts) - wins - losses,
                                 first_clean_per_bout=float(np.mean(points)),
-                                second_clean_per_bout=float(np.mean(against))),
+                                second_clean_per_bout=float(np.mean(against)),
+                                first_knockdowns=int(downs[0]), second_knockdowns=int(downs[1])),
                    assistance=False, results=bouts)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(summary, indent=1))

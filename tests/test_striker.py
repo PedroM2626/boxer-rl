@@ -97,3 +97,18 @@ def test_native_striker_pays_for_moving_its_arm_targets(pair):
         rewards.append(reward)
         motions.append(moved)
     assert rewards[0] - rewards[1] == pytest.approx(motions[1])
+
+
+def test_a_striker_can_be_the_native_opponent(pair):
+    import jax.numpy as jp
+    from brax.training.acme import running_statistics
+    from boxer.native_finetune import NativeBout
+    net, _ = striker_net()
+    k1, k2 = jax.random.split(jax.random.PRNGKey(1))
+    norm = running_statistics.init_state(jax.ShapeDtypeStruct((STRIKER_OBS_SIZE,), jp.float32))
+    opponent = StrikerBrain((norm, net.policy_network.init(k1), net.value_network.init(k2)))
+    motor = lambda inputs, key: (np.zeros((2, 29)), None)
+    bout = NativeBout(pair, motor, np.random.default_rng(0), [opponent], 0., 50, 30., striker=True)
+    assert bout.opponent is opponent and all(isinstance(arm, StrikerArm) for arm in bout.arms)
+    reward, terminal, truncated, info = bout.step(np.zeros(STRIKER_ACTION_SIZE))
+    assert np.isfinite(reward)

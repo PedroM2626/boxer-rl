@@ -6,13 +6,15 @@ comes from the physics used for evaluation. Worker processes each run a
 ``PairedFoundation`` bout with the frozen sparring motor, the native impact
 scorecard and the shared ``observe``/``decode``/``PunchArm`` code. Each bout
 picks the learner's corner at random, and its opponent from the scripted
-brain and a pool of frozen tactics policies. A share of the scripted
+brain and a pool of frozen policies (tactics or strikers). A share of the scripted
 opponents can hold the high guard throughout, which no straight gets through
 (docs/moves.md, scoring audit): only hooks score on them. An optional penalty
 per second of leg contact between the robots targets the main cause of real
 knockdowns, tangled shins (docs/spar-motor.md). With ``--striker`` the learner
 is a striker (``boxer.striker``): one policy for footwork and both arms'
-joint targets, with no scripted punches. A central learner runs PPO on the
+joint targets, with no scripted punches. With ``--whole-body`` it is a
+whole-body policy (``boxer.whole_body``): legs, waist and arms with no motor
+in between. A central learner runs PPO on the
 gathered transitions.
 
 The observation normalizer stays frozen at the starting checkpoint's
@@ -47,17 +49,19 @@ class NativeBout:
 
     def __init__(self, pair, motor, rng, opponents, scripted_fraction, episode_steps, fall_penalty,
                  high_guard_fraction=0., arm_skill=None, leg_contact_penalty=0., striker=False,
-                 arm_motion_cost=0.):
+                 arm_motion_cost=0., whole_body=False):
         """``arm_skill``: an ``arm_skill.ArmSkill`` steering both corners' punches.
         ``leg_contact_penalty``: reward lost per second the robots' legs touch.
         ``striker``: the learner's actions are a striker's (``boxer.striker``),
         not tactics.
         ``arm_motion_cost``: a striker's reward lost per radian its arm targets
-        move (summed over both arms' shoulder and elbow joints)."""
+        move (summed over both arms' shoulder and elbow joints).
+        ``whole_body``: the learner's actions set its legs, waist and arms
+        (``boxer.whole_body``); the motor drives only the opponent."""
         from boxer.spar_match import PunchArm
         self.pair, self.motor, self.rng = pair, motor, rng
         self.arm_skill, self.leg_contact_penalty = arm_skill, leg_contact_penalty
-        self.striker, self.arm_motion_cost = striker, arm_motion_cost
+        self.striker, self.arm_motion_cost, self.whole_body = striker, arm_motion_cost, whole_body
         self.opponents, self.scripted_fraction = opponents, scripted_fraction
         self.high_guard_fraction = high_guard_fraction
         self.episode_steps, self.fall_penalty = episode_steps, fall_penalty
@@ -70,7 +74,7 @@ class NativeBout:
         self.pair.reset(seed=seed)
         self.arms = [self.PunchArm(self.pair.pose, self.pair.action_scale, self.pair.dt) for _ in range(2)]
         self.learner = int(self.rng.integers(2))
-        if self.striker:
+        if self.striker or self.whole_body:
             from boxer.striker import StrikerArm
             self.arms[self.learner] = StrikerArm(self.pair.pose, self.pair.action_scale, self.pair.dt)
         if not self.opponents or self.rng.random() < self.scripted_fraction:
@@ -78,11 +82,16 @@ class NativeBout:
                                       high=bool(self.rng.random() < self.high_guard_fraction))
         else:
             self.opponent = self.opponents[int(self.rng.integers(len(self.opponents)))]
+            if hasattr(self.opponent, "new_arm"):         # a striker opponent drives its own arms
+                self.arms[1 - self.learner] = self.opponent.new_arm(self.pair)
         self.t = 0
 
     def observe(self):
         from boxer.spar_match import _body
         from boxer.tactics_env import observe
+        if self.whole_body:
+            from boxer.whole_body import whole_body_observe
+            return whole_body_observe(self.pair, self.learner, self.arms, self.t / self.episode_steps)
         if self.striker:
             from boxer.striker import striker_observe
             return striker_observe(self.pair, self.learner, self.arms, self.t / self.episode_steps)
@@ -93,17 +102,24 @@ class NativeBout:
 
     def step(self, tactics):
         from boxer.curriculum_env import LEFT_ARM
-        from boxer.spar_match import PolicyBrain, _body, motor_actions
+        from boxer.spar_match import _body, motor_actions
         from boxer.tactics_env import REACH, decode
         pair, i = self.pair, self.learner
         bodies = [_body(pair, k) for k in range(2)]
         commands, launched, hooked, high = [None, None], False, False, [False, False]
-        motion = 0.
+        motion, own_legs = 0., None
         for k in range(2):
             delta = bodies[1 - k]["pos"] - bodies[k]["pos"]
             distance = float(np.linalg.norm(delta))
             local = bodies[k]["rot"].T @ delta
-            if k == i and self.striker:
+            if k == i and self.whole_body:
+                from boxer.whole_body import apply_arms
+                command, punch = np.zeros(3), None
+                before = self.arms[k].arm_pose.copy()
+                own_legs = apply_arms(self.arms[k], tactics)
+                motion = float(np.abs(self.arms[k].arm_pose - before).sum())
+                launched = self.arms[k].launched
+            elif k == i and self.striker:
                 from boxer.striker import striker_command
                 command, punch = striker_command(tactics, distance, local), None
                 before = self.arms[k].arm_pose.copy()
@@ -116,7 +132,7 @@ class NativeBout:
                 punch = (int(hand), float(aim), int(move)) if want and self.arms[k].ready else None
                 launched = punch is not None
                 hooked = launched and punch[2] == moves.HOOK
-            elif isinstance(self.opponent, PolicyBrain):
+            elif hasattr(self.opponent, "decide_pair"):
                 command, punch, high[k] = self.opponent.decide_pair(
                     pair, k, self.arms, self.t / self.episode_steps)
             else:
@@ -127,10 +143,15 @@ class NativeBout:
             commands[k] = command
         commands = np.clip(commands, [-.35, -.25, -.5], [.55, .25, .5])
         action = motor_actions(self.motor, pair.observation(commands))
+        if own_legs is not None:
+            action[i, :LEFT_ARM] = own_legs
+        if hasattr(self.opponent, "legs"):              # a whole-body opponent sets its own legs
+            action[1 - i, :LEFT_ARM] = self.opponent.legs
         for k in range(2):
             if self.arm_skill is not None:
                 self.arm_skill.steer(pair, k, self.arms[k])
             action[k, LEFT_ARM:] = self.arms[k].actions(bool(high[k]))
+        self.executed = action.copy()
         self.executed_arms = action[:, LEFT_ARM:].copy()
         outcome = pair.step(action)
         fallen = np.asarray(outcome["fallen"], bool)
@@ -208,13 +229,13 @@ def export_native_model(path, ring=False):
 
 def _worker(conn, seed, motor_path, opponent_paths, scripted_fraction, episode_steps, fall_penalty,
             min_std, model_path, constants, high_guard_fraction=0., arm_path=None,
-            leg_contact_penalty=0., striker=False, arm_motion_cost=0.):
+            leg_contact_penalty=0., striker=False, arm_motion_cost=0., whole_body=False):
     _configure_worker_env()
     import jax
     import mujoco
     from boxer.curriculum_train import inference, load_policy_params
     from boxer.paired_foundation import PairedFoundation
-    from boxer.spar_match import PolicyBrain
+    from boxer.spar_match import load_brain
 
     foundation = FoundationStub(constants)
     motor = jax.jit(inference(foundation, load_policy_params(motor_path)[0]))
@@ -222,7 +243,7 @@ def _worker(conn, seed, motor_path, opponent_paths, scripted_fraction, episode_s
     rng = np.random.default_rng(seed)
     opponents = []
     for k, path in enumerate(opponent_paths):
-        brain = PolicyBrain(load_policy_params(path)[0], deterministic=bool(k % 2 == 0))
+        brain = load_brain(path, deterministic=bool(k % 2 == 0))       # tactics or a striker
         brain.key = jax.random.PRNGKey(seed * 101 + k)
         opponents.append(brain)
     arm_skill = None
@@ -230,8 +251,8 @@ def _worker(conn, seed, motor_path, opponent_paths, scripted_fraction, episode_s
         from boxer.arm_skill import ArmSkill
         arm_skill = ArmSkill(load_policy_params(arm_path)[0])
     bout = NativeBout(pair, motor, rng, opponents, scripted_fraction, episode_steps, fall_penalty,
-                      high_guard_fraction, arm_skill, leg_contact_penalty, striker, arm_motion_cost)
-    sample_with = make_sampler(min_std, learner_net(striker))
+                      high_guard_fraction, arm_skill, leg_contact_penalty, striker, arm_motion_cost, whole_body)
+    sample_with = make_sampler(min_std, learner_net(striker, whole_body))
 
     def sample_next(params, obs, key):
         key, sub = jax.random.split(key)
@@ -295,7 +316,10 @@ def tactics_net():
     return net, net.parametric_action_distribution
 
 
-def learner_net(striker):
+def learner_net(striker, whole_body=False):
+    if whole_body:
+        from boxer.whole_body import whole_body_net
+        return whole_body_net()
     if striker:
         from boxer.striker import striker_net
         return striker_net()
@@ -334,6 +358,8 @@ def main(argv=None):
                         help="reward lost per second the robots' legs touch")
     parser.add_argument("--striker", action="store_true",
                         help="--init-from is a striker (boxer.striker): one policy for footwork and arms")
+    parser.add_argument("--whole-body", action="store_true",
+                        help="--init-from is a whole-body policy (boxer.whole_body): legs, waist and arms")
     parser.add_argument("--arm-motion-cost", type=float, default=0.,
                         help="striker reward lost per radian its arm targets move")
     parser.add_argument("--min-std", type=float, default=.15)
@@ -345,6 +371,10 @@ def main(argv=None):
     parser.add_argument("--lam", type=float, default=.95)
     parser.add_argument("--native-gate", type=int, default=4,
                         help="gate this many final checkpoints against --init-from (0 disables)")
+    parser.add_argument("--long-gate", type=int, default=2,
+                        help="best gate candidates that may take the 120 s stability check (0 skips it)")
+    parser.add_argument("--long-gate-opponents", type=Path, nargs="*", default=[],
+                        help="opponents of the 120 s stability check besides --init-from")
     parser.add_argument("--seed", type=int, default=0)
     args = parser.parse_args(argv)
     _configure_worker_env()
@@ -358,11 +388,12 @@ def main(argv=None):
 
     from boxer.tactics_env import ACTION_SIZE, OBS_SIZE, policy_sizes, widen_legacy
     initial = load_policy_params(args.init_from)[0]
-    if not args.striker and policy_sizes(initial) != (OBS_SIZE, ACTION_SIZE):
+    kind = "whole-body" if args.whole_body else "striker" if args.striker else "tactics"
+    if kind == "tactics" and policy_sizes(initial) != (OBS_SIZE, ACTION_SIZE):
         # A pre-hook policy: same behaviour, new inputs/outputs start silent.
         initial = widen_legacy(initial)
     norm, policy, value = initial
-    net, dist = learner_net(args.striker)
+    net, dist = learner_net(args.striker, args.whole_body)
     optimizer = optax.chain(optax.clip_by_global_norm(1.), optax.adam(args.learning_rate))
     trainable = dict(policy=policy, value=value)
     opt_state = optimizer.init(trainable)
@@ -409,7 +440,7 @@ def main(argv=None):
             child, args.seed * 1000 + w, args.motor, [str(p) for p in args.pool],
             args.scripted_fraction, 1000, args.fall_penalty, args.min_std, model_path, constants,
             args.high_guard_fraction, str(args.arm) if args.arm else None, args.leg_contact_penalty,
-            args.striker, args.arm_motion_cost),
+            args.striker, args.arm_motion_cost, args.whole_body),
             daemon=True)
         process.start()
         pipes.append(parent)
@@ -428,7 +459,7 @@ def main(argv=None):
         while done_steps < args.steps:
             if done_steps >= next_checkpoint:
                 save_policy(root / "checkpoint", (norm, trainable["policy"], trainable["value"]),
-                            dict(stage="striker-native" if args.striker else "tactics-native", stage_steps=done_steps, init_from=str(args.init_from),
+                            dict(stage=f"{kind}-native", stage_steps=done_steps, init_from=str(args.init_from),
                                  updated_utc=utc()))
                 next_checkpoint += args.checkpoint_every
             params = jax.device_get((norm, trainable["policy"]))
@@ -470,7 +501,7 @@ def main(argv=None):
             log.flush()
             print(json.dumps(record), flush=True)
         save_policy(root / "checkpoint", (norm, trainable["policy"], trainable["value"]),
-                    dict(stage="striker-native" if args.striker else "tactics-native", stage_steps=done_steps, init_from=str(args.init_from),
+                    dict(stage=f"{kind}-native", stage_steps=done_steps, init_from=str(args.init_from),
                          updated_utc=utc()))
     finally:
         for pipe in pipes:
@@ -481,7 +512,8 @@ def main(argv=None):
         for process in processes:
             process.join(timeout=10)
     if args.native_gate:
-        gate_generation(root, args.init_from, args.native_gate, args.ring, args.arm, args.motor)
+        gate_generation(root, args.init_from, args.native_gate, args.ring, args.arm, args.motor, args.long_gate,
+                        args.long_gate_opponents)
     return 0
 
 

@@ -39,7 +39,7 @@ from boxer.native_finetune import (FoundationStub, _configure_worker_env, _recei
 LEGS = 15                       # leg and waist actuators; the arms follow from LEFT_ARM = 15
 REWARD = dict(linear=1.0, yaw=.75, orientation=-2., tilt_rate=-.15, action_rate=-.01, fall=10.)
 SIGMA = .25                     # velocity tracking width, as in the solo task
-BRAINS = ("striker", "low-motion striker", "champion", "scripted")
+BRAINS = ("striker", "second striker", "champion", "scripted")
 VALUE_SIZE = 103 + 3 + 2 * len(BRAINS)
 
 
@@ -258,8 +258,9 @@ def main(argv=None):
     parser.add_argument("--init-from", type=Path, default=Path("checkpoints/spar"))
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--striker", type=Path, default=Path("checkpoints/striker-v1"))
-    parser.add_argument("--low-motion-striker", type=Path, default=Path("checkpoints/striker"),
-                        help="a striker trained with an arm-motion cost")
+    parser.add_argument("--second-striker", "--low-motion-striker", dest="low_motion_striker", type=Path,
+                        default=Path("checkpoints/striker"),
+                        help="another striker in the pool (first used: one trained with an arm-motion cost)")
     parser.add_argument("--tactics", type=Path, default=Path("checkpoints/tactics"))
     parser.add_argument("--arm", type=Path, default=Path("checkpoints/arm-skill"))
     parser.add_argument("--weights", type=float, nargs=4, default=[1., 1., 1., 1.],
