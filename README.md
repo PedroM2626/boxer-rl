@@ -19,55 +19,67 @@ inside a 4 m roped ring under knockdown rules: a fall is counted, both robots
 are reset standing (they cannot get up by themselves), and a third knockdown
 is a TKO.
 
-Two complete boxers exist, each a stack of learned parts:
+Three complete boxers exist. The strongest is one policy for the whole body;
+the other two are stacks of separately trained parts:
 
-| Stack | Legs | Brain and arms | Style |
+| Boxer | Legs | Brain and arms | Style |
 | --- | --- | --- | --- |
-| **Striker** (strongest) | `checkpoints/spar-native` | `checkpoints/striker`: one policy for footwork and both arms' joint targets, no scripted moves | in-fighting, short hook-like punches |
+| **Whole body** (strongest) | — | `checkpoints/whole-body`: one network sets all 23 leg, waist and arm joint targets every step; no motor, no scripted moves | in-fighting, very high punch rate |
+| **Striker** | `checkpoints/spar-native` | `checkpoints/striker`: one policy for footwork and both arms' joint targets, no scripted moves | in-fighting, short hook-like punches |
 | **Champion** (reference) | `checkpoints/spar` | `checkpoints/tactics` (footwork, punch choice, guard height) + scripted straights and hooks (`boxer/moves.py`) bent by `checkpoints/arm-skill` | longer straights, high guard |
 
-Each on its own legs, over 32 bouts of 120 s (16 seeds, corners swapped), the
-striker beats the champion **32–0**, landing **256 clean punches per bout to
-87**, with **1 knockdown to 4**
-([details](docs/striker.md#legs-trained-in-two-robot-bouts-2026-11-03);
-[60 s video at 60 fps](fights/striker_native_legs_vs_champion_60s.mp4)).
+Over 32 bouts of 120 s (16 seeds, corners swapped), each opponent on its own
+legs:
+
+| Bouts | Record | Clean punches per bout | Knockdowns |
+| --- | --- | --- | --- |
+| whole body vs champion | 32–0 | 361 : 81 | 1 : 0 |
+| whole body vs striker | 31–1 | 362 : 114 | 2 : 2 |
+| striker vs champion | 32–0 | 256 : 87 | 1 : 4 |
+| whole body vs itself / striker vs itself | — | — | 4 / 20 in all |
+
+([whole body](docs/whole-body.md#long-episodes-tilt-cost-and-leg-anchor),
+[striker](docs/striker.md#legs-trained-in-two-robot-bouts-2026-11-03);
+60 s videos at 60 fps: [whole body](fights/whole_body_vs_champion_60s.mp4),
+[striker](fights/striker_native_legs_vs_champion_60s.mp4)).
 
 ```bash
 bash tools/run_spar.sh boxer.spar_match --ring --seconds 120 --knockdowns 3 --seeds 0 1 2 3 --swap \
-  --checkpoint checkpoints/spar-native --red-tactics checkpoints/striker \
+  --checkpoint checkpoints/spar-native --red-tactics checkpoints/whole-body \
   --blue-checkpoint checkpoints/spar --blue-tactics checkpoints/tactics --blue-arm checkpoints/arm-skill \
   --video runs/fight.mp4
 ```
 
 **Limits, measured:**
 
-* **Falls in striker brawls.** Two strikers fighting chest to chest fall
+* **Falls in close brawls.** Two strikers fighting chest to chest fall
   about 20 times in 32 bouts of 120 s. Neither more leg training nor
   alternating leg and striker rounds reduced it
   ([spar motor](docs/spar-motor.md#legs-trained-in-two-robot-bouts-2026-11-03),
   [rounds](docs/striker.md#long-bout-gate-and-alternating-rounds-2026-11-11)).
-* **Close to a clinch.** The striker wins by fighting at very close range;
+  Two whole-body policies fall 4 times.
+* **Close to a clinch.** The striker and the whole-body policy win by fighting at very close range;
   nothing in the rules separates clinched boxers.
 * **No getting up.** After a knockdown the referee resets both robots standing.
-* **Parts are trained separately.** Legs, tactics, arm skill and striker are
-  separate policies trained in turn; changing one (e.g. a striker's arm style)
-  can break another (its legs), as several experiments below show. A single
-  [whole-body policy](docs/whole-body.md) for legs, waist and arms boxes full
-  bouts when cloned from the striker (`checkpoints/whole-body-clone`), but
-  falls more than the striker, and native PPO so far adds falls with its hits.
-* **Training sees short episodes.** PPO runs on 30 s episodes, and falls
+* **Stacks are trained part by part.** In the two stacks, legs, tactics, arm
+  skill and striker are separate policies trained in turn; changing one (e.g.
+  a striker's arm style) can break another (its legs), as several experiments
+  below show. The [whole-body policy](docs/whole-body.md) has no parts.
+* **Short training episodes hide falls.** PPO used 20 s episodes, and falls
   show up over 120 s. The native gate now checks 120 s bouts before it
-  promotes anything (`--long-gate`), and it rejected 4 of 5 recent runs.
+  promotes anything (`--long-gate`); it rejected 4 of the 5 runs before the
+  whole-body policy. The whole-body policy trains on 120 s episodes with a
+  per-step tilt cost; which of its changes matters most is not yet measured.
 * **Turning is automatic.** Brains choose advance and circling; facing the
   opponent is a fixed rule (`tactics_env.decode`).
 * **Simulation only**, against a fixed pool of policies; no sim-to-real work.
-* **Tests:** all 85 test files (422 tests) pass when run one file per
+* **Tests:** all 85 test files (425 tests) pass when run one file per
   process (`tools/test_all.sh`, 2026-11-11); the whole suite in one process
   exhausts the WSL VM's memory.
 
-**Checkpoints.** Current: `spar`, `spar-native`, `tactics`, `arm-skill`,
-`striker`. Experimental: `whole-body-clone` (one policy for the whole
-body, imitating the striker). Earlier, kept for comparison: `striker-v1` (first striker),
+**Checkpoints.** Current: `whole-body`, `spar`, `spar-native`, `tactics`,
+`arm-skill`, `striker`. Also kept: `whole-body-clone` (the whole-body policy's
+starting point, imitating the striker). Earlier, kept for comparison: `striker-v1` (first striker),
 `spar-v2` (rapid-punching legs), `spar-v1`, `spar-shorthook`,
 `spar-straight` (earlier spar motors), `tactics-arm-v1`, `tactics-ring-v1`,
 `tactics-highguard-v1`, `tactics-levelhook-v1`, `tactics-guard-v1`,
@@ -103,7 +115,8 @@ since 2026-10-30, including the rejected ones.
 | 11-03 | Legs trained in two-robot bouts | Native PPO for the motor in two-robot ring bouts (`boxer.motor_native`), opponents from strikers, champion and scripted brain. | Low-motion striker knockdowns 29 → 2; promoted (`spar-native`, `striker`). Champion loses 4–28 on these legs, keeps its own. Striker-heavy continuation: no gain ([details](docs/spar-motor.md#legs-trained-in-two-robot-bouts-2026-11-03)). |
 | 11-11 | Long-bout gate | Native gate adds 8 bouts of 120 s with knockdown rules against its champion and named opponents before promoting. | Catches unstable candidates (17 : 1 control); adopted ([details](docs/striker.md#long-bout-gate-and-alternating-rounds-2026-11-11)). |
 | 11-11 | Alternating legs and striker | Three rounds of native leg training then striker training on the new legs (`boxer.co_train`). | Gate kept 1 of 3 strikers; brawl falls 20 → 28; not promoted ([details](docs/striker.md#long-bout-gate-and-alternating-rounds-2026-11-11)). |
-| 11-11 | Whole-body policy | One network for legs, waist and arms (174 → 23), no motor: cloned from the striker, then native PPO. | Clone beats the champion 32–0 (kd 6 : 2); both PPO runs hit more but fell more and were rejected ([whole body](docs/whole-body.md)). |
+| 11-11 | Whole-body policy | One network for legs, waist and arms (174 → 23), no motor: cloned from the striker, then native PPO. | Clone beats the champion 32–0 (kd 6 : 2); two PPO runs hit more but fell more and were rejected ([whole body](docs/whole-body.md)). |
+| 11-11 | Whole body, long episodes | Native PPO on 120 s episodes, γ 0.99, per-step tilt cost, leg outputs anchored to the clone. | First gate-approved whole-body run: vs champion 32–0, 361 : 81, kd 1 : 0; vs striker 31–1; own brawls 4 kd (strikers: 20). **Promoted** (`whole-body`) ([details](docs/whole-body.md#long-episodes-tilt-cost-and-leg-anchor)). |
 
 ## Milestones since unassisted two-robot bouts (2026-10-30 onward)
 
@@ -237,6 +250,17 @@ striker, it beats the champion **32–0** (259 clean punches to 88) but
 suffers 6 knockdowns to 2. Two native PPO runs made it hit harder and fall
 more, and the long gate rejected both.
 
+**The whole-body policy becomes the strongest boxer (2026-11-11).** A third
+run changed what training sees and values: 120 s episodes, a return horizon
+of about 2 s instead of 0.7 s, a per-step cost on torso tilt with the leg
+motor's own weights, and leg outputs anchored to the clone. The long gate
+accepted it. Over 32 bouts of 120 s it beats the champion **32–0, 361 clean
+punches per bout to 81, 1 knockdown to 0**, and the striker **31–1, 362 to
+114**; two of them brawl with **4 knockdowns in 32 bouts** where two
+strikers fall 20 times (`checkpoints/whole-body`;
+[details](docs/whole-body.md#long-episodes-tilt-cost-and-leg-anchor);
+[60 s video](fights/whole_body_vs_champion_60s.mp4)).
+
 ## Archive
 
 Earlier phases, moved out of this README on 2026-11-03 and kept as written:
@@ -359,9 +383,9 @@ Linux or WSL2 with an NVIDIA GPU; one runtime, `$HOME/venvs/boxing_curriculum`
 
 ```bash
 bash tools/setup_curriculum.sh
-# watch the striker against the champion, each on its own legs
+# watch the whole-body policy against the champion stack
 bash tools/run_spar.sh boxer.spar_match --ring --seconds 60 --knockdowns 3 --seeds 1 \
-  --checkpoint checkpoints/spar-native --red-tactics checkpoints/striker \
+  --checkpoint checkpoints/spar-native --red-tactics checkpoints/whole-body \
   --blue-checkpoint checkpoints/spar --blue-tactics checkpoints/tactics --blue-arm checkpoints/arm-skill \
   --video runs/fight.mp4
 # tests, one file per process (the whole suite in one process runs out of memory on WSL)

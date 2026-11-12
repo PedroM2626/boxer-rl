@@ -245,6 +245,6 @@ times in 32 bouts, against 20 for the current striker. Against the current
 striker, the co-trained pair goes down three times as often. Against the
 champion it is level with the current striker (2 : 2 against 1 : 4). Not
 promoted. Each phase adapts to the other, but the striker phase still
-learns to hit harder in 30 s episodes, and its legs pay for it in long
+learns to hit harder in 20 s episodes, and its legs pay for it in long
 bouts. The [whole-body policy](whole-body.md) removes the two phases
 altogether.

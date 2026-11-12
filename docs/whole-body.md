@@ -1,5 +1,8 @@
 # Whole-body policy (2026-11-11)
 
+**Current strongest boxer:** `checkpoints/whole-body` (see
+[long episodes, tilt cost and leg anchor](#long-episodes-tilt-cost-and-leg-anchor)).
+
 Every boxer before this was a hierarchy of separately trained parts. A brain
 (tactics or striker) sent a footwork command to a leg motor and set the
 arms, and the motor turned the command into leg and waist targets. Each part
@@ -66,32 +69,74 @@ the striker.
 In run 1 the updates were large: KL 0.1–0.25 per iteration, with 64 % of
 probability ratios outside the PPO clip. Run 2 brought both down (KL 0.02,
 21 % clipped). Both runs show what the arm-only experiments showed. PPO in
-30 s training episodes raises hits by 1.5–2× and wins the 20 s gate bouts
+20 s training episodes raises hits by 1.5–2× and wins the 20 s gate bouts
 (14–2, 15–1 against the clone), and the falls appear only in long bouts.
 The long-bout gate is what caught it. Neither run was promoted.
 
-Commands (run 2):
+At 50 Hz a 1000-step training episode lasts 20 s, and with γ = 0.97 the
+return looks about 0.7 s ahead. A fall builds up over longer than that, so
+the only signal against it was the terminal fall penalty.
+
+## Long episodes, tilt cost and leg anchor
+
+Run 3 kept run 2's settings and changed what training sees and values:
+
+- `--episode-seconds 120`: training episodes as long as the judged bouts.
+- `--gamma .99`: returns look about 2 s ahead instead of 0.7 s.
+- `--tilt-cost 5`: every step the learner loses `dt · 5 · (2 |g_xy|² + 0.15 |ω_xy|²)`.
+  `g_xy` is the horizontal part of gravity in the torso frame and `ω_xy` the
+  roll and pitch rate. These are the leg motor's own upright terms
+  (`motor_native.REWARD`), 5 times stronger (`native_finetune.tilt_penalty`).
+- `--leg-anchor 20`: the PPO loss adds 20 × the mean squared gap between the
+  leg outputs' means and those of the starting clone
+  (`native_finetune.leg_drift`). The arms and every scale are free.
+
+During training the leg drift stayed around 0.001 and KL around 0.005–0.03.
+Hits per 1000 steps rose from 23 to 66 while the tilt penalty fell from 0.14
+to 0.13 per step.
+
+The gate selected the 1M checkpoint, the first whole-body checkpoint it
+accepted. Its long check (120 s, seeds 24–31) found it stable against all
+three opponents: 1 : 1 knockdowns vs the clone, 0 : 0 vs the champion
+tactics, 2 : 2 vs the striker. Confirmation: 47–0–1 over 48 bouts.
+
+Evaluation, 32 bouts of 120 s (seeds 0–15, corners swapped). The
+whole-body policy has no motor; each opponent plays on its own legs:
+
+| Bouts | Record | Clean punches per bout | Knockdowns (whole body : opponent) |
+| --- | --- | --- | --- |
+| **vs champion stack** | **32–0** | **361 : 81** | **1 : 0** |
+| vs striker (`checkpoints/striker` on `spar-native`) | 31–1 | 362 : 114 | 2 : 2 |
+| vs itself | — | 389 : 391 | 4 in all |
+| *for comparison:* striker vs champion | 32–0 | 256 : 87 | 1 : 4 |
+| *for comparison:* striker vs itself | — | 234 : 252 | 20 in all |
+
+It lands 41 % more clean punches than the striker against the same
+champion. Its own brawls fall 4 times in 32 bouts, where two strikers fall 20
+times. Promoted as `checkpoints/whole-body`
+([60 s video](../fights/whole_body_vs_champion_60s.mp4)).
+
+The three changes were made together, so this run does not show which of
+them matters most.
+
+Commands:
 
 ```bash
 python -m boxer.whole_body_train collect --output runs/whole-body-data
 python -m boxer.whole_body_train clone --data runs/whole-body-data --output runs/whole-body-clone
-python -m boxer.native_finetune --whole-body --init-from runs/whole-body-clone/checkpoint \
-  --output runs/whole-body-native2 --motor checkpoints/spar-native --ring --arm checkpoints/arm-skill \
-  --pool checkpoints/tactics checkpoints/tactics-highguard-v1 checkpoints/striker checkpoints/striker-v1 \
-  --scripted-fraction .3 --high-guard-fraction .6 --steps 2000000 --checkpoint-every 500000 \
-  --min-std .05 --learning-rate 1.5e-5 --epochs 2 --fall-penalty 60 --arm-motion-cost .05 \
-  --native-gate 4 --long-gate 2 --long-gate-opponents checkpoints/tactics checkpoints/striker
+python -m boxer.native_finetune --whole-body --init-from runs/whole-body-clone/checkpoint   --output runs/whole-body-native3 --motor checkpoints/spar-native --ring --arm checkpoints/arm-skill   --pool checkpoints/tactics checkpoints/tactics-highguard-v1 checkpoints/striker checkpoints/striker-v1   --scripted-fraction .3 --high-guard-fraction .6 --steps 2000000 --checkpoint-every 500000   --min-std .05 --learning-rate 1.5e-5 --epochs 2 --fall-penalty 60 --arm-motion-cost .05   --episode-seconds 120 --gamma .99 --tilt-cost 5 --leg-anchor 20   --native-gate 4 --long-gate 2 --long-gate-opponents checkpoints/tactics checkpoints/striker
+bash tools/run_spar.sh boxer.spar_match --ring --seconds 120 --knockdowns 3 --seeds 0 1 2 3 --swap   --checkpoint checkpoints/spar-native --red-tactics checkpoints/whole-body   --blue-checkpoint checkpoints/spar --blue-tactics checkpoints/tactics --blue-arm checkpoints/arm-skill
 ```
+
+In `spar_match`, `--checkpoint` still names a motor for that corner. A
+whole-body corner overrides the motor's leg targets every step, so the motor
+does not move it.
 
 ## What is open
 
-The end-to-end interface works: one network can stand, step, turn and punch
-for a full 120 s bout. What it lacks is training that values staying up over
-a whole bout. Directions not tried yet:
-
-- Episodes as long as the bouts that are judged (120 s), or a value horizon
-  that sees a fall coming.
-- A per-step penalty on the body's tilt and tilt rate, like the leg motor's
-  own reward, instead of only a terminal fall penalty.
-- Keeping the leg outputs close to the clone (a KL or L2 anchor) while the
-  arms explore.
+- Ablations: which of long episodes, γ, tilt cost and leg anchor carries the
+  gain.
+- Training continued from `checkpoints/whole-body`, now with itself in the
+  pool, and with the leg anchor moved to the new policy.
+- Getting up after a knockdown, which a whole-body policy could learn
+  because it controls every joint.

@@ -64,3 +64,41 @@ def test_native_bout_learns_the_whole_body(pair):
     reward, terminal, truncated, info = bout_.step(action)
     np.testing.assert_allclose(bout_.executed[bout_.learner, :LEGS], .3)
     assert np.abs(bout_.executed[1 - bout_.learner, :LEGS]).max() == 0 and np.isfinite(reward)
+
+
+def test_tilt_penalty_uses_the_motors_upright_weights():
+    from boxer.native_finetune import tilt_penalty
+    obs = np.zeros(103)
+    obs[6:9] = [0., 0., -1.]                                  # upright, still
+    assert tilt_penalty(obs) == 0.
+    obs[6:9] = [.3, .4, -.87]
+    obs[3:6] = [1., 2., 5.]                                   # yaw rate costs nothing
+    assert np.isclose(tilt_penalty(obs), 2. * .25 + .15 * 5.)
+
+
+def test_tilt_cost_lowers_the_whole_body_reward_by_the_learners_tilt(pair):
+    from boxer.native_finetune import NativeBout
+    motor = lambda inputs, key: (np.zeros((2, 29)), None)
+    rewards, tilts = [], []
+    for cost in (0., 5.):
+        bout_ = NativeBout(pair, motor, np.random.default_rng(0), [], 1., 50, 30., whole_body=True, tilt_cost=cost)
+        action = np.r_[np.full(LEGS, .3), to_unit(bout_.arms[bout_.learner].arm_pose).ravel()]
+        for _ in range(5):
+            reward, _, _, info = bout_.step(action)
+        rewards.append(reward)
+        tilts.append(info["tilt"])
+    assert tilts[0] == 0. and tilts[1] > 0.
+    assert np.isclose(rewards[0] - rewards[1], pair.dt * 5. * tilts[1], rtol=1e-6)
+
+
+def test_leg_drift_measures_only_the_leg_outputs():
+    from boxer.native_finetune import leg_drift
+    net, _ = whole_body_net()
+    norm, policy, _ = random_params()
+    obs = jp.asarray(np.random.default_rng(0).normal(size=(8, WHOLE_BODY_OBS_SIZE)), jp.float32)
+    logits = net.policy_network.apply(norm, policy, obs)
+    assert float(leg_drift(net, norm, logits, policy, obs)) == 0.
+    moved = logits.at[:, LEGS:].add(1.)                        # arm means and every scale
+    moved = moved.at[:, WHOLE_BODY_ACTION_SIZE:].add(1.)
+    assert float(leg_drift(net, norm, moved, policy, obs)) < 1e-12
+    assert float(leg_drift(net, norm, logits.at[:, :LEGS].add(.5), policy, obs)) > 1e-3

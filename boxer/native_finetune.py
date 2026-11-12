@@ -49,7 +49,7 @@ class NativeBout:
 
     def __init__(self, pair, motor, rng, opponents, scripted_fraction, episode_steps, fall_penalty,
                  high_guard_fraction=0., arm_skill=None, leg_contact_penalty=0., striker=False,
-                 arm_motion_cost=0., whole_body=False):
+                 arm_motion_cost=0., whole_body=False, tilt_cost=0.):
         """``arm_skill``: an ``arm_skill.ArmSkill`` steering both corners' punches.
         ``leg_contact_penalty``: reward lost per second the robots' legs touch.
         ``striker``: the learner's actions are a striker's (``boxer.striker``),
@@ -57,11 +57,14 @@ class NativeBout:
         ``arm_motion_cost``: a striker's reward lost per radian its arm targets
         move (summed over both arms' shoulder and elbow joints).
         ``whole_body``: the learner's actions set its legs, waist and arms
-        (``boxer.whole_body``); the motor drives only the opponent."""
+        (``boxer.whole_body``); the motor drives only the opponent.
+        ``tilt_cost``: reward lost every step for the learner's torso tilt
+        and tilt rate, with the leg motor's own weights (``tilt_penalty``)."""
         from boxer.spar_match import PunchArm
         self.pair, self.motor, self.rng = pair, motor, rng
         self.arm_skill, self.leg_contact_penalty = arm_skill, leg_contact_penalty
         self.striker, self.arm_motion_cost, self.whole_body = striker, arm_motion_cost, whole_body
+        self.tilt_cost = tilt_cost
         self.opponents, self.scripted_fraction = opponents, scripted_fraction
         self.high_guard_fraction = high_guard_fraction
         self.episode_steps, self.fall_penalty = episode_steps, fall_penalty
@@ -158,18 +161,25 @@ class NativeBout:
         scored = outcome["scored"]
         distance = float(np.linalg.norm(_body(pair, 1)["pos"] - _body(pair, 0)["pos"]))
         legs = pair.legs_touching()
+        tilt = tilt_penalty(pair.observation(np.zeros((2, 3)))[i]) if self.tilt_cost else 0.
         reward = (REWARD["hit"] * scored[i] - REWARD["taken"] * scored[1 - i]
                   - self.fall_penalty * fallen[i] + REWARD["opponent_fell"] * (fallen[1 - i] and not fallen[i])
                   + pair.dt * REWARD["in_range"] * np.exp(-((distance - REACH) / .15) ** 2)
                   - REWARD["punch"] * launched - pair.dt * self.leg_contact_penalty * legs
-                  - self.arm_motion_cost * motion)
+                  - self.arm_motion_cost * motion - pair.dt * self.tilt_cost * tilt)
         self.t += 1
         terminal = bool(outcome["done"])
         truncated = not terminal and self.t >= self.episode_steps
         return float(reward), terminal, truncated, dict(hits=float(scored[i]), taken=float(scored[1 - i]),
                                                         fell=float(fallen[i]), punches=float(launched),
                                                         hooks=float(hooked), legs=float(legs),
-                                                        motion=motion)
+                                                        motion=motion, tilt=tilt)
+
+
+def tilt_penalty(motor_obs):
+    """The leg motor's upright terms (``motor_native.REWARD``): torso tilt and tilt rate."""
+    gyro, gravity = motor_obs[3:6], motor_obs[6:9]
+    return float(2. * np.sum(gravity[:2] ** 2) + .15 * np.sum(gyro[:2] ** 2))
 
 
 def worker(conn, *args):
@@ -229,7 +239,7 @@ def export_native_model(path, ring=False):
 
 def _worker(conn, seed, motor_path, opponent_paths, scripted_fraction, episode_steps, fall_penalty,
             min_std, model_path, constants, high_guard_fraction=0., arm_path=None,
-            leg_contact_penalty=0., striker=False, arm_motion_cost=0., whole_body=False):
+            leg_contact_penalty=0., striker=False, arm_motion_cost=0., whole_body=False, tilt_cost=0.):
     _configure_worker_env()
     import jax
     import mujoco
@@ -251,7 +261,8 @@ def _worker(conn, seed, motor_path, opponent_paths, scripted_fraction, episode_s
         from boxer.arm_skill import ArmSkill
         arm_skill = ArmSkill(load_policy_params(arm_path)[0])
     bout = NativeBout(pair, motor, rng, opponents, scripted_fraction, episode_steps, fall_penalty,
-                      high_guard_fraction, arm_skill, leg_contact_penalty, striker, arm_motion_cost, whole_body)
+                      high_guard_fraction, arm_skill, leg_contact_penalty, striker, arm_motion_cost, whole_body,
+                      tilt_cost)
     sample_with = make_sampler(min_std, learner_net(striker, whole_body))
 
     def sample_next(params, obs, key):
@@ -267,7 +278,7 @@ def _worker(conn, seed, motor_path, opponent_paths, scripted_fraction, episode_s
             break
         params, steps = message
         record = {k: [] for k in ("obs", "raw", "logp", "reward", "terminal", "truncated", "next_obs")}
-        stats = dict(hits=0., taken=0., fell=0., punches=0., hooks=0., legs=0., motion=0., bouts=0)
+        stats = dict(hits=0., taken=0., fell=0., punches=0., hooks=0., legs=0., motion=0., tilt=0., bouts=0)
         for _ in range(steps):
             action, raw, logp, key = sample(params, obs, key)
             reward, terminal, truncated, info = bout.step(np.asarray(action))
@@ -276,7 +287,7 @@ def _worker(conn, seed, motor_path, opponent_paths, scripted_fraction, episode_s
                                 ("reward", reward), ("terminal", terminal), ("truncated", truncated),
                                 ("next_obs", next_obs)):
                 record[name].append(value)
-            for name in ("hits", "taken", "fell", "punches", "hooks", "legs", "motion"):
+            for name in ("hits", "taken", "fell", "punches", "hooks", "legs", "motion", "tilt"):
                 stats[name] += info[name]
             if terminal or truncated:
                 stats["bouts"] += 1
@@ -285,6 +296,15 @@ def _worker(conn, seed, motor_path, opponent_paths, scripted_fraction, episode_s
             obs = next_obs
         conn.send(({k: np.asarray(v) for k, v in record.items()}, stats))
 
+
+def leg_drift(net, norm, logits, anchor, obs):
+    """Mean squared gap between the leg outputs' means and the anchor policy's."""
+    import jax
+    import jax.numpy as jp
+    from boxer.whole_body import LEGS
+    fixed = jax.lax.stop_gradient(net.policy_network.apply(norm, anchor, obs))
+    gap = jp.tanh(logits[:, :LEGS]) - jp.tanh(fixed[:, :LEGS])
+    return (gap ** 2).mean()
 
 def make_sampler(min_std, nets=None):
     """Samples like brax's NormalTanh policy, with the scale floored at ``min_std``."""
@@ -386,6 +406,12 @@ def main(argv=None):
                         help="best gate candidates that may take the 120 s stability check (0 skips it)")
     parser.add_argument("--long-gate-opponents", type=Path, nargs="*", default=[],
                         help="opponents of the 120 s stability check besides --init-from")
+    parser.add_argument("--episode-seconds", type=float, default=20.,
+                        help="training episode length (bouts in the gate's long check last 120 s)")
+    parser.add_argument("--tilt-cost", type=float, default=0.,
+                        help="per-second reward lost for torso tilt and tilt rate (motor weights)")
+    parser.add_argument("--leg-anchor", type=float, default=0.,
+                        help="whole body: loss weight keeping leg outputs near --init-from's")
     parser.add_argument("--seed", type=int, default=0)
     args = parser.parse_args(argv)
     _configure_worker_env()
@@ -404,6 +430,7 @@ def main(argv=None):
         # A pre-hook policy: same behaviour, new inputs/outputs start silent.
         initial = widen_legacy(initial)
     norm, policy, value = initial
+    anchor = policy                    # the starting policy; --leg-anchor keeps the legs near it
     net, dist = learner_net(args.striker, args.whole_body)
     optimizer = optax.chain(optax.clip_by_global_norm(1.), optax.adam(args.learning_rate))
     trainable = dict(policy=policy, value=value)
@@ -422,8 +449,10 @@ def main(argv=None):
         value_error = net.value_network.apply(norm, trainable["value"], batch["obs"]) - batch["returns"]
         entropy = dist.entropy(logits, key)
         total = -surrogate.mean() + .25 * (value_error ** 2).mean() - args.entropy_cost * entropy.mean()
+        drift = leg_drift(net, norm, logits, anchor, batch["obs"]) if args.leg_anchor else jp.zeros(())
+        total = total + args.leg_anchor * drift
         return total, dict(kl=(batch["logp"] - logp).mean(), entropy=entropy.mean(),
-                           clipped=(jp.abs(ratio - 1) > .2).mean())
+                           clipped=(jp.abs(ratio - 1) > .2).mean(), leg_drift=drift)
 
     @jax.jit
     def update(trainable, opt_state, batch, key):
@@ -449,9 +478,9 @@ def main(argv=None):
         parent, child = context.Pipe()
         process = context.Process(target=worker, args=(
             child, args.seed * 1000 + w, args.motor, [str(p) for p in args.pool],
-            args.scripted_fraction, 1000, args.fall_penalty, args.min_std, model_path, constants,
+            args.scripted_fraction, round(args.episode_seconds / .02), args.fall_penalty, args.min_std, model_path, constants,
             args.high_guard_fraction, str(args.arm) if args.arm else None, args.leg_contact_penalty,
-            args.striker, args.arm_motion_cost, args.whole_body),
+            args.striker, args.arm_motion_cost, args.whole_body, args.tilt_cost),
             daemon=True)
         process.start()
         pipes.append(parent)
@@ -506,6 +535,7 @@ def main(argv=None):
                           falls=sum(s["fell"] for s in stats), bouts_finished=bouts,
                           leg_contact_share=sum(s["legs"] for s in stats) / size,
                           arm_rad_per_step=sum(s["motion"] for s in stats) / size,
+                          tilt_per_step=sum(s["tilt"] for s in stats) / size,
                           hook_share=sum(s["hooks"] for s in stats) / max(sum(s["punches"] for s in stats), 1.),
                           **{k: float(v) for k, v in info.items()})
             log.write(json.dumps(record) + "\n")
