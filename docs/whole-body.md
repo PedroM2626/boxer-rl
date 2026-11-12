@@ -116,8 +116,7 @@ champion. Its own brawls fall 4 times in 32 bouts, where two strikers fall 20
 times. Promoted as `checkpoints/whole-body`
 ([60 s video](../fights/whole_body_vs_champion_60s.mp4)).
 
-The three changes were made together, so this run does not show which of
-them matters most.
+The changes were made together; the ablations below separate them.
 
 Commands:
 
@@ -132,11 +131,56 @@ In `spar_match`, `--checkpoint` still names a motor for that corner. A
 whole-body corner overrides the motor's leg targets every step, so the motor
 does not move it.
 
+## Ablations: the leg anchor and the horizon carry it
+
+Each run below drops one of run 3's four changes and trains 1M steps from
+the clone with run 3's seed (302); `full-seed303` keeps all four with
+another seed. No gate: every run is judged at 1M steps over 32 bouts of
+120 s (seeds 0–15, corners swapped) against the champion and against
+itself. Training hits and tilt are the last 20 progress rows.
+
+| Run | Dropped | vs champion | Clean per bout | Knockdowns (wb : champ) | Own brawls: knockdowns | Training hits / 1000 |
+| --- | --- | --- | --- | --- | --- | --- |
+| run 3 (promoted) | — | 32–0 | 361 : 81 | 1 : 0 | 4 | 66 |
+| full-seed303 | — (other seed) | 31–0–1 | 376 : 81 | 0 : 0 | 2 | 69 |
+| no-long | 120 s episodes (20 s) | 32–0 | 352 : 58 | 2 : 2 | 4 | 56 |
+| no-tilt | tilt cost | 32–0 | 382 : 113 | 6 : 5 | 10 | 67 |
+| no-gamma | γ 0.99 (0.97) | 32–0 | 326 : 74 | 7 : 5 | 38 | 66 |
+| no-anchor | leg anchor | 31–1 | 404 : 28 | 14 : 1 | **108** | 65 |
+
+- **The leg anchor is essential.** Without it the legs drift from the
+  clone's gait. The policy lands the most punches against the champion (404
+  to 28) and loses one bout on knockdowns (14 : 1); two of them fall 108
+  times in 32 bouts, and the brawls barely produce clean punches (139 per
+  bout).
+- **The longer horizon matters next.** With γ 0.97 the own brawls fall 38
+  times.
+- **The tilt cost helps a little** (10 knockdowns without it, against 4).
+- **Long episodes do not matter** once the other three are in place: 20 s
+  episodes give the same 4 knockdowns, with fewer training hits (56 against
+  66).
+- The second seed reproduces the result (2 knockdowns in own brawls).
+
+## Continued training with itself in the pool (rejected)
+
+Run 4 started from `checkpoints/whole-body`, with the same settings as run 3
+and the policy itself added to the opponent pool. The leg anchor moved with
+it: it now holds the legs near the promoted policy's legs. 2M steps, seed 304.
+
+Every checkpoint beat the promoted policy in the 20 s gate (13–2–1 at 0.5M,
+then 15–0–1, 15–0–1, 15–1). Over 120 s it beat it 16–0 (443 : 280 clean
+punches per bout at 1.5M) with no falls. But against the champion stack it
+fell 9 times in 16 long bouts at 1M and 3 times at 1.5M, where the champion
+fell 0 times; the gate allows 2. Nothing was promoted.
+
+Training against itself makes it stronger against itself and less steady
+against the champion's different style. Keeping the champion stacks and
+the strikers in the pool did not prevent this within 2M steps.
+
 ## What is open
 
-- Ablations: which of long episodes, γ, tilt cost and leg anchor carries the
-  gain.
-- Training continued from `checkpoints/whole-body`, now with itself in the
-  pool, and with the leg anchor moved to the new policy.
+- Self-play that keeps the champion steady: e.g. the long check inside the
+  training loop, or a fall penalty weighted by opponent.
 - Getting up after a knockdown, which a whole-body policy could learn
-  because it controls every joint.
+  because it controls every joint. Two solo attempts in a GPU stage failed
+  ([get-up](getup.md)).

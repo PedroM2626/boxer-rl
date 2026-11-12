@@ -15,6 +15,7 @@ import jax.numpy as jp
 import numpy as np
 from etils import epath
 
+from mujoco import mjx
 from mujoco_playground._src import mjx_env
 from mujoco_playground._src.locomotion.g1 import joystick
 
@@ -49,6 +50,41 @@ PHANTOM_PARK = jp.array([0., 0., -10.])
 # striker (boxer.striker) sent in native bouts instead of the generated moves.
 STRIKER_ARM_FRACTION = .5
 LEFT_ARM, RIGHT_ARM = 15, 22  # first shoulder actuator of each arm
+# Getting up (stage ``getup``). The upstream model only lets the legs and hands
+# touch the floor; a robot on the floor also lies on its pelvis, torso, head,
+# upper arms and elbows. These massless colliders (density 0, so mass and
+# inertia are unchanged) touch only the floor.
+FLOOR_BODY_GEOMS = (
+    # (body, name, type, size, fromto or pos)
+    ("pelvis", "pelvis_floor", "capsule", .09, (0, -.07, -.02, 0, .07, -.02)),
+    ("torso_link", "torso_floor", "capsule", .11, (0, 0, .05, 0, 0, .28)),
+    ("torso_link", "shoulders_floor", "capsule", .07, (0, -.12, .25, 0, .12, .25)),
+    ("torso_link", "head_floor", "sphere", .08, (.02, 0, .44)),
+    ("left_shoulder_yaw_link", "left_upper_arm_floor", "capsule", .04, (0, 0, 0, .016, 0, -.08)),
+    ("right_shoulder_yaw_link", "right_upper_arm_floor", "capsule", .04, (0, 0, 0, .016, 0, -.08)),
+    ("left_elbow_link", "left_forearm_floor", "capsule", .035, (0, 0, 0, .1, 0, -.01)),
+    ("right_elbow_link", "right_forearm_floor", "capsule", .035, (0, 0, 0, .1, 0, -.01)),
+)
+FLOOR_LIMB_GEOMS = ("left_thigh", "right_thigh", "left_shin", "right_shin",
+                    "left_hand_collision", "right_hand_collision")
+# Starts: lying (any side), part-way through a fall, or standing.
+GETUP_LYING, GETUP_FALLING = .5, .3
+GETUP_STAND_HEIGHT = .75   # pelvis height counted as fully up (upstream standing: 0.79)
+GETUP_FLOOR_HEIGHT = .15   # pelvis height counted as fully down
+GETUP_HEAD = (.02, 0., .44)   # head centre in the torso frame
+GETUP_HEAD_HEIGHT = (.12, 1.2)  # head height counted as fully down and fully up
+GETUP_REWARD = dict(height=1., head=2., upright=1., standing=2., pose=-.5, joint_velocity=-1e-4)
+
+
+def _axis_quat(axis, angle):
+    return jp.concatenate([jp.cos(angle / 2)[None], jp.sin(angle / 2) * axis])
+
+
+def _quat_mul(a, b):
+    w1, x1, y1, z1 = a
+    w2, x2, y2, z2 = b
+    return jp.array([w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2, w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2,
+                     w1 * y2 - x1 * z2 + y1 * w2 + z1 * x2, w1 * z2 + x1 * y2 - y1 * x2 + z1 * w2])
 
 
 def configure_assets():
@@ -83,7 +119,15 @@ def stage_config(stage, impl="warp"):
     cfg.push_config.magnitude_range = [0.10, 0.30]
     cfg.noise_config.level = 0.25
     cfg.reward_config.scales.action_rate = -0.01
-    if stage == "balance":
+    if stage == "getup":
+        # No shoves and no footwork commands: only getting up and staying up.
+        cfg.push_config.enable = False
+        cfg.lin_vel_x = [0.0, 0.0]
+        cfg.lin_vel_y = [0.0, 0.0]
+        cfg.ang_vel_yaw = [0.0, 0.0]
+        # Many more floor contacts than standing on two feet.
+        cfg.njmax = 512
+    elif stage == "balance":
         # Mostly standing, with gentle weight shifts rather than a hard
         # separation between stationary balance and the first movement commands.
         cfg.lin_vel_x = [-0.03, 0.05]
@@ -123,6 +167,8 @@ class UnassistedG1(joystick.Joystick):
                 raise ValueError("phantom shins belong to the spar stage")
             self._add_phantom_shins()
             self._phantom = True
+        if stage == "getup":
+            self._add_floor_body()
         self._arm_traces = None
         if self._config.get("striker_arms", None):
             if stage != "spar":
@@ -163,6 +209,8 @@ class UnassistedG1(joystick.Joystick):
         )
 
     def sample_command(self, rng):
+        if self.stage == "getup":
+            return jp.zeros(3)
         motion_rng, standing_rng = jax.random.split(rng)
         command = super().sample_command(motion_rng)
         # Retain standing practice as movement becomes harder. Upstream already
@@ -190,6 +238,8 @@ class UnassistedG1(joystick.Joystick):
 
     def reset(self, rng):
         state = super().reset(rng)
+        if self.stage == "getup":
+            state = self._fallen_start(state, jax.random.fold_in(rng, 97))
         if self.stage == "spar" and self._phantom is not None:
             state.info.update(phantom_timer=jax.random.uniform(jax.random.fold_in(rng, 79), (),
                                                                minval=PHANTOM_GAP[0], maxval=PHANTOM_GAP[1]),
@@ -341,6 +391,12 @@ class UnassistedG1(joystick.Joystick):
         return state.replace(data=state.data.replace(mocap_pos=position[None], mocap_quat=quat[None]))
 
     def step(self, state, action):
+        if self.stage == "getup":
+            state = super().step(state, action)
+            reward, terms = self.getup_reward(state.data, action)
+            state.metrics.update(self._metrics(state.data, state.info))
+            state.metrics.update({f"getup/{k}": v for k, v in terms.items()})
+            return state.replace(reward=reward)
         if self.stage == "spar" and self._phantom is not None:
             state = self.phantom(state)
         if self.stage == "spar":
@@ -371,7 +427,83 @@ class UnassistedG1(joystick.Joystick):
             for sensor in self._feet_floor_found_sensor])
         return state.replace(obs=self._get_obs(state.data, state.info, contact))
 
+    def _add_floor_body(self):
+        """Lets the pelvis, torso, head and arms rest on the floor (stage ``getup``)."""
+        old = self._mj_model
+        spec = mujoco.MjSpec.from_file(self._xml_path, assets=self._model_assets)
+        kinds = dict(capsule=mujoco.mjtGeom.mjGEOM_CAPSULE, sphere=mujoco.mjtGeom.mjGEOM_SPHERE)
+        for body, name, kind, radius, where in FLOOR_BODY_GEOMS:
+            geom = spec.body(body).add_geom(name=name, type=kinds[kind], size=[radius, 0, 0],
+                                            contype=0, conaffinity=0, density=0, group=3)
+            if kind == "capsule":
+                geom.fromto = where
+            else:
+                geom.pos = where
+        for name in [g[1] for g in FLOOR_BODY_GEOMS] + list(FLOOR_LIMB_GEOMS):
+            spec.add_pair(geomname1=name, geomname2="floor", condim=3, friction=[.6, .6, .005, .0001, .0001])
+        model = spec.compile()
+        model.opt.timestep = old.opt.timestep
+        model.jnt_range[:] = old.jnt_range
+        model.actuator_ctrlrange[:] = old.actuator_ctrlrange
+        model.vis.global_.offwidth, model.vis.global_.offheight = old.vis.global_.offwidth, old.vis.global_.offheight
+        if (model.nq != old.nq or model.nbody != old.nbody or model.nu != old.nu
+                or not np.allclose(model.body_mass, old.body_mass)):
+            raise ValueError("floor colliders must not change the robot")
+        self._mj_model = model
+        self._mjx_model = mjx_env.put_model(model, impl=self._config.impl)
+
+    def _fallen_start(self, state, rng):
+        """Replaces the standing start with one lying down or part-way through a fall."""
+        kind_rng, axis_rng, lying_rng, falling_rng, yaw_rng, joint_rng = jax.random.split(rng, 6)
+        u = jax.random.uniform(kind_rng)
+        lying, falling = u < GETUP_LYING, (u >= GETUP_LYING) & (u < GETUP_LYING + GETUP_FALLING)
+        # Tilt about a random horizontal axis: pi/2 lies on the back, front or a side.
+        tilt = jp.where(lying, jax.random.uniform(lying_rng, minval=1.3, maxval=1.85),
+                        jp.where(falling, jax.random.uniform(falling_rng, minval=.4, maxval=1.1), 0.))
+        heading = jax.random.uniform(axis_rng, minval=-jp.pi, maxval=jp.pi)
+        axis = jp.array([jp.cos(heading), jp.sin(heading), 0.])
+        yaw = jax.random.uniform(yaw_rng, minval=-jp.pi, maxval=jp.pi)
+        quat = _quat_mul(_axis_quat(axis, tilt), _axis_quat(jp.array([0., 0., 1.]), yaw))
+        # High enough that the straight legs clear the floor; the robot drops onto it.
+        height = jp.maximum(.8 * jp.cos(tilt) + .05, .3)
+        joints = self._default_pose + jax.random.uniform(joint_rng, (self.mjx_model.nu,), minval=-.25, maxval=.25)
+        low, high = self.mj_model.jnt_range[1:, 0], self.mj_model.jnt_range[1:, 1]
+        joints = jp.clip(joints, low, high)
+        fallen = lying | falling
+        qpos = state.data.qpos
+        qpos = jp.where(fallen, qpos.at[2].set(height).at[3:7].set(quat).at[7:].set(joints), qpos)
+        qvel = jp.where(fallen, jp.zeros_like(state.data.qvel), state.data.qvel)
+        data = mjx_env.make_data(self.mj_model, qpos=qpos, qvel=qvel, ctrl=qpos[7:],
+                                 impl=self.mjx_model.impl.value, naconmax=self._config.naconmax,
+                                 njmax=self._config.njmax)
+        data = mjx.forward(self.mjx_model, data)
+        contact = jp.array([data.sensordata[self.mj_model.sensor_adr[sensor]] > 0
+                            for sensor in self._feet_floor_found_sensor])
+        state.info["last_contact"] = contact
+        state.metrics.update({f"getup/{k}": jp.zeros(()) for k in GETUP_REWARD})
+        state.metrics.update(getup_start_lying=lying.astype(jp.float32))
+        return state.replace(data=data, obs=self._get_obs(data, state.info, contact))
+
+    def getup_reward(self, data, action):
+        """Per-step reward for getting up: pelvis height and an upright torso, then standing still in guard."""
+        height = jp.clip((data.qpos[2] - GETUP_FLOOR_HEIGHT) / (GETUP_STAND_HEIGHT - GETUP_FLOOR_HEIGHT), 0., 1.)
+        upright = self.get_gravity(data, "torso")[-1]
+        # The head rises first (sitting up, kneeling), long before the pelvis.
+        torso = self.mj_model.body("torso_link").id
+        head = data.xpos[torso, 2] + (data.xmat[torso].reshape(3, 3) @ jp.array(GETUP_HEAD))[2]
+        head = jp.clip((head - GETUP_HEAD_HEIGHT[0]) / (GETUP_HEAD_HEIGHT[1] - GETUP_HEAD_HEIGHT[0]), 0., 1.)
+        standing = (height > .95) & (upright > .9)
+        terms = dict(height=height, head=head, upright=((upright + 1.) / 2.) ** 2,
+                     standing=standing.astype(jp.float32),
+                     pose=standing * jp.mean((data.qpos[7:] - self._default_pose) ** 2),
+                     joint_velocity=jp.sum(data.qvel[6:] ** 2))
+        reward = self.dt * sum(GETUP_REWARD[k] * v for k, v in terms.items())
+        return reward, terms
+
     def _get_termination(self, data):
+        if self.stage == "getup":
+            # Lying down is the starting point here, not a failure.
+            return jp.isnan(data.qpos).any() | jp.isnan(data.qvel).any()
         # The upstream task allows extreme tilt before termination. A standing
         # curriculum must end when the torso falls or the pelvis drops, rather
         # than letting a prone robot collect a zero-velocity reward.

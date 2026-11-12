@@ -7,7 +7,7 @@ learned controllers, free legs and no pelvis support. Both fists match each
 boxer's corner color. [Watch the preview video](fights/striker_vs_champion_preview.mp4)
 or the [full 60-second bout](fights/striker_native_legs_vs_champion_60s.mp4).
 
-## Where things stand (2026-11-11)
+## Where things stand (2026-11-12)
 
 Two simulated Unitree G1 humanoids box each other in native MuJoCo with no
 physical assistance: free legs and roots, no pelvis springs, welds or
@@ -61,6 +61,9 @@ bash tools/run_spar.sh boxer.spar_match --ring --seconds 120 --knockdowns 3 --se
 * **Close to a clinch.** The striker and the whole-body policy win by fighting at very close range;
   nothing in the rules separates clinched boxers.
 * **No getting up.** After a knockdown the referee resets both robots standing.
+  Two attempts to learn getting up from the floor (a GPU `getup` stage with
+  floor contacts for the whole body) failed: robots stayed down or learned to
+  sit ([get-up](docs/getup.md)).
 * **Stacks are trained part by part.** In the two stacks, legs, tactics, arm
   skill and striker are separate policies trained in turn; changing one (e.g.
   a striker's arm style) can break another (its legs), as several experiments
@@ -68,13 +71,16 @@ bash tools/run_spar.sh boxer.spar_match --ring --seconds 120 --knockdowns 3 --se
 * **Short training episodes hide falls.** PPO used 20 s episodes, and falls
   show up over 120 s. The native gate now checks 120 s bouts before it
   promotes anything (`--long-gate`); it rejected 4 of the 5 runs before the
-  whole-body policy. The whole-body policy trains on 120 s episodes with a
-  per-step tilt cost; which of its changes matters most is not yet measured.
-* **Turning is automatic.** Brains choose advance and circling; facing the
-  opponent is a fixed rule (`tactics_env.decode`).
+  whole-body policy. For the whole-body policy, ablations show the falls are
+  held off by anchoring its legs to the striker's gait and by a ~2 s return
+  horizon, not by the episode length
+  ([ablations](docs/whole-body.md#ablations-the-leg-anchor-and-the-horizon-carry-it)).
+* **Turning is automatic in the stacks.** Their brains choose advance and
+  circling; facing the opponent is a fixed rule (`tactics_env.decode`). The
+  whole-body policy has no such rule: its own leg targets turn it.
 * **Simulation only**, against a fixed pool of policies; no sim-to-real work.
-* **Tests:** all 85 test files (425 tests) pass when run one file per
-  process (`tools/test_all.sh`, 2026-11-11); the whole suite in one process
+* **Tests:** all 86 test files (430 tests) pass when run one file per
+  process (`tools/test_all.sh`, 2026-11-12); the whole suite in one process
   exhausts the WSL VM's memory.
 
 **Checkpoints.** Current: `whole-body`, `spar`, `spar-native`, `tactics`,
@@ -117,6 +123,9 @@ since 2026-10-30, including the rejected ones.
 | 11-11 | Alternating legs and striker | Three rounds of native leg training then striker training on the new legs (`boxer.co_train`). | Gate kept 1 of 3 strikers; brawl falls 20 → 28; not promoted ([details](docs/striker.md#long-bout-gate-and-alternating-rounds-2026-11-11)). |
 | 11-11 | Whole-body policy | One network for legs, waist and arms (174 → 23), no motor: cloned from the striker, then native PPO. | Clone beats the champion 32–0 (kd 6 : 2); two PPO runs hit more but fell more and were rejected ([whole body](docs/whole-body.md)). |
 | 11-11 | Whole body, long episodes | Native PPO on 120 s episodes, γ 0.99, per-step tilt cost, leg outputs anchored to the clone. | First gate-approved whole-body run: vs champion 32–0, 361 : 81, kd 1 : 0; vs striker 31–1; own brawls 4 kd (strikers: 20). **Promoted** (`whole-body`) ([details](docs/whole-body.md#long-episodes-tilt-cost-and-leg-anchor)). |
+| 11-12 | Whole-body ablations | Run 3 retrained without each change in turn (1M steps). | Own-brawl knockdowns: no leg anchor 108, γ 0.97 38, no tilt cost 10, 20 s episodes 4 (full: 4, other seed 2) ([ablations](docs/whole-body.md#ablations-the-leg-anchor-and-the-horizon-carry-it)). |
+| 11-12 | Whole body vs itself | 2M more steps from `whole-body`, itself in the opponent pool. | Beats the promoted policy 16–0 over 120 s but falls 3–9 times in 16 bouts against the champion; rejected by the long gate ([details](docs/whole-body.md#continued-training-with-itself-in-the-pool-rejected)). |
+| 11-12 | Getting up | GPU `getup` stage: whole-body floor contacts, lying and falling starts, height and upright reward; 150M steps from the spar motor, then 200M from scratch with a head-height term. | 0 of 98 fallen starts stood up in either; the second learned to sit. Not used ([get-up](docs/getup.md)). |
 
 ## Milestones since unassisted two-robot bouts (2026-10-30 onward)
 
@@ -261,6 +270,17 @@ strikers fall 20 times (`checkpoints/whole-body`;
 [details](docs/whole-body.md#long-episodes-tilt-cost-and-leg-anchor);
 [60 s video](fights/whole_body_vs_champion_60s.mp4)).
 
+**What carries it, and what did not work (2026-11-12).** Ablations, each
+dropping one change: without the leg anchor two whole-body policies fall
+**108** times in 32 bouts, with γ 0.97 38 times, without the tilt cost 10
+times, and with 20 s episodes 4 times, the same as the full run
+([ablations](docs/whole-body.md#ablations-the-leg-anchor-and-the-horizon-carry-it)).
+Training 2M more steps with itself in the pool beat the promoted policy 16–0
+but fell 3–9 times against the champion, and the long gate rejected it
+([details](docs/whole-body.md#continued-training-with-itself-in-the-pool-rejected)).
+Two attempts to learn getting up from the floor failed: no fallen robot
+stood up, and the second policy learned to sit ([get-up](docs/getup.md)).
+
 ## Archive
 
 Earlier phases, moved out of this README on 2026-11-03 and kept as written:
@@ -343,8 +363,10 @@ which is declared coordinates on both sides.
 ## Architecture
 
 ```
-boxer/curriculum_env.py    UnassistedG1: one G1 on MJX/Warp, the curriculum stages and the
+boxer/curriculum_env.py    UnassistedG1: one G1 on MJX/Warp, the curriculum stages, the
                            spar stage (generated, rapid or replayed striker arm motions)
+                           and the getup stage (whole-body floor contacts, fallen starts)
+boxer/getup_eval.py        how often a policy gets up from lying and falling starts
 boxer/curriculum_train.py  GPU PPO for the leg motor (balance ... spar), with physical gates
 boxer/curriculum_eval.py   the solo physical gate (survival under shoves and punching arms)
 boxer/paired_foundation.py two robots in one native MuJoCo model, ring, impact scorecard, falls

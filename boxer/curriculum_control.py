@@ -4,9 +4,10 @@ from __future__ import annotations
 import math
 
 STAGES = ("balance", "walk_easy", "walk", "approach")
-# Sparring footwork while a punch generator drives both arms. It follows the
-# locomotion job rather than joining its automatic promotion sequence.
-TRAINABLE_STAGES = STAGES + ("spar",)
+# Sparring footwork while a punch generator drives both arms, and getting up
+# from the floor. Both follow the locomotion job rather than joining its
+# automatic promotion sequence.
+TRAINABLE_STAGES = STAGES + ("spar", "getup")
 COMMANDS = [(0.0, 0.0, 0.0), (0.4, 0.0, 0.0), (-0.25, 0.0, 0.0),
             (0.0, 0.2, 0.0), (0.0, -0.2, 0.0),
             (0.0, 0.0, 0.4), (0.0, 0.0, -0.4)]
