@@ -215,7 +215,8 @@ def _body(pair, i):
 
 
 def bout(pair, motor, seed, seconds=20.0, record=False, brains=None, knockdowns=1, arm_skills=None,
-         frame_every=2, clinch_break=0., getup=None, count_seconds=10., mandatory_count=MANDATORY_COUNT):
+         frame_every=2, clinch_break=0., getup=None, count_seconds=10., mandatory_count=MANDATORY_COUNT,
+         count_separate=0.):
     """One bout; ``brains`` maps corner -> PolicyBrain, others are scripted.
 
     ``knockdowns``: knockdowns of one boxer that stop the bout (1: the first
@@ -241,14 +242,14 @@ def bout(pair, motor, seed, seconds=20.0, record=False, brains=None, knockdowns=
     try:
         with jax.default_device(jax.devices('cpu')[0]):
             return _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills or {},
-                         frame_every, clinch_break, getup, count_seconds, mandatory_count)
+                         frame_every, clinch_break, getup, count_seconds, mandatory_count, count_separate)
     finally:
         pair.self_trip_falls = trips
         pair.stop_on_fall = True
 
 
 def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills, frame_every=2, clinch_break=0.,
-          getup=None, count_seconds=10., mandatory_count=MANDATORY_COUNT):
+          getup=None, count_seconds=10., mandatory_count=MANDATORY_COUNT, count_separate=0.):
     if getup is not None and not pair.floor_body:
         raise ValueError("getting up needs a pair built with floor_body colliders")
     rng = np.random.default_rng(seed)
@@ -304,7 +305,9 @@ def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills, fr
             if counted_out.any() or downs.max() >= knockdowns:
                 break
             if not down.any():
-                # Both up: box on from here.
+                # Both up: box on from here, or from neutral spots ``count_separate`` apart.
+                if count_separate:
+                    pair.separate(count_separate)
                 pair.stop_on_fall = True
                 arms = [_new_arm(pair, brain) for brain in brains]
                 last_arms = None
@@ -501,6 +504,8 @@ def main(argv=None):
                         help='get-up policy (stage getup): knockdowns are counted, not restarted')
     parser.add_argument('--count-seconds', type=float, default=10.,
                         help='with --getup: seconds down before a knockout')
+    parser.add_argument('--count-separate', type=float, default=0.,
+                        help='with --getup: metres apart the referee sets the boxers after a count (0: where they are)')
     parser.add_argument('--mandatory-count', type=float, default=MANDATORY_COUNT,
                         help='with --getup: seconds after a knockdown before boxing resumes, even if up')
     parser.add_argument('--swap', action='store_true',
@@ -537,7 +542,8 @@ def main(argv=None):
         # Every control step (50 Hz) when the video rate is not 25 fps, for resampling.
         result, frames, times = bout(pair, motor, seed, args.seconds, record, brains, args.knockdowns,
                                      arm_skills, 2 if args.fps == 25 else 1, args.clinch_break,
-                                     getup, args.count_seconds, args.mandatory_count)
+                                     getup, args.count_seconds, args.mandatory_count,
+                                     args.count_separate)
         result.update(red=names[1] if swapped else names[0], blue=names[0] if swapped else names[1])
         bouts.append(result)
         print(json.dumps({k: v for k, v in result.items() if k != 'impact_events'}), flush=True)
@@ -566,7 +572,7 @@ def main(argv=None):
                    ring=args.ring, rope_seconds_per_boxer=float(np.mean([b['rope_seconds'] for b in bouts])),
                    clinch_seconds_per_bout=float(np.mean([b['clinch_seconds'] for b in bouts])),
                    clinch_breaks=int(sum(len(b['clinch_breaks']) for b in bouts)),
-                   getup=str(args.getup) if args.getup else None,
+                   getup=str(args.getup) if args.getup else None, count_separate=args.count_separate,
                    knockouts=sum(b['method'] == 'ko' for b in bouts),
                    seconds_down_per_count=float(np.mean(rise)) if rise else None,
                    tactics=dict(first=names[0], second=names[1], first_wins=wins, first_losses=losses,

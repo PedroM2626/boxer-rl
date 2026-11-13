@@ -340,6 +340,27 @@ class PairedFoundation:
                 return True
         return False
 
+    def separate(self, distance=2.0):
+        """The referee's neutral corners: move both boxers, as they stand, ``distance``
+        apart about the ring centre along the line between them, each turned to face
+        the other. Joint angles and body velocities are kept (rotated with the turn)."""
+        roots = [self.data.qpos[m['root']:m['root'] + 2].copy() for m in self.maps]
+        line = roots[1] - roots[0]
+        line = line / np.linalg.norm(line) if np.linalg.norm(line) > 1e-6 else np.array([1., 0.])
+        for i, m in enumerate(self.maps):
+            q, rv = m['root'], m['rootv']
+            toward = line if i == 0 else -line
+            self.data.qpos[q:q + 2] = (-.5 if i == 0 else .5) * distance * line
+            heading = self.data.site(m['side'] + 'imu_in_pelvis').xmat.reshape(3, 3)[:2, 0]
+            turn = np.arctan2(toward[1], toward[0]) - np.arctan2(heading[1], heading[0])
+            c, s = np.cos(turn / 2), np.sin(turn / 2)
+            w, x, y, z = self.data.qpos[q + 3:q + 7]
+            # Yaw about world z applied before the current orientation: (c, 0, 0, s) * q.
+            self.data.qpos[q + 3:q + 7] = [c * w - s * z, c * x - s * y, c * y + s * x, c * z + s * w]
+            rot = np.array([[np.cos(turn), -np.sin(turn)], [np.sin(turn), np.cos(turn)]])
+            self.data.qvel[rv:rv + 2] = rot @ self.data.qvel[rv:rv + 2]   # world-frame velocity
+        mujoco.mj_forward(self.model, self.data)
+
     def standing(self):
         """Per corner: pelvis at standing height and torso near upright (the get-up test)."""
         return np.array([self.data.qpos[m['root'] + 2] >= UP_HEIGHT

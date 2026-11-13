@@ -293,3 +293,16 @@ def test_videos_resample_recorded_states_without_blending_restarts():
         assert np.linalg.norm(qpos[3:7]) == pytest.approx(1)
     held = [q for q, t in zip(out, out_times) if .08 <= t[0] < .1]   # between states 3 and 4: a restart
     assert held and all(np.array_equal(q, frames[3]) for q in held)
+
+
+def test_count_separate_sets_the_boxers_apart_once_the_count_ends():
+    from boxer.spar_match import bout
+    motor = lambda inputs, key: (np.zeros((2, 29)), None)
+    getup = lambda inputs, key: (np.full((2, 29), 7.), None)
+    separated = []
+    for distance in (0., 2.):
+        pair = _CountedPair(up_at=40)
+        pair.separate = lambda d, pair=pair: pair.actions and separated.append((d, len(pair.actions)))
+        bout(pair, motor, 0, 3.0, knockdowns=3, getup=getup, mandatory_count=0., count_separate=distance)
+    [(distance, at)] = separated
+    assert distance == 2. and 40 < at < 80          # once, when the count ends

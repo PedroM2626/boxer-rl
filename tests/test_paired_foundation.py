@@ -207,3 +207,23 @@ def test_floor_body_lets_a_fallen_robot_rest_on_the_floor_without_changing_it(pa
         p.stop_on_fall = True
     # Without body colliders the torso sinks through the floor; with them it rests on it.
     assert heights[0] < .05 < .1 < heights[1]
+
+
+def test_separate_sets_the_boxers_apart_facing_each_other_with_joints_kept(pair):
+    pair.reset(seed=3)
+    for _ in range(10):
+        pair.step(np.zeros((2, 29)))
+    joints = [pair.data.qpos[m['q']].copy() for m in pair.maps]
+    heights = [pair.data.qpos[m['root'] + 2] for m in pair.maps]
+    pair.separate(2.0)
+    roots = [pair.data.qpos[m['root']:m['root'] + 2] for m in pair.maps]
+    assert np.linalg.norm(roots[1] - roots[0]) == pytest.approx(2.0)
+    np.testing.assert_allclose(roots[0] + roots[1], 0., atol=1e-9)    # about the ring centre
+    for i, m in enumerate(pair.maps):
+        np.testing.assert_array_equal(pair.data.qpos[m['q']], joints[i])
+        assert pair.data.qpos[m['root'] + 2] == heights[i]
+        assert np.linalg.norm(pair.data.qpos[m['root'] + 3:m['root'] + 7]) == pytest.approx(1.)
+        heading = pair.data.site(m['side'] + 'imu_in_pelvis').xmat.reshape(3, 3)[:2, 0]
+        toward = roots[1 - i] - roots[i]
+        assert heading @ toward / np.linalg.norm(heading) / 2.0 > .999
+    pair.reset()

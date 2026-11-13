@@ -135,10 +135,10 @@ Each result lists the `counts`: time, who fell, and seconds down.
 
 32 bouts of 120 s (seeds 0–15, corners swapped, ring, 3 knockdowns):
 
-| Matchup | Referee restart (default) | Count, 0.5 s standing, no mandatory count | Count with the mandatory 8 s |
-| --- | --- | --- | --- |
-| whole body vs champion stack | 32–0, knockdowns 8 : 3 | 26–6, 16 : 4, 2 KOs | 26–6, 15 : 2, 3 KOs |
-| striker vs striker-v1 (`spar-native` legs) | 32–0, 15 : 5 | 24–8, 34 : 9 | 25–7, 32 : 11, 2 KOs |
+| Matchup | Referee restart (default) | Count, 0.5 s standing, no mandatory count | Count with the mandatory 8 s | Count, then 2 m apart (`--count-separate 2`) |
+| --- | --- | --- | --- | --- |
+| whole body vs champion stack | 32–0, knockdowns 8 : 3 | 26–6, 16 : 4, 2 KOs | 26–6, 15 : 2, 3 KOs | 29–3, 10 : 2, 3 KOs |
+| striker vs striker-v1 (`spar-native` legs) | 32–0, 15 : 5 | 24–8, 34 : 9 | 25–7, 32 : 11, 2 KOs | 31–1, 20 : 4, 0 KOs |
 
 Seconds down per count: 2.4 and 2.6 without the mandatory count (the rise
 itself, plus 0.5 s standing), 8.0 with it.
@@ -162,13 +162,29 @@ restart, for three reasons:
   against the champion drops from 32–0 to 26–6 because it falls more.
 
 So the count stays an option (`--getup`), and the restart remains the
-default rule for evaluations. Next steps for the count: resume boxing from
-the referee's neutral spots (separate both boxers 2 m apart without a
-reset), and train the boxing policies with starts taken from the end of a
-get-up.
+default rule for evaluations.
+
+### Neutral spots after the count (2026-11-13)
+
+`--count-separate 2` does what a referee does before waving the boxers on:
+once the count is over, both are moved, as they stand, 2 m apart about the
+ring centre on the line between them, each turned to face the other
+(`PairedFoundation.separate`). Joint angles and velocities are kept, so it is
+not the restart's fresh stance.
+
+It removes about a third of the knockdowns (whole body 15 → 10, striker brawl
+32 + 11 → 20 + 4), halves the falls within 3 s of resuming (5 → 3 and 9 → 4),
+and brings the win rates back to 29–3 and 31–1. The 3 knockouts against the
+champion remain: those boxers never got up, which separation cannot help.
+Restarts still fall less (8 : 3 and 15 : 5), so they stay the default for
+evaluations; the count with separation is the rule to use for watching bouts
+with knockdowns. What is left: train the boxing policies with starts taken
+from the end of a get-up, and the get-up policy with the opponent and ropes
+close by.
 
 ```bash
-bash runs/getup8_bouts.sh   # spar_match ... --knockdowns 3 --getup checkpoints/getup (mandatory count 8 s)
+bash runs/getup8_bouts.sh     # spar_match ... --knockdowns 3 --getup checkpoints/getup (mandatory count 8 s)
+bash runs/getupsep_bouts.sh   # the same with --count-separate 2
 ```
 
 Commands (attempt 2):

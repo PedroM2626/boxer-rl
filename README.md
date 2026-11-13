@@ -81,7 +81,9 @@ bash tools/run_spar.sh boxer.spar_match --ring --seconds 120 --knockdowns 3 --se
 * **Getting up works, boxing on after it does not yet.** `checkpoints/getup`
   stands a fallen G1 up in about 1 s, in the GPU stage and in native MuJoCo.
   With a referee's count in place of the reset, boxers often fall again just
-  after resuming, so evaluations keep the reset ([get-up](docs/getup.md)).
+  after resuming; setting them 2 m apart after the count (`--count-separate 2`)
+  removes a third of those knockdowns, but evaluations keep the reset
+  ([get-up](docs/getup.md#neutral-spots-after-the-count-2026-11-13)).
 * **Stacks are trained part by part.** In the two stacks, legs, tactics, arm
   skill and striker are separate policies trained in turn; changing one (e.g.
   a striker's arm style) can break another (its legs), as several experiments
@@ -99,7 +101,7 @@ bash tools/run_spar.sh boxer.spar_match --ring --seconds 120 --knockdowns 3 --se
   circling; facing the opponent is a fixed rule (`tactics_env.decode`). The
   whole-body policy has no such rule: its own leg targets turn it.
 * **Simulation only**, against a fixed pool of policies; no sim-to-real work.
-* **Tests:** all 86 test files (438 tests) pass when run one file per
+* **Tests:** all 86 test files (440 tests) pass when run one file per
   process (`tools/test_all.sh`, 33 min, 2026-11-12); the whole suite in one
   process exhausts the WSL VM's memory. `--fast` skips the five slow files of
   the archived MJX/warp stack (`tools/slow_tests.txt`) and takes about 13 min.
@@ -150,6 +152,7 @@ since 2026-10-30, including the rejected ones.
 | 11-12 | Getting up | GPU `getup` stage: whole-body floor contacts, lying and falling starts, height and upright reward; 150M steps from the spar motor, then 200M from scratch with a head-height term. | 0 of 98 fallen starts stood up in either; the second learned to sit ([get-up](docs/getup.md)). |
 | 11-12 | Getting up with a fading assist | Upward torso force (× body weight) lowered 0.7 → 0.45, then 0.38 → 0 in 0.06 steps, 290M steps in all. | Unassisted: 99 % of lying and 100 % of falling starts up, in about 1 s; 24 of 24 in native MuJoCo. `checkpoints/getup` ([get-up](docs/getup.md#attempts-3-and-4-an-assist-that-fades-to-zero-worked)). |
 | 11-12 | Referee's count | `spar_match --getup`: the fallen boxer gets up while the other waits; mandatory 8 s count, 10 s for a knockout. | 38 of 49 counts end standing, but boxers fall again soon after resuming: whole body vs champion 26–6 (kd 15 : 2) against 32–0 with restarts. Optional; restarts stay the default ([details](docs/getup.md#in-bouts-the-referees-count)). |
+| 11-13 | Neutral spots after the count | `--count-separate 2`: after the count both boxers are moved 2 m apart, facing, joints kept. | Knockdowns down a third (15 → 10, brawl 43 → 24); whole body vs champion 29–3, brawl 31–1; KOs vs champion unchanged (3) ([details](docs/getup.md#neutral-spots-after-the-count-2026-11-13)). |
 | 11-12 | Whole body, self-play with a stack fall penalty | Run 4's pool, plus a 150 fall penalty against stacks and strikers (60 against itself), 20 s episodes. | 0.5M passes every long check; beats run 3 16–0; vs champion 32–0, 419 : 96 but kd 8 : 3. **Promoted** (`whole-body`; run 3 kept as `whole-body-v1`) ([details](docs/whole-body.md#self-play-with-a-heavier-fall-penalty-against-stacks-run-5-promoted)). |
 | 11-12 | Leg anchor for the motor | `motor_native --leg-anchor 20` from `spar-native`, striker-heavy pool. | Striker brawls 22 knockdowns (20 before); not promoted ([details](docs/spar-motor.md#legs-trained-in-two-robot-bouts-2026-11-03)). |
 | 11-12 | Clinches | Body-contact probe; `spar_match --clinch-break` referee rule. | Bodies touch on ≤ 2 % of steps, ≤ 0.1 s at a time; no clinches to break ([details](docs/striker.md#clinches-measured-and-a-referee-break-2026-11-12)). |
@@ -314,6 +317,8 @@ about 1 s**, in the GPU stage and in native MuJoCo (`checkpoints/getup`;
 [get-up](docs/getup.md); [knockdown and get-up in a bout](fights/whole_body_getup_vs_champion.mp4)).
 `spar_match --getup` replaces the referee's restart with a count, but boxers
 often fall again soon after resuming, so evaluations keep the restart.
+Setting them 2 m apart after the count brings the whole body back to 29–3
+against the champion (`--count-separate 2`).
 Self-play with a heavier fall penalty against the stacks (150 against 60)
 gave a whole body that passed every long check: it **beats the previous one
 16–0**, the champion **32–0, 419 : 96**, and the striker **32–0, 445 : 50**,
