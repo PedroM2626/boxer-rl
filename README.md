@@ -86,8 +86,9 @@ bash tools/run_spar.sh boxer.spar_match --ring --seconds 120 --knockdowns 3 --se
   champion, but evaluations keep the reset
   ([get-up](docs/getup.md#neutral-spots-after-the-count-2026-11-13)).
 * **The whole body falls in mirror bouts.** Run 6 suffers 8 knockdowns each
-  in 32 bouts against itself, where run 5 had none
-  ([whole body](docs/whole-body.md#starts-from-the-end-of-a-referees-count-run-6-promoted)).
+  in 32 bouts against itself, where run 5 had none. Self-play (run 7) and a
+  smaller share of post-count starts (run 8) did not fix it without losing
+  elsewhere ([whole body](docs/whole-body.md#falls-against-itself-runs-7-and-8-rejected)).
 * **Stacks are trained part by part.** In the two stacks, legs, tactics, arm
   skill and striker are separate policies trained in turn; changing one (e.g.
   a striker's arm style) can break another (its legs), as several experiments
@@ -161,6 +162,7 @@ since 2026-10-30, including the rejected ones.
 | 11-12 | Clinches | Body-contact probe; `spar_match --clinch-break` referee rule. | Bodies touch on ≤ 2 % of steps, ≤ 0.1 s at a time; no clinches to break ([details](docs/striker.md#clinches-measured-and-a-referee-break-2026-11-12)). |
 | 11-13 | Neutral spots after the count | `--count-separate 2`: after the count both boxers are moved 2 m apart, facing, joints kept. | Knockdowns down a third (15 → 10, brawl 43 → 24); whole body vs champion 29–3, brawl 31–1; KOs vs champion unchanged (3) ([details](docs/getup.md#neutral-spots-after-the-count-2026-11-13)). |
 | 11-13 | Whole body from starts where a count ends | `boxer.getup_starts` bank of 400 native post-count states; run 5's settings with 25 % of bouts from the bank; control without the bank. | 0.25M: beats run 5 32–0; vs champion kd 2 : 0 (run 5 8 : 3, control 18 : 1); counted bouts 0 knockdowns; vs itself 8 : 8. **Promoted** (`whole-body`; run 5 kept as `whole-body-v2`) ([details](docs/whole-body.md#starts-from-the-end-of-a-referees-count-run-6-promoted)). |
+| 11-13 | Whole body: falls against itself | Run 7: run 6 and run 5 in the pool, fall penalty 150 for all. Run 8: 10 % of bouts from the bank instead of 25 %. | Run 7 rejected (14–19 kd vs run 6 in the gate); run 8 halves mirror falls (16 → 8) but falls 5 vs champion and loses to run 6 0–32. Run 6 stays ([details](docs/whole-body.md#falls-against-itself-runs-7-and-8-rejected)). |
 
 ## Milestones since unassisted two-robot bouts (2026-10-30 onward)
 

@@ -280,7 +280,8 @@ seed and step fall 18 times against the champion. Against the champion with
 the count, run 6 was never knocked down, so no count happened. The bank did
 not teach it to box on after getting up so much as to stay up from the
 unusual stances the bank starts it in. The cost is in mirror bouts: 8
-knockdowns each against itself, where run 5 had none. Run 6 was promoted as
+knockdowns each against itself, where run 5 had none
+([runs 7 and 8](#falls-against-itself-runs-7-and-8-rejected)). Run 6 was promoted as
 the strongest boxer; run 5 is kept as `checkpoints/whole-body-v2`.
 
 ```bash
@@ -289,10 +290,45 @@ bash runs/wb_ppo6.sh        # native_finetune ... --start-bank runs/getup_starts
 bash runs/wb_eval6.sh       # the evaluation above
 ```
 
+## Falls against itself (runs 7 and 8, rejected)
+
+Run 6's 16 knockdowns in 32 mirror bouts come late (14 of 16 after 60 s,
+beyond the 20 s training episodes), with more body contact than run 5's
+(1.5 s per bout against 0.4 s). Mirror bouts, 32 of 120 s (seeds 0–15,
+corners swapped), total knockdowns:
+
+| Policy | vs itself | vs champion (its own) |
+| --- | --- | --- |
+| run 5 (`whole-body-v2`) | 0 | 8 |
+| run 6 without the bank, 0.25M | 2 | 18 |
+| **run 6** (`whole-body`, bank 25 %) | 16 | 2 |
+| run 7, 0.25M | 12 | — |
+| run 8, 0.25M (bank 10 %) | 8 | 5 |
+
+The bank that keeps run 6 up against the champion is also what makes it
+fall against itself; the control without it hardly falls in the mirror.
+Two attempts to keep the first without the second:
+
+- **Run 7**: from run 6, run 6 and run 5 in the pool, fall penalty 150
+  against every opponent (`runs/wb_ppo7.sh`, seed 307). Rejected by the
+  gate: 14 and 19 knockdowns against run 6 in 16 long bouts at 0.5M and
+  0.75M. Its 0.25M step, not checked by the gate, still falls 12 times
+  against itself. Self-play in the pool hurt again, as in run 4.
+- **Run 8**: run 6 with 10 % of bouts from the bank, not 25 %
+  (`runs/wb_ppo8.sh`, from run 5, seed 306). 0.25M passed the gate
+  (confirmation 46–1–1) and halves the mirror falls (8), but falls 5 times
+  against the champion and 14 against the striker (5 : 9), and loses to
+  run 6 0–32 (284 : 382 clean punches). Not promoted.
+
+Run 6 stays the strongest boxer: it wins every matchup that has an
+opponent other than itself.
+
 ## What is open
 
-- Mirror bouts: run 6 falls 8 times in 32 bouts against itself (run 5: 0).
-  Next to try: its own fallen-and-risen states against a whole-body
-  opponent in the bank, or itself in the long gate.
+- Mirror bouts: run 6 falls 16 times in 32 bouts against itself (run 5: 0),
+  mostly after a minute. Neither self-play (run 7) nor a smaller bank share
+  (run 8) fixed it without losing elsewhere. Next to try: bank states
+  collected against a whole-body opponent, or the mirror bout in the long
+  gate.
 - Getting up inside the whole-body policy itself. Now a separate get-up
   policy takes over while the boxer is down ([get-up](getup.md)).
