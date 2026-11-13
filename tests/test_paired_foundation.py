@@ -227,3 +227,23 @@ def test_separate_sets_the_boxers_apart_facing_each_other_with_joints_kept(pair)
         toward = roots[1 - i] - roots[i]
         assert heading @ toward / np.linalg.norm(heading) / 2.0 > .999
     pair.reset()
+
+
+def test_getup_start_snapshot_restores_the_pair_exactly(pair, foundation):
+    from boxer.getup_starts import lay_down, restore, snapshot
+    lying = PairedFoundation(foundation, floor_body=True)
+    lying.reset(seed=1)
+    lay_down(lying, 1, np.random.default_rng(0))
+    assert lying.fallen()[1] and not lying.standing()[1]
+    lying.stop_on_fall = False
+    for _ in range(5):
+        lying.step(np.zeros((2, 29)))
+    lying.stop_on_fall = True
+    state = snapshot(lying)
+    pair.reset(seed=9)
+    restore(pair, state)          # a pair without floor colliders has the same layout
+    np.testing.assert_array_equal(pair.data.qpos, state["qpos"])
+    np.testing.assert_array_equal(pair.data.qvel, state["qvel"])
+    np.testing.assert_array_equal(pair.last_action, state["last_action"])
+    assert not pair.done
+    pair.reset()

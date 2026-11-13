@@ -49,7 +49,8 @@ class NativeBout:
 
     def __init__(self, pair, motor, rng, opponents, scripted_fraction, episode_steps, fall_penalty,
                  high_guard_fraction=0., arm_skill=None, leg_contact_penalty=0., striker=False,
-                 arm_motion_cost=0., whole_body=False, tilt_cost=0., stack_fall_penalty=None):
+                 arm_motion_cost=0., whole_body=False, tilt_cost=0., stack_fall_penalty=None,
+                 start_bank=None, start_bank_fraction=0.):
         """``arm_skill``: an ``arm_skill.ArmSkill`` steering both corners' punches.
         ``leg_contact_penalty``: reward lost per second the robots' legs touch.
         ``striker``: the learner's actions are a striker's (``boxer.striker``),
@@ -62,7 +63,10 @@ class NativeBout:
         and tilt rate, with the leg motor's own weights (``tilt_penalty``).
         ``stack_fall_penalty``: the fall penalty in bouts against an opponent
         that is not a whole-body policy (stacks and scripted brains); None
-        keeps ``fall_penalty``."""
+        keeps ``fall_penalty``.
+        ``start_bank``: states from the end of a referee's count
+        (``boxer.getup_starts``); a ``start_bank_fraction`` share of bouts
+        starts from one, the learner in the risen corner three times in four."""
         from boxer.spar_match import PunchArm
         self.pair, self.motor, self.rng = pair, motor, rng
         self.arm_skill, self.leg_contact_penalty = arm_skill, leg_contact_penalty
@@ -73,6 +77,8 @@ class NativeBout:
         self.high_guard_fraction = high_guard_fraction
         self.episode_steps, self.fall_penalty = episode_steps, fall_penalty
         self.PunchArm = PunchArm
+        self.start_bank, self.start_bank_fraction = start_bank or [], start_bank_fraction
+        self.banked = False
         self.reset()
 
     def learner_fall_penalty(self):
@@ -82,8 +88,15 @@ class NativeBout:
         from boxer.spar_match import RingBrain
         seed = int(self.rng.integers(1 << 30))
         self.pair.reset(seed=seed)
+        self.banked = bool(self.start_bank) and self.rng.random() < self.start_bank_fraction
+        if self.banked:
+            from boxer.getup_starts import restore
+            state = self.start_bank[int(self.rng.integers(len(self.start_bank)))]
+            restore(self.pair, state)
         self.arms = [self.PunchArm(self.pair.pose, self.pair.action_scale, self.pair.dt) for _ in range(2)]
         self.learner = int(self.rng.integers(2))
+        if self.banked:
+            self.learner = int(state["risen"]) if self.rng.random() < .75 else 1 - int(state["risen"])
         if self.striker or self.whole_body:
             from boxer.striker import StrikerArm
             self.arms[self.learner] = StrikerArm(self.pair.pose, self.pair.action_scale, self.pair.dt)
@@ -247,7 +260,7 @@ def export_native_model(path, ring=False):
 def _worker(conn, seed, motor_path, opponent_paths, scripted_fraction, episode_steps, fall_penalty,
             min_std, model_path, constants, high_guard_fraction=0., arm_path=None,
             leg_contact_penalty=0., striker=False, arm_motion_cost=0., whole_body=False, tilt_cost=0.,
-            stack_fall_penalty=None):
+            stack_fall_penalty=None, start_bank_path=None, start_bank_fraction=0.):
     _configure_worker_env()
     import jax
     import mujoco
@@ -256,6 +269,10 @@ def _worker(conn, seed, motor_path, opponent_paths, scripted_fraction, episode_s
     from boxer.spar_match import load_brain
 
     foundation = FoundationStub(constants)
+    start_bank = None
+    if start_bank_path:
+        from boxer.getup_starts import load_bank
+        start_bank = load_bank(start_bank_path)
     motor = jax.jit(inference(foundation, load_policy_params(motor_path)[0]))
     pair = PairedFoundation(foundation, model=mujoco.MjModel.from_binary_path(str(model_path)))
     rng = np.random.default_rng(seed)
@@ -270,7 +287,7 @@ def _worker(conn, seed, motor_path, opponent_paths, scripted_fraction, episode_s
         arm_skill = ArmSkill(load_policy_params(arm_path)[0])
     bout = NativeBout(pair, motor, rng, opponents, scripted_fraction, episode_steps, fall_penalty,
                       high_guard_fraction, arm_skill, leg_contact_penalty, striker, arm_motion_cost, whole_body,
-                      tilt_cost, stack_fall_penalty)
+                      tilt_cost, stack_fall_penalty, start_bank, start_bank_fraction)
     sample_with = make_sampler(min_std, learner_net(striker, whole_body))
 
     def sample_next(params, obs, key):
@@ -423,6 +440,10 @@ def main(argv=None):
                         help="per-second reward lost for torso tilt and tilt rate (motor weights)")
     parser.add_argument("--leg-anchor", type=float, default=0.,
                         help="whole body: loss weight keeping leg outputs near --init-from's")
+    parser.add_argument("--start-bank", type=Path,
+                        help="states from the end of a referee's count (boxer.getup_starts) to start bouts from")
+    parser.add_argument("--start-bank-fraction", type=float, default=.25,
+                        help="with --start-bank: share of training bouts starting from a banked state")
     parser.add_argument("--seed", type=int, default=0)
     args = parser.parse_args(argv)
     _configure_worker_env()
@@ -491,7 +512,8 @@ def main(argv=None):
             child, args.seed * 1000 + w, args.motor, [str(p) for p in args.pool],
             args.scripted_fraction, round(args.episode_seconds / .02), args.fall_penalty, args.min_std, model_path, constants,
             args.high_guard_fraction, str(args.arm) if args.arm else None, args.leg_contact_penalty,
-            args.striker, args.arm_motion_cost, args.whole_body, args.tilt_cost, args.stack_fall_penalty),
+            args.striker, args.arm_motion_cost, args.whole_body, args.tilt_cost, args.stack_fall_penalty,
+            args.start_bank and str(args.start_bank), args.start_bank_fraction),
             daemon=True)
         process.start()
         pipes.append(parent)

@@ -3,9 +3,9 @@
 ## README preview
 
 `whole_body_vs_champion_preview.mp4` is a 12-second, seed-0 bout of the
-whole-body policy (`checkpoints/whole-body`, run 5, red fists) against the champion
+whole-body policy (`checkpoints/whole-body`, run 6, red fists) against the champion
 stack (blue fists), rendered at 25 fps; the GIF is the same footage at 15 fps
-and 640 px wide. Red lands 26 clean punches to 0, no knockdowns. A single
+and 640 px wide. Red lands 29 clean punches to 1, no knockdowns. A single
 preview, not an evaluation (`docs/whole-body.md` has those).
 
 ```bash
@@ -16,17 +16,17 @@ ffmpeg -i fights/whole_body_vs_champion_preview.mp4   -filter_complex "fps=15,sc
 (`imageio_ffmpeg.get_ffmpeg_exe()` in the curriculum runtime gives an
 `ffmpeg` binary.)
 
-## Whole-body bouts (2026-11-12)
+## Whole-body bouts (2026-11-13)
 
 60 s at 60 fps, knockdown rules (3), each opponent on its own legs, the
-promoted run-5 policy; seed 0 unless noted (`runs/wb_videos.sh`):
+promoted run-6 policy; seed 0 unless noted (`runs/wb_videos6.sh`):
 
 | Video | Clean punches | Knockdowns |
 | --- | --- | --- |
-| `whole_body_vs_champion_60s.mp4` (seed 1) | 194 : 36 | 0 : 0 |
-| `whole_body_vs_striker_60s.mp4` | 222 : 17 | 0 : 0 |
-| `whole_body_vs_itself_60s.mp4` | 241 : 248 | 0 : 0 |
-| `whole_body_getup_vs_champion.mp4` (seed 138, 50 s, 25 fps, `--getup checkpoints/getup`, `runs/getup_clip.py`): blue down at 3.8 s, red falls while waiting at 4.8 s, both up after the 8 s count and box on | 117 : 20 | 1 : 1 |
+| `whole_body_vs_champion_60s.mp4` (seed 1) | 218 : 60 | 0 : 0 |
+| `whole_body_vs_striker_60s.mp4` | 194 : 16 | 0 : 0 |
+| `whole_body_vs_itself_60s.mp4` | 176 : 186 | 0 : 0 |
+| `whole_body_getup_vs_champion.mp4` (seed 138, 50 s, 25 fps, `--getup checkpoints/getup`, `runs/getup_clip.py`, run 5 in red, now `whole-body-v2`): blue down at 3.8 s, red falls while waiting at 4.8 s, both up after the 8 s count and box on | 117 : 20 | 1 : 1 |
 
 ## Getting up
 
@@ -43,7 +43,8 @@ python -m boxer.getup_eval checkpoints/getup --worlds 32 --seconds 4 --seed 11 -
 `striker_vs_champion_preview.mp4` and `.gif`: the same 12-second, seed-0
 setup with the striker in red (20 clean punches to 5), the README preview
 until 2026-11-12. The run-3 whole-body videos (`whole-body-v1`) were replaced
-by the run-5 ones above on the same day.
+by the run-5 ones on the same day, and those by the run-6 ones above on
+2026-11-13.
 
 ## Historical videos
 

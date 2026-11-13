@@ -1,8 +1,9 @@
 # Whole-body policy (2026-11-11)
 
-**Current strongest boxer:** `checkpoints/whole-body`, run 5 (see
-[self-play with a heavier fall penalty against stacks](#self-play-with-a-heavier-fall-penalty-against-stacks-run-5-promoted)).
-The run-3 policy it replaced is kept as `checkpoints/whole-body-v1`
+**Current strongest boxer:** `checkpoints/whole-body`, run 6 (see
+[starts from the end of a referee's count](#starts-from-the-end-of-a-referees-count-run-6-promoted)).
+Run 5, which it replaced, is kept as `checkpoints/whole-body-v2`, and run 3
+as `checkpoints/whole-body-v1`
 ([long episodes, tilt cost and leg anchor](#long-episodes-tilt-cost-and-leg-anchor)).
 
 Every boxer before this was a hierarchy of separately trained parts. A brain
@@ -236,11 +237,62 @@ ablation (no long episodes: 4 knockdowns, the same as 120 s) and run 5 both
 show that the long episodes are not what keeps the legs steady. The 120 s
 gate check is what catches long-bout falls.
 
+## Starts from the end of a referee's count (run 6, promoted)
+
+With the [referee's count](getup.md#in-bouts-the-referees-count), boxers
+often fell again just after resuming: they restart from where the get-up
+policy left them, a stance no training bout began from. Run 6 trains from
+there. `python -m boxer.getup_starts` builds a bank of such states in native
+MuJoCo: one robot lying (the get-up stage's lying starts), the other
+standing in guard on its motor, the get-up policy run through the 8 s
+count, then both set 2 m apart facing each other
+(`PairedFoundation.separate`), as `spar_match --getup --count-separate 2`
+resumes a bout. 395 of 405 counts ended with the boxer up and steady; the
+bank keeps 400 (`checkpoints/getup-starts/getup_starts.npz`, 0.6 MB).
+`native_finetune --start-bank` starts a share of training bouts
+(`--start-bank-fraction`, 0.25 here) from a banked state, the learner in the
+risen corner three times in four.
+
+Everything else is run 5's (`runs/wb_ppo6.sh`): from run 5, 1M steps, seed
+306. The gate picked 0.5M and 0.25M for the long check; 0.5M fell 3 times
+against the champion and was rejected, 0.25M passed every check (16–0 against
+run 5, the champion and the striker; confirmation 45–1–2, 2 falls).
+The training log shows more KL spikes than run 5 (46 of the first 359
+iterations above 1, against 48 of 1954), most likely from the unusual
+banked states; the clipped updates did not harm the result.
+
+Full evaluation (32 bouts of 120 s, seeds 0–15, corners swapped, ring,
+knockdown rules), with the same run without the bank as a control (same
+seed and settings; its gate rejected every candidate, so its 0.25M step was
+evaluated directly):
+
+| Opponent | Run 5 (`whole-body-v2`) | Run 6 without the bank, 0.25M | Run 6 (`whole-body`) |
+| --- | --- | --- | --- |
+| champion stack | 32–0, 419 : 96, knockdowns 8 : 3 | 32–0, 417 : 124, 18 : 1 | 32–0, 427 : 143, **2 : 0** |
+| striker | 32–0, 445 : 50, 4 : 0 | 32–0, 413 : 74, 1 : 1 | 32–0, 374 : 43, 1 : 0 |
+| champion, count and 2 m apart (`--getup --count-separate 2`) | 29–3, 10 : 2, 3 KOs | — | **32–0, 435 : 148, 0 : 0** |
+| run 5, head to head | — | — | **32–0, 348 : 199, 7 : 17** |
+| itself | 473 : 472, 0 knockdowns | — | 392 : 381, 8 : 8 |
+
+Run 6 falls a quarter as often as run 5 against the champion, and beats
+run 5 32–0. The control shows the bank is what did it: without it, the same
+seed and step fall 18 times against the champion. Against the champion with
+the count, run 6 was never knocked down, so no count happened. The bank did
+not teach it to box on after getting up so much as to stay up from the
+unusual stances the bank starts it in. The cost is in mirror bouts: 8
+knockdowns each against itself, where run 5 had none. Run 6 was promoted as
+the strongest boxer; run 5 is kept as `checkpoints/whole-body-v2`.
+
+```bash
+bash runs/getup_starts.sh   # python -m boxer.getup_starts --output runs/getup_starts.npz --states 400
+bash runs/wb_ppo6.sh        # native_finetune ... --start-bank runs/getup_starts.npz --start-bank-fraction .25
+bash runs/wb_eval6.sh       # the evaluation above
+```
+
 ## What is open
 
-- Self-play that keeps the champion steady over more seeds: the fall penalty
-  against stacks helped (run 5 passed the gate where run 4 did not), but run 5
-  still falls 8 times in 32 bouts against the champion. Next to try: the long
-  check inside the training loop, or a larger gate sample.
+- Mirror bouts: run 6 falls 8 times in 32 bouts against itself (run 5: 0).
+  Next to try: its own fallen-and-risen states against a whole-body
+  opponent in the bank, or itself in the long gate.
 - Getting up inside the whole-body policy itself. Now a separate get-up
   policy takes over while the boxer is down ([get-up](getup.md)).

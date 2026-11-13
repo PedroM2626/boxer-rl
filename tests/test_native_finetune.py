@@ -71,3 +71,28 @@ def test_stack_fall_penalty_applies_only_against_non_whole_body_opponents():
     assert bout.learner_fall_penalty() == 120.
     bout.opponent = type("WholeBody", (), {"legs": None})()
     assert bout.learner_fall_penalty() == 60.
+
+
+def test_banked_starts_restore_a_state_and_mostly_put_the_learner_in_the_risen_corner(monkeypatch):
+    import boxer.getup_starts as getup_starts
+    from boxer.native_finetune import NativeBout
+
+    class Pair:
+        pose, action_scale, dt = np.zeros(29), 1., .02
+
+        def reset(self, seed):
+            self.restored = None
+
+    monkeypatch.setattr(getup_starts, "restore", lambda pair, state: setattr(pair, "restored", state))
+    bank = [dict(risen=1)]
+    bout = NativeBout(Pair(), None, np.random.default_rng(0), [], 1., 10, 30.,
+                      start_bank=bank, start_bank_fraction=1.)
+    learners = []
+    for _ in range(400):
+        bout.reset()
+        assert bout.banked and bout.pair.restored is bank[0]
+        learners.append(bout.learner)
+    assert .65 < np.mean(learners) < .85
+    bout.start_bank_fraction = 0.
+    bout.reset()
+    assert not bout.banked and bout.pair.restored is None

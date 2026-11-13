@@ -178,9 +178,15 @@ and brings the win rates back to 29–3 and 31–1. The 3 knockouts against the
 champion remain: those boxers never got up, which separation cannot help.
 Restarts still fall less (8 : 3 and 15 : 5), so they stay the default for
 evaluations; the count with separation is the rule to use for watching bouts
-with knockdowns. What is left: train the boxing policies with starts taken
-from the end of a get-up, and the get-up policy with the opponent and ropes
-close by.
+with knockdowns.
+
+Training the whole body from states taken at the end of a count
+(`boxer.getup_starts`, `native_finetune --start-bank`) worked: run 6 falls 2
+times in 32 bouts against the champion (run 5: 8; the same run without the
+bank: 18) and, with the count and separation, was never knocked down
+([whole body, run 6](whole-body.md#starts-from-the-end-of-a-referees-count-run-6-promoted)).
+What is left: the get-up policy with the opponent and ropes close by (the
+3 knockouts of run 5 were boxers that never rose).
 
 ```bash
 bash runs/getup8_bouts.sh     # spar_match ... --knockdowns 3 --getup checkpoints/getup (mandatory count 8 s)
