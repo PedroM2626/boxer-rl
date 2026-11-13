@@ -1,7 +1,9 @@
 # Whole-body policy (2026-11-11)
 
-**Current strongest boxer:** `checkpoints/whole-body` (see
-[long episodes, tilt cost and leg anchor](#long-episodes-tilt-cost-and-leg-anchor)).
+**Current strongest boxer:** `checkpoints/whole-body`, run 5 (see
+[self-play with a heavier fall penalty against stacks](#self-play-with-a-heavier-fall-penalty-against-stacks-run-5-promoted)).
+The run-3 policy it replaced is kept as `checkpoints/whole-body-v1`
+([long episodes, tilt cost and leg anchor](#long-episodes-tilt-cost-and-leg-anchor)).
 
 Every boxer before this was a hierarchy of separately trained parts. A brain
 (tactics or striker) sent a footwork command to a leg motor and set the
@@ -177,10 +179,68 @@ Training against itself makes it stronger against itself and less steady
 against the champion's different style. Keeping the champion stacks and
 the strikers in the pool did not prevent this within 2M steps.
 
+## Self-play with a heavier fall penalty against stacks (run 5, promoted)
+
+Run 4 fell against the champion because nothing in self-play made a fall
+against a stack cost more than a fall against itself. Run 5 adds that:
+`native_finetune --stack-fall-penalty 150` charges 150 for the learner's fall
+against an opponent that is not a whole-body policy (the champion stacks and
+the strikers). Falls against the whole-body policy still cost the usual 60
+(`NativeBout.learner_fall_penalty`). The other settings are run 3's, with
+three changes:
+
+- 20 s episodes, since the ablation showed 120 s episodes add nothing;
+- 4 workers;
+- seed 305, starting from run 3.
+
+The opponent pool is run 3 itself, two champion stacks and two strikers.
+Training ran 2M steps.
+
+Gate (`runs/whole-body-native5/gate`):
+
+| Step | 20 s gate vs run 3 | 120 s check vs run 3 (own : its knockdowns) | 120 s vs champion | 120 s vs striker |
+| --- | --- | --- | --- | --- |
+| 0.5M | 13–0–3 | 16–0, 418 : 159 clean, 0 : 0 | 16–0, 1 : 0 | 15–1, 2 : 0 |
+| 1M | 16–0 | 16–0, 422 : 209, 5 : 1 (rejected) | — | — |
+| 1.5M | 14–2, 2 : 0 | not checked | — | — |
+| 2M | 12–4, 4 : 1 | not checked | — | — |
+
+The 0.5M checkpoint passed every long check and the 48-bout confirmation
+(43–1–4, 2 falls). Beyond 0.5M the policy got steadily worse again.
+
+Full evaluation (32 bouts of 120 s, seeds 0–15 with corners swapped, ring,
+knockdown rules), against run 3's numbers:
+
+| Opponent | Run 3 (`whole-body-v1`) | Run 5 (`whole-body`) |
+| --- | --- | --- |
+| champion stack | 32–0, 361 : 81 clean, knockdowns 1 : 0 | 32–0, 419 : 96, knockdowns 8 : 3 |
+| striker | 31–1, 362 : 114, 2 : 2 | 32–0, 445 : 50, 4 : 0 |
+| itself | 389 : 391, 4 knockdowns | 473 : 472, 0 knockdowns |
+| run 3, head to head (gate, 16 bouts) | — | 16–0, 418 : 159, 0 : 0 |
+
+Run 5 wins everything, lands 15–25 % more clean punches, and beats run 3
+16–0. It was promoted as the strongest boxer. The cost is falls against the
+champion stack: 8 knockdowns in 32 bouts, against run 3's 1. The heavier
+penalty kept those falls within the gate's long check (1 in 16 bouts on
+seeds 24–31), but not on seeds 0–15. Against itself and the strikers it is
+steadier than run 3. With the [get-up policy](getup.md) a knockdown no longer
+needs a restart, so these falls cost points rather than the bout.
+
+```bash
+bash runs/wb_ppo5.sh     # native_finetune --whole-body ... --stack-fall-penalty 150 --episode-seconds 20 --workers 4
+```
+
+**Episode length.** 20 s episodes are the recommended default for native
+fine-tuning, and `native_finetune --episode-seconds` defaults to 20. The
+ablation (no long episodes: 4 knockdowns, the same as 120 s) and run 5 both
+show that the long episodes are not what keeps the legs steady. The 120 s
+gate check is what catches long-bout falls.
+
 ## What is open
 
-- Self-play that keeps the champion steady: e.g. the long check inside the
-  training loop, or a fall penalty weighted by opponent.
-- Getting up after a knockdown, which a whole-body policy could learn
-  because it controls every joint. Two solo attempts in a GPU stage failed
-  ([get-up](getup.md)).
+- Self-play that keeps the champion steady over more seeds: the fall penalty
+  against stacks helped (run 5 passed the gate where run 4 did not), but run 5
+  still falls 8 times in 32 bouts against the champion. Next to try: the long
+  check inside the training loop, or a larger gate sample.
+- Getting up inside the whole-body policy itself. Now a separate get-up
+  policy takes over while the boxer is down ([get-up](getup.md)).

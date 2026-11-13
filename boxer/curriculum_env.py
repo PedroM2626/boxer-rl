@@ -74,6 +74,9 @@ GETUP_FLOOR_HEIGHT = .15   # pelvis height counted as fully down
 GETUP_HEAD = (.02, 0., .44)   # head centre in the torso frame
 GETUP_HEAD_HEIGHT = (.12, 1.2)  # head height counted as fully down and fully up
 GETUP_REWARD = dict(height=1., head=2., upright=1., standing=2., pose=-.5, joint_velocity=-1e-4)
+# Training aid (``getup_assist``): an upward force on the torso, as a fraction of
+# the robot's weight, like a harness. Training lowers it to zero in phases; the
+# evaluator never uses it.
 
 
 def _axis_quat(axis, angle):
@@ -169,6 +172,8 @@ class UnassistedG1(joystick.Joystick):
             self._phantom = True
         if stage == "getup":
             self._add_floor_body()
+            self._torso_body = self.mj_model.body("torso_link").id
+            self._weight = float(self.mj_model.body_subtreemass[1] * -self.mj_model.opt.gravity[2])
         self._arm_traces = None
         if self._config.get("striker_arms", None):
             if stage != "spar":
@@ -392,6 +397,10 @@ class UnassistedG1(joystick.Joystick):
 
     def step(self, state, action):
         if self.stage == "getup":
+            assist = self._config.get("getup_assist", 0.)
+            if assist:
+                force = jp.zeros((self.mj_model.nbody, 6)).at[self._torso_body, 2].set(assist * self._weight)
+                state = state.replace(data=state.data.replace(xfrc_applied=force))
             state = super().step(state, action)
             reward, terms = self.getup_reward(state.data, action)
             state.metrics.update(self._metrics(state.data, state.info))
@@ -497,7 +506,8 @@ class UnassistedG1(joystick.Joystick):
                      standing=standing.astype(jp.float32),
                      pose=standing * jp.mean((data.qpos[7:] - self._default_pose) ** 2),
                      joint_velocity=jp.sum(data.qvel[6:] ** 2))
-        reward = self.dt * sum(GETUP_REWARD[k] * v for k, v in terms.items())
+        weights = dict(GETUP_REWARD, head=self._config.get("getup_head_weight", GETUP_REWARD["head"]))
+        reward = self.dt * sum(weights[k] * v for k, v in terms.items())
         return reward, terms
 
     def _get_termination(self, data):

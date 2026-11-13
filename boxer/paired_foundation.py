@@ -21,6 +21,8 @@ ROPE_HEIGHTS = (.35, .60, .85)
 ROPE_RADIUS = .02
 # Ropes give like stiff springs (50 ms time constant) rather than walls.
 ROPE_SOLREF = (.05, 1.)
+# Up again after a knockdown (as boxer.getup_eval counts it).
+UP_HEIGHT, UP_GRAVITY = .72, .9
 # Robot geoms that collide with the ropes.
 ROPE_CONTACTS = (scene.HAND_GEOMS + scene.FOREARM_GEOMS + scene.UPPER_TARGET_GEOMS
                  + scene.BODY_TARGET_GEOMS + ('left_shin', 'right_shin', 'left_foot', 'right_foot'))
@@ -59,8 +61,13 @@ def strike_sensor_name(side, hand, target):
 
 
 def build_pair(foundation, separation=2.0, *, visual_fists=False, diagnostic_excluded_pairs=(),
-               strike_sensors=False, ring=False):
-    """Both robots on a shared floor; ``ring`` adds the roped ring (``add_ring``)."""
+               strike_sensors=False, ring=False, floor_body=False):
+    """Both robots on a shared floor; ``ring`` adds the roped ring (``add_ring``).
+
+    ``floor_body`` lets the pelvis, torso, head, arms and thighs rest on the
+    floor (the ``getup`` stage's massless colliders), so a fallen robot can push
+    itself up. Without it only the feet and shins touch the floor.
+    """
     if not np.isfinite(separation) or separation < 1.8:
         raise ValueError("transfer spawns must be separated by at least 1.8 m")
     source = foundation.mj_model
@@ -98,6 +105,18 @@ def build_pair(foundation, separation=2.0, *, visual_fists=False, diagnostic_exc
         for key in list(robot.keys):
             robot.delete(key)
         existing = {g.name for g in robot.geoms}
+        if floor_body:
+            from boxer.curriculum_env import FLOOR_BODY_GEOMS, FLOOR_LIMB_GEOMS
+            kinds = dict(capsule=mujoco.mjtGeom.mjGEOM_CAPSULE, sphere=mujoco.mjtGeom.mjGEOM_SPHERE)
+            for body, name, kind, radius, where in FLOOR_BODY_GEOMS:
+                geom = robot.body(body).add_geom(name=name, type=kinds[kind], size=[radius, 0, 0],
+                                                 contype=0, conaffinity=0, density=0, group=3)
+                if kind == "capsule":
+                    geom.fromto = where
+                else:
+                    geom.pos = where
+            floor_pairs += [(name, "floor", 3, np.array([.6, .6, .005, .0001, .0001]), None, None)
+                            for name in [g[1] for g in FLOOR_BODY_GEOMS] + list(FLOOR_LIMB_GEOMS)]
         # Head, torso and blocking surfaces are absent from feet-only contacts.
         # Copy massless collision surfaces only: body inertials remain explicit.
         for name in set(scene.UPPER_TARGET_GEOMS + scene.BODY_TARGET_GEOMS):
@@ -116,7 +135,9 @@ def build_pair(foundation, separation=2.0, *, visual_fists=False, diagnostic_exc
         for first, second, dim, friction, solref, solimp in floor_pairs:
             pair = spec.add_pair(geomname1="floor" if first == "floor" else side + first,
                                  geomname2="floor" if second == "floor" else side + second)
-            pair.condim, pair.friction, pair.solref, pair.solimp = dim, friction, solref, solimp
+            pair.condim, pair.friction = dim, friction
+            if solref is not None:
+                pair.solref, pair.solimp = solref, solimp
     wanted = set()
     for side in scene.SIDES:
         other = scene.OPPONENT[side]
@@ -169,13 +190,18 @@ class PairedFoundation:
     dt = .02
 
     def __init__(self, foundation, separation=2.0, *, diagnostic_excluded_pairs=(), model=None,
-                 ring=False):
+                 ring=False, floor_body=False):
         """``model``: an already built ``build_pair`` model (e.g. loaded in a worker)."""
         self.foundation = foundation
         self.model = model if model is not None else build_pair(
-            foundation, separation, diagnostic_excluded_pairs=diagnostic_excluded_pairs, ring=ring)
+            foundation, separation, diagnostic_excluded_pairs=diagnostic_excluded_pairs, ring=ring,
+            floor_body=floor_body)
         # A loaded model (native fine-tuning workers) carries its own ring.
         self.ring = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_GEOM, 'rope_0_0') >= 0
+        self.floor_body = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_GEOM,
+                                            scene.SIDES[0] + 'torso_floor') >= 0
+        # False while the referee counts a fallen boxer: the bout goes on.
+        self.stop_on_fall = True
         self.data = mujoco.MjData(self.model)
         self.pose = np.asarray(foundation._default_pose)
         self.init_height32 = np.float32(foundation._init_q[2])
@@ -228,6 +254,8 @@ class PairedFoundation:
                            for g, n in enumerate(names) if n.startswith(side)}
         legs = ('foot', 'shin', 'thigh', 'thigh_collision', 'hip_collision')
         self._legs = {g for g in self._corner_of if names[g].endswith(legs)}
+        # Everything but the fists and forearms: contact here is holding or leaning, not punching.
+        self._clinch = {g for g in self._corner_of if not names[g].endswith(('hand_collision', 'wrist_collision'))}
         for i, side in enumerate(scene.SIDES):
             own = {n[len(side):]: g for g, n in enumerate(names) if n.startswith(side)}
             for pair in trips:
@@ -303,6 +331,20 @@ class PairedFoundation:
             if g1 in self._legs and g2 in self._legs and self._corner_of[g1] != self._corner_of[g2]:
                 return True
         return False
+
+    def bodies_touching(self):
+        """Are the robots touching with anything but fists and forearms (a clinch)?"""
+        for g1, g2 in self.data.contact.geom:
+            g1, g2 = int(g1), int(g2)
+            if g1 in self._clinch and g2 in self._clinch and self._corner_of[g1] != self._corner_of[g2]:
+                return True
+        return False
+
+    def standing(self):
+        """Per corner: pelvis at standing height and torso near upright (the get-up test)."""
+        return np.array([self.data.qpos[m['root'] + 2] >= UP_HEIGHT
+                         and self.data.sensor(m['side'] + 'upvector_torso').data[2] >= UP_GRAVITY
+                         for m in self.maps])
 
     def fallen(self):
         finite = np.isfinite(self.data.qpos).all() and np.isfinite(self.data.qvel).all()
@@ -396,7 +438,7 @@ class PairedFoundation:
                 self.data.time, self.model.opt.timestep, both_up=not fallen.any())
             if punch_trace is not None:
                 punch_trace.after_substep(self, present, per_hand, closing, advancing)
-            if fallen.any():
+            if fallen.any() and self.stop_on_fall:
                 self.done = True
                 break
         self.last_action = actions.copy()

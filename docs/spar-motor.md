@@ -334,3 +334,27 @@ falls stayed at 0.02–0.03 per 1000 transitions. 32 bouts of 120 s:
 
 The brawls fall as often as before (21 knockdowns against 20); the falls
 only change sides. Not promoted.
+
+**With a leg anchor (2026-11-12).** The whole-body policy's falls dropped
+from 108 to 4 when its legs were held near their starting outputs
+([whole body](whole-body.md#ablations-the-leg-anchor-and-the-horizon-carry-it)).
+The same anchor on the motor: `motor_native --leg-anchor 20` adds 20 × the mean
+squared gap between the policy's leg outputs and those of the starting
+policy (`checkpoints/spar-native`) to the loss. Same pool weights, 3M
+transitions, seed 21:
+
+| Bouts (32 of 120 s) | `spar-native` | continued | continued, leg anchor 20 |
+| --- | --- | --- | --- |
+| striker vs striker-v1 | 32–0, knockdowns 15 : 5 | 32–0, 9 : 12 | 32–0, 393 : 253 clean, 17 : 5 |
+| striker vs champion on `checkpoints/spar` | 32–0, 1 : 4 | 31–1, 0 : 7 | 32–0, 257 : 86, 4 : 1 |
+
+22 knockdowns in the brawls against 20: no better. Not promoted. The anchor
+works for the whole-body policy because its PPO otherwise moves the legs a
+long way from a good gait. Here the motor starts from legs already trained
+in bouts and stays close to them anyway; the brawl falls come from the
+strikers' close range, not from leg drift. With the [get-up policy](getup.md)
+these falls no longer restart the bout.
+
+```bash
+bash runs/motor_anchor.sh   # motor_native --init-from checkpoints/spar-native --weights 1 2 1 .5 --steps 3000000 --leg-anchor 20
+```

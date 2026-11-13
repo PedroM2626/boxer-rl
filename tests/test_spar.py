@@ -107,6 +107,11 @@ class _FallingPair:
     def on_ropes(self):
         return np.zeros(2, bool)
 
+    touching = range(0)
+
+    def bodies_touching(self):
+        return self.t in self.touching
+
     def step(self, action):
         fallen = np.array(self.falls.get(self.t, (False, False)))
         self.t += 1
@@ -128,6 +133,86 @@ def test_knockdowns_restart_the_bout_until_the_stopping_count():
     assert pair.resets == 4
     stopped, _, _ = bout(_FallingPair(falls), motor, 0, 1.0, knockdowns=2)
     assert stopped['method'] == 'tko' and stopped['winner'] == 'red' and stopped['fallen'] == [False, True]
+
+
+def test_referee_breaks_clinches_after_the_set_time_without_counting_anything():
+    from boxer.spar_match import bout
+    motor = lambda obs, key: (np.zeros((2, 29)), None)
+    pair = _FallingPair({})
+    pair.touching = range(5, 40)              # 0.7 s of unbroken body contact
+    free, _, _ = bout(pair, motor, 0, 1.0)
+    assert free['clinch_breaks'] == [] and free['clinch_seconds'] == pytest.approx(.7)
+    pair = _FallingPair({})
+    pair.touching = range(5, 40)
+    broken, _, _ = bout(pair, motor, 0, 1.0, clinch_break=.3)
+    assert len(broken['clinch_breaks']) == 2 and pair.resets == 3
+    assert broken['knockdowns_suffered'] == [0, 0] and broken['restarts'] == []
+
+
+class _CountedPair(_FallingPair):
+    """Red goes down at step 10 and stands from ``up_at`` on; the bout continues."""
+
+    floor_body, stop_on_fall, done = True, True, False
+
+    def __init__(self, up_at):
+        super().__init__({10: (True, False)})
+        self.up_at, self.actions = up_at, []
+
+    def step(self, action):
+        self.actions.append(np.array(action))
+        return super().step(action)
+
+    def standing(self):
+        return np.array([self.t >= self.up_at, True])
+
+    def fallen(self):
+        return np.zeros(2, bool)
+
+
+def test_with_a_getup_policy_the_referee_counts_instead_of_restarting():
+    from boxer.spar_match import COUNT_STEADY, bout
+    motor = lambda inputs, key: (np.zeros((2, 29)), None)
+    getup = lambda inputs, key: (np.full((2, 29), 7.), None)
+    pair = _CountedPair(up_at=40)
+    result, _, _ = bout(pair, motor, 0, 3.0, knockdowns=3, getup=getup, mandatory_count=0.)
+    assert pair.resets == 1 and result['restarts'] == []          # only the opening reset
+    assert result['knockdowns_suffered'] == [1, 0] and result['method'] != 'ko'
+    [count] = result['counts']
+    assert count['fallen'] == [True, False]
+    # Down at 0.22 s (after step 10); standing from step 40, steady for COUNT_STEADY.
+    assert count['seconds_down'] == pytest.approx((40 + COUNT_STEADY / .02) * .02 - .22, abs=.03)
+    # Only the fallen boxer's legs and arms come from the get-up policy, and only while down.
+    counted = [a for a in pair.actions if a[0, 0] == 7.]
+    assert len(counted) == pytest.approx((count['seconds_down']) / .02, abs=2)
+    assert all(a[1, 0] == 0. for a in pair.actions)
+    assert pair.actions[-1][0, 0] == 0. and pair.stop_on_fall
+
+
+def test_the_mandatory_count_keeps_a_risen_boxer_waiting():
+    from boxer.spar_match import bout
+    motor = lambda inputs, key: (np.zeros((2, 29)), None)
+    getup = lambda inputs, key: (np.full((2, 29), 7.), None)
+    pair = _CountedPair(up_at=40)
+    result, _, _ = bout(pair, motor, 0, 4.0, knockdowns=3, getup=getup, mandatory_count=2.)
+    assert result['counts'][0]['seconds_down'] == pytest.approx(2., abs=.03)
+
+
+def test_a_boxer_still_down_after_the_count_is_knocked_out():
+    from boxer.spar_match import bout
+    motor = lambda inputs, key: (np.zeros((2, 29)), None)
+    getup = lambda inputs, key: (np.zeros((2, 29)), None)
+    pair = _CountedPair(up_at=10 ** 6)
+    result, _, _ = bout(pair, motor, 0, 5.0, knockdowns=3, getup=getup, count_seconds=1.)
+    assert result['method'] == 'ko' and result['winner'] == 'blue'
+    assert result['counted_out'] == [True, False] and result['seconds'] == pytest.approx(1.22, abs=.03)
+
+
+def test_getting_up_needs_floor_colliders():
+    from boxer.spar_match import bout
+    pair = _FallingPair({})
+    pair.floor_body = False
+    with pytest.raises(ValueError, match="floor_body"):
+        bout(pair, lambda i, k: (np.zeros((2, 29)), None), 0, 1.0, getup=lambda i, k: None)
 
 
 def test_corner_motors_take_each_row_from_that_corners_motor():

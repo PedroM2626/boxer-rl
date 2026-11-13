@@ -61,3 +61,13 @@ def test_run_config_writes_paths_and_path_lists_as_text():
     config = run_config(args)
     assert json.loads(json.dumps(config)) == dict(output="runs/x", pool=["a", "b"], long_gate_opponents=[],
                                                   steps=3, ring=True)
+
+
+def test_stack_fall_penalty_applies_only_against_non_whole_body_opponents():
+    from boxer.native_finetune import NativeBout
+    bout = NativeBout.__new__(NativeBout)
+    bout.fall_penalty, bout.stack_fall_penalty = 60., 120.
+    bout.opponent = type("Stack", (), {})()
+    assert bout.learner_fall_penalty() == 120.
+    bout.opponent = type("WholeBody", (), {"legs": None})()
+    assert bout.learner_fall_penalty() == 60.

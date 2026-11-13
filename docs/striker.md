@@ -248,3 +248,27 @@ promoted. Each phase adapts to the other, but the striker phase still
 learns to hit harder in 20 s episodes, and its legs pay for it in long
 bouts. The [whole-body policy](whole-body.md) removes the two phases
 altogether.
+
+## Clinches: measured, and a referee break (2026-11-12)
+
+The README listed "close to a clinch" as a limit. To check it,
+`PairedFoundation.bodies_touching()` reports any contact between the two
+robots' bodies (every collision geom except hands and wrists). Two 30 s bouts
+per matchup (`runs/clinch_probe.py`):
+
+| Matchup | Steps with body contact | Longest contact |
+| --- | --- | --- |
+| whole body vs champion | 0.1 % | 0.02 s |
+| striker vs striker | 0 % | 0 s |
+| champion vs champion | 2.1 % | 0.1 s |
+
+In every matchup the pelvises stay about 0.55 m apart, which is punching
+range. The bodies touch only for an instant at a time. There are no clinches
+to break.
+
+`spar_match` still has a referee rule for it: `--clinch-break SECONDS`
+separates the robots after that many seconds of continuous body contact. The
+bout restarts from fresh standing positions, and nothing is counted as a
+knockdown. Each result also records `clinch_seconds` and `clinch_breaks`. In
+the current matchups the rule never fires, so it changes no result; it is
+there for policies that do learn to hold.

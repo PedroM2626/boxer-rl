@@ -185,3 +185,25 @@ def test_legs_touching_sees_only_leg_on_leg_contact_between_the_robots(pair):
     names = {pair.model.geom(g).name.split('/', 1)[1] for g in pair._legs}
     assert names == {f'{s}_{p}' for s in ('left', 'right')
                      for p in ('foot', 'shin', 'thigh', 'thigh_collision', 'hip_collision')}
+
+
+def test_floor_body_lets_a_fallen_robot_rest_on_the_floor_without_changing_it(pair, foundation):
+    lying = PairedFoundation(foundation, floor_body=True)
+    assert lying.floor_body and not pair.floor_body
+    np.testing.assert_allclose(lying.model.body_mass, pair.model.body_mass)
+    assert lying.model.nq == pair.model.nq and lying.model.nu == pair.model.nu
+    heights = []
+    for p in (pair, lying):
+        p.reset(randomized=False)
+        p.stop_on_fall = False
+        q = p.maps[0]['root']
+        p.data.qpos[q + 2] = .35
+        p.data.qpos[q + 3:q + 7] = [np.cos(.75), 0, np.sin(.75), 0]   # on its front
+        mujoco.mj_forward(p.model, p.data)
+        for _ in range(50):
+            p.step(np.zeros((2, 29)))
+        heights.append(p.data.qpos[q + 2])
+        assert p.fallen()[0] and not p.standing()[0]
+        p.stop_on_fall = True
+    # Without body colliders the torso sinks through the floor; with them it rests on it.
+    assert heights[0] < .05 < .1 < heights[1]

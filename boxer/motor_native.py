@@ -278,6 +278,8 @@ def main(argv=None):
     parser.add_argument("--target-kl", type=float, default=.01, help="stop an update's epochs beyond this")
     parser.add_argument("--gamma", type=float, default=.99)
     parser.add_argument("--lam", type=float, default=.95)
+    parser.add_argument("--leg-anchor", type=float, default=0.,
+                        help="loss weight on the mean squared gap between the leg means and the starting motor's")
     parser.add_argument("--seed", type=int, default=0)
     args = parser.parse_args(argv)
     _configure_worker_env()
@@ -328,6 +330,7 @@ def main(argv=None):
     policy_opt = optax.chain(optax.clip_by_global_norm(1.), optax.adam(args.learning_rate))
     critic_opt = optax.chain(optax.clip_by_global_norm(1.), optax.adam(args.critic_learning_rate))
     policy_state, critic_state = policy_opt.init(policy_params), critic_opt.init(value_params)
+    anchor = policy_params      # the starting motor; --leg-anchor holds the leg means near it
 
     def values(params, vnorm, x):
         return critic.apply(params, running_statistics.normalize(x, vnorm))
@@ -342,8 +345,11 @@ def main(argv=None):
         ratio = jp.exp(logp - batch["logp"])
         advantage = (batch["advantage"] - batch["advantage"].mean()) / (batch["advantage"].std() + 1e-6)
         surrogate = jp.minimum(ratio * advantage, jp.clip(ratio, .8, 1.2) * advantage)
-        return -surrogate.mean(), dict(kl=(batch["logp"] - logp).mean(), clipped=(jp.abs(ratio - 1) > .2).mean(),
-                                       leg_std=scale[:, :LEGS].mean())
+        fixed, _ = split_logits(jax.lax.stop_gradient(policy.apply(norm, anchor, obs)))
+        drift = ((loc[:, :LEGS] - fixed[:, :LEGS]) ** 2).mean()
+        return -surrogate.mean() + args.leg_anchor * drift, dict(
+            kl=(batch["logp"] - logp).mean(), clipped=(jp.abs(ratio - 1) > .2).mean(),
+            leg_std=scale[:, :LEGS].mean(), leg_drift=drift)
 
     @jax.jit
     def policy_update(params, state, batch):

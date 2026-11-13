@@ -1,11 +1,21 @@
 # boxer — two humanoids learning to fight each other in JAX
 
-![Striker (red fists) boxing Champion (blue fists) in native MuJoCo](fights/striker_vs_champion_preview.gif)
+![The whole-body policy (red fists) boxing the champion stack (blue fists) in native MuJoCo](fights/whole_body_vs_champion_preview.gif)
 
-**Striker (red) vs Champion (blue).** A 12-second native MuJoCo bout with
-learned controllers, free legs and no pelvis support. Both fists match each
-boxer's corner color. [Watch the preview video](fights/striker_vs_champion_preview.mp4)
-or the [full 60-second bout](fights/striker_native_legs_vs_champion_60s.mp4).
+**Whole body (red) vs Champion (blue).** The strongest boxer, one network for
+all 23 leg, waist and arm joint targets, in a 12-second native MuJoCo bout
+against the champion stack: free legs, no pelvis support, fists in each
+corner's color. Red lands 26 clean punches to 0.
+[Preview video](fights/whole_body_vs_champion_preview.mp4); 60-second bouts
+[vs the champion](fights/whole_body_vs_champion_60s.mp4) (194 : 36),
+[vs the striker](fights/whole_body_vs_striker_60s.mp4) (222 : 17) and
+[vs itself](fights/whole_body_vs_itself_60s.mp4); a
+[knockdown, count and get-up](fights/whole_body_getup_vs_champion.mp4) in a bout.
+
+<img src="fights/getup_from_the_floor.gif" alt="A G1 getting up from lying on the floor with the learned get-up policy" width="400">
+
+**Getting up.** `checkpoints/getup` stands a G1 up from lying on the floor in
+about a second, unassisted ([video](fights/getup_from_the_floor.mp4), [get-up](docs/getup.md)).
 
 ## Where things stand (2026-11-12)
 
@@ -16,8 +26,8 @@ paths of the champion stack and a scripted sparring brain. A punch scores
 only as a physical impact of a fist on the opponent's head or torso (native
 impact scorecard: impulse, closing speed and fist speed). Bouts of 120 s run
 inside a 4 m roped ring under knockdown rules: a fall is counted, both robots
-are reset standing (they cannot get up by themselves), and a third knockdown
-is a TKO.
+are reset standing, and a third knockdown is a TKO. A learned get-up policy
+can replace the reset with a referee's count (`--getup`, below).
 
 Three complete boxers exist. The strongest is one policy for the whole body;
 the other two are stacks of separately trained parts:
@@ -33,12 +43,13 @@ legs:
 
 | Bouts | Record | Clean punches per bout | Knockdowns |
 | --- | --- | --- | --- |
-| whole body vs champion | 32–0 | 361 : 81 | 1 : 0 |
-| whole body vs striker | 31–1 | 362 : 114 | 2 : 2 |
+| whole body vs champion | 32–0 | 419 : 96 | 8 : 3 |
+| whole body vs striker | 32–0 | 445 : 50 | 4 : 0 |
+| whole body vs the previous whole body (`whole-body-v1`, 16 bouts) | 16–0 | 418 : 159 | 0 : 0 |
 | striker vs champion | 32–0 | 256 : 87 | 1 : 4 |
-| whole body vs itself / striker vs itself | — | — | 4 / 20 in all |
+| whole body vs itself / striker vs itself | — | — | 0 / 20 in all |
 
-([whole body](docs/whole-body.md#long-episodes-tilt-cost-and-leg-anchor),
+([whole body](docs/whole-body.md#self-play-with-a-heavier-fall-penalty-against-stacks-run-5-promoted),
 [striker](docs/striker.md#legs-trained-in-two-robot-bouts-2026-11-03);
 60 s videos at 60 fps: [whole body](fights/whole_body_vs_champion_60s.mp4),
 [striker](fights/striker_native_legs_vs_champion_60s.mp4)).
@@ -57,13 +68,20 @@ bash tools/run_spar.sh boxer.spar_match --ring --seconds 120 --knockdowns 3 --se
   alternating leg and striker rounds reduced it
   ([spar motor](docs/spar-motor.md#legs-trained-in-two-robot-bouts-2026-11-03),
   [rounds](docs/striker.md#long-bout-gate-and-alternating-rounds-2026-11-11)).
-  Two whole-body policies fall 4 times.
-* **Close to a clinch.** The striker and the whole-body policy win by fighting at very close range;
-  nothing in the rules separates clinched boxers.
-* **No getting up.** After a knockdown the referee resets both robots standing.
-  Two attempts to learn getting up from the floor (a GPU `getup` stage with
-  floor contacts for the whole body) failed: robots stayed down or learned to
-  sit ([get-up](docs/getup.md)).
+  Two whole-body policies fall 0 times. A leg anchor for the motor did not
+  help either ([spar motor](docs/spar-motor.md#legs-trained-in-two-robot-bouts-2026-11-03)).
+* **The strongest boxer still falls against the champion.** The whole body
+  falls 8 times in 32 bouts against the champion stack (the previous one: 1),
+  though it wins all 32.
+* **No clinches, but close.** The striker and the whole-body policy fight at
+  about 0.55 m between pelvises, which is punching range. Bodies touch on at most
+  2 % of steps, for at most 0.1 s at a time. `spar_match --clinch-break` would
+  separate a clinch, but it never fires
+  ([clinches](docs/striker.md#clinches-measured-and-a-referee-break-2026-11-12)).
+* **Getting up works, boxing on after it does not yet.** `checkpoints/getup`
+  stands a fallen G1 up in about 1 s, in the GPU stage and in native MuJoCo.
+  With a referee's count in place of the reset, boxers often fall again just
+  after resuming, so evaluations keep the reset ([get-up](docs/getup.md)).
 * **Stacks are trained part by part.** In the two stacks, legs, tactics, arm
   skill and striker are separate policies trained in turn; changing one (e.g.
   a striker's arm style) can break another (its legs), as several experiments
@@ -75,17 +93,21 @@ bash tools/run_spar.sh boxer.spar_match --ring --seconds 120 --knockdowns 3 --se
   held off by anchoring its legs to the striker's gait and by a ~2 s return
   horizon, not by the episode length
   ([ablations](docs/whole-body.md#ablations-the-leg-anchor-and-the-horizon-carry-it)).
+  20 s episodes are the default for native fine-tuning
+  (`native_finetune --episode-seconds 20`); the 120 s gate catches the falls.
 * **Turning is automatic in the stacks.** Their brains choose advance and
   circling; facing the opponent is a fixed rule (`tactics_env.decode`). The
   whole-body policy has no such rule: its own leg targets turn it.
 * **Simulation only**, against a fixed pool of policies; no sim-to-real work.
-* **Tests:** all 86 test files (430 tests) pass when run one file per
-  process (`tools/test_all.sh`, 2026-11-12); the whole suite in one process
-  exhausts the WSL VM's memory.
+* **Tests:** all 86 test files (438 tests) pass when run one file per
+  process (`tools/test_all.sh`, 33 min, 2026-11-12); the whole suite in one
+  process exhausts the WSL VM's memory. `--fast` skips the five slow files of
+  the archived MJX/warp stack (`tools/slow_tests.txt`) and takes about 13 min.
 
 **Checkpoints.** Current: `whole-body`, `spar`, `spar-native`, `tactics`,
-`arm-skill`, `striker`. Also kept: `whole-body-clone` (the whole-body policy's
-starting point, imitating the striker). Earlier, kept for comparison: `striker-v1` (first striker),
+`arm-skill`, `striker`, `getup` (gets a fallen G1 up). Also kept:
+`whole-body-v1` (the previous whole-body policy, run 3), `whole-body-clone`
+(the whole-body policy's starting point, imitating the striker). Earlier, kept for comparison: `striker-v1` (first striker),
 `spar-v2` (rapid-punching legs), `spar-v1`, `spar-shorthook`,
 `spar-straight` (earlier spar motors), `tactics-arm-v1`, `tactics-ring-v1`,
 `tactics-highguard-v1`, `tactics-levelhook-v1`, `tactics-guard-v1`,
@@ -125,7 +147,12 @@ since 2026-10-30, including the rejected ones.
 | 11-11 | Whole body, long episodes | Native PPO on 120 s episodes, γ 0.99, per-step tilt cost, leg outputs anchored to the clone. | First gate-approved whole-body run: vs champion 32–0, 361 : 81, kd 1 : 0; vs striker 31–1; own brawls 4 kd (strikers: 20). **Promoted** (`whole-body`) ([details](docs/whole-body.md#long-episodes-tilt-cost-and-leg-anchor)). |
 | 11-12 | Whole-body ablations | Run 3 retrained without each change in turn (1M steps). | Own-brawl knockdowns: no leg anchor 108, γ 0.97 38, no tilt cost 10, 20 s episodes 4 (full: 4, other seed 2) ([ablations](docs/whole-body.md#ablations-the-leg-anchor-and-the-horizon-carry-it)). |
 | 11-12 | Whole body vs itself | 2M more steps from `whole-body`, itself in the opponent pool. | Beats the promoted policy 16–0 over 120 s but falls 3–9 times in 16 bouts against the champion; rejected by the long gate ([details](docs/whole-body.md#continued-training-with-itself-in-the-pool-rejected)). |
-| 11-12 | Getting up | GPU `getup` stage: whole-body floor contacts, lying and falling starts, height and upright reward; 150M steps from the spar motor, then 200M from scratch with a head-height term. | 0 of 98 fallen starts stood up in either; the second learned to sit. Not used ([get-up](docs/getup.md)). |
+| 11-12 | Getting up | GPU `getup` stage: whole-body floor contacts, lying and falling starts, height and upright reward; 150M steps from the spar motor, then 200M from scratch with a head-height term. | 0 of 98 fallen starts stood up in either; the second learned to sit ([get-up](docs/getup.md)). |
+| 11-12 | Getting up with a fading assist | Upward torso force (× body weight) lowered 0.7 → 0.45, then 0.38 → 0 in 0.06 steps, 290M steps in all. | Unassisted: 99 % of lying and 100 % of falling starts up, in about 1 s; 24 of 24 in native MuJoCo. `checkpoints/getup` ([get-up](docs/getup.md#attempts-3-and-4-an-assist-that-fades-to-zero-worked)). |
+| 11-12 | Referee's count | `spar_match --getup`: the fallen boxer gets up while the other waits; mandatory 8 s count, 10 s for a knockout. | 38 of 49 counts end standing, but boxers fall again soon after resuming: whole body vs champion 26–6 (kd 15 : 2) against 32–0 with restarts. Optional; restarts stay the default ([details](docs/getup.md#in-bouts-the-referees-count)). |
+| 11-12 | Whole body, self-play with a stack fall penalty | Run 4's pool, plus a 150 fall penalty against stacks and strikers (60 against itself), 20 s episodes. | 0.5M passes every long check; beats run 3 16–0; vs champion 32–0, 419 : 96 but kd 8 : 3. **Promoted** (`whole-body`; run 3 kept as `whole-body-v1`) ([details](docs/whole-body.md#self-play-with-a-heavier-fall-penalty-against-stacks-run-5-promoted)). |
+| 11-12 | Leg anchor for the motor | `motor_native --leg-anchor 20` from `spar-native`, striker-heavy pool. | Striker brawls 22 knockdowns (20 before); not promoted ([details](docs/spar-motor.md#legs-trained-in-two-robot-bouts-2026-11-03)). |
+| 11-12 | Clinches | Body-contact probe; `spar_match --clinch-break` referee rule. | Bodies touch on ≤ 2 % of steps, ≤ 0.1 s at a time; no clinches to break ([details](docs/striker.md#clinches-measured-and-a-referee-break-2026-11-12)). |
 
 ## Milestones since unassisted two-robot bouts (2026-10-30 onward)
 
@@ -182,8 +209,8 @@ beat the ring champion 35–11–2, though more knockdown-prone over long bouts
 
 **Long rounds and knockdowns (2026-10-31).** Bouts of 120–180 s hold up after
 a footwork fix that keeps the boxers facing each other. `--knockdowns 3` adds
-a referee: a fall is counted and both robots restart standing (they cannot
-get up unaided), and a third knockdown is a TKO
+a referee: a fall is counted and both robots restart standing (they could
+not get up unaided then), and a third knockdown is a TKO
 ([details](docs/tactics.md#knockdown-rules-2026-10-31);
 [3-minute video](fights/tactics_knockdown_rules_180s.mp4) with two knockdowns,
 the high-guard champion in blue).
@@ -266,9 +293,8 @@ motor's own weights, and leg outputs anchored to the clone. The long gate
 accepted it. Over 32 bouts of 120 s it beats the champion **32–0, 361 clean
 punches per bout to 81, 1 knockdown to 0**, and the striker **31–1, 362 to
 114**; two of them brawl with **4 knockdowns in 32 bouts** where two
-strikers fall 20 times (`checkpoints/whole-body`;
-[details](docs/whole-body.md#long-episodes-tilt-cost-and-leg-anchor);
-[60 s video](fights/whole_body_vs_champion_60s.mp4)).
+strikers fall 20 times (now `checkpoints/whole-body-v1`;
+[details](docs/whole-body.md#long-episodes-tilt-cost-and-leg-anchor)).
 
 **What carries it, and what did not work (2026-11-12).** Ablations, each
 dropping one change: without the leg anchor two whole-body policies fall
@@ -280,6 +306,23 @@ but fell 3–9 times against the champion, and the long gate rejected it
 ([details](docs/whole-body.md#continued-training-with-itself-in-the-pool-rejected)).
 Two attempts to learn getting up from the floor failed: no fallen robot
 stood up, and the second policy learned to sit ([get-up](docs/getup.md)).
+
+**Getting up, and a stronger whole body (2026-11-12).** An upward assist on
+the torso, lowered to zero in seven phases, taught a G1 to get up from the
+floor: unassisted, **99 % of lying and 100 % of falling starts stand up in
+about 1 s**, in the GPU stage and in native MuJoCo (`checkpoints/getup`;
+[get-up](docs/getup.md); [knockdown and get-up in a bout](fights/whole_body_getup_vs_champion.mp4)).
+`spar_match --getup` replaces the referee's restart with a count, but boxers
+often fall again soon after resuming, so evaluations keep the restart.
+Self-play with a heavier fall penalty against the stacks (150 against 60)
+gave a whole body that passed every long check: it **beats the previous one
+16–0**, the champion **32–0, 419 : 96**, and the striker **32–0, 445 : 50**,
+at the cost of 8 knockdowns against the champion
+(`checkpoints/whole-body`;
+[details](docs/whole-body.md#self-play-with-a-heavier-fall-penalty-against-stacks-run-5-promoted);
+[60 s video](fights/whole_body_vs_champion_60s.mp4)). Bodies barely touch in
+any matchup, so a clinch-break rule exists but never fires
+([clinches](docs/striker.md#clinches-measured-and-a-referee-break-2026-11-12)).
 
 ## Archive
 
@@ -369,7 +412,8 @@ boxer/curriculum_env.py    UnassistedG1: one G1 on MJX/Warp, the curriculum stag
 boxer/getup_eval.py        how often a policy gets up from lying and falling starts
 boxer/curriculum_train.py  GPU PPO for the leg motor (balance ... spar), with physical gates
 boxer/curriculum_eval.py   the solo physical gate (survival under shoves and punching arms)
-boxer/paired_foundation.py two robots in one native MuJoCo model, ring, impact scorecard, falls
+boxer/paired_foundation.py two robots in one native MuJoCo model, ring, impact scorecard, falls,
+                           optional floor colliders for getting up
 boxer/moves.py             scripted straights, hooks and guards, fitted by forward kinematics
 boxer/tactics_env.py       tactics observation and decode (footwork, punch, aim, guard)
 boxer/tactics_train.py     batched GPU self-play for tactics
@@ -381,7 +425,8 @@ boxer/striker_train.py     striker imitation data, cloning, and arm recordings f
 boxer/motor_native.py      PPO for the leg motor in native two-robot bouts
 boxer/co_train.py          alternating rounds: legs, then striker on the new legs
 boxer/whole_body.py, boxer/whole_body_train.py   one policy for legs, waist and arms; its cloning
-boxer/spar_match.py        native bouts between any two stacks, knockdown rules, video
+boxer/spar_match.py        native bouts between any two stacks, knockdown rules (restart or
+                           count with a get-up policy), clinch breaks, video
 tools/punch_shapes.py      which punch shapes a corner throws
 tools/knockdown_causes.py  what happens in the second before each knockdown
 tools/score_audit.py       every fist-on-target contact and why it did or did not score
@@ -394,7 +439,7 @@ targets while keeping balance; the arm targets replace the motor's own arm
 outputs. A whole-body policy skips the motor and sets every target itself.
 Details: [spar motor](docs/spar-motor.md), [tactics](docs/tactics.md),
 [moves](docs/moves.md), [arm skill](docs/arm-skill.md), [striker](docs/striker.md),
-[whole body](docs/whole-body.md).
+[whole body](docs/whole-body.md), [get-up](docs/getup.md).
 The original MJX and warp stacks are described in the
 [archive](docs/archive/mjx-warp-experiments.md#architecture-of-the-mjx-and-warp-stacks).
 
@@ -413,6 +458,8 @@ bash tools/run_spar.sh boxer.spar_match --ring --seconds 60 --knockdowns 3 --see
 # tests, one file per process (the whole suite in one process runs out of memory on WSL)
 bash tools/test_all.sh
 bash tools/test_all.sh tests/test_spar.py tests/test_striker.py   # or only some files
+bash tools/test_all.sh --fast                                       # skip tools/slow_tests.txt (~13 min)
+bash tools/test_all.sh --times runs/test_times.tsv                  # also record seconds per file
 ```
 
 Training commands for each part are in its report: the leg motor

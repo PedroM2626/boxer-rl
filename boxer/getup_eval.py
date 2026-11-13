@@ -62,6 +62,11 @@ def render(env, qpos, path, every=2):
     """qpos: (steps, robots, nq) -> one clip per robot, back to back, at real time."""
     import mediapy
     import mujoco
+    try:  # WSL often has no system ffmpeg; imageio-ffmpeg ships one
+        import imageio_ffmpeg
+        mediapy.set_ffmpeg(imageio_ffmpeg.get_ffmpeg_exe())
+    except ImportError:
+        pass
     model = env.mj_model
     data = mujoco.MjData(model)
     renderer = mujoco.Renderer(model, height=360, width=480)
@@ -85,17 +90,20 @@ def main(argv=None):
     parser.add_argument("--seconds", type=float, default=10.)
     parser.add_argument("--seed", type=int, default=7)
     parser.add_argument("--output", type=Path)
+    parser.add_argument("--assist", type=float, default=0.,
+                        help="the training aid's upward torso force, as a fraction of body weight (default: none)")
     parser.add_argument("--video", type=Path, help="render the first lying starts one after another")
     args = parser.parse_args(argv)
     jax_compat()
     config = stage_config("getup")
     config.naconmax = max(8192, args.worlds * 32)
+    config.getup_assist = args.assist
     env = UnassistedG1("getup", config=config)
     params, manifest = load_policy_params(args.checkpoint)
     steps = int(round(args.seconds / env.dt))
     heights, upright, kinds, rollout = evaluate(env, inference(env, params), args.worlds, steps, args.seed)
     result = dict(checkpoint=str(args.checkpoint), stage=manifest["stage"], stage_steps=manifest["stage_steps"],
-                  seconds=args.seconds, worlds=args.worlds, seed=args.seed,
+                  seconds=args.seconds, worlds=args.worlds, seed=args.seed, assist=args.assist,
                   up_height=UP_HEIGHT, up_gravity=UP_GRAVITY, **summarize(heights, upright, kinds, env.dt))
     print(json.dumps(result), flush=True)
     if args.output:

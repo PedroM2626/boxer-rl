@@ -65,3 +65,17 @@ def test_getup_summary_counts_first_time_up_per_start_kind():
     assert result["lying"]["peak_height"] == .8 and result["lying"]["end_height"] == .8
     assert result["standing"]["up_at_end"] == 0. and result["standing"]["ever_up"] == 1.
     assert result["falling"]["ever_up"] == 0. and result["falling"]["seconds_to_up"] is None
+
+
+def test_assist_force_lifts_the_torso_and_is_off_by_default():
+    heights = {}
+    for assist in (0., 1.5):
+        config = stage_config("getup")
+        config.getup_assist = assist
+        env = UnassistedG1("getup", config=config)
+        state = jax.jit(jax.vmap(env.reset))(jax.random.split(jax.random.PRNGKey(5), 8))
+        step = jax.jit(jax.vmap(env.step))
+        for _ in range(40):
+            state = step(state, jp.zeros((8, env.action_size)))
+        heights[assist] = float(np.asarray(state.data.xpos[:, env._torso_body, 2]).mean())
+    assert heights[1.5] > heights[0.] + .2

@@ -120,6 +120,10 @@ def main(argv=None):
     parser.add_argument("--striker-arms", type=Path,
                         help="spar: npz of striker arm actions (striker_train arms) replayed in a share "
                              "of episodes (curriculum_env.STRIKER_ARM_FRACTION)")
+    parser.add_argument("--getup-assist", type=float, default=0.,
+                        help="getup: upward torso force as a fraction of body weight (training aid)")
+    parser.add_argument("--getup-head-weight", type=float,
+                        help="getup: weight of the head-height reward term (curriculum_env.GETUP_REWARD)")
     parser.add_argument("--publish-run", type=Path)
     parser.add_argument("--preview-snapshots", action="store_true")
     parser.add_argument("--adaptive-gates", action="store_true")
@@ -154,6 +158,12 @@ def main(argv=None):
         config.rapid_punches = True
     if args.striker_arms:
         config.striker_arms = str(args.striker_arms)
+    if args.getup_assist or args.getup_head_weight is not None:
+        if args.stage != "getup":
+            raise ValueError("--getup-* options belong to the getup stage")
+        config.getup_assist = args.getup_assist
+        if args.getup_head_weight is not None:
+            config.getup_head_weight = args.getup_head_weight
     config.naconmax = max(8192, args.worlds * 16)
     env = UnassistedG1(args.stage, config=config)
     env_contract = contract(env)

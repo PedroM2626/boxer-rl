@@ -19,10 +19,17 @@ ends the bout; otherwise it goes the distance and is decided on clean
 punches. With ``knockdowns=N`` (``--knockdowns N``, N > 1) a knockdown is
 counted and the referee restarts the bout instead. Only real falls count
 (pelvis below 0.55 m or torso tilted past the limit), not the foundation's
-self-trip rule (a foot touching the robot's own other foot or shin): the G1s cannot get up, so both
+self-trip rule (a foot touching the robot's own other foot or shin). Both
 are reset standing at fresh starting positions, scores and the clock carry
 on, and the N-th knockdown of one boxer stops the bout (TKO). Each knockdown
 scored is worth ``KNOCKDOWN_POINTS`` clean punches on the cards.
+
+With a get-up policy (``--getup``, trained in the ``getup`` stage) there is
+no restart: the referee counts. The fallen boxer's get-up policy acts until
+it has stood (``PairedFoundation.standing``) for ``COUNT_STEADY`` seconds
+and the mandatory count (``MANDATORY_COUNT``, as in boxing's eight count) is
+over; the other boxer waits in guard on its leg motor; then the bout goes on
+from where they are. Still down after ``count_seconds``: knocked out.
 """
 from __future__ import annotations
 
@@ -39,6 +46,8 @@ from boxer.curriculum_train import inference, load_policy_params
 from boxer.paired_foundation import PairedFoundation
 
 KNOCKDOWN_POINTS = 10
+COUNT_STEADY = .5          # seconds standing that end the referee's count
+MANDATORY_COUNT = 8.       # but never before this many seconds after the knockdown
 # Constant motor inputs, passed as NumPy so a step costs no extra JAX dispatch.
 MOTOR_PRIVILEGED = np.zeros((2, 216), np.float32)
 MOTOR_KEY = np.zeros(2, np.uint32)          # == jax.random.PRNGKey(0)
@@ -206,13 +215,20 @@ def _body(pair, i):
 
 
 def bout(pair, motor, seed, seconds=20.0, record=False, brains=None, knockdowns=1, arm_skills=None,
-         frame_every=2):
+         frame_every=2, clinch_break=0., getup=None, count_seconds=10., mandatory_count=MANDATORY_COUNT):
     """One bout; ``brains`` maps corner -> PolicyBrain, others are scripted.
 
     ``knockdowns``: knockdowns of one boxer that stop the bout (1: the first
     fall ends it, the original rule). ``arm_skills`` maps corner ->
     ``arm_skill.ArmSkill`` that steers that corner's punches. When
     ``record``, a frame is kept every ``frame_every`` control steps.
+    ``clinch_break``: seconds of unbroken body contact (anything but fists
+    and forearms, ``PairedFoundation.bodies_touching``) after which the
+    referee separates the boxers to fresh spots, as after a knockdown but
+    with nothing counted; 0 never breaks.
+    ``getup``: a get-up policy (as ``motor``, both rows); knockdowns are then
+    counted where they happen instead of restarted (module docstring). The
+    pair needs ``floor_body`` colliders for it.
 
     Networks run on the CPU even when a GPU is visible. GPU float32 matmuls
     use TF32 by default (motor actions differ by up to 5e-4), and a bout is
@@ -225,12 +241,16 @@ def bout(pair, motor, seed, seconds=20.0, record=False, brains=None, knockdowns=
     try:
         with jax.default_device(jax.devices('cpu')[0]):
             return _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills or {},
-                         frame_every)
+                         frame_every, clinch_break, getup, count_seconds, mandatory_count)
     finally:
         pair.self_trip_falls = trips
+        pair.stop_on_fall = True
 
 
-def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills, frame_every=2):
+def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills, frame_every=2, clinch_break=0.,
+          getup=None, count_seconds=10., mandatory_count=MANDATORY_COUNT):
+    if getup is not None and not pair.floor_body:
+        raise ValueError("getting up needs a pair built with floor_body colliders")
     rng = np.random.default_rng(seed)
     pair.reset(seed=seed)
     brains = [(brains or {}).get(i) or RingBrain(np.random.default_rng([seed, i]))
@@ -242,11 +262,53 @@ def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills, fr
     downs, restarts = np.zeros(2, int), []
     turned_away = np.zeros(2, int)      # steps facing more than 45 deg off the opponent
     roped = np.zeros(2, int)            # steps touching the ropes
+    clinched, holding, breaks = 0, 0, []   # steps in body contact, current spell, referee breaks
     # Radians the shoulder and elbow targets of both arms move, summed over steps.
     arm_joints = np.r_[LEFT_ARM:LEFT_ARM + 4, LEFT_ARM + 7:LEFT_ARM + 11]
     motion, last_arms = np.zeros(2), None
+    # The referee's count: who is down, since when, and for how long they have stood.
+    down, down_since, steady = np.zeros(2, bool), np.zeros(2), np.zeros(2, int)
+    counts, counted_out = [], np.zeros(2, bool)
+    pair.stop_on_fall = True
     steps = int(round(seconds / pair.dt))
     for t in range(steps):
+        if down.any():
+            obs = pair.observation(np.zeros((2, 3)))
+            action, lifted = motor_actions(motor, obs), motor_actions(getup, obs)
+            for i in range(2):
+                if down[i]:
+                    action[i] = lifted[i]
+                else:
+                    action[i, LEFT_ARM:] = arms[i].actions(False)
+            pair.step(action)
+            elapsed = (t + 1) * pair.dt
+            if record and t % frame_every == 0:
+                frames.append(pair.data.qpos.copy())
+                times.append((elapsed, scored.copy(), downs.copy()))
+            standing = pair.standing()
+            # The waiting boxer can fall too: a knockdown of its own.
+            new = ~down & pair.fallen() & ~standing
+            if new.any():
+                downs += new
+                down |= new
+                down_since[new] = elapsed
+                counts.append(dict(time=round(elapsed, 3), fallen=new.tolist(), seconds_down=None))
+            steady = np.where(down & standing, steady + 1, 0)
+            for i in np.flatnonzero(down & (steady * pair.dt >= COUNT_STEADY)
+                                    & (elapsed - down_since >= mandatory_count)):
+                down[i] = False
+                for c in counts:
+                    if c['fallen'][i] and c['seconds_down'] is None:
+                        c['seconds_down'] = round(elapsed - down_since[i], 2)
+            counted_out = down & (elapsed - down_since >= count_seconds)
+            if counted_out.any() or downs.max() >= knockdowns:
+                break
+            if not down.any():
+                # Both up: box on from here.
+                pair.stop_on_fall = True
+                arms = [_new_arm(pair, brain) for brain in brains]
+                last_arms = None
+            continue
         roots = [pair.data.qpos[m['root']:m['root'] + 2] for m in pair.maps]
         commands, launches = [], []
         for i, m in enumerate(pair.maps):
@@ -282,6 +344,9 @@ def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills, fr
         outcome = pair.step(action)
         roped += pair.on_ropes()
         elapsed = (t + 1) * pair.dt
+        touching = pair.bodies_touching()
+        clinched += touching
+        holding = holding + 1 if touching else 0
         if outcome['scored'].any():
             events.append(dict(time=round(elapsed, 3),
                                scored=outcome['scored'].tolist()))
@@ -294,19 +359,33 @@ def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills, fr
             downs += fallen
             if downs.max() >= knockdowns or t == steps - 1:
                 break
+            if getup is not None:
+                # The referee counts; the bout goes on where it is.
+                down, steady[:] = fallen.copy(), 0
+                down_since[fallen] = elapsed
+                counts.append(dict(time=round(elapsed, 3), fallen=fallen.tolist(), seconds_down=None))
+                pair.done, pair.stop_on_fall = False, False
+                arms = [_new_arm(pair, brain) for brain in brains]   # back to the guard
+                continue
             # The referee's restart: both boxers stand again at fresh spots.
             restarts.append(dict(time=round(elapsed, 3), fallen=fallen.tolist()))
             pair.reset(seed=int(rng.integers(1 << 30)))
             arms = [_new_arm(pair, brain) for brain in brains]
             fallen = np.zeros(2, bool)
             last_arms = None
-    stopped = downs >= knockdowns
+        elif clinch_break and holding * pair.dt >= clinch_break and t < steps - 1:
+            # The referee's break: separated to fresh spots, nothing counted.
+            breaks.append(round(elapsed, 3))
+            pair.reset(seed=int(rng.integers(1 << 30)))
+            arms = [_new_arm(pair, brain) for brain in brains]
+            holding, last_arms = 0, None
+    stopped = (downs >= knockdowns) | counted_out
     cards = scored + KNOCKDOWN_POINTS * downs[::-1]
     if knockdowns > 1:
         fallen = stopped
     if fallen.any() and not fallen.all():
         winner = int(np.flatnonzero(~fallen)[0])
-        method = 'knockdown' if knockdowns == 1 else 'tko'
+        method = 'ko' if counted_out.any() else 'knockdown' if knockdowns == 1 else 'tko'
     elif fallen.all():
         winner, method = None, 'double knockdown'
     elif cards[0] != cards[1]:
@@ -314,11 +393,13 @@ def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills, fr
     else:
         winner, method = None, 'draw'
     result = dict(seed=seed, seconds=round(min(steps, t + 1) * pair.dt, 2), clean_punches=scored.tolist(),
-                  knockdowns_suffered=downs.tolist(), restarts=restarts, cards=cards.tolist(),
+                  knockdowns_suffered=downs.tolist(), restarts=restarts, counts=counts,
+                  counted_out=counted_out.tolist(), cards=cards.tolist(),
                   punches_thrown=thrown.tolist(), hooks_thrown=hooks.tolist(),
                   high_guard_seconds=(guarded * pair.dt).round(2).tolist(),
                   turned_away_seconds=(turned_away * pair.dt).round(2).tolist(),
                   rope_seconds=(roped * pair.dt).round(2).tolist(), fallen=fallen.tolist(),
+                  clinch_seconds=round(clinched * pair.dt, 2), clinch_breaks=breaks,
                   arm_motion_rad=motion.round(1).tolist(),
                   winner=None if winner is None else ('red', 'blue')[winner],
                   method=method, impact_events=events)
@@ -363,7 +444,7 @@ def render(pair, frames, times, path, caption, fps=25):
     import mujoco
     from PIL import Image, ImageDraw
     from boxer.paired_foundation import build_pair
-    model = build_pair(pair.foundation, visual_fists=True, ring=pair.ring)
+    model = build_pair(pair.foundation, visual_fists=True, ring=pair.ring, floor_body=pair.floor_body)
     data = mujoco.MjData(model)
     if len(frames) > 1 and abs((times[1][0] - times[0][0]) * fps - 1) > 1e-6:
         frames, times = resample(model, frames, times, fps)
@@ -391,7 +472,8 @@ def render(pair, frames, times, path, caption, fps=25):
                       '   | free legs, no pelvis support', fill='white')
             if elapsed - last_down < 2.:
                 draw.rectangle((330, 470, 630, 510), fill='darkred')
-                draw.text((345, 482), 'KNOCKDOWN - referee restart', fill='white')
+                draw.text((345, 482), 'KNOCKDOWN - referee count' if pair.floor_body
+                          else 'KNOCKDOWN - referee restart', fill='white')
             writer.append_data(np.asarray(image))
 
 
@@ -413,6 +495,14 @@ def main(argv=None):
     parser.add_argument('--ring', action='store_true', help='fight inside the roped ring')
     parser.add_argument('--red-arm', type=Path, help='arm-skill checkpoint steering red punches')
     parser.add_argument('--blue-arm', type=Path, help='arm-skill checkpoint steering blue punches')
+    parser.add_argument('--clinch-break', type=float, default=0.,
+                        help='seconds of body contact before the referee separates the boxers (0: never)')
+    parser.add_argument('--getup', type=Path,
+                        help='get-up policy (stage getup): knockdowns are counted, not restarted')
+    parser.add_argument('--count-seconds', type=float, default=10.,
+                        help='with --getup: seconds down before a knockout')
+    parser.add_argument('--mandatory-count', type=float, default=MANDATORY_COUNT,
+                        help='with --getup: seconds after a knockdown before boxing resumes, even if up')
     parser.add_argument('--swap', action='store_true',
                         help='also play every seed with the tactics exchanged between corners')
     args = parser.parse_args(argv)
@@ -432,7 +522,8 @@ def main(argv=None):
         # So is its leg motor: the two stacks differ from the legs up.
         motors[1] = jax.jit(inference(foundation, load_policy_params(args.blue_checkpoint)[0]))
         names = [n + f' + motor {p}' for n, p in zip(names, (args.checkpoint, args.blue_checkpoint))]
-    pair = PairedFoundation(foundation, ring=args.ring)
+    pair = PairedFoundation(foundation, ring=args.ring, floor_body=args.getup is not None)
+    getup = jax.jit(inference(foundation, load_policy_params(args.getup)[0])) if args.getup else None
     bouts = []
     schedule = [(seed, False) for seed in args.seeds]
     if args.swap:
@@ -445,7 +536,8 @@ def main(argv=None):
             motor = corner_motors(*(motors[::-1] if swapped else motors))
         # Every control step (50 Hz) when the video rate is not 25 fps, for resampling.
         result, frames, times = bout(pair, motor, seed, args.seconds, record, brains, args.knockdowns,
-                                     arm_skills, 2 if args.fps == 25 else 1)
+                                     arm_skills, 2 if args.fps == 25 else 1, args.clinch_break,
+                                     getup, args.count_seconds, args.mandatory_count)
         result.update(red=names[1] if swapped else names[0], blue=names[0] if swapped else names[1])
         bouts.append(result)
         print(json.dumps({k: v for k, v in result.items() if k != 'impact_events'}), flush=True)
@@ -460,17 +552,23 @@ def main(argv=None):
     points = [b['clean_punches'][0 if b['red'] == first else 1] for b in bouts]
     against = [b['clean_punches'][1 if b['red'] == first else 0] for b in bouts]
     downs = [sum(b['knockdowns_suffered'][k if b['red'] == first else 1 - k] for b in bouts) for k in (0, 1)]
+    rise = [c['seconds_down'] for b in bouts for c in b['counts'] if c['seconds_down'] is not None]
     summary = dict(checkpoint=str(args.checkpoint), stage=metadata['stage'],
                    stage_steps=metadata['stage_steps'], checkpoint_sha256=metadata['sha256'],
                    bouts=len(bouts), went_the_distance=survived,
                    knockdowns=sum(b['method'] == 'knockdown' for b in bouts),
-                   stoppages=sum(b['method'] in ('knockdown', 'tko', 'double knockdown') for b in bouts),
+                   stoppages=sum(b['method'] in ('knockdown', 'tko', 'ko', 'double knockdown') for b in bouts),
                    total_knockdowns=int(sum(sum(b['knockdowns_suffered']) for b in bouts)),
                    mean_seconds=float(np.mean([b['seconds'] for b in bouts])),
                    clean_punches_per_bout=float(np.mean([sum(b['clean_punches']) for b in bouts])),
                    punches_thrown_per_bout=float(np.mean([sum(b['punches_thrown']) for b in bouts])),
                    turned_away_seconds_per_boxer=float(np.mean([b['turned_away_seconds'] for b in bouts])),
                    ring=args.ring, rope_seconds_per_boxer=float(np.mean([b['rope_seconds'] for b in bouts])),
+                   clinch_seconds_per_bout=float(np.mean([b['clinch_seconds'] for b in bouts])),
+                   clinch_breaks=int(sum(len(b['clinch_breaks']) for b in bouts)),
+                   getup=str(args.getup) if args.getup else None,
+                   knockouts=sum(b['method'] == 'ko' for b in bouts),
+                   seconds_down_per_count=float(np.mean(rise)) if rise else None,
                    tactics=dict(first=names[0], second=names[1], first_wins=wins, first_losses=losses,
                                 draws=len(bouts) - wins - losses,
                                 first_clean_per_bout=float(np.mean(points)),
