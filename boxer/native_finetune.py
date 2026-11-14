@@ -50,7 +50,8 @@ class NativeBout:
     def __init__(self, pair, motor, rng, opponents, scripted_fraction, episode_steps, fall_penalty,
                  high_guard_fraction=0., arm_skill=None, leg_contact_penalty=0., striker=False,
                  arm_motion_cost=0., whole_body=False, tilt_cost=0., stack_fall_penalty=None,
-                 start_bank=None, start_bank_fraction=0.):
+                 start_bank=None, start_bank_fraction=0., mirror_bank=None, mirror_bank_fraction=0.,
+                 mirror_opponent=None):
         """``arm_skill``: an ``arm_skill.ArmSkill`` steering both corners' punches.
         ``leg_contact_penalty``: reward lost per second the robots' legs touch.
         ``striker``: the learner's actions are a striker's (``boxer.striker``),
@@ -66,7 +67,11 @@ class NativeBout:
         keeps ``fall_penalty``.
         ``start_bank``: states from the end of a referee's count
         (``boxer.getup_starts``); a ``start_bank_fraction`` share of bouts
-        starts from one, the learner in the risen corner three times in four."""
+        starts from one, the learner in the risen corner three times in four.
+        ``mirror_bank``: states just before a fall in a policy's bouts against
+        itself (``boxer.mirror_starts``); a ``mirror_bank_fraction`` share of
+        bouts starts from one against ``mirror_opponent`` (that policy), the
+        learner in the corner that fell three times in four."""
         from boxer.spar_match import PunchArm
         self.pair, self.motor, self.rng = pair, motor, rng
         self.arm_skill, self.leg_contact_penalty = arm_skill, leg_contact_penalty
@@ -78,7 +83,9 @@ class NativeBout:
         self.episode_steps, self.fall_penalty = episode_steps, fall_penalty
         self.PunchArm = PunchArm
         self.start_bank, self.start_bank_fraction = start_bank or [], start_bank_fraction
-        self.banked = False
+        self.mirror_bank, self.mirror_bank_fraction = mirror_bank or [], mirror_bank_fraction
+        self.mirror_opponent = mirror_opponent
+        self.banked = self.mirrored = False
         self.reset()
 
     def learner_fall_penalty(self):
@@ -88,10 +95,17 @@ class NativeBout:
         from boxer.spar_match import RingBrain
         seed = int(self.rng.integers(1 << 30))
         self.pair.reset(seed=seed)
-        self.banked = bool(self.start_bank) and self.rng.random() < self.start_bank_fraction
+        state, self.mirrored = None, False
+        if self.start_bank or self.mirror_bank:
+            u = self.rng.random()
+            if self.start_bank and u < self.start_bank_fraction:
+                state = self.start_bank[int(self.rng.integers(len(self.start_bank)))]
+            elif self.mirror_bank and u < self.start_bank_fraction * bool(self.start_bank) + self.mirror_bank_fraction:
+                state = self.mirror_bank[int(self.rng.integers(len(self.mirror_bank)))]
+                self.mirrored = True
+        self.banked = state is not None
         if self.banked:
             from boxer.getup_starts import restore
-            state = self.start_bank[int(self.rng.integers(len(self.start_bank)))]
             restore(self.pair, state)
         self.arms = [self.PunchArm(self.pair.pose, self.pair.action_scale, self.pair.dt) for _ in range(2)]
         self.learner = int(self.rng.integers(2))
@@ -100,7 +114,11 @@ class NativeBout:
         if self.striker or self.whole_body:
             from boxer.striker import StrikerArm
             self.arms[self.learner] = StrikerArm(self.pair.pose, self.pair.action_scale, self.pair.dt)
-        if not self.opponents or self.rng.random() < self.scripted_fraction:
+        if self.mirrored:
+            self.opponent = self.mirror_opponent
+            if hasattr(self.opponent, "new_arm"):
+                self.arms[1 - self.learner] = self.opponent.new_arm(self.pair)
+        elif not self.opponents or self.rng.random() < self.scripted_fraction:
             self.opponent = RingBrain(np.random.default_rng(seed),
                                       high=bool(self.rng.random() < self.high_guard_fraction))
         else:
@@ -260,7 +278,8 @@ def export_native_model(path, ring=False):
 def _worker(conn, seed, motor_path, opponent_paths, scripted_fraction, episode_steps, fall_penalty,
             min_std, model_path, constants, high_guard_fraction=0., arm_path=None,
             leg_contact_penalty=0., striker=False, arm_motion_cost=0., whole_body=False, tilt_cost=0.,
-            stack_fall_penalty=None, start_bank_path=None, start_bank_fraction=0.):
+            stack_fall_penalty=None, start_bank_path=None, start_bank_fraction=0., mirror_bank_path=None,
+            mirror_bank_fraction=0., mirror_opponent_path=None):
     _configure_worker_env()
     import jax
     import mujoco
@@ -273,6 +292,12 @@ def _worker(conn, seed, motor_path, opponent_paths, scripted_fraction, episode_s
     if start_bank_path:
         from boxer.getup_starts import load_bank
         start_bank = load_bank(start_bank_path)
+    mirror_bank = mirror_opponent = None
+    if mirror_bank_path:
+        from boxer.getup_starts import load_bank
+        mirror_bank = load_bank(mirror_bank_path)
+        mirror_opponent = load_brain(mirror_opponent_path, deterministic=True)
+        mirror_opponent.key = jax.random.PRNGKey(seed * 101 + 99)
     motor = jax.jit(inference(foundation, load_policy_params(motor_path)[0]))
     pair = PairedFoundation(foundation, model=mujoco.MjModel.from_binary_path(str(model_path)))
     rng = np.random.default_rng(seed)
@@ -287,7 +312,8 @@ def _worker(conn, seed, motor_path, opponent_paths, scripted_fraction, episode_s
         arm_skill = ArmSkill(load_policy_params(arm_path)[0])
     bout = NativeBout(pair, motor, rng, opponents, scripted_fraction, episode_steps, fall_penalty,
                       high_guard_fraction, arm_skill, leg_contact_penalty, striker, arm_motion_cost, whole_body,
-                      tilt_cost, stack_fall_penalty, start_bank, start_bank_fraction)
+                      tilt_cost, stack_fall_penalty, start_bank, start_bank_fraction, mirror_bank,
+                      mirror_bank_fraction, mirror_opponent)
     sample_with = make_sampler(min_std, learner_net(striker, whole_body))
 
     def sample_next(params, obs, key):
@@ -447,6 +473,12 @@ def main(argv=None):
                         help="states from the end of a referee's count (boxer.getup_starts) to start bouts from")
     parser.add_argument("--start-bank-fraction", type=float, default=.25,
                         help="with --start-bank: share of training bouts starting from a banked state")
+    parser.add_argument("--mirror-bank", type=Path,
+                        help="states just before a fall in a policy's bouts against itself (boxer.mirror_starts)")
+    parser.add_argument("--mirror-bank-fraction", type=float, default=.15,
+                        help="with --mirror-bank: share of training bouts starting from one, against --mirror-opponent")
+    parser.add_argument("--mirror-opponent", type=Path, default=Path("checkpoints/whole-body"),
+                        help="with --mirror-bank: the policy those states came from, the opponent in those bouts")
     parser.add_argument("--seed", type=int, default=0)
     args = parser.parse_args(argv)
     _configure_worker_env()
@@ -516,7 +548,9 @@ def main(argv=None):
             args.scripted_fraction, round(args.episode_seconds / .02), args.fall_penalty, args.min_std, model_path, constants,
             args.high_guard_fraction, str(args.arm) if args.arm else None, args.leg_contact_penalty,
             args.striker, args.arm_motion_cost, args.whole_body, args.tilt_cost, args.stack_fall_penalty,
-            args.start_bank and str(args.start_bank), args.start_bank_fraction),
+            args.start_bank and str(args.start_bank), args.start_bank_fraction,
+            args.mirror_bank and str(args.mirror_bank), args.mirror_bank_fraction,
+            args.mirror_opponent and str(args.mirror_opponent)),
             daemon=True)
         process.start()
         pipes.append(parent)

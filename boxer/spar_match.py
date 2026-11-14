@@ -216,13 +216,15 @@ def _body(pair, i):
 
 def bout(pair, motor, seed, seconds=20.0, record=False, brains=None, knockdowns=1, arm_skills=None,
          frame_every=2, clinch_break=0., getup=None, count_seconds=10., mandatory_count=MANDATORY_COUNT,
-         count_separate=0.):
+         count_separate=0., observer=None):
     """One bout; ``brains`` maps corner -> PolicyBrain, others are scripted.
 
     ``knockdowns``: knockdowns of one boxer that stop the bout (1: the first
     fall ends it, the original rule). ``arm_skills`` maps corner ->
     ``arm_skill.ArmSkill`` that steers that corner's punches. When
     ``record``, a frame is kept every ``frame_every`` control steps.
+    ``observer(elapsed, pair, outcome)``, if given, is called after every
+    boxing step (not during a count), before any restart.
     ``clinch_break``: seconds of unbroken body contact (anything but fists
     and forearms, ``PairedFoundation.bodies_touching``) after which the
     referee separates the boxers to fresh spots, as after a knockdown but
@@ -242,14 +244,15 @@ def bout(pair, motor, seed, seconds=20.0, record=False, brains=None, knockdowns=
     try:
         with jax.default_device(jax.devices('cpu')[0]):
             return _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills or {},
-                         frame_every, clinch_break, getup, count_seconds, mandatory_count, count_separate)
+                         frame_every, clinch_break, getup, count_seconds, mandatory_count, count_separate,
+                         observer)
     finally:
         pair.self_trip_falls = trips
         pair.stop_on_fall = True
 
 
 def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills, frame_every=2, clinch_break=0.,
-          getup=None, count_seconds=10., mandatory_count=MANDATORY_COUNT, count_separate=0.):
+          getup=None, count_seconds=10., mandatory_count=MANDATORY_COUNT, count_separate=0., observer=None):
     if getup is not None and not pair.floor_body:
         raise ValueError("getting up needs a pair built with floor_body colliders")
     rng = np.random.default_rng(seed)
@@ -347,6 +350,8 @@ def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills, fr
         outcome = pair.step(action)
         roped += pair.on_ropes()
         elapsed = (t + 1) * pair.dt
+        if observer is not None:
+            observer(elapsed, pair, outcome)
         touching = pair.bodies_touching()
         clinched += touching
         holding = holding + 1 if touching else 0

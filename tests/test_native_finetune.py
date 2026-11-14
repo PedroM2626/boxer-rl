@@ -96,3 +96,35 @@ def test_banked_starts_restore_a_state_and_mostly_put_the_learner_in_the_risen_c
     bout.start_bank_fraction = 0.
     bout.reset()
     assert not bout.banked and bout.pair.restored is None
+
+
+def test_mirror_starts_face_the_mirror_opponent_with_the_learner_mostly_in_the_falling_corner(monkeypatch):
+    import boxer.getup_starts as getup_starts
+    from boxer.native_finetune import NativeBout
+
+    class Pair:
+        pose, action_scale, dt = np.zeros(29), 1., .02
+
+        def reset(self, seed):
+            self.restored = None
+
+    monkeypatch.setattr(getup_starts, "restore", lambda pair, state: setattr(pair, "restored", state))
+    count, mirror, itself, other = [dict(risen=0)], [dict(risen=1)], object(), object()
+    bout = NativeBout(Pair(), None, np.random.default_rng(0), [other], 0., 10, 30.,
+                      start_bank=count, start_bank_fraction=.25, mirror_bank=mirror, mirror_bank_fraction=.25,
+                      mirror_opponent=itself)
+    kinds, learners = [], []
+    for _ in range(800):
+        bout.reset()
+        if bout.mirrored:
+            assert bout.pair.restored is mirror[0] and bout.opponent is itself
+            learners.append(bout.learner)
+            kinds.append("mirror")
+        elif bout.banked:
+            assert bout.pair.restored is count[0] and bout.opponent is other
+            kinds.append("count")
+        else:
+            assert bout.pair.restored is None and bout.opponent is other
+            kinds.append("fresh")
+    assert .2 < kinds.count("mirror") / 800 < .3 and .2 < kinds.count("count") / 800 < .3
+    assert .65 < np.mean(learners) < .85
