@@ -160,3 +160,25 @@ def test_style_rewards_one_hit_per_cooldown_and_arms_near_the_guard():
     arm.guards = arm.arm_pose = np.zeros((2, 4)) + 5.        # far from the high guard
     arm.arm_pose = arm.guards + [[.3, 0, 0, 0], [0, 0, 0, 0]]
     assert abs(guard_closeness(arm) - (np.exp(-1.) + 1.) / 2) < 1e-12
+
+
+def test_defense_is_paid_only_after_staying_up():
+    from boxer.native_finetune import NativeBout
+
+    class Pair:
+        pose, action_scale, dt = np.zeros(29), 1., .02
+
+        def reset(self, seed):
+            pass
+
+    bout = NativeBout(Pair(), None, np.random.default_rng(0), [], 1., 10, 30., style=dict(defense_hold=1.))
+    assert bout.held_defense(2., 1., False) == 0.            # earned, held back
+    assert bout.held_defense(.5, 1.5, False) == 0.
+    assert bout.held_defense(0., 2., False) == 2.            # stood 1 s: the first is paid
+    assert bout.held_defense(0., 2.4, True) == 0.            # a fall forfeits the second
+    assert bout.held_defense(0., 3., False) == 0. and bout.pending_defense == []
+    bout.held_defense(1., 3., False)
+    bout.reset()
+    assert bout.pending_defense == []                         # a new bout starts clean
+    plain = NativeBout(Pair(), None, np.random.default_rng(0), [], 1., 10, 30.)
+    assert plain.held_defense(2., 1., True) == 2.             # no hold: paid at once

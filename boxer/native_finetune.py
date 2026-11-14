@@ -87,7 +87,9 @@ class NativeBout:
         before the learner's next clean punch is rewarded again (the bout's
         scorecard still counts every one), and ``guard``, reward per second
         for a striker or whole-body learner's arm targets near the guard or
-        high guard (``guard_closeness``)."""
+        high guard (``guard_closeness``). ``defense_hold``: seconds the
+        learner must stay up after a punch blocked or evaded before that
+        defense is paid (``held_defense``); a fall first forfeits it."""
         from boxer.spar_match import PunchArm
         self.pair, self.motor, self.rng = pair, motor, rng
         self.arm_skill, self.leg_contact_penalty = arm_skill, leg_contact_penalty
@@ -105,6 +107,7 @@ class NativeBout:
         self.reward = dict(REWARD, **{k: v for k, v in (style or {}).items() if k in REWARD})
         self.hit_cooldown = (style or {}).get("hit_cooldown", 0.)
         self.guard_reward = (style or {}).get("guard", 0.)
+        self.defense_hold = (style or {}).get("defense_hold", 0.)
         self.reset()
 
     def learner_fall_penalty(self):
@@ -146,6 +149,7 @@ class NativeBout:
                 self.arms[1 - self.learner] = self.opponent.new_arm(self.pair)
         self.t = 0
         self.last_rewarded_hit = -np.inf
+        self.pending_defense = []
 
     def rewarded_hits(self, hits, now):
         """The learner's clean punches this step that earn the hit reward: all of
@@ -157,6 +161,21 @@ class NativeBout:
             self.last_rewarded_hit = now
             return 1.
         return 0.
+
+    def held_defense(self, earned, now, fell):
+        """Defense reward paid this step: ``earned`` at once without a
+        ``defense_hold``; otherwise what was earned ``defense_hold`` seconds
+        ago or more, if the learner has not fallen since (a fall drops it all)."""
+        if not self.defense_hold:
+            return earned
+        if fell:
+            self.pending_defense = []
+            return 0.
+        if earned:
+            self.pending_defense.append((now, earned))
+        paid = sum(v for t, v in self.pending_defense if now - t >= self.defense_hold)
+        self.pending_defense = [(t, v) for t, v in self.pending_defense if now - t < self.defense_hold]
+        return paid
 
     def observe(self):
         from boxer.spar_match import _body
@@ -233,13 +252,15 @@ class NativeBout:
         tilt = tilt_penalty(pair.observation(np.zeros((2, 3)))[i]) if self.tilt_cost else 0.
         REWARD = self.reward
         rewarded = self.rewarded_hits(scored[i], (self.t + 1) * pair.dt)
+        defense = self.held_defense(REWARD["blocked"] * outcome.get("blocked", (0., 0.))[1 - i]
+                                    + REWARD["evaded"] * outcome.get("evaded", (0., 0.))[1 - i],
+                                    (self.t + 1) * pair.dt, bool(fallen[i]))
         guard = guard_closeness(self.arms[i]) if self.guard_reward and hasattr(self.arms[i], "arm_pose") else 0.
         reward = (REWARD["hit"] * rewarded - REWARD["taken"] * scored[1 - i]
                   - self.learner_fall_penalty() * fallen[i] + REWARD["opponent_fell"] * (fallen[1 - i] and not fallen[i])
                   + pair.dt * REWARD["in_range"] * np.exp(-((distance - REACH) / .15) ** 2)
                   + pair.dt * self.guard_reward * guard
-                  + REWARD["blocked"] * outcome.get("blocked", (0., 0.))[1 - i]
-                  + REWARD["evaded"] * outcome.get("evaded", (0., 0.))[1 - i]
+                  + defense
                   - REWARD["punch"] * launched - pair.dt * self.leg_contact_penalty * legs
                   - self.arm_motion_cost * motion - pair.dt * self.tilt_cost * tilt)
         self.t += 1
@@ -522,6 +543,8 @@ def main(argv=None):
                         help="seconds after a rewarded hit before the next one is rewarded (rhythm)")
     parser.add_argument("--guard-reward", type=float, default=0.,
                         help="reward per second for arm targets near the guard (striker and whole body)")
+    parser.add_argument("--defense-hold", type=float, default=0.,
+                        help="seconds the learner must stay up before a block or evasion is paid")
     parser.add_argument("--style-gate", type=float, nargs=2, metavar=("MAX_RATE", "MIN_PAUSE"),
                         help="long gate: reject a candidate landing more than MAX_RATE clean punches a second "
                              "or pausing (1 s or more between its hits) less than MIN_PAUSE of the time")
@@ -594,7 +617,8 @@ def main(argv=None):
 
     style = {k: v for k, v in dict(hit=args.hit_reward, taken=args.taken_penalty, in_range=args.in_range_reward,
                                    blocked=args.block_reward, evaded=args.evade_reward,
-                                   hit_cooldown=args.hit_cooldown, guard=args.guard_reward).items() if v is not None}
+                                   hit_cooldown=args.hit_cooldown, guard=args.guard_reward,
+                                   defense_hold=args.defense_hold).items() if v is not None}
     pipes, processes = [], []
     for w in range(args.workers):
         parent, child = context.Pipe()
