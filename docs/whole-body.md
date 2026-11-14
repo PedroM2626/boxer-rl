@@ -281,7 +281,7 @@ the count, run 6 was never knocked down, so no count happened. The bank did
 not teach it to box on after getting up so much as to stay up from the
 unusual stances the bank starts it in. The cost is in mirror bouts: 8
 knockdowns each against itself, where run 5 had none
-([runs 7 to 10](#falls-against-itself-runs-7-to-10-rejected)). Run 6 was promoted as
+([runs 7 to 11](#falls-against-itself-runs-7-to-11-rejected)). Run 6 was promoted as
 the strongest boxer; run 5 is kept as `checkpoints/whole-body-v2`.
 
 ```bash
@@ -290,7 +290,7 @@ bash runs/wb_ppo6.sh        # native_finetune ... --start-bank runs/getup_starts
 bash runs/wb_eval6.sh       # the evaluation above
 ```
 
-## Falls against itself (runs 7 to 10, rejected)
+## Falls against itself (runs 7 to 11, rejected)
 
 Run 6's 16 knockdowns in 32 mirror bouts come late (14 of 16 after 60 s,
 beyond the 20 s training episodes), with more body contact than run 5's
@@ -335,6 +335,19 @@ Two attempts to keep the first without the second:
   the end). In 16 long bouts the four candidates fell 5 to 14 times against
   the champion, and 3 to 18 times against run 6 (run 6: 3 to 13). None
   reached the mirror check. Rejected.
+- **Run 11**: from run 6, its recipe plus starts taken just before its own
+  falls against itself. `boxer.mirror_starts` played run 6 against itself
+  (100 bouts of 120 s) and kept the state 0.5 to 3 s before every fall:
+  333 states (`checkpoints/mirror-starts`). `--mirror-bank` started 15 % of
+  training bouts from one, against run 6, the learner in the corner that
+  fell three times in four (`runs/wb_ppo11.sh`, seed 311). The gate
+  rejected it: the later candidates fell 14 to 32 times against run 6 in 16
+  long bouts; 0.125M passed against run 6 and the champion but fell 6 times
+  against the striker. Over 32 bouts that step beats the champion 32–0
+  (4 : 2 kd) and the striker 32–0 (2 : 1), but against itself it falls
+  far more than run 6 (22 + 34 = 56 knockdowns, against 16), and it falls 21
+  times against run 6 (run 6: 7). Learning from those states against a
+  frozen run 6 made it a worse partner for itself. Rejected.
 
 Run 9 shows that run 6's low knockdowns against the champion are partly its
 seed: the same recipe with another seed falls as often as the control
@@ -348,7 +361,9 @@ that has an opponent other than itself.
   (run 8) fixed it without losing elsewhere. Run 9 repeated run 6's recipe
   with the mirror bout in the long gate (`--mirror-gate`), but with its
   seed it fell 16–21 times against the champion. Run 10 trained on 60 s
-  episodes from run 6 and fell 5–14 times against the champion. Next to
-  try: bank states collected against a whole-body opponent.
+  episodes from run 6 and fell 5–14 times against the champion. Run 11
+  started from states just before run 6's own mirror falls, against run 6,
+  and fell 56 times against itself. Five attempts have not fixed it;
+  the mirror falls are left open.
 - Getting up inside the whole-body policy itself. Now a separate get-up
   policy takes over while the boxer is down ([get-up](getup.md)).

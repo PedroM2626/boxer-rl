@@ -89,8 +89,9 @@ bash tools/run_spar.sh boxer.spar_match --ring --seconds 120 --knockdowns 3 --se
   in 32 bouts against itself, where run 5 had none. Self-play (run 7) and a
   smaller share of post-count starts (run 8) did not fix it without losing
   elsewhere; run 6's recipe with another seed and a mirror check in the gate
-  (run 9) fell 16–21 times against the champion, and 60 s training
-  episodes (run 10) 5–14 times ([whole body](docs/whole-body.md#falls-against-itself-runs-7-to-10-rejected)).
+  (run 9) fell 16–21 times against the champion, 60 s training
+  episodes (run 10) 5–14 times; starting from the states just before its
+  mirror falls (run 11) made it fall more against itself (56) ([whole body](docs/whole-body.md#falls-against-itself-runs-7-to-11-rejected)).
 * **Stacks are trained part by part.** In the two stacks, legs, tactics, arm
   skill and striker are separate policies trained in turn; changing one (e.g.
   a striker's arm style) can break another (its legs), as several experiments
@@ -108,7 +109,7 @@ bash tools/run_spar.sh boxer.spar_match --ring --seconds 120 --knockdowns 3 --se
   circling; facing the opponent is a fixed rule (`tactics_env.decode`). The
   whole-body policy has no such rule: its own leg targets turn it.
 * **Simulation only**, against a fixed pool of policies; no sim-to-real work.
-* **Tests:** all 86 test files (443 tests) pass when run one file per
+* **Tests:** all 87 test files (445 tests) pass when run one file per
   process (`tools/test_all.sh`, 33 min, 2026-11-12); the whole suite in one
   process exhausts the WSL VM's memory. `--fast` skips the five slow files of
   the archived MJX/warp stack (`tools/slow_tests.txt`) and takes about 13 min.
@@ -164,9 +165,10 @@ since 2026-10-30, including the rejected ones.
 | 11-12 | Clinches | Body-contact probe; `spar_match --clinch-break` referee rule. | Bodies touch on ≤ 2 % of steps, ≤ 0.1 s at a time; no clinches to break ([details](docs/striker.md#clinches-measured-and-a-referee-break-2026-11-12)). |
 | 11-13 | Neutral spots after the count | `--count-separate 2`: after the count both boxers are moved 2 m apart, facing, joints kept. | Knockdowns down a third (15 → 10, brawl 43 → 24); whole body vs champion 29–3, brawl 31–1; KOs vs champion unchanged (3) ([details](docs/getup.md#neutral-spots-after-the-count-2026-11-13)). |
 | 11-13 | Whole body from starts where a count ends | `boxer.getup_starts` bank of 400 native post-count states; run 5's settings with 25 % of bouts from the bank; control without the bank. | 0.25M: beats run 5 32–0; vs champion kd 2 : 0 (run 5 8 : 3, control 18 : 1); counted bouts 0 knockdowns; vs itself 8 : 8. **Promoted** (`whole-body`; run 5 kept as `whole-body-v2`) ([details](docs/whole-body.md#starts-from-the-end-of-a-referees-count-run-6-promoted)). |
-| 11-13 | Whole body: falls against itself | Run 7: run 6 and run 5 in the pool, fall penalty 150 for all. Run 8: 10 % of bouts from the bank instead of 25 %. | Run 7 rejected (14–19 kd vs run 6 in the gate); run 8 halves mirror falls (16 → 8) but falls 5 vs champion and loses to run 6 0–32. Run 6 stays ([details](docs/whole-body.md#falls-against-itself-runs-7-to-10-rejected)). |
+| 11-13 | Whole body: falls against itself | Run 7: run 6 and run 5 in the pool, fall penalty 150 for all. Run 8: 10 % of bouts from the bank instead of 25 %. | Run 7 rejected (14–19 kd vs run 6 in the gate); run 8 halves mirror falls (16 → 8) but falls 5 vs champion and loses to run 6 0–32. Run 6 stays ([details](docs/whole-body.md#falls-against-itself-runs-7-to-11-rejected)). |
 | 11-14 | Whole body: mirror check in the gate | Run 9: run 6's recipe, seed 309, `--mirror-gate 2` (≤ 2 kd in 16 long bouts against itself). | Rejected: all 4 long-gate candidates fell 16–21 times vs the champion (run 6: 2), so run 6's result is partly its seed. Run 6 stays. |
 | 11-14 | Whole body: 60 s training episodes | Run 10: from run 6, its recipe with `--episode-seconds 60` and `--mirror-gate 4`. | Rejected: at best level with run 6 in the short gate; 5–14 kd vs the champion in long bouts. Run 6 stays. |
+| 11-14 | Whole body: starts before its own mirror falls | Run 11: `boxer.mirror_starts` keeps 333 states 0.5–3 s before run 6's falls against itself; 15 % of bouts start from one against run 6. | Rejected: its best step falls 56 times against itself (run 6: 16) and 21 vs run 6 (7). Run 6 stays. |
 
 ## Milestones since unassisted two-robot bouts (2026-10-30 onward)
 
@@ -429,6 +431,7 @@ boxer/curriculum_env.py    UnassistedG1: one G1 on MJX/Warp, the curriculum stag
                            and the getup stage (whole-body floor contacts, fallen starts)
 boxer/getup_eval.py        how often a policy gets up from lying and falling starts
 boxer/getup_starts.py      starting states where a referee's count ends (native_finetune --start-bank)
+boxer/mirror_starts.py     states just before a policy's falls against itself (native_finetune --mirror-bank)
 boxer/curriculum_train.py  GPU PPO for the leg motor (balance ... spar), with physical gates
 boxer/curriculum_eval.py   the solo physical gate (survival under shoves and punching arms)
 boxer/paired_foundation.py two robots in one native MuJoCo model, ring, impact scorecard, falls,
