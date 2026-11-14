@@ -99,8 +99,14 @@ def combine(*records):
     return total
 
 
+def mirror_stable(record, limit):
+    """In bouts of a candidate against itself: no more than ``limit`` knockdowns in all."""
+    tactics = record["tactics"]
+    return tactics["first_knockdowns"] + tactics["second_knockdowns"] <= limit
+
+
 def gate_generation(root, champion, last=4, ring=False, arm=None, motor=None, long_tries=2,
-                    long_opponents=()):
+                    long_opponents=(), mirror_knockdowns=None):
     """Selects and confirms a generation's best checkpoint; returns its directory.
 
     ``ring``: all gate bouts are fought inside the roped ring. ``arm``: an
@@ -108,7 +114,9 @@ def gate_generation(root, champion, last=4, ring=False, arm=None, motor=None, lo
     motor both corners balance with (default ``checkpoints/spar``).
     ``long_tries``: how many candidates, best first, may take the long-bout
     stability check (0 skips it); ``long_opponents`` are checked besides
-    ``champion``. Returns ``champion`` when none is stable.
+    ``champion``. ``mirror_knockdowns``: also box each long-checked candidate
+    against itself and allow at most this many knockdowns in all (None skips
+    it). Returns ``champion`` when none is stable.
     """
     root = Path(root)
     gate = root / "gate"
@@ -138,6 +146,14 @@ def gate_generation(root, champion, last=4, ring=False, arm=None, motor=None, lo
                 fine = fine and checks[-1]["stable"]
                 if not fine:
                     break
+            if fine and mirror_knockdowns is not None:
+                record = native_match(trial["directory"], trial["directory"], LONG_SEEDS,
+                                      gate / f"long-{trial['step']}-mirror.json", ring, arm, motor, LONG_SECONDS,
+                                      LONG_KNOCKDOWNS)
+                checks.append(dict(step=trial["step"], opponent="itself",
+                                   stable=mirror_stable(record, mirror_knockdowns), **record["tactics"]))
+                print(json.dumps(dict(event="native_long_gate", **checks[-1])), flush=True)
+                fine = checks[-1]["stable"]
             if fine:
                 best = trial
                 break

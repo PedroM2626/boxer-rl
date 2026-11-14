@@ -127,3 +127,26 @@ def test_long_check_can_be_skipped(tmp_path, monkeypatch):
     short = {1: record(4, 4, 0, 1., 1.), 2: record(9, 1, 0, 3., 1.), 3: record(7, 3, 0, 2., 1.)}
     selected, calls = gate_with(tmp_path, monkeypatch, short, {}, tries=0)
     assert selected.name == "step-2" and not [c for c in calls if c[1]]
+
+
+def test_mirror_check_rejects_a_candidate_that_falls_against_itself(tmp_path, monkeypatch):
+    from boxer import tactics_gate
+    for step in (1, 2):
+        save_policy(tmp_path / "checkpoint", (np.full(2, step, float),), dict(stage_steps=step, stage="tactics"))
+    seen = []
+
+    def match(first, second, seeds, output, ring=False, arm=None, motor=None, seconds=None, knockdowns=None):
+        step = int(Path(first).name.split("-")[1])
+        if seconds:
+            mirror = Path(str(second)).name == Path(str(first)).name
+            seen.append((step, "itself" if mirror else second))
+            # Both are steady against the champion; step 2 falls 3 + 2 times against itself.
+            return long_record(3, 2) if mirror and step == 2 else long_record(1, 1) if mirror else long_record(0, 0)
+        if tuple(seeds) == tactics_gate.CONFIRMATION_SEEDS:
+            return record(10, 6, 0, 2., 1., bouts=32)
+        return record(9, 1, 0, 3., 1.) if step == 2 else record(5, 5, 0, 1., 1.)
+    monkeypatch.setattr(tactics_gate, "native_match", match)
+    selected = tactics_gate.gate_generation(tmp_path, "champion", 2, mirror_knockdowns=2)
+    assert selected.name == "step-1"
+    assert seen == [(2, "champion"), (2, "itself"), (1, "champion"), (1, "itself")]
+    assert tactics_gate.mirror_stable(long_record(1, 1), 2) and not tactics_gate.mirror_stable(long_record(2, 1), 2)

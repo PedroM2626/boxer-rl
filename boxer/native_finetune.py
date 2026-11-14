@@ -440,6 +440,9 @@ def main(argv=None):
                         help="per-second reward lost for torso tilt and tilt rate (motor weights)")
     parser.add_argument("--leg-anchor", type=float, default=0.,
                         help="whole body: loss weight keeping leg outputs near --init-from's")
+    parser.add_argument("--mirror-gate", type=int, default=-1,
+                        help="long gate: most knockdowns allowed in a candidate's 120 s bouts against itself "
+                             "(-1 skips the check)")
     parser.add_argument("--start-bank", type=Path,
                         help="states from the end of a referee's count (boxer.getup_starts) to start bouts from")
     parser.add_argument("--start-bank-fraction", type=float, default=.25,
@@ -587,7 +590,7 @@ def main(argv=None):
             process.join(timeout=10)
     if args.native_gate:
         gate_generation(root, args.init_from, args.native_gate, args.ring, args.arm, args.motor, args.long_gate,
-                        args.long_gate_opponents)
+                        args.long_gate_opponents, None if args.mirror_gate < 0 else args.mirror_gate)
     return 0
 
 
