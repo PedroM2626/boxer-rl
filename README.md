@@ -92,6 +92,11 @@ bash tools/run_spar.sh boxer.spar_match --ring --seconds 120 --knockdowns 3 --se
   (run 12, `whole-body-style`) brings back the champion's pace, but it falls
   10 times in 32 bouts against the champion and loses every bout to run 6
   ([whole body](docs/whole-body.md#a-boxing-rhythm-run-12-kept-as-whole-body-style)).
+* **Defense or balance.** Rewarding blocked and evaded punches (run 13)
+  raises the share of the champion's punches defended from 83 % to 92 %,
+  but that boxer falls 92 times in 32 bouts against itself. Evasions stay
+  rare (1 to 8 a bout); the guard does nearly all the defending
+  ([whole body](docs/whole-body.md#blocks-and-slips-run-13-rejected)).
 * **The whole body falls in mirror bouts.** Run 6 suffers 8 knockdowns each
   in 32 bouts against itself, where run 5 had none. Self-play (run 7) and a
   smaller share of post-count starts (run 8) did not fix it without losing
@@ -116,7 +121,7 @@ bash tools/run_spar.sh boxer.spar_match --ring --seconds 120 --knockdowns 3 --se
   circling; facing the opponent is a fixed rule (`tactics_env.decode`). The
   whole-body policy has no such rule: its own leg targets turn it.
 * **Simulation only**, against a fixed pool of policies; no sim-to-real work.
-* **Tests:** all 87 test files (447 tests) pass when run one file per
+* **Tests:** all 88 test files (448 tests) pass when run one file per
   process (`tools/test_all.sh`, 33 min, 2026-11-12); the whole suite in one
   process exhausts the WSL VM's memory. `--fast` skips the five slow files of
   the archived MJX/warp stack (`tools/slow_tests.txt`) and takes about 13 min.
@@ -176,6 +181,7 @@ since 2026-10-30, including the rejected ones.
 | 11-14 | Whole body: mirror check in the gate | Run 9: run 6's recipe, seed 309, `--mirror-gate 2` (≤ 2 kd in 16 long bouts against itself). | Rejected: all 4 long-gate candidates fell 16–21 times vs the champion (run 6: 2), so run 6's result is partly its seed. Run 6 stays. |
 | 11-14 | Whole body: 60 s training episodes | Run 10: from run 6, its recipe with `--episode-seconds 60` and `--mirror-gate 4`. | Rejected: at best level with run 6 in the short gate; 5–14 kd vs the champion in long bouts. Run 6 stays. |
 | 11-14 | Whole body: a boxing rhythm | Run 12: from the clone, a punch taken costs more than one landed (2.5 > 2), no reward for staying at range, one rewarded hit per 0.6 s, a guard reward, a style check in the gate. | Rejected by the gate (6 kd vs the champion), kept as `whole-body-style`: 1.5 clean punches/s and 48 % of the time in pauses vs the champion (run 6: 3.6 and 6 %), 32–0 against it but kd 10 : 0; loses to run 6 0–31 ([details](docs/whole-body.md#a-boxing-rhythm-run-12-kept-as-whole-body-style)). |
+| 11-14 | Whole body: blocks and slips | The scorecard also counts blocked, missed and evaded punches (`defense.py`); run 13 from `whole-body-style` pays 0.5 per block and 2 per evasion. | Rejected (4–17 kd vs the champion in 16 bouts): 0.75M defends 92 % of the champion's punches (style: 83 %) and evades 8 a bout (4.8), keeps the pace (1.56/s, 48 % paused), but falls 92 times in 32 bouts against itself ([details](docs/whole-body.md#blocks-and-slips-run-13-rejected)). |
 | 11-14 | Whole body: starts before its own mirror falls | Run 11: `boxer.mirror_starts` keeps 333 states 0.5–3 s before run 6's falls against itself; 15 % of bouts start from one against run 6. | Rejected: its best step falls 56 times against itself (run 6: 16) and 21 vs run 6 (7). Run 6 stays. |
 
 ## Milestones since unassisted two-robot bouts (2026-10-30 onward)
@@ -440,6 +446,7 @@ boxer/curriculum_env.py    UnassistedG1: one G1 on MJX/Warp, the curriculum stag
 boxer/getup_eval.py        how often a policy gets up from lying and falling starts
 boxer/getup_starts.py      starting states where a referee's count ends (native_finetune --start-bank)
 boxer/mirror_starts.py     states just before a policy's falls against itself (native_finetune --mirror-bank)
+boxer/defense.py           punches that missed, and those the target evaded (MissTracker)
 boxer/curriculum_train.py  GPU PPO for the leg motor (balance ... spar), with physical gates
 boxer/curriculum_eval.py   the solo physical gate (survival under shoves and punching arms)
 boxer/paired_foundation.py two robots in one native MuJoCo model, ring, impact scorecard, falls,

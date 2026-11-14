@@ -37,6 +37,16 @@ in blue on its own legs), 119 : 37 clean punches, no knockdowns;
 `whole_body_vs_champion_60s.mp4` and `whole_body_vs_itself_60s.mp4`
 (run 6, 218 : 60 and 176 : 186).
 
+### Blocks and slips (2026-11-14)
+
+Run 13's 0.75M step (red, rejected, `runs/whole-body-native13/gate/step-750592`),
+60 s at 60 fps, knockdown rules (3) (`runs/wb_video13.sh`):
+`defense_vs_champion_60s.mp4` (seed 1, the champion in blue on its own legs),
+86 : 17 clean punches, no knockdowns; of the champion's punches red takes 17,
+blocks 107 and evades 2. `defense_vs_itself_60s.mp4` (seed 0), 19 : 17 clean
+punches, three knockdowns (18.0 s, 29.7 s, 37.5 s): the falls that got it
+rejected ([whole body](../docs/whole-body.md#blocks-and-slips-run-13-rejected)).
+
 ### Hits more, falls more (2026-11-14)
 
 `run11_vs_run6_120s.mp4` (and `.json`): run 11's 0.125M step (red, rejected,

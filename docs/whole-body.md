@@ -394,6 +394,49 @@ It boxes at the champion's pace and falls less against itself than run 6
 else, and run 6's volume beats it every time. Videos:
 `fights/style_vs_champion_60s.mp4` and `fights/style_vs_itself_60s.mp4`.
 
+## Blocks and slips (run 13, rejected)
+
+The scorecard now also counts the punches a boxer stops
+(`PairedFoundation`'s `blocked`, `defense.MissTracker`):
+
+- *blocked*: a fist lands on the opponent's arms or gloves under the clean
+  punch rules (it may include fist-on-glove clashes; they are not
+  separated yet);
+- *missed*: a fist drives at the head or torso (closing at 1 m/s or faster,
+  within 0.35 m), comes within 0.10 m of it and pulls back without touching
+  a target or the guard;
+- *evaded*: a miss during which the target moved away from the fist at
+  0.3 m/s or faster (a slip or a step back).
+
+`spar_match` reports them per bout (`defense`), with the defended share =
+(blocked + evaded) / (landed + blocked + evaded). Before any training for it
+(16 bouts of 120 s, `runs/defense_probe.sh`), boxing the champion, run 6
+defends 61 % of the punches thrown at it and evades 1.4 a bout;
+`whole-body-style` defends 83 % and evades 4.8.
+
+Run 13 (`runs/wb_ppo13.sh`, from `whole-body-style`, run 12's style terms,
+seed 313) pays 0.5 per punch blocked and 2 per punch evaded
+(`--block-reward .5 --evade-reward 2`). The gate rejected every candidate:
+all fell 4 to 17 times in 16 long bouts against the champion. 0.75M, the
+stylish one that fell least, over 32 bouts of 120 s (`runs/wb_eval13.sh`):
+
+| Matchup | W–L–D | Clean punches | Knockdowns | Punches a second / pauses | Taken / blocked / evaded a bout | Defended |
+| --- | --- | --- | --- | --- | --- | --- |
+| vs champion | 32–0–0 | 187 : 24 | 5 : 2 | 1.56 / 48 % | 24 / 255 / 8.2 | 92 % (champion 55 %) |
+| vs striker | 31–1–0 | 147 : 30 | 29 : 3 | 1.25 / 60 % | 30 / 263 / 2.7 | 90 % |
+| vs `whole-body-style` | 27–5–0 | 96 : 63 | 19 : 33 | 0.89 / 70 % | 63 / 167 / 2.0 | 73 % (style 61 %) |
+| vs run 6 | 0–32–0 | 47 : 133 | 58 : 12 | 0.43 / 90 % | 133 / 139 / 5.8 | 52 % (run 6 82 %) |
+| vs itself | — | 37 : 32 | 32 : 60 | 0.48 / 84 % | 32 / 95 / 1.1 | 75 % |
+
+The defense rewards work as far as the scorecard goes: against the champion
+it takes 24 clean punches a bout instead of run 12's 52, and evades almost
+twice as often, keeping the champion's pace. But it stays up worse: 92
+knockdowns in 32 bouts against itself (run 12: 10), 29 against the striker,
+58 against run 6. Evasions stay rare (1 to 8 a bout, against 100 to 260
+blocks), so the guard does nearly all the defending; slipping or stepping
+back at speed seems to cost the legs their balance. Videos:
+`fights/defense_vs_champion_60s.mp4` and `fights/defense_vs_itself_60s.mp4`.
+
 ## What is open
 
 - Mirror bouts: run 6 falls 16 times in 32 bouts against itself (run 5: 0),
@@ -407,5 +450,8 @@ else, and run 6's volume beats it every time. Videos:
   the mirror falls are left open.
 - A boxing rhythm that also stays up: run 12 boxes at the champion's pace
   but falls 10 times against it in 32 bouts, and loses every bout to run 6.
+- Defense that also stays up: run 13 blocks and evades more (92 % of the
+  champion's punches defended) but falls 92 times against itself in 32
+  bouts. Slips are rare; telling blocks from glove clashes is not done.
 - Getting up inside the whole-body policy itself. Now a separate get-up
   policy takes over while the boxer is down ([get-up](getup.md)).
