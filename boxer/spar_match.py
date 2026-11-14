@@ -261,6 +261,7 @@ def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills, fr
               for i in range(2)]
     arms = [_new_arm(pair, brain) for brain in brains]
     scored, thrown, frames, times, events = np.zeros(2), np.zeros(2, int), [], [], []
+    blocked, missed, evaded = np.zeros(2), np.zeros(2), np.zeros(2)   # by attacking corner
     hooks, guarded, high = np.zeros(2, int), np.zeros(2, int), [False, False]
     fallen = np.zeros(2, bool)
     downs, restarts = np.zeros(2, int), []
@@ -359,6 +360,10 @@ def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills, fr
             events.append(dict(time=round(elapsed, 3),
                                scored=outcome['scored'].tolist()))
         scored += outcome['scored']
+        # Pairs without the defense counters (test doubles) leave them at zero.
+        blocked += outcome.get('blocked', 0.)
+        missed += outcome.get('missed', 0.)
+        evaded += outcome.get('evaded', 0.)
         if record and t % frame_every == 0:
             frames.append(pair.data.qpos.copy())
             times.append((elapsed, scored.copy(), downs.copy()))
@@ -409,9 +414,31 @@ def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills, fr
                   rope_seconds=(roped * pair.dt).round(2).tolist(), fallen=fallen.tolist(),
                   clinch_seconds=round(clinched * pair.dt, 2), clinch_breaks=breaks,
                   arm_motion_rad=motion.round(1).tolist(),
+                  punches_blocked=blocked.tolist(), punches_missed=missed.tolist(),
+                  punches_evaded=evaded.tolist(),
                   winner=None if winner is None else ('red', 'blue')[winner],
                   method=method, impact_events=events)
     return result, frames, times
+
+
+def defense_summary(bouts, first):
+    """Per bout, for the first-named and the second boxer: the opponent's punches
+    that landed clean, were blocked, missed and were evaded (a miss while the
+    target moved away, ``boxer.defense``), and the share stopped by its own
+    guard or slipped among those that landed, were blocked or were evaded."""
+    out = {}
+    for name, me in (("first", True), ("second", False)):
+        rows = []
+        for b in bouts:
+            k = (0 if b['red'] == first else 1) if me else (1 if b['red'] == first else 0)
+            o = 1 - k
+            rows.append([b['clean_punches'][o], b['punches_blocked'][o], b['punches_missed'][o],
+                         b['punches_evaded'][o]])
+        landed, blocked, missed, evaded = np.mean(rows, axis=0)
+        out[name] = dict(taken_per_bout=float(landed), blocked_per_bout=float(blocked),
+                         missed_per_bout=float(missed), evaded_per_bout=float(evaded),
+                         defended_share=float((blocked + evaded) / max(landed + blocked + evaded, 1e-9)))
+    return out
 
 
 def resample(model, frames, times, fps):
@@ -585,6 +612,7 @@ def main(argv=None):
                                 first_clean_per_bout=float(np.mean(points)),
                                 second_clean_per_bout=float(np.mean(against)),
                                 first_knockdowns=int(downs[0]), second_knockdowns=int(downs[1])),
+                   defense=defense_summary(bouts, first),
                    assistance=False, results=bouts)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(summary, indent=1))

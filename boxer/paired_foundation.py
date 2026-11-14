@@ -12,6 +12,10 @@ import numpy as np
 from boxer import scene
 from boxer.impact_scorecard import ImpactScorecard
 
+# The opponent's arms and gloves: a punch landing there is blocked.
+GUARD_GEOMS = tuple(name for name in scene.UPPER_TARGET_GEOMS
+                    if name not in ("head_collision", "torso_collision"))
+
 
 STRIKE_SENSOR_TARGETS = ('head_collision', 'torso_collision')
 # Roped ring, scaled to the 1.32 m G1 (0.73 x a human ring): 4 m between the
@@ -226,16 +230,23 @@ class PairedFoundation:
                          for target in ('head_collision', 'torso_collision')}
                         for side in scene.SIDES]
         self.scorecard = ImpactScorecard()
+        # Punches stopped by the opponent's arms, under the clean-punch rules.
+        self.blockcard = ImpactScorecard()
+        self.guard_geoms = [{self.model.geom(side + name).id for name in GUARD_GEOMS} for side in scene.SIDES]
         # The foundation also ends a trial when a robot's foot touches its own
         # other foot or shin. Knockdown rules may count only real falls.
         self.self_trip_falls = True
         self._index_geoms()
+        from boxer.defense import MissTracker
+        self.misses = MissTracker(self)
         self.reset()
 
     def _index_geoms(self):
         """Integer lookups that replace per-substep name and set work in ``step``."""
         model = self.model
-        self._tracked = sorted(set(self.fists.ravel()) | self.targets[0] | self.targets[1])
+        self._tracked = sorted(set(self.fists.ravel()) | self.targets[0] | self.targets[1]
+                               | self.guard_geoms[0] | self.guard_geoms[1])
+        self._guard_of = {int(g): i for i in range(2) for g in self.guard_geoms[i]}
         self._torso_sites = [model.site(m['side'] + 'imu_in_torso').id for m in self.maps]
         self._aim_geoms = [(model.geom(side + 'head_collision').id, model.geom(side + 'torso_collision').id)
                            for side in scene.SIDES]
@@ -271,6 +282,9 @@ class PairedFoundation:
         self.last_action = np.zeros((2, 29))
         self.done = False
         self.scorecard.reset()
+        self.blockcard.reset()
+        if hasattr(self, 'misses'):
+            self.misses.reset()
         self.elapsed = 0.
         for index, mapping in enumerate(self.maps):
             q, rv, side = mapping['root'], mapping['rootv'], mapping['side']
@@ -390,6 +404,8 @@ class PairedFoundation:
             raise ValueError("actions must be finite with shape (2, 29)")
         impulses = np.zeros(2)
         scored = np.zeros(2)
+        blocked = np.zeros(2)
+        touched = np.zeros((2, 2), bool)
         self.data.xfrc_applied[:] = 0
         self.data.qfrc_applied[:] = 0
         for i, m in enumerate(self.maps):
@@ -423,6 +439,7 @@ class PairedFoundation:
             per_hand = np.zeros((2, 2))
             closing = np.zeros((2, 2))
             advancing = np.zeros((2, 2))
+            guard = [np.zeros((2, 2), bool), np.zeros((2, 2)), np.zeros((2, 2)), np.zeros((2, 2))]
             contact_times = getattr(self, 'diagnostic_contact_times', None)
             for k, (g1, g2) in enumerate(self.data.contact.geom):
                 g1, g2 = int(g1), int(g2)
@@ -439,24 +456,31 @@ class PairedFoundation:
                 # fist owner's opponent (corner 0 before corner 1, as before).
                 hits = sorted(self._fist_owner[f] + (t,) for f, t in ((g1, g2), (g2, g1))
                               if f in self._fist_owner and self._target_of.get(t) == 1 - self._fist_owner[f][0])
-                for i, hand, target in hits:
+                # A punch on the guard: a fist on the opponent's arms or gloves.
+                stops = sorted(self._fist_owner[f] + (t,) for f, t in ((g1, g2), (g2, g1))
+                               if f in self._fist_owner and self._guard_of.get(t) == 1 - self._fist_owner[f][0])
+                for found, (i, hand, target) in [(0, h) for h in hits] + [(1, h) for h in stops]:
+                    into = (present, per_hand, closing, advancing) if found == 0 else guard
                     fist = self.fists[i][hand]
                     force = np.zeros(6)
                     mujoco.mj_contactForce(self.model, self.data, k, force)
-                    per_hand[i, hand] += max(0., force[0]) * self.model.opt.timestep
-                    present[i, hand] = True
+                    into[1][i, hand] += max(0., force[0]) * self.model.opt.timestep
+                    into[0][i, hand] = True
                     direction = positions[target] - positions[fist]
                     direction /= max(np.linalg.norm(direction), 1e-8)
-                    closing[i, hand] = max(closing[i, hand],
+                    into[2][i, hand] = max(into[2][i, hand],
                         float((velocities[fist] - velocities[target]) @ direction))
                     origin, velocity = torso_motion[i]
                     torso_at_fist = velocity[3:] + np.cross(velocity[:3], positions[fist] - origin)
-                    advancing[i, hand] = max(advancing[i, hand],
+                    into[3][i, hand] = max(into[3][i, hand],
                         float((velocities[fist] - torso_at_fist) @ direction))
             impulses += per_hand.sum(axis=1)
             fallen = self.fallen()
             scored += self.scorecard.update(present, per_hand, closing, advancing,
                 self.data.time, self.model.opt.timestep, both_up=not fallen.any())
+            touched |= present | guard[0]
+            blocked += self.blockcard.update(*guard, self.data.time, self.model.opt.timestep,
+                                             both_up=not fallen.any())
             if punch_trace is not None:
                 punch_trace.after_substep(self, present, per_hand, closing, advancing)
             if fallen.any() and self.stop_on_fall:
@@ -465,8 +489,9 @@ class PairedFoundation:
         self.last_action = actions.copy()
         self.phase = (self.phase + 2 * np.pi * self.dt * self.frequency + np.pi) % (2*np.pi) - np.pi
         self.elapsed = float(self.data.time)
+        missed, evaded = self.misses.update(self.model, self.data, touched)
         return dict(done=self.done, fallen=self.fallen(), legal_contact_impulse=impulses,
-                    scored=scored)
+                    scored=scored, blocked=blocked, missed=missed, evaded=evaded)
 
     def _physics_step(self):
         """Native production dynamics; experimental backends override this hook."""

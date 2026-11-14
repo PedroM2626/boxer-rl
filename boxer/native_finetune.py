@@ -33,7 +33,7 @@ import numpy as np
 
 from boxer import moves
 
-REWARD = dict(hit=2.0, taken=1.5, opponent_fell=5.0, in_range=.3, punch=.02)
+REWARD = dict(hit=2.0, taken=1.5, opponent_fell=5.0, in_range=.3, punch=.02, blocked=0., evaded=0.)
 
 
 def guard_closeness(arm, width=.3):
@@ -80,7 +80,9 @@ class NativeBout:
         itself (``boxer.mirror_starts``); a ``mirror_bank_fraction`` share of
         bouts starts from one against ``mirror_opponent`` (that policy), the
         learner in the corner that fell three times in four.
-        ``style``: overrides of ``REWARD`` (``hit``, ``taken``, ``in_range``)
+        ``style``: overrides of ``REWARD`` (``hit``, ``taken``, ``in_range``,
+        ``blocked`` and ``evaded``: per opponent punch stopped on the
+        learner's guard or slipped, ``boxer.defense``)
         and two rhythm terms: ``hit_cooldown``, seconds after a rewarded hit
         before the learner's next clean punch is rewarded again (the bout's
         scorecard still counts every one), and ``guard``, reward per second
@@ -236,6 +238,8 @@ class NativeBout:
                   - self.learner_fall_penalty() * fallen[i] + REWARD["opponent_fell"] * (fallen[1 - i] and not fallen[i])
                   + pair.dt * REWARD["in_range"] * np.exp(-((distance - REACH) / .15) ** 2)
                   + pair.dt * self.guard_reward * guard
+                  + REWARD["blocked"] * outcome.get("blocked", (0., 0.))[1 - i]
+                  + REWARD["evaded"] * outcome.get("evaded", (0., 0.))[1 - i]
                   - REWARD["punch"] * launched - pair.dt * self.leg_contact_penalty * legs
                   - self.arm_motion_cost * motion - pair.dt * self.tilt_cost * tilt)
         self.t += 1
@@ -510,6 +514,10 @@ def main(argv=None):
     parser.add_argument("--taken-penalty", type=float, help=f"reward lost per clean punch taken (default {REWARD['taken']})")
     parser.add_argument("--in-range-reward", type=float,
                         help=f"reward per second at punching range (default {REWARD['in_range']})")
+    parser.add_argument("--block-reward", type=float,
+                        help="reward per opponent punch landing on the learner's arms or gloves")
+    parser.add_argument("--evade-reward", type=float,
+                        help="reward per opponent punch that misses while the learner moves away")
     parser.add_argument("--hit-cooldown", type=float, default=0.,
                         help="seconds after a rewarded hit before the next one is rewarded (rhythm)")
     parser.add_argument("--guard-reward", type=float, default=0.,
@@ -585,6 +593,7 @@ def main(argv=None):
     constants = json.loads(model_path.with_suffix(".json").read_text())
 
     style = {k: v for k, v in dict(hit=args.hit_reward, taken=args.taken_penalty, in_range=args.in_range_reward,
+                                   blocked=args.block_reward, evaded=args.evade_reward,
                                    hit_cooldown=args.hit_cooldown, guard=args.guard_reward).items() if v is not None}
     pipes, processes = [], []
     for w in range(args.workers):
