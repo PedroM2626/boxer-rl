@@ -34,7 +34,7 @@ the other two are stacks of separately trained parts:
 
 | Boxer | Legs | Brain and arms | Style |
 | --- | --- | --- | --- |
-| **Whole body** (strongest) | — | `checkpoints/whole-body`: one network sets all 23 leg, waist and arm joint targets every step; no motor, no scripted moves | in-fighting, very high punch rate |
+| **Whole body** (strongest) | — | `checkpoints/whole-body`: one network sets all 23 leg, waist and arm joint targets every step; no motor, no scripted moves | in-fighting, very high punch rate (`whole-body-style`: pauses, about the champion's pace) |
 | **Striker** | `checkpoints/spar-native` | `checkpoints/striker`: one policy for footwork and both arms' joint targets, no scripted moves | in-fighting, short hook-like punches |
 | **Champion** (reference) | `checkpoints/spar` | `checkpoints/tactics` (footwork, punch choice, guard height) + scripted straights and hooks (`boxer/moves.py`) bent by `checkpoints/arm-skill` | longer straights, high guard |
 
@@ -86,6 +86,12 @@ bash tools/run_spar.sh boxer.spar_match --ring --seconds 120 --knockdowns 3 --se
   count ends, was not knocked down once in 32 counted bouts against the
   champion, but evaluations keep the reset
   ([get-up](docs/getup.md#neutral-spots-after-the-count-2026-11-13)).
+* **Rhythm or wins.** Runs 3 to 6 won by punch volume (3.6 clean punches a
+  second, 6 % of the time in pauses); the champion lands 1.2 a second and
+  pauses half the time. A reward that stops trading blows from paying
+  (run 12, `whole-body-style`) brings back the champion's pace, but it falls
+  10 times in 32 bouts against the champion and loses every bout to run 6
+  ([whole body](docs/whole-body.md#a-boxing-rhythm-run-12-kept-as-whole-body-style)).
 * **The whole body falls in mirror bouts.** Run 6 suffers 8 knockdowns each
   in 32 bouts against itself, where run 5 had none. Self-play (run 7) and a
   smaller share of post-count starts (run 8) did not fix it without losing
@@ -110,14 +116,14 @@ bash tools/run_spar.sh boxer.spar_match --ring --seconds 120 --knockdowns 3 --se
   circling; facing the opponent is a fixed rule (`tactics_env.decode`). The
   whole-body policy has no such rule: its own leg targets turn it.
 * **Simulation only**, against a fixed pool of policies; no sim-to-real work.
-* **Tests:** all 87 test files (445 tests) pass when run one file per
+* **Tests:** all 87 test files (447 tests) pass when run one file per
   process (`tools/test_all.sh`, 33 min, 2026-11-12); the whole suite in one
   process exhausts the WSL VM's memory. `--fast` skips the five slow files of
   the archived MJX/warp stack (`tools/slow_tests.txt`) and takes about 13 min.
 
 **Checkpoints.** Current: `whole-body`, `spar`, `spar-native`, `tactics`,
 `arm-skill`, `striker`, `getup` (gets a fallen G1 up). Also kept:
-`whole-body-v2` (the previous whole-body policy, run 5), `whole-body-v1` (run 3), `whole-body-clone`
+`whole-body-style` (run 12: the champion's rhythm, falls more), `whole-body-v2` (the previous whole-body policy, run 5), `whole-body-v1` (run 3), `whole-body-clone`
 (the whole-body policy's starting point, imitating the striker). Earlier, kept for comparison: `striker-v1` (first striker),
 `spar-v2` (rapid-punching legs), `spar-v1`, `spar-shorthook`,
 `spar-straight` (earlier spar motors), `tactics-arm-v1`, `tactics-ring-v1`,
@@ -169,6 +175,7 @@ since 2026-10-30, including the rejected ones.
 | 11-13 | Whole body: falls against itself | Run 7: run 6 and run 5 in the pool, fall penalty 150 for all. Run 8: 10 % of bouts from the bank instead of 25 %. | Run 7 rejected (14–19 kd vs run 6 in the gate); run 8 halves mirror falls (16 → 8) but falls 5 vs champion and loses to run 6 0–32. Run 6 stays ([details](docs/whole-body.md#falls-against-itself-runs-7-to-11-rejected)). |
 | 11-14 | Whole body: mirror check in the gate | Run 9: run 6's recipe, seed 309, `--mirror-gate 2` (≤ 2 kd in 16 long bouts against itself). | Rejected: all 4 long-gate candidates fell 16–21 times vs the champion (run 6: 2), so run 6's result is partly its seed. Run 6 stays. |
 | 11-14 | Whole body: 60 s training episodes | Run 10: from run 6, its recipe with `--episode-seconds 60` and `--mirror-gate 4`. | Rejected: at best level with run 6 in the short gate; 5–14 kd vs the champion in long bouts. Run 6 stays. |
+| 11-14 | Whole body: a boxing rhythm | Run 12: from the clone, a punch taken costs more than one landed (2.5 > 2), no reward for staying at range, one rewarded hit per 0.6 s, a guard reward, a style check in the gate. | Rejected by the gate (6 kd vs the champion), kept as `whole-body-style`: 1.5 clean punches/s and 48 % of the time in pauses vs the champion (run 6: 3.6 and 6 %), 32–0 against it but kd 10 : 0; loses to run 6 0–31 ([details](docs/whole-body.md#a-boxing-rhythm-run-12-kept-as-whole-body-style)). |
 | 11-14 | Whole body: starts before its own mirror falls | Run 11: `boxer.mirror_starts` keeps 333 states 0.5–3 s before run 6's falls against itself; 15 % of bouts start from one against run 6. | Rejected: its best step falls 56 times against itself (run 6: 16) and 21 vs run 6 (7). Run 6 stays. |
 
 ## Milestones since unassisted two-robot bouts (2026-10-30 onward)

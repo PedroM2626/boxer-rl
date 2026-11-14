@@ -354,6 +354,46 @@ seed: the same recipe with another seed falls as often as the control
 without the bank. Run 6 stays the strongest boxer: it wins every matchup
 that has an opponent other than itself.
 
+## A boxing rhythm (run 12, kept as `whole-body-style`)
+
+Runs 3 to 6 won by volume: from the clone to run 6 the whole body went from
+2.2 to 3.6 clean punches a second, and from 29 % to 6 % of the time in pauses
+(1 s or more between its clean punches). The champion stack lands 1.2 a
+second and pauses half the time, with its high guard up 44 % of it. It looks
+like boxing; runs 3 to 6 look like a brawl. The reward caused it
+(`REWARD`): a punch landed paid 2 and one taken cost 1.5, so trading blows
+paid both boxers, and a bonus paid every second spent at punching range.
+
+Run 12 (`runs/wb_ppo12.sh`, from the clone, run 6's recipe otherwise, seed
+312) changes the reward only, not the scorecard:
+
+- `--taken-penalty 2.5`: trading blows no longer pays;
+- `--in-range-reward 0`: no pay for standing at punching range;
+- `--hit-cooldown .6`: at most one rewarded clean punch per 0.6 s (the bout's
+  scorecard still counts every one);
+- `--guard-reward 1`: per second, for arm targets near the guard or high
+  guard (`guard_closeness`);
+- `--style-gate 2.0 .25`: the long gate also rejects a candidate landing
+  more than 2 clean punches a second or pausing less than 25 % of the time
+  (`tactics_gate.bout_style`).
+
+The gate rejected every candidate: 0.875M kept the style (1.5 and 2.0 a
+second, 49 % and 34 % paused) but fell 6 times against the champion in 16
+long bouts. That step is kept as `checkpoints/whole-body-style` for its
+rhythm. 32 bouts of 120 s:
+
+| Matchup | W–L–D | Clean punches | Knockdowns | Its clean punches a second | Its time in pauses |
+| --- | --- | --- | --- | --- | --- |
+| vs champion | 32–0–0 | 177 : 52 | 10 : 0 | 1.47 (run 6: 3.56) | 48 % (run 6: 6 %) |
+| vs striker | 32–0–0 | 159 : 59 | 13 : 2 | 1.32 (3.12) | 55 % (13 %) |
+| vs itself | — | 85 : 92 | 6 : 4 | 0.71 (3.26) | 75 % (13 %) |
+| vs run 6 | 0–31–1 | 111 : 329 | 34 : 6 | 0.93 | 77 % |
+
+It boxes at the champion's pace and falls less against itself than run 6
+(10 knockdowns in 32 bouts, against 16), but it falls more against everyone
+else, and run 6's volume beats it every time. Videos:
+`fights/style_vs_champion_60s.mp4` and `fights/style_vs_itself_60s.mp4`.
+
 ## What is open
 
 - Mirror bouts: run 6 falls 16 times in 32 bouts against itself (run 5: 0),
@@ -365,5 +405,7 @@ that has an opponent other than itself.
   started from states just before run 6's own mirror falls, against run 6,
   and fell 56 times against itself. Five attempts have not fixed it;
   the mirror falls are left open.
+- A boxing rhythm that also stays up: run 12 boxes at the champion's pace
+  but falls 10 times against it in 32 bouts, and loses every bout to run 6.
 - Getting up inside the whole-body policy itself. Now a separate get-up
   policy takes over while the boxer is down ([get-up](getup.md)).

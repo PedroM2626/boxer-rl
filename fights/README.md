@@ -28,6 +28,15 @@ promoted run-6 policy; seed 0 unless noted (`runs/wb_videos6.sh`):
 | `whole_body_vs_itself_60s.mp4` | 176 : 186 | 0 : 0 |
 | `whole_body_getup_vs_champion.mp4` (seed 138, 50 s, 25 fps, `--getup checkpoints/getup`, `runs/getup_clip.py`, run 5 in red, now `whole-body-v2`): blue down at 3.8 s, red falls while waiting at 4.8 s, both up after the 8 s count and box on | 117 : 20 | 1 : 1 |
 
+### A boxing rhythm (2026-11-14)
+
+`whole-body-style` (run 12) in red, 60 s at 60 fps, knockdown rules (3)
+(`runs/wb_eval12.sh`): `style_vs_champion_60s.mp4` (seed 1, the champion
+in blue on its own legs), 119 : 37 clean punches, no knockdowns;
+`style_vs_itself_60s.mp4` (seed 0), 74 : 75, no knockdowns. Compare with
+`whole_body_vs_champion_60s.mp4` and `whole_body_vs_itself_60s.mp4`
+(run 6, 218 : 60 and 176 : 186).
+
 ### Hits more, falls more (2026-11-14)
 
 `run11_vs_run6_120s.mp4` (and `.json`): run 11's 0.125M step (red, rejected,
