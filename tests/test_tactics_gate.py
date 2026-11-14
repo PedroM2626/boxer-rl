@@ -150,3 +150,30 @@ def test_mirror_check_rejects_a_candidate_that_falls_against_itself(tmp_path, mo
     assert selected.name == "step-1"
     assert seen == [(2, "champion"), (2, "itself"), (1, "champion"), (1, "itself")]
     assert tactics_gate.mirror_stable(long_record(1, 1), 2) and not tactics_gate.mirror_stable(long_record(2, 1), 2)
+
+
+def test_style_check_rejects_a_candidate_that_lands_too_fast_without_pauses(tmp_path, monkeypatch):
+    import json
+    from boxer import tactics_gate
+    for step in (1, 2):
+        save_policy(tmp_path / "checkpoint", (np.full(2, step, float),), dict(stage_steps=step, stage="tactics"))
+
+    def match(first, second, seeds, output, ring=False, arm=None, motor=None, seconds=None, knockdowns=None):
+        step = int(Path(first).name.split("-")[1])
+        if seconds:
+            # 10 s bouts: step 2 lands every 0.25 s; step 1 lands 4 times, 2 s apart.
+            times = [.25 * k for k in range(1, 40)] if step == 2 else [1., 3., 5., 7.]
+            events = [dict(time=t, scored=[1., 0.]) for t in times]
+            Path(output).write_text(json.dumps(dict(results=[dict(red=f"{first} + motor m", blue=str(second),
+                                                                   seconds=10., impact_events=events)])))
+            return long_record(0, 0)
+        if tuple(seeds) == tactics_gate.CONFIRMATION_SEEDS:
+            return record(10, 6, 0, 2., 1., bouts=32)
+        return record(9, 1, 0, 3., 1.) if step == 2 else record(5, 5, 0, 1., 1.)
+    monkeypatch.setattr(tactics_gate, "native_match", match)
+    selected = tactics_gate.gate_generation(tmp_path, "champion", 2, style_limits=(2., .25))
+    assert selected.name == "step-1"
+    checks = json.loads((tmp_path / "gate" / "gate.json").read_text())["long_checks"]
+    assert [c["stylish"] for c in checks] == [False, True]
+    assert abs(checks[0]["hit_rate"] - 3.9) < 1e-9 and checks[0]["pause_share"] == 0.
+    assert abs(checks[1]["hit_rate"] - .4) < 1e-9 and abs(checks[1]["pause_share"] - 1.) < 1e-9

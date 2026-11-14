@@ -128,3 +128,35 @@ def test_mirror_starts_face_the_mirror_opponent_with_the_learner_mostly_in_the_f
             kinds.append("fresh")
     assert .2 < kinds.count("mirror") / 800 < .3 and .2 < kinds.count("count") / 800 < .3
     assert .65 < np.mean(learners) < .85
+
+
+def test_style_rewards_one_hit_per_cooldown_and_arms_near_the_guard():
+    from boxer import moves
+    from boxer.native_finetune import REWARD, NativeBout, guard_closeness
+
+    class Pair:
+        pose, action_scale, dt = np.zeros(29), 1., .02
+
+        def reset(self, seed):
+            pass
+
+    bout = NativeBout(Pair(), None, np.random.default_rng(0), [], 1., 10, 30.,
+                      style=dict(taken=2.5, in_range=0., hit_cooldown=.6, guard=1.))
+    assert bout.reward == dict(REWARD, taken=2.5, in_range=0.) and bout.reward["hit"] == REWARD["hit"]
+    rewarded = [bout.rewarded_hits(h, t) for h, t in [(2., 1.), (1., 1.3), (0., 1.5), (1., 1.6), (1., 1.7)]]
+    assert rewarded == [1., 0., 0., 1., 0.]
+    bout.reset()
+    assert bout.rewarded_hits(1., .1) == 1.                  # a new bout forgets the last hit
+    plain = NativeBout(Pair(), None, np.random.default_rng(0), [], 1., 10, 30.)
+    assert plain.rewarded_hits(2., 1.) == 2. and plain.reward == REWARD
+
+    class Arm:
+        guards = np.zeros((2, 4))
+        arm_pose = np.zeros((2, 4))
+    arm = Arm()
+    assert guard_closeness(arm) == 1.
+    arm.arm_pose = np.stack([moves.HIGH_GUARD, moves.HIGH_GUARD])
+    assert guard_closeness(arm) == 1.                        # the high guard counts too
+    arm.guards = arm.arm_pose = np.zeros((2, 4)) + 5.        # far from the high guard
+    arm.arm_pose = arm.guards + [[.3, 0, 0, 0], [0, 0, 0, 0]]
+    assert abs(guard_closeness(arm) - (np.exp(-1.) + 1.) / 2) < 1e-12

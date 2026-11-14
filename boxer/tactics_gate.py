@@ -105,8 +105,32 @@ def mirror_stable(record, limit):
     return tactics["first_knockdowns"] + tactics["second_knockdowns"] <= limit
 
 
+def bout_style(output, first):
+    """``first``'s clean punches a second and share of time in pauses (1 s or
+    more between its clean punches, bout start and end included), over every
+    bout of a ``spar_match`` output where it boxes."""
+    import numpy as np
+    hits = seconds = paused = 0.
+    for result in json.loads(Path(output).read_text())["results"]:
+        for corner, name in enumerate((result["red"], result["blue"])):
+            if not name.startswith(str(first)):
+                continue
+            times = [e["time"] for e in result["impact_events"] if e["scored"][corner] > 0]
+            gaps = np.diff([0., *times, result["seconds"]])
+            hits += len(times)
+            seconds += result["seconds"]
+            paused += gaps[gaps >= 1.].sum()
+            break                       # against itself: the red corner stands for both
+    return dict(hit_rate=float(hits / seconds), pause_share=float(paused / seconds))
+
+
+def stylish(style, limits):
+    max_rate, min_pause = limits
+    return bool(style["hit_rate"] <= max_rate and style["pause_share"] >= min_pause)
+
+
 def gate_generation(root, champion, last=4, ring=False, arm=None, motor=None, long_tries=2,
-                    long_opponents=(), mirror_knockdowns=None):
+                    long_opponents=(), mirror_knockdowns=None, style_limits=None):
     """Selects and confirms a generation's best checkpoint; returns its directory.
 
     ``ring``: all gate bouts are fought inside the roped ring. ``arm``: an
@@ -116,7 +140,9 @@ def gate_generation(root, champion, last=4, ring=False, arm=None, motor=None, lo
     stability check (0 skips it); ``long_opponents`` are checked besides
     ``champion``. ``mirror_knockdowns``: also box each long-checked candidate
     against itself and allow at most this many knockdowns in all (None skips
-    it). Returns ``champion`` when none is stable.
+    it). ``style_limits``: (most clean punches a second, least pause share)
+    a candidate must keep in every long check (``bout_style``; None skips it).
+    Returns ``champion`` when none is stable.
     """
     root = Path(root)
     gate = root / "gate"
@@ -142,6 +168,10 @@ def gate_generation(root, champion, last=4, ring=False, arm=None, motor=None, lo
                                       LONG_KNOCKDOWNS)
                 checks.append(dict(step=trial["step"], opponent=str(opponent), stable=stable(record),
                                    **record["tactics"]))
+                if style_limits is not None:
+                    style = bout_style(gate / f"long-{trial['step']}-{n}.json", trial["directory"])
+                    checks[-1].update(style, stylish=stylish(style, style_limits))
+                    checks[-1]["stable"] = checks[-1]["stable"] and checks[-1]["stylish"]
                 print(json.dumps(dict(event="native_long_gate", **checks[-1])), flush=True)
                 fine = fine and checks[-1]["stable"]
                 if not fine:

@@ -36,6 +36,14 @@ from boxer import moves
 REWARD = dict(hit=2.0, taken=1.5, opponent_fell=5.0, in_range=.3, punch=.02)
 
 
+def guard_closeness(arm, width=.3):
+    """1 with both arm targets on the guard or high guard pose, falling off over ``width`` rad."""
+    poses = np.asarray(arm.arm_pose)
+    near = np.minimum(np.linalg.norm(poses - arm.guards, axis=1),
+                      np.linalg.norm(poses - moves.HIGH_GUARD, axis=1))
+    return float(np.mean(np.exp(-(near / width) ** 2)))
+
+
 def _configure_worker_env():
     os.environ["JAX_PLATFORMS"] = "cpu"
     # Native rollouts need no GPU; a CUDA context per worker exhausts it.
@@ -51,7 +59,7 @@ class NativeBout:
                  high_guard_fraction=0., arm_skill=None, leg_contact_penalty=0., striker=False,
                  arm_motion_cost=0., whole_body=False, tilt_cost=0., stack_fall_penalty=None,
                  start_bank=None, start_bank_fraction=0., mirror_bank=None, mirror_bank_fraction=0.,
-                 mirror_opponent=None):
+                 mirror_opponent=None, style=None):
         """``arm_skill``: an ``arm_skill.ArmSkill`` steering both corners' punches.
         ``leg_contact_penalty``: reward lost per second the robots' legs touch.
         ``striker``: the learner's actions are a striker's (``boxer.striker``),
@@ -71,7 +79,13 @@ class NativeBout:
         ``mirror_bank``: states just before a fall in a policy's bouts against
         itself (``boxer.mirror_starts``); a ``mirror_bank_fraction`` share of
         bouts starts from one against ``mirror_opponent`` (that policy), the
-        learner in the corner that fell three times in four."""
+        learner in the corner that fell three times in four.
+        ``style``: overrides of ``REWARD`` (``hit``, ``taken``, ``in_range``)
+        and two rhythm terms: ``hit_cooldown``, seconds after a rewarded hit
+        before the learner's next clean punch is rewarded again (the bout's
+        scorecard still counts every one), and ``guard``, reward per second
+        for a striker or whole-body learner's arm targets near the guard or
+        high guard (``guard_closeness``)."""
         from boxer.spar_match import PunchArm
         self.pair, self.motor, self.rng = pair, motor, rng
         self.arm_skill, self.leg_contact_penalty = arm_skill, leg_contact_penalty
@@ -86,6 +100,9 @@ class NativeBout:
         self.mirror_bank, self.mirror_bank_fraction = mirror_bank or [], mirror_bank_fraction
         self.mirror_opponent = mirror_opponent
         self.banked = self.mirrored = False
+        self.reward = dict(REWARD, **{k: v for k, v in (style or {}).items() if k in REWARD})
+        self.hit_cooldown = (style or {}).get("hit_cooldown", 0.)
+        self.guard_reward = (style or {}).get("guard", 0.)
         self.reset()
 
     def learner_fall_penalty(self):
@@ -126,6 +143,18 @@ class NativeBout:
             if hasattr(self.opponent, "new_arm"):         # a striker opponent drives its own arms
                 self.arms[1 - self.learner] = self.opponent.new_arm(self.pair)
         self.t = 0
+        self.last_rewarded_hit = -np.inf
+
+    def rewarded_hits(self, hits, now):
+        """The learner's clean punches this step that earn the hit reward: all of
+        them, or with a ``hit_cooldown`` at most one, and none within the
+        cooldown of the last rewarded one."""
+        if not self.hit_cooldown:
+            return hits
+        if hits > 0 and now - self.last_rewarded_hit >= self.hit_cooldown:
+            self.last_rewarded_hit = now
+            return 1.
+        return 0.
 
     def observe(self):
         from boxer.spar_match import _body
@@ -200,9 +229,13 @@ class NativeBout:
         distance = float(np.linalg.norm(_body(pair, 1)["pos"] - _body(pair, 0)["pos"]))
         legs = pair.legs_touching()
         tilt = tilt_penalty(pair.observation(np.zeros((2, 3)))[i]) if self.tilt_cost else 0.
-        reward = (REWARD["hit"] * scored[i] - REWARD["taken"] * scored[1 - i]
+        REWARD = self.reward
+        rewarded = self.rewarded_hits(scored[i], (self.t + 1) * pair.dt)
+        guard = guard_closeness(self.arms[i]) if self.guard_reward and hasattr(self.arms[i], "arm_pose") else 0.
+        reward = (REWARD["hit"] * rewarded - REWARD["taken"] * scored[1 - i]
                   - self.learner_fall_penalty() * fallen[i] + REWARD["opponent_fell"] * (fallen[1 - i] and not fallen[i])
                   + pair.dt * REWARD["in_range"] * np.exp(-((distance - REACH) / .15) ** 2)
+                  + pair.dt * self.guard_reward * guard
                   - REWARD["punch"] * launched - pair.dt * self.leg_contact_penalty * legs
                   - self.arm_motion_cost * motion - pair.dt * self.tilt_cost * tilt)
         self.t += 1
@@ -279,7 +312,7 @@ def _worker(conn, seed, motor_path, opponent_paths, scripted_fraction, episode_s
             min_std, model_path, constants, high_guard_fraction=0., arm_path=None,
             leg_contact_penalty=0., striker=False, arm_motion_cost=0., whole_body=False, tilt_cost=0.,
             stack_fall_penalty=None, start_bank_path=None, start_bank_fraction=0., mirror_bank_path=None,
-            mirror_bank_fraction=0., mirror_opponent_path=None):
+            mirror_bank_fraction=0., mirror_opponent_path=None, style=None):
     _configure_worker_env()
     import jax
     import mujoco
@@ -313,7 +346,7 @@ def _worker(conn, seed, motor_path, opponent_paths, scripted_fraction, episode_s
     bout = NativeBout(pair, motor, rng, opponents, scripted_fraction, episode_steps, fall_penalty,
                       high_guard_fraction, arm_skill, leg_contact_penalty, striker, arm_motion_cost, whole_body,
                       tilt_cost, stack_fall_penalty, start_bank, start_bank_fraction, mirror_bank,
-                      mirror_bank_fraction, mirror_opponent)
+                      mirror_bank_fraction, mirror_opponent, style)
     sample_with = make_sampler(min_std, learner_net(striker, whole_body))
 
     def sample_next(params, obs, key):
@@ -473,6 +506,17 @@ def main(argv=None):
                         help="states from the end of a referee's count (boxer.getup_starts) to start bouts from")
     parser.add_argument("--start-bank-fraction", type=float, default=.25,
                         help="with --start-bank: share of training bouts starting from a banked state")
+    parser.add_argument("--hit-reward", type=float, help=f"reward per clean punch landed (default {REWARD['hit']})")
+    parser.add_argument("--taken-penalty", type=float, help=f"reward lost per clean punch taken (default {REWARD['taken']})")
+    parser.add_argument("--in-range-reward", type=float,
+                        help=f"reward per second at punching range (default {REWARD['in_range']})")
+    parser.add_argument("--hit-cooldown", type=float, default=0.,
+                        help="seconds after a rewarded hit before the next one is rewarded (rhythm)")
+    parser.add_argument("--guard-reward", type=float, default=0.,
+                        help="reward per second for arm targets near the guard (striker and whole body)")
+    parser.add_argument("--style-gate", type=float, nargs=2, metavar=("MAX_RATE", "MIN_PAUSE"),
+                        help="long gate: reject a candidate landing more than MAX_RATE clean punches a second "
+                             "or pausing (1 s or more between its hits) less than MIN_PAUSE of the time")
     parser.add_argument("--mirror-bank", type=Path,
                         help="states just before a fall in a policy's bouts against itself (boxer.mirror_starts)")
     parser.add_argument("--mirror-bank-fraction", type=float, default=.15,
@@ -540,6 +584,8 @@ def main(argv=None):
         raise RuntimeError("could not export the native pair model")
     constants = json.loads(model_path.with_suffix(".json").read_text())
 
+    style = {k: v for k, v in dict(hit=args.hit_reward, taken=args.taken_penalty, in_range=args.in_range_reward,
+                                   hit_cooldown=args.hit_cooldown, guard=args.guard_reward).items() if v is not None}
     pipes, processes = [], []
     for w in range(args.workers):
         parent, child = context.Pipe()
@@ -550,7 +596,7 @@ def main(argv=None):
             args.striker, args.arm_motion_cost, args.whole_body, args.tilt_cost, args.stack_fall_penalty,
             args.start_bank and str(args.start_bank), args.start_bank_fraction,
             args.mirror_bank and str(args.mirror_bank), args.mirror_bank_fraction,
-            args.mirror_opponent and str(args.mirror_opponent)),
+            args.mirror_opponent and str(args.mirror_opponent), style),
             daemon=True)
         process.start()
         pipes.append(parent)
@@ -561,7 +607,7 @@ def main(argv=None):
     print(f"{args.workers} native workers ready", flush=True)
 
     atomic_json(root / "config.json", run_config(args)
-                | dict(pool=[str(p) for p in args.pool], reward=REWARD, started_utc=utc()))
+                | dict(pool=[str(p) for p in args.pool], reward=REWARD, style=style, started_utc=utc()))
     log = (root / "progress.jsonl").open("a")
     key = jax.random.PRNGKey(args.seed)
     done_steps, next_checkpoint, started = 0, 0, time.monotonic()
@@ -624,7 +670,8 @@ def main(argv=None):
             process.join(timeout=10)
     if args.native_gate:
         gate_generation(root, args.init_from, args.native_gate, args.ring, args.arm, args.motor, args.long_gate,
-                        args.long_gate_opponents, None if args.mirror_gate < 0 else args.mirror_gate)
+                        args.long_gate_opponents, None if args.mirror_gate < 0 else args.mirror_gate,
+                        tuple(args.style_gate) if args.style_gate else None)
     return 0
 
 
