@@ -28,6 +28,16 @@ promoted run-6 policy; seed 0 unless noted (`runs/wb_videos6.sh`):
 | `whole_body_vs_itself_60s.mp4` | 176 : 186 | 0 : 0 |
 | `whole_body_getup_vs_champion.mp4` (seed 138, 50 s, 25 fps, `--getup checkpoints/getup`, `runs/getup_clip.py`, run 5 in red, now `whole-body-v2`): blue down at 3.8 s, red falls while waiting at 4.8 s, both up after the 8 s count and box on | 117 : 20 | 1 : 1 |
 
+### Hits more, falls more (2026-11-14)
+
+`run11_vs_run6_120s.mp4` (and `.json`): run 11's 0.125M step (red, rejected,
+`runs/whole-body-native11/gate/step-125952`) against run 6 (blue), 120 s at
+60 fps, seed 4 of its 32-bout evaluation (`runs/wb_video11.sh`). Red
+outpunches blue 349 : 327 but is knocked down at 30.3 s and 43.7 s (referee
+restarts); 2 knockdowns are worth 20 points, so blue keeps it close on the
+cards (349 : 347). Over all 32 bouts run 11 wins 31 but falls 21 times to
+run 6's 7 ([whole body](../docs/whole-body.md#falls-against-itself-runs-7-to-11-rejected)).
+
 ## Getting up
 
 `getup_from_the_floor.mp4` and `.gif`: `checkpoints/getup` standing four G1s

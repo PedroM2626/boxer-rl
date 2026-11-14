@@ -70,9 +70,10 @@ bash tools/run_spar.sh boxer.spar_match --ring --seconds 120 --knockdowns 3 --se
   [rounds](docs/striker.md#long-bout-gate-and-alternating-rounds-2026-11-11)).
   Two whole-body policies fall 0 times. A leg anchor for the motor did not
   help either ([spar motor](docs/spar-motor.md#legs-trained-in-two-robot-bouts-2026-11-03)).
-* **The strongest boxer still falls against the champion.** The whole body
-  falls 8 times in 32 bouts against the champion stack (the previous one: 1),
-  though it wins all 32.
+* **The strongest boxer still falls, rarely, against the champion.** The
+  whole body (run 6) falls 2 times in 32 bouts against the champion stack
+  (run 5: 8) and wins all 32. Run 6's recipe with another seed (run 9) fell
+  16–21 times in 16 long bouts, so part of that is run 6's seed.
 * **No clinches, but close.** The striker and the whole-body policy fight at
   about 0.55 m between pelvises, which is punching range. Bodies touch on at most
   2 % of steps, for at most 0.1 s at a time. `spar_match --clinch-break` would
