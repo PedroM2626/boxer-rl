@@ -91,7 +91,9 @@ class NativeBout:
         learner must stay up after a punch blocked or evaded before that
         defense is paid (``held_defense``); a fall first forfeits it.
         ``variety``: reward when a tactics learner launches a punch of another
-        kind (straight, hook, uppercut) than its last one."""
+        kind (straight, hook, uppercut) than its last one. ``combo``: reward
+        when a tactics learner's clean punch lands within ``combo_window``
+        seconds of a clean punch of another kind (``combo``)."""
         from boxer.spar_match import PunchArm
         self.pair, self.motor, self.rng = pair, motor, rng
         self.arm_skill, self.leg_contact_penalty = arm_skill, leg_contact_penalty
@@ -111,6 +113,8 @@ class NativeBout:
         self.guard_reward = (style or {}).get("guard", 0.)
         self.defense_hold = (style or {}).get("defense_hold", 0.)
         self.variety_reward = (style or {}).get("variety", 0.)
+        self.combo_reward = (style or {}).get("combo", 0.)
+        self.combo_window = (style or {}).get("combo_window", 2.)
         self.reset()
 
     def learner_fall_penalty(self):
@@ -153,7 +157,17 @@ class NativeBout:
         self.t = 0
         self.last_rewarded_hit = -np.inf
         self.last_move = None
+        self.last_landed = (None, -np.inf)
         self.pending_defense = []
+
+    def combo(self, hits, move, now):
+        """1 when a clean punch of kind ``move`` lands within ``combo_window``
+        seconds of a clean punch of another kind (a combination), else 0."""
+        if not hits or move is None:
+            return 0.
+        kind, when = self.last_landed
+        self.last_landed = (move, now)
+        return float(kind is not None and kind != move and now - when <= self.combo_window)
 
     def rewarded_hits(self, hits, now):
         """The learner's clean punches this step that earn the hit reward: all of
@@ -261,6 +275,8 @@ class NativeBout:
         tilt = tilt_penalty(pair.observation(np.zeros((2, 3)))[i]) if self.tilt_cost else 0.
         REWARD = self.reward
         rewarded = self.rewarded_hits(scored[i], (self.t + 1) * pair.dt)
+        landed_move = self.arms[i].move if self.combo_reward and not self.arms[i].ready else None
+        combo = self.combo(scored[i], landed_move, (self.t + 1) * pair.dt) if self.combo_reward else 0.
         defense = self.held_defense(REWARD["blocked"] * outcome.get("blocked", (0., 0.))[1 - i]
                                     + REWARD["evaded"] * outcome.get("evaded", (0., 0.))[1 - i],
                                     (self.t + 1) * pair.dt, bool(fallen[i]))
@@ -269,7 +285,7 @@ class NativeBout:
                   - self.learner_fall_penalty() * fallen[i] + REWARD["opponent_fell"] * (fallen[1 - i] and not fallen[i])
                   + pair.dt * REWARD["in_range"] * np.exp(-((distance - REACH) / .15) ** 2)
                   + pair.dt * self.guard_reward * guard
-                  + defense + self.variety_reward * varied
+                  + defense + self.variety_reward * varied + self.combo_reward * combo
                   - REWARD["punch"] * launched - pair.dt * self.leg_contact_penalty * legs
                   - self.arm_motion_cost * motion - pair.dt * self.tilt_cost * tilt)
         self.t += 1
@@ -517,6 +533,8 @@ def main(argv=None):
     parser.add_argument("--learning-rate", type=float, default=1e-4)
     parser.add_argument("--new-action-mean", type=float, default=0.,
                         help="tactics: mean of actions an older policy lacks (the uppercut switch) when widened")
+    parser.add_argument("--combo-reward", type=float, default=0.,
+                        help="tactics: reward for a clean punch landing within 2 s of a clean punch of another kind")
     parser.add_argument("--variety-reward", type=float, default=0.,
                         help="tactics: reward for a punch of another kind than the last one")
     parser.add_argument("--entropy-cost", type=float, default=1e-3)
@@ -633,7 +651,8 @@ def main(argv=None):
     style = {k: v for k, v in dict(hit=args.hit_reward, taken=args.taken_penalty, in_range=args.in_range_reward,
                                    blocked=args.block_reward, evaded=args.evade_reward,
                                    hit_cooldown=args.hit_cooldown, guard=args.guard_reward,
-                                   defense_hold=args.defense_hold, variety=args.variety_reward).items() if v is not None}
+                                   defense_hold=args.defense_hold, variety=args.variety_reward,
+                                   combo=args.combo_reward).items() if v is not None}
     pipes, processes = [], []
     for w in range(args.workers):
         parent, child = context.Pipe()

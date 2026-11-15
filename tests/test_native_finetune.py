@@ -182,3 +182,24 @@ def test_defense_is_paid_only_after_staying_up():
     assert bout.pending_defense == []                         # a new bout starts clean
     plain = NativeBout(Pair(), None, np.random.default_rng(0), [], 1., 10, 30.)
     assert plain.held_defense(2., 1., True) == 2.             # no hold: paid at once
+
+
+def test_combo_pays_a_landed_punch_of_another_kind_soon_after_the_last():
+    from boxer import moves
+    from boxer.native_finetune import NativeBout
+
+    class Pair:
+        pose, action_scale, dt = np.zeros(29), 1., .02
+
+        def reset(self, seed):
+            pass
+
+    bout = NativeBout(Pair(), None, np.random.default_rng(0), [], 1., 10, 30., style=dict(combo=1.))
+    assert bout.combo(1., moves.STRAIGHT, 1.) == 0.            # the first landed punch
+    assert bout.combo(1., moves.STRAIGHT, 1.5) == 0.           # same kind
+    assert bout.combo(0., moves.HOOK, 1.6) == 0.               # nothing landed
+    assert bout.combo(1., moves.UPPERCUT, 2.) == 1.            # straight then uppercut within 2 s
+    assert bout.combo(1., moves.HOOK, 4.5) == 0.               # too late after the uppercut
+    assert bout.combo(1., None, 4.6) == 0.                     # no punch in flight
+    bout.reset()
+    assert bout.last_landed[0] is None
