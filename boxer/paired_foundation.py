@@ -7,6 +7,8 @@ This harness is deliberately separate from legacy assisted boxing controllers.
 from __future__ import annotations
 
 import mujoco
+import os
+
 import numpy as np
 
 from boxer import scene
@@ -33,6 +35,39 @@ UP_HEIGHT, UP_GRAVITY = .72, .9
 # Robot geoms that collide with the ropes.
 ROPE_CONTACTS = (scene.HAND_GEOMS + scene.FOREARM_GEOMS + scene.UPPER_TARGET_GEOMS
                  + scene.BODY_TARGET_GEOMS + ('left_shin', 'right_shin', 'left_foot', 'right_foot'))
+
+
+PUNCH_IMPULSE_ENV = 'BOXER_PUNCH_IMPULSE'
+ARMS = slice(15, 29)          # both arms' actuators of one G1 (after legs and waist)
+
+
+class Stamina:
+    """Arm fatigue, the same rule for both corners.
+
+    Each boxer has an energy store of ``capacity`` joules. Its arm actuators'
+    mechanical power (|force x joint speed|, summed) drains it and it refills
+    at ``recovery`` watts. Tired arms are weaker: their position gains scale
+    from 1 (full) down to ``floor`` (empty), so punches slow down and the
+    guard sags. ``capacity=None`` turns the rule off (arm work is still
+    measured)."""
+
+    def __init__(self, capacity=None, recovery=0., floor=.5):
+        self.capacity, self.recovery, self.floor = capacity, recovery, floor
+        self.reset()
+
+    def reset(self):
+        self.level = np.ones(2)
+        self.work = np.zeros(2)
+
+    def update(self, power, dt):
+        power = np.asarray(power, float)
+        self.work += power * dt
+        if self.capacity is not None:
+            self.level = np.clip(self.level + (self.recovery - power) * dt / self.capacity, 0., 1.)
+        return self.strength()
+
+    def strength(self):
+        return self.floor + (1. - self.floor) * self.level
 
 
 def add_ring(spec, robot_geoms):
@@ -233,6 +268,12 @@ class PairedFoundation:
                          for target in ('head_collision', 'torso_collision')}
                         for side in scene.SIDES]
         self.scorecard = ImpactScorecard()
+        # Power rule: a clean punch must carry this impulse (N s) within its
+        # contact window. Set through the environment so training workers and
+        # gate matches inherit it.
+        power = os.environ.get(PUNCH_IMPULSE_ENV)
+        if power:
+            self.scorecard.minimum_impulse = float(power)
         # Punches stopped by the opponent's arms, under the clean-punch rules.
         self.blockcard = ImpactScorecard()
         self.clashcard = ImpactScorecard()
@@ -240,6 +281,12 @@ class PairedFoundation:
         # The foundation also ends a trial when a robot's foot touches its own
         # other foot or shin. Knockdown rules may count only real falls.
         self.self_trip_falls = True
+        self.stamina = Stamina()
+        self.arm_actuators = [m['act'][ARMS] for m in self.maps]
+        self.arm_dofs = [self.model.actuator_trnid[a, 0] for a in self.arm_actuators]
+        self.arm_dofs = [self.model.jnt_dofadr[j] for j in self.arm_dofs]
+        self.arm_gain = [self.model.actuator_gainprm[a, 0].copy() for a in self.arm_actuators]
+        self.arm_bias = [self.model.actuator_biasprm[a, :3].copy() for a in self.arm_actuators]
         self._index_geoms()
         from boxer.defense import MissTracker
         self.misses = MissTracker(self)
@@ -290,6 +337,9 @@ class PairedFoundation:
         self.clashcard.reset()
         if hasattr(self, 'misses'):
             self.misses.reset()
+        if hasattr(self, 'stamina'):
+            self.stamina.reset()
+            self._set_arm_strength(self.stamina.strength())
         self.elapsed = 0.
         for index, mapping in enumerate(self.maps):
             q, rv, side = mapping['root'], mapping['rootv'], mapping['side']
@@ -436,6 +486,7 @@ class PairedFoundation:
             if punch_trace is not None:
                 punch_trace.before_substep(self, positions, velocities, torso_motion)
             self._physics_step()
+            self._tire_arms()
             for warning in self._warnings:
                 if self.data.warning[warning].number:
                     # Native MuJoCo can reset an invalid state internally.
@@ -501,7 +552,7 @@ class PairedFoundation:
         self.phase = (self.phase + 2 * np.pi * self.dt * self.frequency + np.pi) % (2*np.pi) - np.pi
         self.elapsed = float(self.data.time)
         missed, evaded = self.misses.update(self.model, self.data, touched)
-        return dict(done=self.done, fallen=self.fallen(), legal_contact_impulse=impulses,
+        return dict(done=self.done, fallen=self.fallen(), legal_contact_impulse=impulses, stamina=self.stamina.level.copy(),
                     scored=scored, blocked=blocked, clashed=clashed, missed=missed, evaded=evaded)
 
     def glove_punching(self, attacker, glove, positions, velocities, torso_motion):
@@ -515,6 +566,18 @@ class PairedFoundation:
         toward /= max(np.linalg.norm(toward), 1e-8)
         defender_torso = torso_motion[defender][1][3:]
         return float((velocities[glove] - defender_torso) @ toward) >= CLASH_SPEED
+
+    def _tire_arms(self):
+        power = [float(np.abs(self.data.actuator_force[a] * self.data.qvel[d]).sum())
+                 for a, d in zip(self.arm_actuators, self.arm_dofs)]
+        strength = self.stamina.update(power, self.model.opt.timestep)
+        if self.stamina.capacity is not None:
+            self._set_arm_strength(strength)
+
+    def _set_arm_strength(self, strength):
+        for actuators, gain, bias, s in zip(self.arm_actuators, self.arm_gain, self.arm_bias, strength):
+            self.model.actuator_gainprm[actuators, 0] = gain * s
+            self.model.actuator_biasprm[actuators, :3] = bias * s
 
     def _physics_step(self):
         """Native production dynamics; experimental backends override this hook."""

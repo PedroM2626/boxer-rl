@@ -48,3 +48,14 @@ def test_qualifying_contact_does_not_certify_a_boxing_punch():
     for step in range(40):
         events.append(sample(card,step*.002,impulse=.0128,closing=.31,extension=.21))
     np.testing.assert_array_equal(np.sum(events,axis=0),[1,0])
+
+
+def test_scored_punch_logs_its_onset_speeds():
+    card=ImpactScorecard()
+    sample(card,0.,closing=2.5,extension=1.5)
+    assert card.log==[dict(time=0.,corner=0,hand=0,closing=2.5,advancing=1.5,impulse=.6)]
+    sample(card,.002,closing=2.5,extension=1.5)
+    assert card.log[0]['impulse']==pytest.approx(1.2)
+    card.reset()
+    assert card.log==[]
+

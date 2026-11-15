@@ -30,6 +30,11 @@ class ImpactScorecard:
         self.age = np.zeros((2, 2))
         self.absent = np.full((2, 2), self.release_seconds)
         self.last_score = np.full((2, 2), -np.inf)
+        # Speeds at contact onset, kept for the punch-power record (``log``).
+        self.onset_closing = np.zeros((2, 2))
+        self.onset_advancing = np.zeros((2, 2))
+        self.log = []
+        self.open_entry = {}            # (corner, hand) -> log entry still gathering impulse
 
     def update(self, present, impulses, closing, advancing, time, dt, both_up=True):
         present = np.asarray(present, bool)
@@ -52,6 +57,8 @@ class ImpactScorecard:
         self.impulse[onset] = 0.
         self.age[onset] = 0.
         self.scored[onset] = False
+        self.onset_closing[onset] = closing[onset]
+        self.onset_advancing[onset] = advancing[onset]
         self.eligible[onset] = ((closing >= self.minimum_closing_speed)
                                 & (advancing >= self.minimum_fist_speed)
                                 & (time - self.last_score >= self.cooldown_seconds)
@@ -59,9 +66,21 @@ class ImpactScorecard:
         self.engaged |= present
         within = present & (self.age < self.contact_window)
         self.impulse += np.where(within, impulses, 0.)
+        for (corner, hand), entry in list(self.open_entry.items()):
+            if within[corner, hand]:
+                entry['impulse'] = float(self.impulse[corner, hand])
+            else:
+                del self.open_entry[corner, hand]
         self.age += present * dt
         events = (within & self.eligible & ~self.scored
                   & (self.impulse >= self.minimum_impulse) & bool(both_up))
         self.scored |= events
         self.last_score[events] = time
+        for corner, hand in zip(*np.nonzero(events)):
+            entry = dict(time=float(time), corner=int(corner), hand=int(hand),
+                         closing=float(self.onset_closing[corner, hand]),
+                         advancing=float(self.onset_advancing[corner, hand]),
+                         impulse=float(self.impulse[corner, hand]))
+            self.log.append(entry)
+            self.open_entry[int(corner), int(hand)] = entry
         return events.sum(axis=1).astype(np.float32)

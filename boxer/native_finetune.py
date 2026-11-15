@@ -533,6 +533,9 @@ def main(argv=None):
     parser.add_argument("--learning-rate", type=float, default=1e-4)
     parser.add_argument("--new-action-mean", type=float, default=0.,
                         help="tactics: mean of actions an older policy lacks (the uppercut switch) when widened")
+    parser.add_argument("--punch-impulse", type=float,
+                        help="power rule for training and gate bouts: impulse (N s) a clean punch must "
+                             "carry (default 0.5, ImpactScorecard)")
     parser.add_argument("--combo-reward", type=float, default=0.,
                         help="tactics: reward for a clean punch landing within 2 s of a clean punch of another kind")
     parser.add_argument("--variety-reward", type=float, default=0.,
@@ -589,6 +592,9 @@ def main(argv=None):
                         help="with --mirror-bank: the policy those states came from, the opponent in those bouts")
     parser.add_argument("--seed", type=int, default=0)
     args = parser.parse_args(argv)
+    if args.punch_impulse is not None:
+        from boxer.paired_foundation import PUNCH_IMPULSE_ENV
+        os.environ[PUNCH_IMPULSE_ENV] = str(args.punch_impulse)
     _configure_worker_env()
 
     import jax

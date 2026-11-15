@@ -262,6 +262,7 @@ def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills, fr
               for i in range(2)]
     arms = [_new_arm(pair, brain) for brain in brains]
     scored, thrown, frames, times, events = np.zeros(2), np.zeros(2, int), [], [], []
+    stamina_sum, stamina_low, stamina_steps = np.zeros(2), np.ones(2), 0
     blocked, clashed, missed, evaded = np.zeros(2), np.zeros(2), np.zeros(2), np.zeros(2)   # by attacking corner
     hooks, uppercuts, guarded, high = np.zeros(2, int), np.zeros(2, int), np.zeros(2, int), [False, False]
     fallen = np.zeros(2, bool)
@@ -359,9 +360,17 @@ def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills, fr
         clinched += touching
         holding = holding + 1 if touching else 0
         if outcome['scored'].any():
+            log = getattr(getattr(pair, 'scorecard', None), 'log', None)
             events.append(dict(time=round(elapsed, 3),
-                               scored=outcome['scored'].tolist()))
+                               scored=outcome['scored'].tolist(),
+                               # The scorecard's own entries: their impulse keeps
+                               # growing over the punch's contact window.
+                               **({} if not log else dict(punches=log[-int(outcome['scored'].sum()):]))))
         scored += outcome['scored']
+        if 'stamina' in outcome:
+            stamina_sum += outcome['stamina']
+            stamina_low = np.minimum(stamina_low, outcome['stamina'])
+            stamina_steps += 1
         # Pairs without the defense counters (test doubles) leave them at zero.
         blocked += outcome.get('blocked', 0.)
         clashed += outcome.get('clashed', 0.)
@@ -421,6 +430,10 @@ def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills, fr
                   punches_blocked=blocked.tolist(), punches_clashed=clashed.tolist(),
                   punches_missed=missed.tolist(),
                   punches_evaded=evaded.tolist(),
+                  **({} if not hasattr(pair, 'stamina') else dict(
+                      arm_work_j=pair.stamina.work.round(1).tolist(),
+                      stamina_mean=(stamina_sum / max(stamina_steps, 1)).round(3).tolist(),
+                      stamina_low=stamina_low.round(3).tolist())),
                   winner=None if winner is None else ('red', 'blue')[winner],
                   method=method, impact_events=events)
     return result, frames, times
@@ -547,9 +560,18 @@ def main(argv=None):
                         help='with --getup: metres apart the referee sets the boxers after a count (0: where they are)')
     parser.add_argument('--mandatory-count', type=float, default=MANDATORY_COUNT,
                         help='with --getup: seconds after a knockdown before boxing resumes, even if up')
+    parser.add_argument('--punch-impulse', type=float,
+                        help='power rule: impulse (N s) a clean punch must carry (default 0.5)')
+    parser.add_argument('--stamina', type=float, nargs='+', metavar='VALUE',
+                        help='arm fatigue for both corners: energy store (J), refill rate (W) and '
+                             'optionally the strength left when empty (paired_foundation.Stamina)')
     parser.add_argument('--swap', action='store_true',
                         help='also play every seed with the tactics exchanged between corners')
     args = parser.parse_args(argv)
+    if args.punch_impulse is not None:
+        import os
+        from boxer.paired_foundation import PUNCH_IMPULSE_ENV
+        os.environ[PUNCH_IMPULSE_ENV] = str(args.punch_impulse)
     params, metadata = load_policy_params(args.checkpoint)
     tactics = {i: load_brain(path)
                for i, path in enumerate((args.red_tactics, args.blue_tactics)) if path}
@@ -567,6 +589,9 @@ def main(argv=None):
         motors[1] = jax.jit(inference(foundation, load_policy_params(args.blue_checkpoint)[0]))
         names = [n + f' + motor {p}' for n, p in zip(names, (args.checkpoint, args.blue_checkpoint))]
     pair = PairedFoundation(foundation, ring=args.ring, floor_body=args.getup is not None)
+    if args.stamina:
+        from boxer.paired_foundation import Stamina
+        pair.stamina = Stamina(*args.stamina)
     getup = jax.jit(inference(foundation, load_policy_params(args.getup)[0])) if args.getup else None
     bouts = []
     schedule = [(seed, False) for seed in args.seeds]
