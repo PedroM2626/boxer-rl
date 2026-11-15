@@ -45,7 +45,7 @@ Run 13's 0.75M step (red, rejected, `runs/whole-body-native13/gate/step-750592`)
 86 : 17 clean punches, no knockdowns; of the champion's punches red takes 17,
 blocks 107 and evades 2. `defense_vs_itself_60s.mp4` (seed 0), 19 : 17 clean
 punches, three knockdowns (18.0 s, 29.7 s, 37.5 s): the falls that got it
-rejected ([whole body](../docs/whole-body.md#blocks-and-slips-run-13-rejected)).
+rejected ([whole body](../docs/whole-body.md#blocks-and-slips-runs-13-and-14-rejected)).
 
 ### Hits more, falls more (2026-11-14)
 
