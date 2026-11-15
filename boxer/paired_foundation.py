@@ -15,6 +15,9 @@ from boxer.impact_scorecard import ImpactScorecard
 # The opponent's arms and gloves: a punch landing there is blocked.
 GUARD_GEOMS = tuple(name for name in scene.UPPER_TARGET_GEOMS
                     if name not in ("head_collision", "torso_collision"))
+# A fist on a glove that is itself driving at the puncher (this fast, m/s,
+# toward the puncher's torso) is two punches meeting, not a block.
+CLASH_SPEED = .3
 
 
 STRIKE_SENSOR_TARGETS = ('head_collision', 'torso_collision')
@@ -232,6 +235,7 @@ class PairedFoundation:
         self.scorecard = ImpactScorecard()
         # Punches stopped by the opponent's arms, under the clean-punch rules.
         self.blockcard = ImpactScorecard()
+        self.clashcard = ImpactScorecard()
         self.guard_geoms = [{self.model.geom(side + name).id for name in GUARD_GEOMS} for side in scene.SIDES]
         # The foundation also ends a trial when a robot's foot touches its own
         # other foot or shin. Knockdown rules may count only real falls.
@@ -283,6 +287,7 @@ class PairedFoundation:
         self.done = False
         self.scorecard.reset()
         self.blockcard.reset()
+        self.clashcard.reset()
         if hasattr(self, 'misses'):
             self.misses.reset()
         self.elapsed = 0.
@@ -405,6 +410,7 @@ class PairedFoundation:
         impulses = np.zeros(2)
         scored = np.zeros(2)
         blocked = np.zeros(2)
+        clashed = np.zeros(2)
         touched = np.zeros((2, 2), bool)
         self.data.xfrc_applied[:] = 0
         self.data.qfrc_applied[:] = 0
@@ -440,6 +446,7 @@ class PairedFoundation:
             closing = np.zeros((2, 2))
             advancing = np.zeros((2, 2))
             guard = [np.zeros((2, 2), bool), np.zeros((2, 2)), np.zeros((2, 2)), np.zeros((2, 2))]
+            clash = [np.zeros((2, 2), bool), np.zeros((2, 2)), np.zeros((2, 2)), np.zeros((2, 2))]
             contact_times = getattr(self, 'diagnostic_contact_times', None)
             for k, (g1, g2) in enumerate(self.data.contact.geom):
                 g1, g2 = int(g1), int(g2)
@@ -461,6 +468,8 @@ class PairedFoundation:
                                if f in self._fist_owner and self._guard_of.get(t) == 1 - self._fist_owner[f][0])
                 for found, (i, hand, target) in [(0, h) for h in hits] + [(1, h) for h in stops]:
                     into = (present, per_hand, closing, advancing) if found == 0 else guard
+                    if found == 1 and self.glove_punching(i, target, positions, velocities, torso_motion):
+                        into = clash
                     fist = self.fists[i][hand]
                     force = np.zeros(6)
                     mujoco.mj_contactForce(self.model, self.data, k, force)
@@ -478,8 +487,10 @@ class PairedFoundation:
             fallen = self.fallen()
             scored += self.scorecard.update(present, per_hand, closing, advancing,
                 self.data.time, self.model.opt.timestep, both_up=not fallen.any())
-            touched |= present | guard[0]
+            touched |= present | guard[0] | clash[0]
             blocked += self.blockcard.update(*guard, self.data.time, self.model.opt.timestep,
+                                             both_up=not fallen.any())
+            clashed += self.clashcard.update(*clash, self.data.time, self.model.opt.timestep,
                                              both_up=not fallen.any())
             if punch_trace is not None:
                 punch_trace.after_substep(self, present, per_hand, closing, advancing)
@@ -491,7 +502,19 @@ class PairedFoundation:
         self.elapsed = float(self.data.time)
         missed, evaded = self.misses.update(self.model, self.data, touched)
         return dict(done=self.done, fallen=self.fallen(), legal_contact_impulse=impulses,
-                    scored=scored, blocked=blocked, missed=missed, evaded=evaded)
+                    scored=scored, blocked=blocked, clashed=clashed, missed=missed, evaded=evaded)
+
+    def glove_punching(self, attacker, glove, positions, velocities, torso_motion):
+        """Is ``glove`` (a geom of ``attacker``'s opponent) one of its fists,
+        moving toward ``attacker``'s torso at ``CLASH_SPEED`` or faster?"""
+        defender = 1 - attacker
+        if int(glove) not in {int(g) for g in self.fists[defender]}:
+            return False
+        toward = torso_motion[attacker][0] - positions[glove]
+        toward[2] = 0.
+        toward /= max(np.linalg.norm(toward), 1e-8)
+        defender_torso = torso_motion[defender][1][3:]
+        return float((velocities[glove] - defender_torso) @ toward) >= CLASH_SPEED
 
     def _physics_step(self):
         """Native production dynamics; experimental backends override this hook."""

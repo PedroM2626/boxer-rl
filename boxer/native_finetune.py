@@ -89,7 +89,9 @@ class NativeBout:
         for a striker or whole-body learner's arm targets near the guard or
         high guard (``guard_closeness``). ``defense_hold``: seconds the
         learner must stay up after a punch blocked or evaded before that
-        defense is paid (``held_defense``); a fall first forfeits it."""
+        defense is paid (``held_defense``); a fall first forfeits it.
+        ``variety``: reward when a tactics learner launches a punch of another
+        kind (straight, hook, uppercut) than its last one."""
         from boxer.spar_match import PunchArm
         self.pair, self.motor, self.rng = pair, motor, rng
         self.arm_skill, self.leg_contact_penalty = arm_skill, leg_contact_penalty
@@ -108,6 +110,7 @@ class NativeBout:
         self.hit_cooldown = (style or {}).get("hit_cooldown", 0.)
         self.guard_reward = (style or {}).get("guard", 0.)
         self.defense_hold = (style or {}).get("defense_hold", 0.)
+        self.variety_reward = (style or {}).get("variety", 0.)
         self.reset()
 
     def learner_fall_penalty(self):
@@ -149,6 +152,7 @@ class NativeBout:
                 self.arms[1 - self.learner] = self.opponent.new_arm(self.pair)
         self.t = 0
         self.last_rewarded_hit = -np.inf
+        self.last_move = None
         self.pending_defense = []
 
     def rewarded_hits(self, hits, now):
@@ -179,7 +183,7 @@ class NativeBout:
 
     def observe(self):
         from boxer.spar_match import _body
-        from boxer.tactics_env import observe
+        from boxer.tactics_env import observe_tactics
         if self.whole_body:
             from boxer.whole_body import whole_body_observe
             return whole_body_observe(self.pair, self.learner, self.arms, self.t / self.episode_steps)
@@ -188,7 +192,7 @@ class NativeBout:
             return striker_observe(self.pair, self.learner, self.arms, self.t / self.episode_steps)
         bodies = [_body(self.pair, k) for k in range(2)]
         i = self.learner
-        return observe(np, bodies[i], bodies[1 - i], self.arms[i].features(),
+        return observe_tactics(np, bodies[i], bodies[1 - i], self.arms[i].features(),
                        self.arms[1 - i].features(), self.t / self.episode_steps).astype(np.float32)
 
     def step(self, tactics):
@@ -198,6 +202,7 @@ class NativeBout:
         pair, i = self.pair, self.learner
         bodies = [_body(pair, k) for k in range(2)]
         commands, launched, hooked, high = [None, None], False, False, [False, False]
+        uppercut, varied = False, False
         motion, own_legs = 0., None
         for k in range(2):
             delta = bodies[1 - k]["pos"] - bodies[k]["pos"]
@@ -223,6 +228,10 @@ class NativeBout:
                 punch = (int(hand), float(aim), int(move)) if want and self.arms[k].ready else None
                 launched = punch is not None
                 hooked = launched and punch[2] == moves.HOOK
+                uppercut = launched and punch[2] == moves.UPPERCUT
+                if launched:
+                    varied = self.last_move is not None and punch[2] != self.last_move
+                    self.last_move = punch[2]
             elif hasattr(self.opponent, "decide_pair"):
                 command, punch, high[k] = self.opponent.decide_pair(
                     pair, k, self.arms, self.t / self.episode_steps)
@@ -260,7 +269,7 @@ class NativeBout:
                   - self.learner_fall_penalty() * fallen[i] + REWARD["opponent_fell"] * (fallen[1 - i] and not fallen[i])
                   + pair.dt * REWARD["in_range"] * np.exp(-((distance - REACH) / .15) ** 2)
                   + pair.dt * self.guard_reward * guard
-                  + defense
+                  + defense + self.variety_reward * varied
                   - REWARD["punch"] * launched - pair.dt * self.leg_contact_penalty * legs
                   - self.arm_motion_cost * motion - pair.dt * self.tilt_cost * tilt)
         self.t += 1
@@ -268,7 +277,8 @@ class NativeBout:
         truncated = not terminal and self.t >= self.episode_steps
         return float(reward), terminal, truncated, dict(hits=float(scored[i]), taken=float(scored[1 - i]),
                                                         fell=float(fallen[i]), punches=float(launched),
-                                                        hooks=float(hooked), legs=float(legs),
+                                                        hooks=float(hooked), uppercuts=float(uppercut),
+                                                        legs=float(legs),
                                                         motion=motion, tilt=tilt)
 
 
@@ -387,7 +397,8 @@ def _worker(conn, seed, motor_path, opponent_paths, scripted_fraction, episode_s
             break
         params, steps = message
         record = {k: [] for k in ("obs", "raw", "logp", "reward", "terminal", "truncated", "next_obs")}
-        stats = dict(hits=0., taken=0., fell=0., punches=0., hooks=0., legs=0., motion=0., tilt=0., bouts=0)
+        stats = dict(hits=0., taken=0., fell=0., punches=0., hooks=0., uppercuts=0., legs=0., motion=0., tilt=0.,
+                     bouts=0)
         for _ in range(steps):
             action, raw, logp, key = sample(params, obs, key)
             reward, terminal, truncated, info = bout.step(np.asarray(action))
@@ -396,7 +407,7 @@ def _worker(conn, seed, motor_path, opponent_paths, scripted_fraction, episode_s
                                 ("reward", reward), ("terminal", terminal), ("truncated", truncated),
                                 ("next_obs", next_obs)):
                 record[name].append(value)
-            for name in ("hits", "taken", "fell", "punches", "hooks", "legs", "motion", "tilt"):
+            for name in ("hits", "taken", "fell", "punches", "hooks", "uppercuts", "legs", "motion", "tilt"):
                 stats[name] += info[name]
             if terminal or truncated:
                 stats["bouts"] += 1
@@ -504,6 +515,10 @@ def main(argv=None):
                         help="striker reward lost per radian its arm targets move")
     parser.add_argument("--min-std", type=float, default=.15)
     parser.add_argument("--learning-rate", type=float, default=1e-4)
+    parser.add_argument("--new-action-mean", type=float, default=0.,
+                        help="tactics: mean of actions an older policy lacks (the uppercut switch) when widened")
+    parser.add_argument("--variety-reward", type=float, default=0.,
+                        help="tactics: reward for a punch of another kind than the last one")
     parser.add_argument("--entropy-cost", type=float, default=1e-3)
     parser.add_argument("--epochs", type=int, default=4)
     parser.add_argument("--minibatches", type=int, default=4)
@@ -570,7 +585,7 @@ def main(argv=None):
     kind = "whole-body" if args.whole_body else "striker" if args.striker else "tactics"
     if kind == "tactics" and policy_sizes(initial) != (OBS_SIZE, ACTION_SIZE):
         # A pre-hook policy: same behaviour, new inputs/outputs start silent.
-        initial = widen_legacy(initial)
+        initial = widen_legacy(initial, new_mean=args.new_action_mean)
     norm, policy, value = initial
     anchor = policy                    # the starting policy; --leg-anchor keeps the legs near it
     net, dist = learner_net(args.striker, args.whole_body)
@@ -618,7 +633,7 @@ def main(argv=None):
     style = {k: v for k, v in dict(hit=args.hit_reward, taken=args.taken_penalty, in_range=args.in_range_reward,
                                    blocked=args.block_reward, evaded=args.evade_reward,
                                    hit_cooldown=args.hit_cooldown, guard=args.guard_reward,
-                                   defense_hold=args.defense_hold).items() if v is not None}
+                                   defense_hold=args.defense_hold, variety=args.variety_reward).items() if v is not None}
     pipes, processes = [], []
     for w in range(args.workers):
         parent, child = context.Pipe()
@@ -686,6 +701,7 @@ def main(argv=None):
                           arm_rad_per_step=sum(s["motion"] for s in stats) / size,
                           tilt_per_step=sum(s["tilt"] for s in stats) / size,
                           hook_share=sum(s["hooks"] for s in stats) / max(sum(s["punches"] for s in stats), 1.),
+                          uppercut_share=sum(s["uppercuts"] for s in stats) / max(sum(s["punches"] for s in stats), 1.),
                           **{k: float(v) for k, v in info.items()})
             log.write(json.dumps(record) + "\n")
             log.flush()

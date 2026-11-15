@@ -31,3 +31,19 @@ def test_a_punch_that_comes_close_and_pulls_back_untouched_misses_and_is_evaded_
     assert run(tracker, blocked, touched_at={1}).tolist() == [0., 0.]
     slow = [(.3, .5, .5), (.05, .5, .5), (.2, -1., 0.)]              # never an attack
     assert run(tracker, slow).tolist() == [0., 0.]
+
+
+def test_a_glove_driving_at_the_puncher_is_a_clash_not_a_block():
+    from types import SimpleNamespace
+    from boxer.paired_foundation import PairedFoundation
+    pair = SimpleNamespace(fists=np.array([[1, 2], [3, 4]]))
+    positions = {3: np.array([.5, 0., 1.]), 9: np.array([.5, 0., 1.])}
+    torso = [(np.zeros(3), np.zeros(6)), (np.array([1., 0., 1.]), np.zeros(6))]
+    punching = {3: np.array([-1., 0., 0.]), 9: np.array([-1., 0., 0.])}
+    held = {3: np.array([0., 0., .1]), 9: np.zeros(3)}
+    clash = PairedFoundation.glove_punching
+    assert clash(pair, 0, 3, positions, punching, torso)          # corner 1's fist drives at corner 0
+    assert not clash(pair, 0, 3, positions, held, torso)          # a glove held up: a block
+    assert not clash(pair, 0, 9, positions, punching, torso)      # not a fist (forearm, elbow): a block
+    moving = [torso[0], (torso[1][0], np.array([0., 0., 0., -1., 0., 0.]))]
+    assert not clash(pair, 0, 3, positions, punching, moving)     # the whole body steps in, not the fist

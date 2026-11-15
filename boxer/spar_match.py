@@ -86,12 +86,13 @@ class PunchArm:
         return self.age < 0
 
     def features(self):
-        """(age fraction, active, hand sign, aim, hook, high guard), as ``TacticsEnv._arm_features``."""
+        """(age fraction, active, hand sign, aim, hook, high guard, uppercut), as ``TacticsEnv._arm_features``."""
         active = self.age >= 0
         extend, retract = moves.durations(np, self.move, self.dt)
         return np.array([max(self.age, 0) / (extend + retract), float(active),
                          (2. * self.hand - 1) if active else 0., self.aim if active else 0.,
-                         float(active and self.move == moves.HOOK), float(self.high)])
+                         float(active and self.move == moves.HOOK), float(self.high),
+                         float(active and self.move == moves.UPPERCUT)])
 
     def launch(self, hand, aim, rng, move=moves.STRAIGHT):
         self.hand, self.age, self.aim, self.move = int(hand), 0.0, float(aim), int(move)
@@ -174,9 +175,9 @@ class PolicyBrain:
         self.key = jax.random.PRNGKey(0)
 
     def decide_pair(self, pair, i, arms, clock):
-        from boxer.tactics_env import decode, observe
+        from boxer.tactics_env import decode, observe_tactics
         bodies = [_body(pair, k) for k in range(2)]
-        obs = observe(np, bodies[i], bodies[1 - i], arms[i].features(), arms[1 - i].features(), clock)
+        obs = observe_tactics(np, bodies[i], bodies[1 - i], arms[i].features(), arms[1 - i].features(), clock)
         tactics, self.key = self.act(np.asarray(obs, np.float32), self.key)
         tactics = np.asarray(tactics, np.float64)
         delta = bodies[1 - i]['pos'] - bodies[i]['pos']
@@ -261,8 +262,8 @@ def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills, fr
               for i in range(2)]
     arms = [_new_arm(pair, brain) for brain in brains]
     scored, thrown, frames, times, events = np.zeros(2), np.zeros(2, int), [], [], []
-    blocked, missed, evaded = np.zeros(2), np.zeros(2), np.zeros(2)   # by attacking corner
-    hooks, guarded, high = np.zeros(2, int), np.zeros(2, int), [False, False]
+    blocked, clashed, missed, evaded = np.zeros(2), np.zeros(2), np.zeros(2), np.zeros(2)   # by attacking corner
+    hooks, uppercuts, guarded, high = np.zeros(2, int), np.zeros(2, int), np.zeros(2, int), [False, False]
     fallen = np.zeros(2, bool)
     downs, restarts = np.zeros(2, int), []
     turned_away = np.zeros(2, int)      # steps facing more than 45 deg off the opponent
@@ -333,6 +334,7 @@ def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills, fr
                 arms[i].launch(*punch[:2], rng, *punch[2:])
                 thrown[i] += 1
                 hooks[i] += len(punch) > 2 and punch[2] == moves.HOOK
+                uppercuts[i] += len(punch) > 2 and punch[2] == moves.UPPERCUT
             elif getattr(arms[i], 'launched', False):
                 thrown[i] += 1          # a striker's arm left the guard
         commands = np.clip(commands, [-.35, -.25, -.5], [.55, .25, .5])
@@ -362,6 +364,7 @@ def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills, fr
         scored += outcome['scored']
         # Pairs without the defense counters (test doubles) leave them at zero.
         blocked += outcome.get('blocked', 0.)
+        clashed += outcome.get('clashed', 0.)
         missed += outcome.get('missed', 0.)
         evaded += outcome.get('evaded', 0.)
         if record and t % frame_every == 0:
@@ -409,12 +412,14 @@ def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills, fr
                   knockdowns_suffered=downs.tolist(), restarts=restarts, counts=counts,
                   counted_out=counted_out.tolist(), cards=cards.tolist(),
                   punches_thrown=thrown.tolist(), hooks_thrown=hooks.tolist(),
+                  uppercuts_thrown=uppercuts.tolist(),
                   high_guard_seconds=(guarded * pair.dt).round(2).tolist(),
                   turned_away_seconds=(turned_away * pair.dt).round(2).tolist(),
                   rope_seconds=(roped * pair.dt).round(2).tolist(), fallen=fallen.tolist(),
                   clinch_seconds=round(clinched * pair.dt, 2), clinch_breaks=breaks,
                   arm_motion_rad=motion.round(1).tolist(),
-                  punches_blocked=blocked.tolist(), punches_missed=missed.tolist(),
+                  punches_blocked=blocked.tolist(), punches_clashed=clashed.tolist(),
+                  punches_missed=missed.tolist(),
                   punches_evaded=evaded.tolist(),
                   winner=None if winner is None else ('red', 'blue')[winner],
                   method=method, impact_events=events)
@@ -423,9 +428,10 @@ def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills, fr
 
 def defense_summary(bouts, first):
     """Per bout, for the first-named and the second boxer: the opponent's punches
-    that landed clean, were blocked, missed and were evaded (a miss while the
-    target moved away, ``boxer.defense``), and the share stopped by its own
-    guard or slipped among those that landed, were blocked or were evaded."""
+    that landed clean, were blocked, met its own punch (glove on glove, not a
+    block), missed and were evaded (a miss while the target moved away,
+    ``boxer.defense``), and the share stopped by its own guard or slipped
+    among those that landed, were blocked or were evaded."""
     out = {}
     for name, me in (("first", True), ("second", False)):
         rows = []
@@ -433,9 +439,10 @@ def defense_summary(bouts, first):
             k = (0 if b['red'] == first else 1) if me else (1 if b['red'] == first else 0)
             o = 1 - k
             rows.append([b['clean_punches'][o], b['punches_blocked'][o], b['punches_missed'][o],
-                         b['punches_evaded'][o]])
-        landed, blocked, missed, evaded = np.mean(rows, axis=0)
+                         b['punches_evaded'][o], b.get('punches_clashed', [0., 0.])[o]])
+        landed, blocked, missed, evaded, clashed = np.mean(rows, axis=0)
         out[name] = dict(taken_per_bout=float(landed), blocked_per_bout=float(blocked),
+                         clashed_per_bout=float(clashed),
                          missed_per_bout=float(missed), evaded_per_bout=float(evaded),
                          defended_share=float((blocked + evaded) / max(landed + blocked + evaded, 1e-9)))
     return out

@@ -57,9 +57,13 @@ def fit(arm, target, start, elbow_target=None, weight=4.0):
 
 
 def main():
-    argparse.ArgumentParser(description=__doc__).parse_args()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--uppercut", action="store_true", help="fit only the uppercut paths")
+    args = parser.parse_args()
     arm = Arm()
     np.set_printoptions(precision=3, suppress=True)
+    if args.uppercut:
+        return uppercut(arm)
     print("left arm ranges", arm.range["left"])
     guard = np.asarray(arm.data.qpos[arm.adr["left"]])
     for name, pose in (("guard", guard), ("straight body", PUNCH_BODY), ("straight head", PUNCH_HEAD)):
@@ -113,6 +117,41 @@ def main():
         print("])")
         zs = [arm.place(q)[0][2] for q in path]
         print(f"# fist z along the arc: {np.round(zs, 3).tolist()}")
+
+
+# Uppercut: the fist drops low and close (the dip), then rises almost
+# vertically, forearm upright, to end on the centre line under the target:
+# the chin (aim 1) or the middle of the torso (aim 0), shorter than the
+# straight. Against a high guard the opponent's elbows sit 0.25 m apart in
+# front of the torso; a straight body punch ends 0.07 m off centre, an
+# uppercut on it.
+UPPERCUT_TARGETS = {"head": ((.22, .08, .22), (.34, .01, .42)),
+                    "body": ((.20, .09, .08), (.38, .01, .22))}
+
+
+def uppercut(arm, waypoints=6, smooth=.002):
+    starts = [np.asarray(arm.data.qpos[arm.adr["left"]]), np.array([-.6, .2, 0., 1.6]),
+              np.array([-1.2, .1, .2, 1.8]), np.array([-1.6, 0., .3, 1.2]), np.array([-.9, .3, -.3, 1.4])]
+    low, high = arm.range["left"][:, 0], arm.range["left"][:, 1]
+    for aim, (dip, strike) in UPPERCUT_TARGETS.items():
+        dip, strike = np.array(dip), np.array(strike)
+        q0, (f0, e0), r0 = fit(arm, dip, starts, dip - [.08, -.02, .18])
+        path, previous = [q0], q0
+        for t in np.linspace(0, 1, waypoints)[1:]:
+            # Rise first, then reach: the fist climbs faster than it moves forward.
+            target = dip + (strike - dip) * [t ** 2, t, t ** .7]
+            elbow = target - [.06, -.06, .17]
+            cost = lambda q: (np.sum((arm.place(q)[0] - target) ** 2) + .1 * np.sum((arm.place(q)[1] - elbow) ** 2)
+                              + smooth * np.sum((q - previous) ** 2))
+            previous = minimize(cost, previous, bounds=list(zip(low, high)), method="L-BFGS-B").x
+            path.append(previous)
+        print(f"UPPERCUT_PATH_{aim.upper()} = np.array([")
+        for q in path:
+            print("    [" + ", ".join(f"{v:.4f}" for v in q) + "],")
+        print("])")
+        for q in path:
+            fist, elbow = arm.place(q)
+            print(f"#   fist {np.round(fist, 3).tolist()} elbow {np.round(elbow, 3).tolist()}")
 
 
 def arc_path(arm, start, end, waypoints=6, smooth=.02):

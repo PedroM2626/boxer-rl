@@ -123,7 +123,7 @@ bash tools/run_spar.sh boxer.spar_match --ring --seconds 120 --knockdowns 3 --se
   circling; facing the opponent is a fixed rule (`tactics_env.decode`). The
   whole-body policy has no such rule: its own leg targets turn it.
 * **Simulation only**, against a fixed pool of policies; no sim-to-real work.
-* **Tests:** all 88 test files (449 tests) pass when run one file per
+* **Tests:** all 88 test files (451 tests) pass when run one file per
   process (`tools/test_all.sh`, 33 min, 2026-11-12); the whole suite in one
   process exhausts the WSL VM's memory. `--fast` skips the five slow files of
   the archived MJX/warp stack (`tools/slow_tests.txt`) and takes about 13 min.

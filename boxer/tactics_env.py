@@ -40,9 +40,10 @@ from boxer.curriculum_train import inference
 from boxer.paired_foundation import (RING_HALF, STRIKE_SENSOR_TARGETS, build_pair,
                                      strike_sensor_name)
 
-# left punch, right punch, aim, advance, lateral, hook (vs straight), high guard
-ACTION_SIZE = 7
-OBS_SIZE = 32
+# left punch, right punch, aim, advance, lateral, hook (vs straight), high guard,
+# uppercut (vs hook and straight)
+ACTION_SIZE = 8
+OBS_SIZE = 34                  # observe (32) + both corners' uppercut flags
 # Checkpoints before hooks and guards (2026-10-30/31) see the first 26 inputs
 # and output the first 5 actions; ``tactics_policy`` adapts them.
 LEGACY_ACTION_SIZE, LEGACY_OBS_SIZE = 5, 26
@@ -67,8 +68,8 @@ def policy_sizes(params):
 def tactics_policy(params, deterministic=False):
     """Inference function for a saved tactics policy (normalizer, policy, value).
 
-    Accepts current (32 → 7) and older policies: 30 → 7 (before the ring) and
-    26 → 5 (straights only). An older policy sees the first observations, which
+    Accepts current (34 → 8) and older policies: 32 → 7 (before the uppercut),
+    30 → 7 (before the ring) and 26 → 5 (straights only). An older policy sees the first observations, which
     keep its layout, and missing actions are padded with "straight, normal guard".
     """
     obs_size, action_size = policy_sizes(params)
@@ -87,11 +88,12 @@ def tactics_policy(params, deterministic=False):
     return legacy
 
 
-def widen_legacy(params, new_scale=-1.):
-    """A 32 → 7 policy that acts exactly like an older, narrower one.
+def widen_legacy(params, new_scale=-1., new_mean=0.):
+    """A 34 → 8 policy that acts like an older, narrower one.
 
     New inputs get zero weights (normalized by mean 0, std 1), new action means
-    start at 0 ("straight, normal guard", since only positive values switch), and
+    start at ``new_mean`` (0 or below keeps "straight, normal guard, no
+    uppercut" for the mean action, since only positive values switch), and
     new action scales start at softplus(``new_scale``) + 0.001 for exploration.
     """
     norm, policy, value = params
@@ -113,7 +115,8 @@ def widen_legacy(params, new_scale=-1.):
     layers[last]["kernel"] = jp.concatenate(
         [kernel[:, :action_size], zeros, kernel[:, action_size:], zeros], axis=1)
     layers[last]["bias"] = jp.concatenate(
-        [bias[:action_size], jp.zeros(extra_act), bias[action_size:], jp.full(extra_act, new_scale)])
+        [bias[:action_size], jp.full(extra_act, new_mean, bias.dtype), bias[action_size:],
+         jp.full(extra_act, new_scale)])
     pad = lambda x, v: jp.concatenate([x, jp.full((extra_obs,), v, x.dtype)])
     # The normalizer is frozen during fine-tuning; only mean and std are used.
     norm = norm.replace(mean=pad(norm.mean, 0.), std=pad(norm.std, 1.),
@@ -131,8 +134,8 @@ def decode(tactics, distance, local):
     """
     xp = jp if isinstance(tactics, jax.Array) else np
     tactics = xp.clip(tactics, -1, 1)
-    if tactics.shape[-1] == LEGACY_ACTION_SIZE:
-        tactics = xp.concatenate([tactics, -xp.ones(ACTION_SIZE - LEGACY_ACTION_SIZE)])
+    if tactics.shape[-1] < ACTION_SIZE:            # older layouts: straight, normal guard, no uppercut
+        tactics = xp.concatenate([tactics, -xp.ones(ACTION_SIZE - tactics.shape[-1])])
     direction = local / xp.maximum(distance, 1e-6)
     advance = xp.where(tactics[3] > 0, .4 * tactics[3], .3 * tactics[3])
     tangent = xp.stack([-direction[1], direction[0]])
@@ -148,8 +151,17 @@ def decode(tactics, distance, local):
     want = xp.maximum(tactics[0], tactics[1]) > 0
     hand = xp.where(tactics[1] > tactics[0], 1, 0)
     aim = (tactics[2] + 1) / 2
-    move = xp.where(tactics[5] > 0, moves.HOOK, moves.STRAIGHT)
+    upper = (tactics[7] > 0) & (tactics[7] >= tactics[5])
+    move = xp.where(upper, moves.UPPERCUT, xp.where(tactics[5] > 0, moves.HOOK, moves.STRAIGHT))
     return command, want, hand, aim, move, tactics[6] > 0
+
+
+def observe_tactics(xp, own, opp, own_arm, opp_arm, clock):
+    """The tactics policy's observation (34): ``observe`` (32), then whether
+    this corner's and the opponent's punch in flight is an uppercut (entry 6
+    of an arm's features; arms without one, like the striker's, count 0)."""
+    flag = lambda arm: arm[6:7] if arm.shape[-1] > 6 else xp.zeros(1)
+    return xp.concatenate([observe(xp, own, opp, own_arm, opp_arm, clock), flag(own_arm), flag(opp_arm)])
 
 
 def observe(xp, own, opp, own_arm, opp_arm, clock):
@@ -347,13 +359,14 @@ class TacticsEnv(mjx_env.MjxEnv):
                          active.astype(jp.float32),
                          jp.where(active, 2. * arm["hand"][i] - 1, 0.), arm["aim"][i] * active,
                          (active & (arm["move"][i] == moves.HOOK)).astype(jp.float32),
-                         arm["high"][i].astype(jp.float32)])
+                         arm["high"][i].astype(jp.float32),
+                         (active & (arm["move"][i] == moves.UPPERCUT)).astype(jp.float32)])
 
     def _observations(self, data, info):
         bodies = [self._body(data, i) for i in range(2)]
         clock = info["step"] / self.episode_steps
         arm = info["arm"]
-        return [observe(jp, bodies[i], bodies[1 - i], self._arm_features(arm, i),
+        return [observe_tactics(jp, bodies[i], bodies[1 - i], self._arm_features(arm, i),
                         self._arm_features(arm, 1 - i), clock) for i in range(2)]
 
     def _motor_obs(self, data, info, commands):
@@ -376,7 +389,7 @@ class TacticsEnv(mjx_env.MjxEnv):
         hand = jax.random.bernoulli(hand_rng)
         punch = jp.where(ready, 1., -1.)
         tactics = jp.stack([jp.where(hand, -1., punch), jp.where(hand, punch, -1.),
-                            jp.where(jax.random.bernoulli(aim_rng), 1., -1.), advance, 0., -1., -1.])
+                            jp.where(jax.random.bernoulli(aim_rng), 1., -1.), advance, 0., -1., -1., -1.])
         pause = jp.where(jax.random.bernoulli(pause_rng, .6),
                          jax.random.randint(wait_rng, (), 2, 12),
                          jax.random.randint(wait_rng, (), 20, 50))

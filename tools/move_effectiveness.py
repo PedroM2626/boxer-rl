@@ -27,7 +27,7 @@ def main():
     parser.add_argument("--reaches", type=float, nargs="+", default=[.62, .52])
     parser.add_argument("--defender-reach", type=float, default=.62,
                         help="distance the scripted defender holds; lower it to test infighting")
-    parser.add_argument("--moves", nargs="+", default=["straight", "hook"], choices=["straight", "hook"])
+    parser.add_argument("--moves", nargs="+", default=["straight", "hook"], choices=["straight", "hook", "uppercut"])
     parser.add_argument("--output", type=Path, default=Path("runs/moves/effectiveness.json"))
     args = parser.parse_args()
     foundation = UnassistedG1("spar")
@@ -35,7 +35,7 @@ def main():
     pair = PairedFoundation(foundation)
     rows = []
     for reach in args.reaches:
-        for move in [dict(straight=moves.STRAIGHT, hook=moves.HOOK)[m] for m in args.moves]:
+        for move in [dict(straight=moves.STRAIGHT, hook=moves.HOOK, uppercut=moves.UPPERCUT)[m] for m in args.moves]:
             for high in (False, True):
                 landed = thrown = fell = 0
                 for seed in args.seeds:
@@ -46,7 +46,7 @@ def main():
                     landed += result["clean_punches"][0]
                     thrown += result["punches_thrown"][0]
                     fell += result["fallen"][0]
-                row = dict(reach=reach, defender_reach=args.defender_reach, move="hook" if move == moves.HOOK else "straight",
+                row = dict(reach=reach, defender_reach=args.defender_reach, move={moves.STRAIGHT: "straight", moves.HOOK: "hook", moves.UPPERCUT: "uppercut"}[move],
                            defender_guard="high" if high else "normal", bouts=len(args.seeds),
                            thrown=thrown, landed=landed, land_rate=landed / max(thrown, 1),
                            attacker_falls=int(fell))

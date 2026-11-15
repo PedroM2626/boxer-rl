@@ -7,7 +7,7 @@ import pytest
 from boxer import moves
 from boxer.curriculum_train import load_policy_params
 from boxer.spar_match import PunchArm
-from boxer.tactics_env import ACTION_SIZE, OBS_SIZE, REACH, TacticsEnv, decode, observe
+from boxer.tactics_env import ACTION_SIZE, OBS_SIZE, REACH, TacticsEnv, decode, observe, observe_tactics
 
 
 def bodies(rng):
@@ -28,8 +28,10 @@ def test_observation_and_decoding_match_between_numpy_and_jax():
         native = observe(np, own, opp, arm, other, clock)
         batched = observe(jp, *(jax.tree.map(jp.asarray, (own, opp))), jp.asarray(arm),
                           jp.asarray(other), jp.asarray(clock))
-        assert native.shape == (OBS_SIZE,)
+        assert native.shape == (32,)                 # the striker and whole body read these 32
         np.testing.assert_allclose(native[26:30], [arm[4], arm[5], other[4], other[5]])
+        full = observe_tactics(np, own, opp, np.append(arm, .7), other, clock)
+        assert full.shape == (OBS_SIZE,) and np.allclose(full[:32], native) and list(full[32:]) == [.7, 0.]
         np.testing.assert_allclose(native, np.asarray(batched), rtol=1e-5, atol=1e-5)
         tactics = rng.uniform(-1.5, 1.5, ACTION_SIZE)
         distance, local = np.linalg.norm(opp["pos"] - own["pos"]), own["rot"].T @ (opp["pos"] - own["pos"])
@@ -55,8 +57,8 @@ def test_native_arm_features_follow_a_punch():
     np.testing.assert_allclose(arm.features(), 0)
     arm.launch(1, .25, np.random.default_rng(0))
     arm.actions()
-    age, active, hand, aim, hook, high = arm.features()
-    assert 0 < age < 1 and active == 1 and hand == 1 and aim == .25 and hook == 0 and high == 0
+    age, active, hand, aim, hook, high, uppercut = arm.features()
+    assert 0 < age < 1 and active == 1 and hand == 1 and aim == .25 and hook == 0 and high == 0 and uppercut == 0
     arm = PunchArm(np.zeros(29), .5, .02)
     arm.launch(0, 1., np.random.default_rng(0), moves.HOOK)
     arm.actions(high=True)
@@ -80,7 +82,7 @@ def test_native_arms_hold_the_high_guard_and_hook_through_the_wind_up():
 
 
 def test_moves_match_between_numpy_and_jax():
-    for move in (moves.STRAIGHT, moves.HOOK):
+    for move in (moves.STRAIGHT, moves.HOOK, moves.UPPERCUT):
         for age in (0., 3.4, 7., 12.5, 20.):
             for high in (False, True):
                 rest = moves.rest_pose(np, np.array([-.2, .1, .1, -.5]), high)
@@ -185,13 +187,14 @@ def test_decode_stops_circling_and_turns_when_facing_away():
 def test_widened_pre_ring_policy_acts_like_the_original():
     from boxer.tactics_env import policy_sizes, tactics_policy, widen_legacy
     before_ring = load_policy_params("checkpoints/tactics-levelhook-v1")[0]
-    assert policy_sizes(before_ring) == (30, ACTION_SIZE)
-    wide = widen_legacy(before_ring)
+    assert policy_sizes(before_ring) == (30, 7)
+    wide = widen_legacy(before_ring, new_mean=-.5)
     assert policy_sizes(wide) == (OBS_SIZE, ACTION_SIZE)
     obs = jax.random.normal(jax.random.PRNGKey(0), (16, OBS_SIZE))
     a, _ = tactics_policy(before_ring, True)(obs, jax.random.PRNGKey(1))
     b, _ = tactics_policy(wide, True)(obs, jax.random.PRNGKey(1))
-    np.testing.assert_allclose(np.asarray(a), np.asarray(b), atol=1e-5)
+    np.testing.assert_allclose(np.asarray(a)[:, :7], np.asarray(b)[:, :7], atol=1e-5)
+    assert np.all(np.asarray(a)[:, 7] == -1) and np.allclose(np.asarray(b)[:, 7], np.tanh(-.5), atol=1e-5)
 
 
 def test_ring_observation_points_to_the_centre():
@@ -199,3 +202,22 @@ def test_ring_observation_points_to_the_centre():
     opp = dict(own, pos=np.array([0., 0.]))
     obs = observe(np, own, opp, np.zeros(6), np.zeros(6), .5)
     np.testing.assert_allclose(obs[-2:], [-.5, 0.])
+
+
+def test_uppercut_is_chosen_by_its_own_switch_and_rises_to_the_centre_line():
+    def move(hook, upper):
+        return decode(np.array([1, -1, 1, 0, 0, hook, -1, upper]), .6, np.array([.6, 0.]))[4]
+    assert move(-1, 1) == move(.2, .5) == moves.UPPERCUT
+    assert move(.5, .2) == moves.HOOK and move(-1, -1) == moves.STRAIGHT
+    assert decode(np.array([1, -1, 1, 0, 0, -1, -1]), .6, np.array([.6, 0.]))[4] == moves.STRAIGHT  # 7 outputs: no uppercut
+    extend, retract = moves.durations(np, moves.UPPERCUT, .02)
+    assert (extend, retract) == pytest.approx((11., 13.))
+    target = moves.strike_pose(np, moves.UPPERCUT, 1.)
+    rest = np.zeros(4)
+    dip = moves.punch_pose(np, moves.UPPERCUT, 1., target, moves.DIP_FRACTION * extend - 1, rest, .02)
+    np.testing.assert_allclose(dip, moves.UPPERCUT_PATH_HEAD[0], atol=1e-9)
+    np.testing.assert_allclose(moves.punch_pose(np, moves.UPPERCUT, 1., target, extend - 1, rest, .02), target)
+    arm = PunchArm(np.zeros(29), .5, .02)
+    arm.launch(1, 1., np.random.default_rng(0), moves.UPPERCUT)
+    arm.actions()
+    assert arm.features()[6] == 1 and arm.features()[4] == 0
