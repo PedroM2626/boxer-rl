@@ -492,7 +492,7 @@ JSONs are in `runs/tactics/eval/`.
   The clinch sensor rarely fires (torso capsules barely touch), so the clinch
   penalty never acts. A distance floor or a penalty on arm/shoulder contacts
   would.
-* **Move set.** Only straight punches and footwork. Hooks, uppercuts and
-  guard/block primitives must first go into the `spar` generator, so the motor
-  learns to balance through them.
+* **Move set.** Hooks, the high guard (2026-10-31) and the uppercut
+  (2026-11-15) are in ([moves](moves.md)); the learned tactics still throw
+  almost only straights.
 * **Bouts end at the first knockdown.** Standing back up is not trained.

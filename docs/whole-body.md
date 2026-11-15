@@ -400,8 +400,10 @@ The scorecard now also counts the punches a boxer stops
 (`PairedFoundation`'s `blocked`, `defense.MissTracker`):
 
 - *blocked*: a fist lands on the opponent's arms or gloves under the clean
-  punch rules (it may include fist-on-glove clashes; they are not
-  separated yet);
+  punch rules;
+- *clashed* (since 2026-11-15): the same contact, but the glove it hits is
+  itself punching: moving toward the attacker's torso at 0.3 m/s or more,
+  relative to its own torso. Clashes no longer count as blocks;
 - *missed*: a fist drives at the head or torso (closing at 1 m/s or faster,
   within 0.35 m), comes within 0.10 m of it and pulls back without touching
   a target or the guard;
@@ -477,7 +479,8 @@ itself). Evasions stay at 1 to 8 a bout.
 - Defense that also stays up: run 13 blocks and evades more (92 % of the
   champion's punches defended) but falls 92 times against itself in 32
   bouts; run 14, paying defense only after 1.5 s standing, falls 32 times
-  but defends less (78 %). Slips are rare; telling blocks from glove
-  clashes is not done.
+  but defends less (78 %). Slips are rare. Clashes are now counted apart
+  from blocks; re-scored, `whole-body-style` still defends 83 % of the
+  champion's punches (238 blocks and 27 clashes a bout).
 - Getting up inside the whole-body policy itself. Now a separate get-up
   policy takes over while the boxer is down ([get-up](getup.md)).

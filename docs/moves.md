@@ -262,3 +262,80 @@ the guard. Under this scorecard and these moves, hooks are not worth
 learning. Making them matter would mean changing the game: e.g. a guard that
 actually covers the torso front so only angled punches get through, or a
 richer target (head shots within reach at closer range).
+
+## Uppercut (2026-11-15)
+
+### The move
+
+`UPPERCUT` joins `STRAIGHT` and `HOOK` in `boxer/moves.py`. The fist dips
+first (35 % of the extension, `DIP_FRACTION`), then rises along a line to
+the target, palm up and elbow tucked. Its waypoints come from IK along that
+line (`tools/fit_moves.py --uppercut`: target = dip + (strike − dip)·[t², t,
+t^0.7], elbow aimed 0.17 m below the fist).
+
+| Path | Timing | Fist at the end (torso frame) |
+| --- | --- | --- |
+| Head | 0.22 s out, 0.26 s back | x 0.34, z 0.42 m |
+| Body | 0.22 s out, 0.26 s back | x 0.37, z 0.22 m |
+
+The hook and the uppercut share the curved-path code (`curved_out`). The
+`checkpoints/spar` motor already balances through it: no attacker fell in
+the scripted bouts below, so the motor was not retrained.
+
+### Is it worth throwing? (scripted)
+
+`tools/move_effectiveness.py --moves straight hook uppercut`: a scripted
+attacker throws only one kind of punch at a scripted defender (reach 0.62 m)
+holding the normal or the high guard; 8 bouts of 20 s per row
+(`runs/upper_eff.sh`). Share of thrown punches that land clean:
+
+| Attacker reach | Straight, normal / high guard | Hook, normal / high | Uppercut, normal / high |
+| --- | --- | --- | --- |
+| 0.62 m | 13.7 % / 0 % | 2.7 % / 1.3 % | 3.6 % / **8.4 %** |
+| 0.52 m | 25.3 % / 1.7 % | 7.1 % / 3.0 % | 5.9 % / **10.1 %** |
+| 0.45 m | 42.9 % / 1.5 % | 17.6 % / 20.4 % | 17.2 % / 18.3 % |
+
+Against a held high guard the uppercut is the only punch that lands from
+range. Against the normal guard the straight lands two to seven times more
+often at every distance.
+
+### Tactics interface
+
+Tactics grow from 7 to 8 actions: output 8 picks the uppercut when positive
+and at least the hook output. The tactics observation (`observe_tactics`)
+grows from 32 to 34 with both corners' "uppercut in flight" flags, appended
+at the end. `observe` stays at 32 because the striker and whole-body inputs
+are built on it. Older 7-action policies are padded with −1 (never an
+uppercut). `widen_legacy --new-action-mean` sets the starting mean of the
+new output.
+
+### Training
+
+Two native fine-tunes from `checkpoints/tactics`, 2M steps each. Settings:
+
+- pool: the champion, the level-hook and high-guard champions, and the striker;
+- 30 % scripted bouts, 60 % of those with a held high guard;
+- learning rate 3e-5, ring and arm skill on;
+- gate: 8 short-gate candidates, then 4 long checks against the champion and the striker.
+
+| Run | Extra | Uppercut share while training | Gate pick (1.5M): long vs champion, vs striker | Confirmation, 48 bouts |
+| --- | --- | --- | --- | --- |
+| 1 (`runs/tactics_upper1.sh`) | start mean −0.3, 0.1 per change of punch kind (`--variety-reward`) | 11 % → about 2 % | 4–12, knockdowns 6 : 7; 0–16 | 24–20–4 |
+| 2 (`runs/tactics_upper2.sh`) | start mean 0, 1 per clean punch landing within 2 s of a clean punch of another kind (`--combo-reward`) | 49 % at the start → 0–7 % | **13–2–1**, 174 : 162, knockdowns 5 : 6; 2–14 | **28–11–9** |
+
+For reference, the champion loses 0–32 to the striker over 120 s.
+
+**The learned tactics never throw the uppercut.** The training share comes
+from exploration noise. Played deterministically, run 2's pick throws 0
+uppercuts in its 120 s checks and in the confirmation. Run 2's pick is
+still a better straight-and-footwork tactic: it beats the champion
+28–11–9 and wins 13–2–1 in 120 s bouts. It is kept as
+`checkpoints/tactics-upper-v1` and not promoted, so the champion and all
+earlier comparisons stay as they are.
+
+This is the same result as for the hook. Under this scorecard the opponents
+rarely hold the high guard long enough for the uppercut to pay, and the
+straight is faster and lands more. Making uppercuts matter would need:
+
+- opponents that hold the high guard more;
+- or a scorecard that pays for punches that get through a guard.

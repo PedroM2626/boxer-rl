@@ -18,7 +18,7 @@ historical record.
 | Ring | 4 m roped ring scaled to the G1; ring-trained champion: 14–2 and 2 knockdowns in 16 bouts of 120 s, ropes touched 0.6 s per boxer ([tactics](tactics.md#roped-ring-2026-10-31)) |
 | Knockdowns | Referee rules: a knockdown is counted and the bout restarts; 3 knockdowns is a TKO. 180 s bouts: 10 knockdowns in 16, all went the distance. The robots cannot get up unaided ([tactics](tactics.md#knockdown-rules-2026-10-31)) |
 | Learned punches | Arm skill corrects each punch toward the real target: 39–4–5 over 48 bouts with identical tactics, landing 41 % → 50 % ([arm skill](arm-skill.md)) |
-| Hooks, uppercuts, slips | Hooks implemented but unused by the policy; uppercuts and slips outstanding |
+| Hooks, uppercuts, slips | Hooks and uppercuts implemented; the learned tactics use neither, since straights land more under this scorecard ([moves](moves.md#uppercut-2026-11-15)); slips outstanding |
 
 Reviewed 2026-10-29. **Approximately 40%** is a subjective estimate of demonstrated
 functional scope, not a measured learning-convergence percentage, fraction of
