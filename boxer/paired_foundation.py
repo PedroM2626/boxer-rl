@@ -38,6 +38,15 @@ ROPE_CONTACTS = (scene.HAND_GEOMS + scene.FOREARM_GEOMS + scene.UPPER_TARGET_GEO
 
 
 PUNCH_IMPULSE_ENV = 'BOXER_PUNCH_IMPULSE'
+FIXED_CLOCK_ENV = 'BOXER_FIXED_CLOCK'
+
+
+def bout_clock(step, steps):
+    """The bout clock policies observe: the share of the bout gone, or the
+    value in ``BOXER_FIXED_CLOCK`` all bout. Policies trained on 20 s episodes
+    learned late-episode habits from the clock; a fixed one removes them."""
+    fixed = os.environ.get(FIXED_CLOCK_ENV)
+    return float(fixed) if fixed else step / steps
 ARMS = slice(15, 29)          # both arms' actuators of one G1 (after legs and waist)
 
 

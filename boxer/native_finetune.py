@@ -36,6 +36,12 @@ from boxer import moves
 REWARD = dict(hit=2.0, taken=1.5, opponent_fell=5.0, in_range=.3, punch=.02, blocked=0., evaded=0.)
 
 
+def bout_clock(step, steps):
+    """``paired_foundation.bout_clock``, imported late like the rest of the physics."""
+    from boxer.paired_foundation import bout_clock as clock
+    return clock(step, steps)
+
+
 def guard_closeness(arm, width=.3):
     """1 with both arm targets on the guard or high guard pose, falling off over ``width`` rad."""
     poses = np.asarray(arm.arm_pose)
@@ -200,14 +206,14 @@ class NativeBout:
         from boxer.tactics_env import observe_tactics
         if self.whole_body:
             from boxer.whole_body import whole_body_observe
-            return whole_body_observe(self.pair, self.learner, self.arms, self.t / self.episode_steps)
+            return whole_body_observe(self.pair, self.learner, self.arms, bout_clock(self.t, self.episode_steps))
         if self.striker:
             from boxer.striker import striker_observe
-            return striker_observe(self.pair, self.learner, self.arms, self.t / self.episode_steps)
+            return striker_observe(self.pair, self.learner, self.arms, bout_clock(self.t, self.episode_steps))
         bodies = [_body(self.pair, k) for k in range(2)]
         i = self.learner
         return observe_tactics(np, bodies[i], bodies[1 - i], self.arms[i].features(),
-                       self.arms[1 - i].features(), self.t / self.episode_steps).astype(np.float32)
+                       self.arms[1 - i].features(), bout_clock(self.t, self.episode_steps)).astype(np.float32)
 
     def step(self, tactics):
         from boxer.curriculum_env import LEFT_ARM
@@ -248,7 +254,7 @@ class NativeBout:
                     self.last_move = punch[2]
             elif hasattr(self.opponent, "decide_pair"):
                 command, punch, high[k] = self.opponent.decide_pair(
-                    pair, k, self.arms, self.t / self.episode_steps)
+                    pair, k, self.arms, bout_clock(self.t, self.episode_steps))
             else:
                 command, punch = self.opponent.decide(distance, local, self.arms[k])
                 high[k] = self.opponent.high
@@ -533,6 +539,8 @@ def main(argv=None):
     parser.add_argument("--learning-rate", type=float, default=1e-4)
     parser.add_argument("--new-action-mean", type=float, default=0.,
                         help="tactics: mean of actions an older policy lacks (the uppercut switch) when widened")
+    parser.add_argument("--fixed-clock", type=float,
+                        help="hold the bout clock every policy observes at this value (paired_foundation.bout_clock)")
     parser.add_argument("--punch-impulse", type=float,
                         help="power rule for training and gate bouts: impulse (N s) a clean punch must "
                              "carry (default 0.5, ImpactScorecard)")
@@ -592,6 +600,9 @@ def main(argv=None):
                         help="with --mirror-bank: the policy those states came from, the opponent in those bouts")
     parser.add_argument("--seed", type=int, default=0)
     args = parser.parse_args(argv)
+    if args.fixed_clock is not None:
+        from boxer.paired_foundation import FIXED_CLOCK_ENV
+        os.environ[FIXED_CLOCK_ENV] = str(args.fixed_clock)
     if args.punch_impulse is not None:
         from boxer.paired_foundation import PUNCH_IMPULSE_ENV
         os.environ[PUNCH_IMPULSE_ENV] = str(args.punch_impulse)

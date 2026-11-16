@@ -43,7 +43,7 @@ import numpy as np
 from boxer import moves
 from boxer.curriculum_env import LEFT_ARM, UnassistedG1
 from boxer.curriculum_train import inference, load_policy_params
-from boxer.paired_foundation import PairedFoundation
+from boxer.paired_foundation import PairedFoundation, bout_clock
 
 KNOCKDOWN_POINTS = 10
 COUNT_STEADY = .5          # seconds standing that end the referee's count
@@ -326,7 +326,7 @@ def _bout(pair, motor, seed, seconds, record, brains, knockdowns, arm_skills, fr
             local = rotation[:2, :2].T @ delta
             turned_away[i] += abs(np.arctan2(local[1], local[0])) > np.pi / 4
             if hasattr(brains[i], 'decide_pair'):
-                command, punch, high[i] = brains[i].decide_pair(pair, i, arms, t / steps)
+                command, punch, high[i] = brains[i].decide_pair(pair, i, arms, bout_clock(t, steps))
             else:
                 command, punch = brains[i].decide(float(np.linalg.norm(delta)), local, arms[i])
                 high[i] = getattr(brains[i], 'high', False)
@@ -560,6 +560,8 @@ def main(argv=None):
                         help='with --getup: metres apart the referee sets the boxers after a count (0: where they are)')
     parser.add_argument('--mandatory-count', type=float, default=MANDATORY_COUNT,
                         help='with --getup: seconds after a knockdown before boxing resumes, even if up')
+    parser.add_argument('--fixed-clock', type=float,
+                        help='hold the bout clock the policies observe at this share of the bout')
     parser.add_argument('--punch-impulse', type=float,
                         help='power rule: impulse (N s) a clean punch must carry (default 0.5)')
     parser.add_argument('--stamina', type=float, nargs='+', metavar='VALUE',
@@ -568,6 +570,10 @@ def main(argv=None):
     parser.add_argument('--swap', action='store_true',
                         help='also play every seed with the tactics exchanged between corners')
     args = parser.parse_args(argv)
+    if args.fixed_clock is not None:
+        import os
+        from boxer.paired_foundation import FIXED_CLOCK_ENV
+        os.environ[FIXED_CLOCK_ENV] = str(args.fixed_clock)
     if args.punch_impulse is not None:
         import os
         from boxer.paired_foundation import PUNCH_IMPULSE_ENV

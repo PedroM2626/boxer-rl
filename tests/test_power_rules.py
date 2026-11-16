@@ -32,3 +32,11 @@ def test_stamina_drains_with_arm_power_refills_at_rest_and_weakens_tired_arms(fo
     pair.reset(randomized=False)                     # a new bout: fresh arms
     for a, g in zip(pair.arm_actuators, gains):
         np.testing.assert_allclose(pair.model.actuator_gainprm[a, 0], g)
+
+
+def test_a_fixed_clock_holds_for_training_and_matches(monkeypatch):
+    from boxer.native_finetune import bout_clock as training_clock
+    from boxer.paired_foundation import FIXED_CLOCK_ENV, bout_clock
+    assert bout_clock(30, 120) == training_clock(30, 120) == .25
+    monkeypatch.setenv(FIXED_CLOCK_ENV, '.5')
+    assert bout_clock(30, 120) == bout_clock(110, 120) == training_clock(5, 1000) == .5
