@@ -654,10 +654,18 @@ meaningless, and the bout does not look like boxing.
   but defends less (78 %). Slips are rare. Clashes are now counted apart
   from blocks; re-scored, `whole-body-style` still defends 83 % of the
   champion's punches (238 blocks and 27 clashes a bout).
-- Strong and boxing, and staying up against itself: `whole-body-power` beats
-  run 6 19–13 under the power rule with a boxing rhythm. Against itself it
-  falls when the bout clock nears the end (52 knockdowns in 32 bouts; 14 with
-  the clock held at 0.5). With the clock held, a standoff against itself is
-  still open: neither boxer attacks.
+- Strong and boxing, and staying up against itself. This line closed on
+  2026-11-16 with `whole-body-power` played with the clock held at 0.5
+  (`--punch-impulse 2 --fixed-clock .5`) as the result. It beats run 6 26–6
+  and the champion 32–0, at about two clean punches a second and a third of
+  the time in pauses against run 6, and it falls 14 times in 32 bouts against
+  itself. Still open:
+  - a standoff against itself: in 9 of the 16 mirror pairings neither boxer
+    attacks;
+  - falls and passivity against the striker with the clock held (15
+    knockdowns to 6).
+
+  The passivity warning (runs 20, 21) and training against itself (run 22)
+  each fixed one side and broke the other.
 - Getting up inside the whole-body policy itself. Now a separate get-up
   policy takes over while the boxer is down ([get-up](getup.md)).

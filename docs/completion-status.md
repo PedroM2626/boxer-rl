@@ -19,6 +19,7 @@ historical record.
 | Knockdowns | Referee rules: a knockdown is counted and the bout restarts; 3 knockdowns is a TKO. 180 s bouts: 10 knockdowns in 16, all went the distance. The robots cannot get up unaided ([tactics](tactics.md#knockdown-rules-2026-10-31)) |
 | Learned punches | Arm skill corrects each punch toward the real target: 39–4–5 over 48 bouts with identical tactics, landing 41 % → 50 % ([arm skill](arm-skill.md)) |
 | Hooks, uppercuts, slips | Hooks and uppercuts implemented; the learned tactics use neither, since straights land more under this scorecard ([moves](moves.md#uppercut-2026-11-15)); slips outstanding |
+| Strong and boxing | `whole-body-power` with a clean punch needing 2 N s and the bout clock held: beats run 6 26–6 and the champion 32–0 at about two clean punches a second and a third of the time paused; mirror standoff and striker falls open ([whole body](whole-body.md#punches-with-weight-runs-15-to-18-whole-body-power-kept)) |
 
 Reviewed 2026-10-29. **Approximately 40%** is a subjective estimate of demonstrated
 functional scope, not a measured learning-convergence percentage, fraction of
