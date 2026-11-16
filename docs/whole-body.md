@@ -542,6 +542,55 @@ punches thrown. Two counter-punchers wait, and the policy, trained on
 Videos: `fights/power_vs_run6_60s.mp4` (seed 0, 123 : 124, run 6 down at
 3.7 s) and `fights/power_vs_itself_60s.mp4` (seed 0, 99 : 83, one knockdown).
 
+### Why it falls against itself: the bout clock
+
+`tools/mirror_trace.py` records both boxers every control step. In
+`whole-body-power`'s mirror bouts (seeds 0 and 1, 120 s), none of the four
+knockdowns involves contact or a punch. The two stand about 0.75 m apart for
+a minute and a half. Then one backs away, speeding up from 0.1 to 0.9 m/s
+within a second, and falls.
+
+Every policy observes the bout clock, `[share of the bout gone, 1 − that]`
+(`tactics_env.observe`). Training episodes last 20 s. Knockdowns with no
+exchange come at the same share of the bout, whatever its length (6 mirror
+bouts per length):
+
+| Bout | Late knockdowns | Share of the bout |
+| --- | --- | --- |
+| 60 s | 44–55 s | 0.74–0.91 |
+| 120 s | 90–117 s | 0.75–0.98 |
+| 240 s | 178–239 s | 0.74–1.0 |
+
+The policy learned a habit for the end of an episode: back off. Seed 0 falls
+at 92.6 s in a 120 s bout and never in 240 s.
+
+`--fixed-clock` (`spar_match`, `native_finetune`, through
+`BOXER_FIXED_CLOCK`, `paired_foundation.bout_clock`) holds the clock at one
+value for every policy. With the clock held at 0.5 and no retraining,
+32 bouts of 120 s under the power rule:
+
+| `whole-body-power` vs | Clock running | Clock held at 0.5 |
+| --- | --- | --- |
+| itself | 52 knockdowns | 14 knockdowns |
+| run 6 | 19–13, knockdowns 6 : 19 | **26–6**, 8 : 28 |
+| champion | 31–0–1 | 32–0, 307 : 4 |
+| striker | 32–0, knockdowns 9 : 20 | 21–2–9, **15 : 6**, 0.68 clean punches a second |
+
+Run 6 against itself does not improve (24 knockdowns in 32 bouts), so its
+mirror falls have another cause.
+
+Run 19 (`runs/wb_ppo19.sh`): run 16's recipe from `whole-body-power` with
+the clock held at 0.5 in training and gates. It fell less (3–10 knockdowns
+in 16 long bouts against `whole-body-power`), but neither boxer attacked:
+0.0–0.4 clean punches a second, 85–100 % paused, mostly draws. Against run 6
+its best step went 9–7 with knockdowns 6 : 5. Rejected.
+
+**Left open: the standoff.** Against an opponent like itself, waiting
+pays. The rhythm terms make a punch taken cost more than one landed, and
+nothing rewards staying active. In nine of the 16 mirror pairings with the
+clock held, neither boxer throws a punch. That makes the fall test
+meaningless, and the bout does not look like boxing.
+
 ## What is open
 
 - Mirror bouts: run 6 falls 16 times in 32 bouts against itself (run 5: 0),
@@ -562,7 +611,9 @@ Videos: `fights/power_vs_run6_60s.mp4` (seed 0, 123 : 124, run 6 down at
   from blocks; re-scored, `whole-body-style` still defends 83 % of the
   champion's punches (238 blocks and 27 clashes a bout).
 - Strong and boxing, and staying up against itself: `whole-body-power` beats
-  run 6 19–13 under the power rule with a boxing rhythm, but against itself it
-  waits and falls (52 knockdowns in 32 bouts, most after 85 s).
+  run 6 19–13 under the power rule with a boxing rhythm. Against itself it
+  falls when the bout clock nears the end (52 knockdowns in 32 bouts; 14 with
+  the clock held at 0.5). With the clock held, a standoff against itself is
+  still open: neither boxer attacks.
 - Getting up inside the whole-body policy itself. Now a separate get-up
   policy takes over while the boxer is down ([get-up](getup.md)).
