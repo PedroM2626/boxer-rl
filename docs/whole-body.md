@@ -607,6 +607,28 @@ In training, both land about as often as run 19 (23–27 clean punches per
 is one of eight pool opponents, in 20 s episodes where the two seldom
 settle into it.
 
+### Training against itself (run 22, not promoted)
+
+Run 22 (`runs/wb_ppo22.sh`): run 21 from `whole-body-power`, with
+`whole-body-power` as 4 of the 8 pool entries (about 45 % of bouts),
+60 s episodes and 10 % scripted bouts. Its 0.375M step is the first to
+pass every long check, the mirror check included. Each 120 s check is 16
+bouts:
+
+| 0.375M vs | W–L–D | Clean punches | Knockdowns | Clean punches a second / paused |
+| --- | --- | --- | --- | --- |
+| itself | 8–4–4 | 104 : 90 | 0 : 2 | |
+| `whole-body-power` | 3–6–7 | 23 : 36 | 1 : 4 | 0.19 / 93 % |
+| run 6 | 1–15 | 42 : 71 | 2 : 9 | 0.35 / 89 % |
+| champion | 16–0 | 227 : 1 | 0 : 0 | 1.89 / 21 % |
+| striker | 15–0–1 | 191 : 4 | 2 : 8 | 1.67 / 39 % |
+| 48 bouts of 20 s vs `whole-body-power` (confirmation) | 6–11–31 | 2.6 : 3.2 | 8 falls | |
+
+Against itself it boxes and stays up. Against the other whole-body policies
+it waits, and it loses to run 6. Later steps fall more: 13 knockdowns in
+16 short-gate bouts at 0.875M and 1.0M. It does not beat
+`whole-body-power` and was not promoted.
+
 **Left open: the standoff.** Against an opponent like itself, waiting
 pays. The rhythm terms make a punch taken cost more than one landed, and
 nothing rewards staying active. In nine of the 16 mirror pairings with the
