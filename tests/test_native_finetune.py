@@ -203,3 +203,23 @@ def test_combo_pays_a_landed_punch_of_another_kind_soon_after_the_last():
     assert bout.combo(1., None, 4.6) == 0.                     # no punch in flight
     bout.reset()
     assert bout.last_landed[0] is None
+
+
+def test_idle_penalty_warns_a_learner_that_waits_in_range():
+    from boxer.native_finetune import NativeBout
+
+    class Pair:
+        pose, action_scale, dt = np.zeros(29), 1., .02
+
+        def reset(self, seed):
+            pass
+
+    bout = NativeBout(Pair(), None, np.random.default_rng(0), [], 1., 10, 30., style=dict(idle=1.))
+    assert bout.idle(False, .8, 1.) == 0.        # the bout's first 2 s are free
+    assert bout.idle(False, .8, 2.5) == 1.       # in range, nothing thrown for 2.5 s
+    assert bout.idle(False, 1.5, 2.5) == 0.      # out of range: no warning
+    assert bout.idle(True, .8, 3.) == 0.         # a punch resets it
+    assert bout.idle(False, .8, 4.9) == 0.
+    assert bout.idle(False, .8, 5.1) == 1.
+    bout.reset()
+    assert bout.last_attack == 0.

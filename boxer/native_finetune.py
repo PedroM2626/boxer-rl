@@ -99,7 +99,10 @@ class NativeBout:
         ``variety``: reward when a tactics learner launches a punch of another
         kind (straight, hook, uppercut) than its last one. ``combo``: reward
         when a tactics learner's clean punch lands within ``combo_window``
-        seconds of a clean punch of another kind (``combo``)."""
+        seconds of a clean punch of another kind (``combo``). ``idle``: reward
+        lost per second the learner, within ``idle_range`` metres of the
+        opponent, has launched no punch for ``idle_seconds`` (``idle``): the
+        referee's warning for passivity."""
         from boxer.spar_match import PunchArm
         self.pair, self.motor, self.rng = pair, motor, rng
         self.arm_skill, self.leg_contact_penalty = arm_skill, leg_contact_penalty
@@ -121,6 +124,9 @@ class NativeBout:
         self.variety_reward = (style or {}).get("variety", 0.)
         self.combo_reward = (style or {}).get("combo", 0.)
         self.combo_window = (style or {}).get("combo_window", 2.)
+        self.idle_penalty = (style or {}).get("idle", 0.)
+        self.idle_seconds = (style or {}).get("idle_seconds", 2.)
+        self.idle_range = (style or {}).get("idle_range", 1.2)
         self.reset()
 
     def learner_fall_penalty(self):
@@ -165,6 +171,14 @@ class NativeBout:
         self.last_move = None
         self.last_landed = (None, -np.inf)
         self.pending_defense = []
+        self.last_attack = 0.
+
+    def idle(self, launched, distance, now):
+        """1 while the learner stands within ``idle_range`` of the opponent and
+        has launched no punch for more than ``idle_seconds``, else 0."""
+        if launched:
+            self.last_attack = now
+        return float(distance < self.idle_range and now - self.last_attack > self.idle_seconds)
 
     def combo(self, hits, move, now):
         """1 when a clean punch of kind ``move`` lands within ``combo_window``
@@ -292,6 +306,8 @@ class NativeBout:
                   + pair.dt * REWARD["in_range"] * np.exp(-((distance - REACH) / .15) ** 2)
                   + pair.dt * self.guard_reward * guard
                   + defense + self.variety_reward * varied + self.combo_reward * combo
+                  - pair.dt * self.idle_penalty * (self.idle(launched, distance, (self.t + 1) * pair.dt)
+                                                   if self.idle_penalty else 0.)
                   - REWARD["punch"] * launched - pair.dt * self.leg_contact_penalty * legs
                   - self.arm_motion_cost * motion - pair.dt * self.tilt_cost * tilt)
         self.t += 1
@@ -546,6 +562,9 @@ def main(argv=None):
                              "carry (default 0.5, ImpactScorecard)")
     parser.add_argument("--combo-reward", type=float, default=0.,
                         help="tactics: reward for a clean punch landing within 2 s of a clean punch of another kind")
+    parser.add_argument("--idle-penalty", type=float, default=0.,
+                        help="reward lost per second the learner stays within 1.2 m without launching a punch "
+                             "for 2 s (NativeBout.idle)")
     parser.add_argument("--variety-reward", type=float, default=0.,
                         help="tactics: reward for a punch of another kind than the last one")
     parser.add_argument("--entropy-cost", type=float, default=1e-3)
@@ -669,7 +688,7 @@ def main(argv=None):
                                    blocked=args.block_reward, evaded=args.evade_reward,
                                    hit_cooldown=args.hit_cooldown, guard=args.guard_reward,
                                    defense_hold=args.defense_hold, variety=args.variety_reward,
-                                   combo=args.combo_reward).items() if v is not None}
+                                   combo=args.combo_reward, idle=args.idle_penalty).items() if v is not None}
     pipes, processes = [], []
     for w in range(args.workers):
         parent, child = context.Pipe()
