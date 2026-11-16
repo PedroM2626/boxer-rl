@@ -463,6 +463,85 @@ against run 13's 92 % and `whole-body-style`'s 83 %). Neither run defends
 better and stays up as well as `whole-body-style` (10 knockdowns against
 itself). Evasions stay at 1 to 8 a bout.
 
+## Punches with weight (runs 15 to 18, `whole-body-power` kept)
+
+Goal: a policy that is strong and also boxes, with rhythm, pauses and a
+guard instead of volume.
+
+### Why run 6 wins: volume of light punches
+
+Each scored punch now records its speed at contact onset and its impulse
+over the 80 ms contact window (`ImpactScorecard.log`). 60 s bouts against
+the champion (median, 10th to 90th percentile):
+
+| Boxer | Clean punches a second | Closing speed (m/s) | Impulse (N s) |
+| --- | --- | --- | --- |
+| run 6 | 3.4 | 3.8 (2.4–4.5) | 0.84 (0.56–3.0) |
+| champion, against run 6 | 1.0 | 1.05 (0.57–1.6) | 2.5 (1.3–4.2) |
+| `whole-body-style` | 1.7 | 2.1 (1.2–3.1) | 0.80 (0.54–4.9) |
+
+Run 6's punches are fast but light, just over the 0.5 N s the scorecard
+asks for. The champion's straights are slow but carry about three times the
+impulse. Those impulses are a lower bound: the log stops at the first break
+in contact.
+
+### Two rules, the same for both corners
+
+- **Power rule**, `--punch-impulse` (`spar_match`, `native_finetune`): the
+  impulse a clean punch must carry. It reaches training workers and gate
+  matches through `BOXER_PUNCH_IMPULSE`. All bouts below use 2 N s.
+- **Arm fatigue**, `--stamina JOULES WATTS [FLOOR]` (`paired_foundation.Stamina`):
+  arm actuator power drains an energy store and tired arms' position gains
+  drop toward the floor. Run 6 spends about 640 W on its arms and the
+  champion 370 W. With 2000 J and 400 W, run 6 settles at 56–65 % stamina:
+  weaker arms spend less power. It still lands 194 : 66 against the
+  champion in 60 s, so fatigue does not cut volume and was not used.
+
+Under the power rule alone (16 bouts of 120 s against the champion):
+
+| Boxer | W–L–D | Clean punches | Knockdowns | Clean punches a second / paused |
+| --- | --- | --- | --- | --- |
+| run 6 | 16–0 | 353 : 97 | 1 : 0 | 2.94 / 11 % |
+| `whole-body-style` | 16–0 | 167 : 34 | 3 : 0 | 1.39 / 49 % |
+| striker | 16–0 | 202 : 61 | 1 : 2 | 1.68 / 36 % |
+
+The rule trims run 6's count by about a fifth, but it is still the volume
+boxer. Against itself under the rule it falls 8 times in 16 bouts.
+
+### Runs
+
+All runs use the power rule in training and in the gate, the `--style-gate`
+and a mirror check (`--mirror-gate 8`).
+
+| Run | From | Change | Outcome |
+| --- | --- | --- | --- |
+| 15 (`runs/wb_ppo15.sh`) | run 6 | run 6's recipe | Stronger and brawlier: each long-gate candidate beats run 6 16–0, at 2.7–3.1 clean punches a second and 7–16 % paused. Rejected (style). |
+| 16 (`runs/wb_ppo16.sh`) | run 6 | plus run 12's rhythm terms (`--taken-penalty 2.5 --in-range-reward 0 --hit-cooldown .6 --guard-reward 1`) | 1.0M beats run 6 9–7 in the long gate at 2.01 a second, 31 % paused; rejected by 0.01 on rate and for falls. Kept as **`whole-body-power`**. |
+| 17 (`runs/wb_ppo17.sh`) | `whole-body-power` | itself in the pool, fall penalty 100, `--style-gate 2.5 .2` | Passive: against `whole-body-power` 0.0–0.1 clean punches a second, 97–100 % paused, 20–33 knockdowns in 16 bouts. Rejected. |
+| 18 (`runs/wb_ppo18.sh`) | `whole-body-power` | as 17, but fall penalty 60, a punch taken costs 2 like one landed, 60 s episodes | The same standoff: 84–98 % paused, 23–34 knockdowns in 16 bouts against `whole-body-power`. Rejected. |
+
+`whole-body-power` (run 16's 1.0M step), 32 bouts of 120 s under the power
+rule:
+
+| Matchup | W–L–D | Clean punches | Knockdowns | Clean punches a second / paused | Of the opponent's punches defended |
+| --- | --- | --- | --- | --- | --- |
+| vs champion | 31–0–1 | 281 : 7 | 2 : 0 | 2.34 / 18 % | 97 % |
+| vs run 6 | **19–13** | 232 : 233 | **6 : 19** | 1.96 / 33 % | 42 % |
+| vs striker | 32–0 | 144 : 10 | 9 : 20 | 1.20 / 60 % | |
+| vs itself | — | 29 : 28 | 52 in all | 0.25 / 91 % | |
+
+It beats every opponent, run 6 included, and against run 6 it boxes at about
+two clean punches a second with a third of the time in pauses. It also knocks
+run 6 down three times as often as it goes down. Against itself it breaks down: in 12 of the 16
+mirror pairings neither boxer lands more than 6 punches. Neither clinches
+(0 s of body contact). Most knockdowns come after 85 s with almost no
+punches thrown. Two counter-punchers wait, and the policy, trained on
+20 s episodes, falls after standing for a minute and a half. Runs 17 and
+18 put it in its own pool and learned that standoff instead of fixing it.
+
+Videos: `fights/power_vs_run6_60s.mp4` (seed 0, 123 : 124, run 6 down at
+3.7 s) and `fights/power_vs_itself_60s.mp4` (seed 0, 99 : 83, one knockdown).
+
 ## What is open
 
 - Mirror bouts: run 6 falls 16 times in 32 bouts against itself (run 5: 0),
@@ -482,5 +561,8 @@ itself). Evasions stay at 1 to 8 a bout.
   but defends less (78 %). Slips are rare. Clashes are now counted apart
   from blocks; re-scored, `whole-body-style` still defends 83 % of the
   champion's punches (238 blocks and 27 clashes a bout).
+- Strong and boxing, and staying up against itself: `whole-body-power` beats
+  run 6 19–13 under the power rule with a boxing rhythm, but against itself it
+  waits and falls (52 knockdowns in 32 bouts, most after 85 s).
 - Getting up inside the whole-body policy itself. Now a separate get-up
   policy takes over while the boxer is down ([get-up](getup.md)).

@@ -47,6 +47,14 @@ blocks 107 and evades 2. `defense_vs_itself_60s.mp4` (seed 0), 19 : 17 clean
 punches, three knockdowns (18.0 s, 29.7 s, 37.5 s): the falls that got it
 rejected ([whole body](../docs/whole-body.md#blocks-and-slips-runs-13-and-14-rejected)).
 
+### Punches with weight (2026-11-15)
+
+`whole-body-power` (run 16's 1.0M step, red) under the power rule (a clean
+punch must carry 2 N s), 60 s at 60 fps, knockdown rules (3), seed 0
+(`runs/wb_video16.sh`): `power_vs_run6_60s.mp4` (run 6 in blue), 123 : 124
+clean punches, run 6 down at 3.7 s; `power_vs_itself_60s.mp4`, 99 : 83, one
+knockdown at 8.0 s ([whole body](../docs/whole-body.md#punches-with-weight-runs-15-to-18-whole-body-power-kept)).
+
 ### Hits more, falls more (2026-11-14)
 
 `run11_vs_run6_120s.mp4` (and `.json`): run 11's 0.125M step (red, rejected,

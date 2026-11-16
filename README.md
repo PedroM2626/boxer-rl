@@ -130,7 +130,7 @@ bash tools/run_spar.sh boxer.spar_match --ring --seconds 120 --knockdowns 3 --se
 
 **Checkpoints.** Current: `whole-body`, `spar`, `spar-native`, `tactics`,
 `arm-skill`, `striker`, `getup` (gets a fallen G1 up). Also kept:
-`whole-body-style` (run 12: the champion's rhythm, falls more), `whole-body-v2` (the previous whole-body policy, run 5), `whole-body-v1` (run 3), `whole-body-clone`
+`whole-body-power` (run 16: beats run 6 under the power rule with a boxing rhythm, falls against itself), `whole-body-style` (run 12: the champion's rhythm, falls more), `whole-body-v2` (the previous whole-body policy, run 5), `whole-body-v1` (run 3), `whole-body-clone`
 (the whole-body policy's starting point, imitating the striker). Earlier, kept for comparison: `striker-v1` (first striker),
 `spar-v2` (rapid-punching legs), `spar-v1`, `spar-shorthook`,
 `spar-straight` (earlier spar motors), `tactics-arm-v1`, `tactics-ring-v1`,
@@ -187,6 +187,7 @@ since 2026-10-30, including the rejected ones.
 | 11-14 | Whole body: defense that stays up | Run 14: run 13 plus blocks and evasions paid only after 1.5 s standing (`--defense-hold`), fall penalty 100 against whole-body opponents, a mirror check. | Rejected (over the style limit): 0.25M falls 32 times against itself (run 13: 92) and 6 against the champion in 32 bouts, but defends 78 % of its punches (run 13: 92 %) at 2.06 clean punches/s ([details](docs/whole-body.md#blocks-and-slips-runs-13-and-14-rejected)). |
 | 11-14 | Whole body: starts before its own mirror falls | Run 11: `boxer.mirror_starts` keeps 333 states 0.5–3 s before run 6's falls against itself; 15 % of bouts start from one against run 6. | Rejected: its best step falls 56 times against itself (run 6: 16) and 21 vs run 6 (7). Run 6 stays. |
 | 11-15 | Uppercut | An uppercut move (dip, then a rising IK path) and an 8th tactics action. Clashes counted apart from blocks. Two native tactics fine-tunes with rewards for changing punch kind and for combinations. | Scripted, the uppercut lands best against a held high guard (8–10 % from range, straights 0–2 %). The learned tactics never throw it. Run 2's pick still beats the champion 28–11–9 and is kept as `tactics-upper-v1`, not promoted ([details](docs/moves.md#uppercut-2026-11-15)). |
+| 11-15 | Whole body: punches with weight | A power rule (a clean punch must carry 2 N s; run 6's median is 0.84, the champion's 2.5) and arm fatigue (not used: it does not cut volume). Runs 15–18 under the rule, with style and mirror checks. | Run 16's 1.0M, kept as `whole-body-power`, beats run 6 19–13 (knockdowns 6 : 19) at 1.96 clean punches/s and 33 % paused, and the champion and striker 31–0–1 and 32–0. It falls 52 times in 32 bouts against itself, mostly after 85 s of standoff; runs 17 and 18 did not fix it ([details](docs/whole-body.md#punches-with-weight-runs-15-to-18-whole-body-power-kept)). |
 
 ## Milestones since unassisted two-robot bouts (2026-10-30 onward)
 
