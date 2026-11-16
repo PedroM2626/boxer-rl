@@ -585,6 +585,28 @@ in 16 long bouts against `whole-body-power`), but neither boxer attacked:
 0.0–0.4 clean punches a second, 85–100 % paused, mostly draws. Against run 6
 its best step went 9–7 with knockdowns 6 : 5. Rejected.
 
+### A passivity warning (runs 20 and 21, rejected)
+
+`--idle-penalty` (`NativeBout.idle`): the learner loses reward per second
+while it stands within 1.2 m of the opponent and none of its punches has
+reached the opponent for 2 s. Both runs start from `whole-body-power` with
+run 19's recipe, `--idle-penalty 1`, and `whole-body-power` in the pool.
+
+- **Run 20** counted any launched punch as activity. Its 0.625M step stands
+  0.77 m from `whole-body-power` the whole bout, just out of reach: in active
+  mirror bouts they box at about 0.58 m. It throws at the air and lands
+  nothing (`tools/mirror_trace.py`, 60 s, 0 : 0). Rejected.
+- **Run 21** counts only punches that reach the opponent: clean, blocked,
+  clashed or a near miss. Against `whole-body-power` its long-gate
+  candidates still stand off: 0.02–0.33 clean punches a second, 86–99 %
+  paused, mostly draws. They lose to run 6 in 120 s bouts (1–15 to 3–13).
+  Rejected.
+
+In training, both land about as often as run 19 (23–27 clean punches per
+1000 steps). The standoff appears only against `whole-body-power`, which
+is one of eight pool opponents, in 20 s episodes where the two seldom
+settle into it.
+
 **Left open: the standoff.** Against an opponent like itself, waiting
 pays. The rhythm terms make a punch taken cost more than one landed, and
 nothing rewards staying active. In nine of the 16 mirror pairings with the
