@@ -101,8 +101,9 @@ class NativeBout:
         when a tactics learner's clean punch lands within ``combo_window``
         seconds of a clean punch of another kind (``combo``). ``idle``: reward
         lost per second the learner, within ``idle_range`` metres of the
-        opponent, has launched no punch for ``idle_seconds`` (``idle``): the
-        referee's warning for passivity."""
+        opponent, has reached it with no punch (clean, blocked, clashed or a
+        near miss) for ``idle_seconds`` (``idle``): the referee's warning for
+        passivity. Punches thrown at the air from out of range do not count."""
         from boxer.spar_match import PunchArm
         self.pair, self.motor, self.rng = pair, motor, rng
         self.arm_skill, self.leg_contact_penalty = arm_skill, leg_contact_penalty
@@ -173,10 +174,11 @@ class NativeBout:
         self.pending_defense = []
         self.last_attack = 0.
 
-    def idle(self, launched, distance, now):
+    def idle(self, attacked, distance, now):
         """1 while the learner stands within ``idle_range`` of the opponent and
-        has launched no punch for more than ``idle_seconds``, else 0."""
-        if launched:
+        no punch of its has reached the opponent for more than ``idle_seconds``,
+        else 0."""
+        if attacked:
             self.last_attack = now
         return float(distance < self.idle_range and now - self.last_attack > self.idle_seconds)
 
@@ -300,13 +302,15 @@ class NativeBout:
         defense = self.held_defense(REWARD["blocked"] * outcome.get("blocked", (0., 0.))[1 - i]
                                     + REWARD["evaded"] * outcome.get("evaded", (0., 0.))[1 - i],
                                     (self.t + 1) * pair.dt, bool(fallen[i]))
+        attacked = bool(scored[i] + sum(outcome.get(key, (0., 0.))[i]
+                                        for key in ("blocked", "clashed", "missed")))
         guard = guard_closeness(self.arms[i]) if self.guard_reward and hasattr(self.arms[i], "arm_pose") else 0.
         reward = (REWARD["hit"] * rewarded - REWARD["taken"] * scored[1 - i]
                   - self.learner_fall_penalty() * fallen[i] + REWARD["opponent_fell"] * (fallen[1 - i] and not fallen[i])
                   + pair.dt * REWARD["in_range"] * np.exp(-((distance - REACH) / .15) ** 2)
                   + pair.dt * self.guard_reward * guard
                   + defense + self.variety_reward * varied + self.combo_reward * combo
-                  - pair.dt * self.idle_penalty * (self.idle(launched, distance, (self.t + 1) * pair.dt)
+                  - pair.dt * self.idle_penalty * (self.idle(attacked, distance, (self.t + 1) * pair.dt)
                                                    if self.idle_penalty else 0.)
                   - REWARD["punch"] * launched - pair.dt * self.leg_contact_penalty * legs
                   - self.arm_motion_cost * motion - pair.dt * self.tilt_cost * tilt)
@@ -563,8 +567,8 @@ def main(argv=None):
     parser.add_argument("--combo-reward", type=float, default=0.,
                         help="tactics: reward for a clean punch landing within 2 s of a clean punch of another kind")
     parser.add_argument("--idle-penalty", type=float, default=0.,
-                        help="reward lost per second the learner stays within 1.2 m without launching a punch "
-                             "for 2 s (NativeBout.idle)")
+                        help="reward lost per second the learner stays within 1.2 m without reaching the "
+                             "opponent with a punch for 2 s (NativeBout.idle)")
     parser.add_argument("--variety-reward", type=float, default=0.,
                         help="tactics: reward for a punch of another kind than the last one")
     parser.add_argument("--entropy-cost", type=float, default=1e-3)

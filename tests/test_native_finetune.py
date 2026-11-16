@@ -218,7 +218,7 @@ def test_idle_penalty_warns_a_learner_that_waits_in_range():
     assert bout.idle(False, .8, 1.) == 0.        # the bout's first 2 s are free
     assert bout.idle(False, .8, 2.5) == 1.       # in range, nothing thrown for 2.5 s
     assert bout.idle(False, 1.5, 2.5) == 0.      # out of range: no warning
-    assert bout.idle(True, .8, 3.) == 0.         # a punch resets it
+    assert bout.idle(True, .8, 3.) == 0.         # a punch that reaches the opponent resets it
     assert bout.idle(False, .8, 4.9) == 0.
     assert bout.idle(False, .8, 5.1) == 1.
     bout.reset()
